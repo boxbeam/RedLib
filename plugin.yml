@@ -1,0 +1,3 @@
+name: CmdMgr2
+main: redempt.cmdmgr2.CmdMgr
+version: 2.0
