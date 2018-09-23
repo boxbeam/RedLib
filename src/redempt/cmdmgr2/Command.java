@@ -29,7 +29,7 @@ import org.bukkit.entity.Player;
 public class Command {
 	
 	private static List<CommandArgumentType<?>> types = new ArrayList<>();
-	private List<Command> children = new ArrayList<>();
+	protected List<Command> children = new ArrayList<>();
 	
 	static {
 		types.add(new CommandArgumentType<Integer>("int", Integer::parseInt));
@@ -43,7 +43,7 @@ public class Command {
 	private String[] names;
 	private String permission;
 	private SenderType type;
-	private String hook;
+	protected String hook;
 	private Method methodHook;
 	private String help;
 	private Object listener;
@@ -78,7 +78,7 @@ public class Command {
 	}
 	
 	private String getHelpRecursive() {
-		String help = ChatColor.translateAlternateColorCodes('&', CmdMgr.helpEntry).replace("%cmdname%", getFullName()).replace("%help%", this.help) + "\n";
+		String help = this.help == null ? "" : ChatColor.translateAlternateColorCodes('&', CmdMgr.helpEntry).replace("%cmdname%", getFullName()).replace("%help%", this.help) + "\n";
 		if (hideSub) {
 			return help;
 		}
@@ -89,11 +89,22 @@ public class Command {
 	}
 	
 	/**
-	 * @return The full name of the command, including arguments
+	 * @return The expanded name of the command, plus arguments
 	 */
 	public String getFullName() {
-		String name = this.names[0] + " ";
+		String name = getExpandedName() + " ";
 		name += String.join(" ", Arrays.stream(args).map(CommandArgument::toString).collect(Collectors.toList()));
+		return name;
+	}
+	
+	/**
+	 * @return The name of the command concatenated with its parents' names
+	 */
+	public String getExpandedName() {
+		String name = names[0];
+		if (parent != null) {
+			name = parent.getExpandedName() + " " + name;
+		}
 		return name;
 	}
 	
@@ -177,7 +188,7 @@ public class Command {
 			field = Bukkit.getServer().getClass().getDeclaredField("commandMap");
 			field.setAccessible(true);
 			SimpleCommandMap map = (SimpleCommandMap) field.get(Bukkit.getServer());
-			org.bukkit.command.Command cmd = new org.bukkit.command.Command(names[0], help, "", Arrays.stream(names).filter(s -> !s.equals(names[0])).collect(Collectors.toList())) {
+			org.bukkit.command.Command cmd = new org.bukkit.command.Command(names[0], help == null ? "None" : help, "", Arrays.stream(names).filter(s -> !s.equals(names[0])).collect(Collectors.toList())) {
 
 				@Override
 				public boolean execute(CommandSender sender, String name, String[] args) {
