@@ -32,11 +32,11 @@ public class Command {
 	protected List<Command> children = new ArrayList<>();
 	
 	static {
-		types.add(new CommandArgumentType<Integer>("int", Integer::parseInt));
-		types.add(new CommandArgumentType<Double>("double", Double::parseDouble));
-		types.add(new CommandArgumentType<Float>("float", Float::parseFloat));
-		types.add(new CommandArgumentType<Long>("long", Long::parseLong));
-		types.add(new CommandArgumentType<String>("string", s -> s));
+		types.add(new CommandArgumentType<Integer>("int", (Function<String, Integer>) Integer::parseInt));
+		types.add(new CommandArgumentType<Double>("double", (Function<String, Double>) Double::parseDouble));
+		types.add(new CommandArgumentType<Float>("float", (Function<String, Float>) Float::parseFloat));
+		types.add(new CommandArgumentType<Long>("long", (Function<String, Long>) Long::parseLong));
+		types.add(new CommandArgumentType<String>("string", (Function<String, String>) s -> s));
 	}
 	
 	private CommandArgument[] args;
@@ -74,16 +74,19 @@ public class Command {
 	public void showHelp(CommandSender sender) {
 		String title = ChatColor.translateAlternateColorCodes('&', CmdMgr.helpTitle).replace("%cmdname%", names[0]);
 		sender.sendMessage(title);
-		sender.sendMessage(getHelpRecursive().trim());
+		sender.sendMessage(getHelpRecursive(sender).trim());
 	}
 	
-	private String getHelpRecursive() {
+	private String getHelpRecursive(CommandSender sender) {
+		if (!sender.hasPermission(permission)) {
+			return "";
+		}
 		String help = this.help == null ? "" : ChatColor.translateAlternateColorCodes('&', CmdMgr.helpEntry).replace("%cmdname%", getFullName()).replace("%help%", this.help) + "\n";
 		if (hideSub) {
 			return help;
 		}
 		for (Command command : children) {
-			help += command.getHelpRecursive();
+			help += command.getHelpRecursive(sender);
 		}
 		return help;
 	}
@@ -583,20 +586,18 @@ public class Command {
 		private Function<CommandSender, List<String>> tab = null;
 		
 		/**
+		 * Had to make this into a single constructor that takes an Object for Maven reasons
 		 * @param name The name of this command argument type, to be used in the command file
-		 * @param convert The function to convert from a String to whatever type this converts to
+		 * @param convert The Function<String, T> or BiFunction<CommandSender, String, T> to convert from a String to whatever type this converts to
 		 */
-		public CommandArgumentType(String name, Function<String, T> convert) {
-			this.func = convert;
-			this.name = name;
-		}
-		
-		/**
-		 * @param name The name of this command argument type, to be used in the command file
-		 * @param convert The function to convert from a String to whatever type this converts to
-		 */
-		public CommandArgumentType(String name, BiFunction<CommandSender, String, T> convert) {
-			this.bifunc = convert;
+		public CommandArgumentType(String name, Object convert) {
+			if (convert instanceof Function<?, ?>) {
+				func = (Function<String, T>) convert;
+			} else if (convert instanceof BiFunction<?, ?, ?>) {
+				bifunc = (BiFunction<CommandSender, String, T>) convert;
+			} else {
+				throw new IllegalArgumentException("'convert' must be an instance of BiFunction<CommandSender, String, T> or Function<String, T>!");
+			}
 			this.name = name;
 		}
 		

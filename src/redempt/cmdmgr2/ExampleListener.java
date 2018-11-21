@@ -1,5 +1,7 @@
 package redempt.cmdmgr2;
 
+import java.util.function.Function;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -23,7 +25,7 @@ public class ExampleListener {
 		//The argument will be run through this to cast it to another type to be passed to the hook method
 		//If the CommandSender is required for context, you can pass a BiFunction<CommandSender, String, T>
 		//If your Function returns null, the player will be shown the command help
-		CommandArgumentType<Player> playerType = new CommandArgumentType<Player>("player", Bukkit::getPlayer);
+		CommandArgumentType<Player> playerType = new CommandArgumentType<Player>("player", (Function<String, Player>) Bukkit::getPlayer);
 		
 		//Tab completer for the player argument type
 		//This returns a stream of all online Players for possible tab completions
