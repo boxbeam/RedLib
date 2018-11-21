@@ -255,6 +255,9 @@ public class Command {
 				}
 			}
 		}
+		for (Command child : children) {
+			child.registerHook(listener);
+		}
 	}
 	
 	private List<String> tab(CommandSender sender, String[] args) {
