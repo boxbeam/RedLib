@@ -49,10 +49,11 @@ test {
 	}
 	
 	//This command's name is broadcast
-	//It has no arguments, but the ! at the beginning of its name indicates it consumes all arguments
+	//Putting ... at the end of an argument will make it consume all arguments following it
+	//Must be the last argument
 	//All arguments will be passed to the hook method as a single String
 	//Aliases are separated by commas
-	!broadcast,bc {
+	broadcast,bc string:message*... {
 		hook broadcast
 		help Broadcasts a message
 		permission message.broadcast

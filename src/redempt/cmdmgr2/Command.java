@@ -47,12 +47,11 @@ public class Command {
 	private Method methodHook;
 	private String help;
 	private Object listener;
-	private boolean consume;
 	private boolean topLevel = false;
 	private Command parent = null;
 	private boolean hideSub = false;
 	
-	private Command(String[] names, CommandArgument[] args, String help, String permission, SenderType type, String hook, List<Command> children, boolean consume, boolean hideSub) {
+	private Command(String[] names, CommandArgument[] args, String help, String permission, SenderType type, String hook, List<Command> children, boolean hideSub) {
 		this.names = names;
 		this.args = args;
 		this.permission = permission;
@@ -60,7 +59,6 @@ public class Command {
 		this.hook = hook;
 		this.help = help;
 		this.children = children;
-		this.consume = consume;
 		this.hideSub = hideSub;
 		for (Command command : children) {
 			command.parent = this;
@@ -78,7 +76,7 @@ public class Command {
 	}
 	
 	private String getHelpRecursive(CommandSender sender) {
-		if (!sender.hasPermission(permission)) {
+		if (permission != null && !sender.hasPermission(permission)) {
 			return "";
 		}
 		String help = this.help == null ? "" : ChatColor.translateAlternateColorCodes('&', CmdMgr.helpEntry).replace("%cmdname%", getFullName()).replace("%help%", this.help) + "\n";
@@ -157,7 +155,7 @@ public class Command {
 				return null;
 			}
 		}
-		if (cmdArgs.size() != args.length) {
+		if (cmdArgs.size() != args.length && !c[c.length - 1].consumes()) {
 			return null;
 		}
 		Object[] output = new Object[c.length + 1];
@@ -166,6 +164,18 @@ public class Command {
 			if (!cmdArgs.contains(c[i - 1])) {
 				output[i] = null;
 				continue;
+			}
+			if (c[i - 1].consumes()) {
+				if (i < c.length) {
+					throw new IllegalArgumentException("Consuming argument must be the last argument!");
+				}
+				String combine = "";
+				for (int x = i - 1; x < args.length; x++) {
+					combine += args[x] + " ";
+				}
+				combine = combine.substring(0, combine.length() - 1);
+				output[i] = c[i - 1].getType().convert(sender, combine);
+				return output;
 			}
 			try {
 				output[i] = c[i - 1].getType().convert(sender, args[i - 1]);
@@ -305,18 +315,6 @@ public class Command {
 					}
 					break;
 			}
-			if (consume) {
-				try {
-					Object[] stuff = new Object[2];
-					stuff[0] = sender;
-					stuff[1] = String.join(" ", args);
-					methodHook.invoke(listener, stuff);
-					return true;
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					showHelp(sender);
-					return true;
-				}
-			}
 			Object[] objArgs = processArgs(parseArgs(String.join(" ", args)), this.args, sender);
 			if (objArgs != null) {
 				try {
@@ -391,17 +389,12 @@ public class Command {
 		String permission = null;
 		String hook = null;
 		SenderType type = SenderType.EVERYONE;
-		boolean consume = false;
 		List<Command> commands = new ArrayList<>();
 		List<Command> children = new ArrayList<>();
 		boolean hideSub = false;
 		for (int pos = lineNumber; pos < lines.size(); pos++) {
 			String line = lines.get(pos).trim();
 			if (line.endsWith("{")) {
-				if (line.startsWith("!") && depth == 0) {
-					consume = true;
-					line = line.substring(1);
-				}
 				depth++;
 				if (depth == 1) {
 					line = line.replaceAll("\\{$", "").trim();
@@ -419,6 +412,11 @@ public class Command {
 						String name = argSplit[1];
 						boolean hideType = false;
 						boolean optional = false;
+						boolean consumes = false;
+						if (name.endsWith("...")) {
+							consumes = true;
+							name = name.substring(0, name.length() - 3);
+						}
 						if (name.endsWith("*?") || name.endsWith("?*")) {
 							hideType = true;
 							optional = true;
@@ -432,7 +430,7 @@ public class Command {
 							optional = true;
 							name = name.substring(0, name.length() - 1);
 						}
-						args.add(new CommandArgument(argType, name, optional, hideType));
+						args.add(new CommandArgument(argType, name, optional, hideType, consumes));
 					}
 				} else {
 					children.addAll(fromLines(lines, pos, types).getCommands());
@@ -474,7 +472,7 @@ public class Command {
 			if (line.equals("}")) {
 				depth--;
 				if (depth == 0) {
-					commands.add(new Command(names, args.toArray(new CommandArgument[args.size()]), help, permission, type, hook, children, consume, hideSub));
+					commands.add(new Command(names, args.toArray(new CommandArgument[args.size()]), help, permission, type, hook, children, hideSub));
 					children = new ArrayList<>();
 					names = null;
 					args = new ArrayList<>();
@@ -482,7 +480,6 @@ public class Command {
 					permission = null;
 					type = null;
 					hook = null;
-					consume = false;
 					hideSub = false;
 					if (lineNumber != 0) {
 						return new CommandCollection(commands);
@@ -544,12 +541,14 @@ public class Command {
 		private String name;
 		private boolean optional;
 		private boolean hideType;
+		private boolean consume;
 		
-		public CommandArgument(CommandArgumentType<?> type, String name, boolean optional, boolean hideType) {
+		public CommandArgument(CommandArgumentType<?> type, String name, boolean optional, boolean hideType, boolean consume) {
 			this.name = name;
 			this.type = type;
 			this.optional = optional;
 			this.hideType = hideType;
+			this.consume = consume;
 		}
 		
 		public CommandArgumentType<?> getType() {
@@ -558,6 +557,10 @@ public class Command {
 		
 		public boolean isOptional() {
 			return optional;
+		}
+		
+		public boolean consumes() {
+			return consume;
 		}
 		
 		@Override
