@@ -72,19 +72,22 @@ public class Command {
 	public void showHelp(CommandSender sender) {
 		String title = ChatColor.translateAlternateColorCodes('&', CmdMgr.helpTitle).replace("%cmdname%", names[0]);
 		sender.sendMessage(title);
-		sender.sendMessage(getHelpRecursive(sender).trim());
+		sender.sendMessage(getHelpRecursive(sender, 0).trim());
 	}
 	
-	private String getHelpRecursive(CommandSender sender) {
+	private String getHelpRecursive(CommandSender sender, int level) {
 		if (permission != null && !sender.hasPermission(permission)) {
 			return "";
 		}
 		String help = this.help == null ? "" : ChatColor.translateAlternateColorCodes('&', CmdMgr.helpEntry).replace("%cmdname%", getFullName()).replace("%help%", this.help) + "\n";
-		if (hideSub) {
+		if (hideSub && level != 0) {
+			if (help.equals("")) {
+				return ChatColor.translateAlternateColorCodes('&', CmdMgr.helpEntry).replace("%cmdname%", getFullName()).replace("%help%", "[Hidden subcommands]") + "\n";
+			}
 			return help;
 		}
 		for (Command command : children) {
-			help += command.getHelpRecursive(sender);
+			help += command.getHelpRecursive(sender, level + 1);
 		}
 		return help;
 	}
@@ -155,7 +158,7 @@ public class Command {
 				return null;
 			}
 		}
-		if (cmdArgs.size() != args.length && !c[c.length - 1].consumes()) {
+		if (cmdArgs.size() != args.length && c.length > 0 && !c[c.length - 1].consumes()) {
 			return null;
 		}
 		Object[] output = new Object[c.length + 1];
@@ -432,7 +435,7 @@ public class Command {
 						}
 						args.add(new CommandArgument(argType, name, optional, hideType, consumes));
 					}
-				} else {
+				} else if (depth == 2) {
 					children.addAll(fromLines(lines, pos, types).getCommands());
 				}
 			}
