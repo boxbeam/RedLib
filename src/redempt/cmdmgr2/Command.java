@@ -158,7 +158,7 @@ public class Command {
 				return null;
 			}
 		}
-		if (cmdArgs.size() != args.length && c.length > 0 && !c[c.length - 1].consumes()) {
+		if (cmdArgs.size() != args.length && (c.length == 0 || !c[c.length - 1].consumes())) {
 			return null;
 		}
 		Object[] output = new Object[c.length + 1];
