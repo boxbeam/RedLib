@@ -284,10 +284,14 @@ public class Command {
 			}
 		}
 		if (args.length - 1 < this.args.length && args.length > 0) {
+			String partial = args[args.length - 1].replaceAll("(^\")|(\"$)", "");
 			CommandArgument arg = this.args[args.length - 1];
 			List<String> argCompletions = arg.getType().tabComplete(sender);
 			for (String completion : argCompletions) {
-				if (completion.toLowerCase().startsWith(args[args.length - 1].toLowerCase()) && !args[args.length - 1].equals(completion)) {
+				if (completion.toLowerCase().startsWith(partial.toLowerCase()) && !partial.equals(completion)) {
+					if (completion.contains(" ")) {
+						completion = '"' + completion + '"'; 
+					}
 					completions.add(completion);
 				}
 			}
