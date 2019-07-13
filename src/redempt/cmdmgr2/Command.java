@@ -21,21 +21,22 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 
 /**
  * Represents a command which can be registered
  * @author Redempt
  */
-public class Command {
+public class Command implements Listener {
 	
 	private static List<CommandArgumentType<?>> types = new ArrayList<>();
 	protected List<Command> children = new ArrayList<>();
 	
 	static {
-		types.add(new CommandArgumentType<Integer>("int", Integer::parseInt));
+		types.add(new CommandArgumentType<Integer>("int", (Function<String, Integer>) Integer::parseInt));
 		types.add(new CommandArgumentType<Double>("double", Double::parseDouble));
 		types.add(new CommandArgumentType<Float>("float", Float::parseFloat));
-		types.add(new CommandArgumentType<Long>("long", Long::parseLong));
+		types.add(new CommandArgumentType<Long>("long", (Function<String, Long>) Long::parseLong));
 		types.add(new CommandArgumentType<String>("string", s -> s));
 	}
 	
@@ -290,7 +291,7 @@ public class Command {
 			for (String completion : argCompletions) {
 				if (completion.toLowerCase().startsWith(partial.toLowerCase()) && !partial.equals(completion)) {
 					if (completion.contains(" ")) {
-						completion = '"' + completion + '"'; 
+						completion = '"' + completion + '"';
 					}
 					completions.add(completion);
 				}
