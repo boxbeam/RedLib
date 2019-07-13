@@ -3,8 +3,13 @@ package redempt.cmdmgr2.itemutils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -97,6 +102,56 @@ public class ItemUtils {
 			meta.removeEnchant(enchant);
 		}
 		ItemStack clone = item.clone();
+		clone.setItemMeta(meta);
+		return clone;
+	}
+	
+	/**
+	 * Add an attribute to the item
+	 * @param item The item to have an attribute added
+	 * @param attribute The Attribute to be added
+	 * @param modifier The AttributeModifier to be added
+	 * @return The modified ItemStack
+	 */
+	public static ItemStack addAttribute(ItemStack item, Attribute attribute, AttributeModifier modifier) {
+		var meta = item.getItemMeta();
+		meta.addAttributeModifier(attribute, modifier);
+		var clone = item.clone();
+		clone.setItemMeta(meta);
+		return clone;
+	}
+	
+	/**
+	 * Add an attribute to the item
+	 * @param item The item to have an attribute added
+	 * @param attribute The Attribute to be added
+	 * @param amount The amount to modify it by
+	 * @param operation The operation by which the value will be modified
+	 * @return The modified item
+	 */
+	public static ItemStack addAttribute(ItemStack item, Attribute attribute, double amount, Operation operation) {
+		var meta = item.getItemMeta();
+		var modifier = new AttributeModifier(attribute.toString(), amount, operation);
+		meta.addAttributeModifier(attribute, modifier);
+		var clone = item.clone();
+		clone.setItemMeta(meta);
+		return clone;
+	}
+	
+	/**
+	 * Add an attribute to the item
+	 * @param item The item to have an attribute added
+	 * @param attribute The Attribute to be added
+	 * @param amount The amount to modify it by
+	 * @param operation The operation by which the value will be modified
+	 * @param slot The slot this attribute will be effective in
+	 * @return The modified item
+	 */
+	public static ItemStack addAttribute(ItemStack item, Attribute attribute, double amount, Operation operation, EquipmentSlot slot) {
+		var meta = item.getItemMeta();
+		var modifier = new AttributeModifier(UUID.randomUUID(), attribute.toString(), amount, operation, slot);
+		meta.addAttributeModifier(attribute, modifier);
+		var clone = item.clone();
 		clone.setItemMeta(meta);
 		return clone;
 	}

@@ -1,7 +1,11 @@
 package redempt.cmdmgr2.itemutils;
 
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 public class ItemBuilder extends ItemStack {
@@ -73,9 +77,43 @@ public class ItemBuilder extends ItemStack {
 	 * @param durability The durability to set
 	 * @return The ItemBuilder with its durability changed
 	 */
+	@SuppressWarnings("deprecation")
 	public ItemBuilder setDurability(int durability) {
 		this.setDurability((short) durability);
 		return new ItemBuilder(this);
+	}
+	
+	/**
+	 * Adds an attribute to this ItemBuilder
+	 * @param attribute The Attribute to be added
+	 * @param modifier The AttributeModifier to be added
+	 * @return The ItemBuilder with the attribute added
+	 */
+	public ItemBuilder addAttribute(Attribute attribute, AttributeModifier modifier) {
+		return new ItemBuilder(ItemUtils.addAttribute(this, attribute, modifier));
+	}
+	
+	/**
+	 * Adds an attribute to this ItemBuilder
+	 * @param attribute The attribute to be added
+	 * @param amount The amount of the modifier
+	 * @param operation The operation of the modifier 
+	 * @return The ItemBuilder with the attribute added
+	 */
+	public ItemBuilder addAttribute(Attribute attribute, double amount, Operation operation) {
+		return new ItemBuilder(ItemUtils.addAttribute(this, attribute, amount, operation));
+	}
+	
+	/**
+	 * Adds an attribute to this ItemBuilder
+	 * @param attribute The attribute to be added
+	 * @param amount The amount of the modifier
+	 * @param operation The operation of the modifier 
+	 * @param slot The slot the modifier affects
+	 * @return The ItemBuilder with the attribute added
+	 */
+	public ItemBuilder addAttribute(Attribute attribute, double amount, Operation operation, EquipmentSlot slot) {
+		return new ItemBuilder(ItemUtils.addAttribute(this, attribute, amount, operation, slot));
 	}
 	
 }
