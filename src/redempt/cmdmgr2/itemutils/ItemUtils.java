@@ -114,9 +114,9 @@ public class ItemUtils {
 	 * @return The modified ItemStack
 	 */
 	public static ItemStack addAttribute(ItemStack item, Attribute attribute, AttributeModifier modifier) {
-		var meta = item.getItemMeta();
+		ItemMeta meta = item.getItemMeta();
 		meta.addAttributeModifier(attribute, modifier);
-		var clone = item.clone();
+		ItemStack clone = item.clone();
 		clone.setItemMeta(meta);
 		return clone;
 	}
@@ -130,10 +130,10 @@ public class ItemUtils {
 	 * @return The modified item
 	 */
 	public static ItemStack addAttribute(ItemStack item, Attribute attribute, double amount, Operation operation) {
-		var meta = item.getItemMeta();
-		var modifier = new AttributeModifier(attribute.toString(), amount, operation);
+		ItemMeta meta = item.getItemMeta();
+		AttributeModifier modifier = new AttributeModifier(attribute.toString(), amount, operation);
 		meta.addAttributeModifier(attribute, modifier);
-		var clone = item.clone();
+		ItemStack clone = item.clone();
 		clone.setItemMeta(meta);
 		return clone;
 	}
@@ -148,10 +148,10 @@ public class ItemUtils {
 	 * @return The modified item
 	 */
 	public static ItemStack addAttribute(ItemStack item, Attribute attribute, double amount, Operation operation, EquipmentSlot slot) {
-		var meta = item.getItemMeta();
-		var modifier = new AttributeModifier(UUID.randomUUID(), attribute.toString(), amount, operation, slot);
+		ItemMeta meta = item.getItemMeta();
+		AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), attribute.toString(), amount, operation, slot);
 		meta.addAttributeModifier(attribute, modifier);
-		var clone = item.clone();
+		ItemStack clone = item.clone();
 		clone.setItemMeta(meta);
 		return clone;
 	}
