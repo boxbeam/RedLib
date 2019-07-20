@@ -1,4 +1,4 @@
-package redempt.redlib;
+package redempt.redlib.commandmanager;
 
 import java.util.List;
 

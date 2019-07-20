@@ -1,4 +1,4 @@
-package redempt.cmdmgr2.inventorygui;
+package redempt.redlib.inventorygui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
-import redempt.cmdmgr2.CmdMgr;
+import redempt.redlib.RedLib;
 
 /**
  * @author Redempt
@@ -27,7 +27,7 @@ public class InventoryGUI implements Listener {
 	 */
 	public InventoryGUI(Inventory inventory) {
 		this.inventory = inventory;
-		Bukkit.getPluginManager().registerEvents(this, CmdMgr.plugin);
+		Bukkit.getPluginManager().registerEvents(this, RedLib.plugin);
 	}
 	
 	/**

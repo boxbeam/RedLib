@@ -1,4 +1,5 @@
 //See ExampleListener.java to see how this is registered in Java
+//For real plugins, this file should be in the root directory of the jar
 
 //Command format is like this
 //This is the base command

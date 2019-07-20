@@ -1,4 +1,4 @@
-package redempt.cmdmgr2.itemutils;
+package redempt.redlib.itemutils;
 
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;

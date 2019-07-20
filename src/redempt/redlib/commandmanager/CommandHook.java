@@ -1,4 +1,4 @@
-package redempt.redlib;
+package redempt.redlib.commandmanager;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,4 +1,4 @@
-package redempt.cmdmgr2.inventorygui;
+package redempt.redlib.inventorygui;
 
 import java.util.function.Consumer;
 

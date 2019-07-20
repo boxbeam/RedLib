@@ -1,4 +1,4 @@
-package redempt.redlib;
+package redempt.redlib.commandmanager;
 
 import java.io.BufferedReader;
 import java.io.EOFException;
@@ -22,6 +22,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+
+import redempt.redlib.RedLib;
 
 /**
  * Represents a command which can be registered
