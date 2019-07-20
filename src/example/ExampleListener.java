@@ -1,4 +1,4 @@
-package redempt.redlib.example;
+package example;
 
 import java.util.function.Function;
 
@@ -8,8 +8,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import redempt.redlib.Command.CommandArgumentType;
 import redempt.redlib.commandmanager.Command;
+import redempt.redlib.commandmanager.Command.CommandArgumentType;
 import redempt.redlib.commandmanager.CommandCollection;
 import redempt.redlib.commandmanager.CommandHook;
 
