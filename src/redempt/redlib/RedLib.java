@@ -18,9 +18,11 @@ public class RedLib extends JavaPlugin implements Listener {
 		FileConfiguration config = this.getConfig();
 		if (config.getString("helpTitle") == null) {
 			config.set("helpTitle", "&a--[ &eHelp for %cmdname% &a]--");
+			this.saveConfig();
 		}
 		if (config.getString("helpEntry") == null) {
 			config.set("helpEntry", "&e%cmdname%&a: %help%");
+			this.saveConfig();
 		}
 		helpTitle = config.getString("helpTitle");
 		helpEntry = config.getString("helpEntry");

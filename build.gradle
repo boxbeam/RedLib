@@ -1,0 +1,33 @@
+plugins {
+	id 'java'
+}
+targetCompatibility = 1.8
+sourceCompatibility = 1.8
+repositories {
+	mavenCentral()
+	maven {
+		url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+		name = 'spigot'
+		content {
+			includeGroup 'org.bukkit'
+			includeGroup 'org.spigotmc'
+		}
+	}
+	maven {
+		url = 'https://oss.sonatype.org/content/repositories/snapshots'
+	}
+	mavenLocal()
+}
+dependencies {
+	compileOnly 'org.spigotmc:spigot:1.14.4-R0.1-SNAPSHOT'
+}
+sourceSets {
+	main {
+		java {
+			srcDir 'src'
+		}
+		resources {
+			srcDir 'res'
+		}
+	}
+}
