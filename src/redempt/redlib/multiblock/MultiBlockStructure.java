@@ -76,6 +76,8 @@ public class MultiBlockStructure {
 		dimY = Integer.parseInt(dimSplit[1]);
 		dimZ = Integer.parseInt(dimSplit[2]);
 		
+		data = new String[dimX][dimY][dimZ];
+		
 		int pos = 1;
 		for (int x = 0; x < dimX; x++) {
 			for (int y = 0; y < dimY; y++) {
