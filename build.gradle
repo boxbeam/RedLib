@@ -36,7 +36,10 @@ task updateJars(type: Copy) {
 	into serverDir
 }
 task reloadServer {
-	file(serverDir + "/reload").text = rootProject.name
+	def folder = file(serverDir + "/reload")
+	if (folder.exists()) {
+		file(serverDir + "/reload").text = rootProject.name	
+	}
 }
 task deploy(dependsOn: ["jar", "updateJars", "reloadServer"]) {
 	updateJars.mustRunAfter jar
