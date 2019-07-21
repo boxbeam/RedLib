@@ -31,3 +31,10 @@ sourceSets {
 		}
 	}
 }
+task updateJars(type: Copy) {
+	from 'build/libs'
+	into serverDir
+}
+task deploy(dependsOn: ['jar', 'updateJars']) {
+	updateJars.mustRunAfter jar
+}
