@@ -1,5 +1,7 @@
 package redempt.redlib.multiblock;
 
+import java.util.Objects;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -60,16 +62,20 @@ public class MultiBlockStructure {
 	 * @param info The info string. Get this from {@link MultiBlockStructure#stringify(Location, Location)}
 	 * @return
 	 */
-	public static MultiBlockStructure create(String info) {
-		return new MultiBlockStructure(info);
+	public static MultiBlockStructure create(String info, String name) {
+		return new MultiBlockStructure(info, name);
 	}
 	
 	private String[][][] data;
+	private String dataString;
+	private String name;
 	private int dimX;
 	private int dimY;
 	private int dimZ;
 	
-	private MultiBlockStructure(String info) {
+	private MultiBlockStructure(String info, String name) {
+		this.dataString = info;
+		this.name = name;
 		String[] split = info.split(";");
 		String[] dimSplit = split[0].split("x");
 		dimX = Integer.parseInt(dimSplit[0]);
@@ -89,6 +95,10 @@ public class MultiBlockStructure {
 		}
 	}
 	
+	/**
+	 * Builds this multi-block structure at the given location
+	 * @param loc The location to build the structure at
+	 */
 	public void build(Location loc) {
 		for (int x = 0; x < dimX; x++) {
 			for (int y = 0; y < dimY; y++) {
@@ -98,6 +108,35 @@ public class MultiBlockStructure {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Gets this multi-block structure's name. May be faster to compare this than to use .equals().
+	 * @return The name of this multi-block structure
+	 */
+	public String getName() {
+		return name;
+	}
+	
+	
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof MultiBlockStructure) {
+			MultiBlockStructure structure = (MultiBlockStructure) o;
+			return structure.dataString.equals(dataString);
+		}
+		return super.equals(o);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(dataString, name);
+	}
+	
+	@Override
+	public String toString() {
+		return dataString;
 	}
 	
 	private void setBlock(Location loc, String data) {
@@ -119,6 +158,16 @@ public class MultiBlockStructure {
 		SINGLE_AXIS_SYMMETRY,
 		DOUBLE_AXIS_SYMMETRY,
 		NO_SYMMETRY;
+		
+	}
+	
+	private static class Rotator {
+		
+		private static String[] rotations = {"-y,x", "-x,-y", "y,-x", "x,y"};
+		
+		public Rotator() {
+			
+		}
 		
 	}
 	

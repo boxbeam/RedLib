@@ -8,6 +8,11 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * A utility class to easily create items
+ * @author Redempt
+ *
+ */
 public class ItemBuilder extends ItemStack {
 	
 	/**

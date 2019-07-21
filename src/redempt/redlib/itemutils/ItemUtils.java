@@ -13,6 +13,11 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+/**
+ * A utility class to easily modify items
+ * @author Redempt
+ *
+ */
 public class ItemUtils {
 	
 	/**

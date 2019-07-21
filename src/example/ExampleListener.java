@@ -79,11 +79,9 @@ public class ExampleListener {
 	}
 	
 	@CommandHook("broadcast")
-	//This is a consuming command
-	//That means that all arguments are passed as a single String
-	//Spaces are included in this String
-	//Arguments may contain spaces if they are surrounded by ""
-	//Quotes can be escaped with \
+	//This command's last argument consumes
+	//That means that it will ignore spaces once it reaches that argument
+	//Since there is only one argument, that means all arguments will be passed as a single string here
 	public void broadcast(CommandSender sender, String message) {
 		Bukkit.broadcastMessage(ChatColor.GREEN + "Broadcast: " + message);
 	}
