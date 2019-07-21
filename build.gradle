@@ -37,7 +37,7 @@ task updateJars(type: Copy) {
 }
 task reloadServer {
 	def folder = file(serverDir + "/reload")
-	if (folder.exists()) {
+	if (file(serverDir).exists()) {
 		file(serverDir + "/reload").text = rootProject.name	
 	}
 }
