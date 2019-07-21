@@ -35,6 +35,10 @@ task updateJars(type: Copy) {
 	from 'build/libs'
 	into serverDir
 }
-task deploy(dependsOn: ['jar', 'updateJars']) {
+task reloadServer {
+	file(serverDir + "/reload").text = rootProject.name
+}
+task deploy(dependsOn: ["jar", "updateJars", "reloadServer"]) {
 	updateJars.mustRunAfter jar
+	reloadServer.mustRunAfter updateJars
 }
