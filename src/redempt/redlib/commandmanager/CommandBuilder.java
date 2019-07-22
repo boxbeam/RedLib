@@ -95,7 +95,6 @@ public class CommandBuilder {
 	private List<Command> buildChildren(String prefix) {
 		return children.stream().map(c -> {
 			Command cmd = new Command(c.names, c.args, c.help, c.permission, c.type, "_", c.buildChildren(prefix), c.hideSub);
-			System.out.println(c.names[0]);
 			cmd.register(prefix, c.listener);
 			return cmd;
 		}).collect(Collectors.toList());
