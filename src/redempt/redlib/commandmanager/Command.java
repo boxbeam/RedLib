@@ -54,7 +54,7 @@ public class Command implements Listener {
 	private Command parent = null;
 	private boolean hideSub = false;
 	
-	private Command(String[] names, CommandArgument[] args, String help, String permission, SenderType type, String hook, List<Command> children, boolean hideSub) {
+	protected Command(String[] names, CommandArgument[] args, String help, String permission, SenderType type, String hook, List<Command> children, boolean hideSub) {
 		this.names = names;
 		this.args = args;
 		this.permission = permission;
@@ -243,7 +243,7 @@ public class Command implements Listener {
 		}
 	}
 	
-	private void registerHook(Object listener) {
+	protected void registerHook(Object listener) {
 		this.listener = listener;
 		for (Method method : listener.getClass().getDeclaredMethods()) {
 			if (method.isAnnotationPresent(CommandHook.class)) {
@@ -548,7 +548,7 @@ public class Command implements Listener {
 		return permission;
 	}
 	
-	private static class CommandArgument {
+	protected static class CommandArgument {
 		
 		private CommandArgumentType<?> type;
 		private String name;
@@ -673,7 +673,7 @@ public class Command implements Listener {
 		
 	}
 	
-	private static enum SenderType {
+	public static enum SenderType {
 		
 		CONSOLE,
 		PLAYER,
