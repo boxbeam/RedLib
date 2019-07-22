@@ -51,7 +51,7 @@ public class Command implements Listener {
 	private String help;
 	private Object listener;
 	private boolean topLevel = false;
-	private Command parent = null;
+	protected Command parent = null;
 	private boolean hideSub = false;
 	
 	protected Command(String[] names, CommandArgument[] args, String help, String permission, SenderType type, String hook, List<Command> children, boolean hideSub) {

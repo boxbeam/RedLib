@@ -1,13 +1,13 @@
 package redempt.redlib.commandmanager;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.bukkit.command.CommandSender;
 
 import redempt.redlib.commandmanager.Command.CommandArgument;
+import redempt.redlib.commandmanager.Command.CommandArgumentType;
 import redempt.redlib.commandmanager.Command.SenderType;
 
 /**
@@ -21,8 +21,7 @@ public class CommandBuilder {
 	private String permission;
 	private CommandArgument[] args;
 	private String help;
-	private SenderType type;
-	private List<CommandBuilder> children = new ArrayList<>();
+	private SenderType type = SenderType.EVERYONE;
 	private boolean hideSub = false;
 	private Object listener;
 	
@@ -83,21 +82,26 @@ public class CommandBuilder {
 	}
 	
 	/**
-	 * Adds a child to this command
-	 * @param command The child command builder
+	 * Sets the hook for this command
+	 * @param hook The handler for when this command is run, takes the sender and all arguments after that as a single String
+	 * @param argName The name of the argument, to be shown in the help menu
 	 * @return The command builder
 	 */
-	public CommandBuilder addChild(CommandBuilder command) {
-		this.children.add(command);
+	public CommandBuilder hook(BiConsumer<CommandSender, String> hook, String argName) {
+		listener = new Object() {
+			
+			@CommandHook("_")
+			public void func(CommandSender sender, String arg) {
+				hook.accept(sender, arg);
+			}
+			
+		};
+		args = new CommandArgument[] {new CommandArgument(new CommandArgumentType<String>("string", s -> s),
+				argName,
+				false,
+				true,
+				true)};
 		return this;
-	}
-	
-	private List<Command> buildChildren(String prefix) {
-		return children.stream().map(c -> {
-			Command cmd = new Command(c.names, c.args, c.help, c.permission, c.type, "_", c.buildChildren(prefix), c.hideSub);
-			cmd.register(prefix, c.listener);
-			return cmd;
-		}).collect(Collectors.toList());
 	}
 	
 	/**
@@ -106,7 +110,7 @@ public class CommandBuilder {
 	 * @return The registered command
 	 */
 	public Command build(String prefix) {
-		Command command = new Command(names, args, help, permission, type, listener == null ? null : "_", buildChildren(prefix), hideSub);
+		Command command = new Command(names, args, help, permission, type, listener == null ? null : "_", new ArrayList<>(), hideSub);
 		command.register(prefix, listener == null ? new Object() : listener);
 		return command;
 	}
