@@ -98,16 +98,27 @@ public class MultiBlockStructure {
 	/**
 	 * Builds this multi-block structure at the given location
 	 * @param loc The location to build the structure at
+	 * @param rotation The number of 90-degree rotations to apply
 	 */
-	public void build(Location loc) {
+	public void build(Location loc, int rotation) {
+		Rotator rotator = new Rotator(rotation);
 		for (int x = 0; x < dimX; x++) {
 			for (int y = 0; y < dimY; y++) {
 				for (int z = 0; z < dimZ; z++) {
-					Location l = loc.clone().add(x, y, z);
+					rotator.setLocation(x, z);
+					Location l = loc.clone().add(rotator.getRotatedX(), y, rotator.getRotatedZ());
 					setBlock(l, data[x][y][z]);
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Builds this multi-block structure at the given location
+	 * @param loc The location to build the structure at
+	 */
+	public void build(Location loc) {
+		build(loc, 0);
 	}
 	
 	/**
@@ -163,10 +174,49 @@ public class MultiBlockStructure {
 	
 	private static class Rotator {
 		
-		private static String[] rotations = {"-y,x", "-x,-y", "y,-x", "x,y"};
+		private static String[] rotations = {"x,z", "-y,z", "-x,-z", "y,-z"};
 		
-		public Rotator() {
-			
+		private int rotation;
+		private int x;
+		private int z;
+		
+		public Rotator(int rotation) {
+			this.rotation = rotation % 4;
+		}
+		
+		public void setLocation(int x, int z) {
+			this.x = x;
+			this.z = z;
+		}
+		
+		public int getRotatedX() {
+			String rotationString = rotations[rotation];
+			String xString = rotationString.split(",")[0];
+			int val = 0;
+			switch (xString.charAt(xString.length())) {
+				case 'x':
+					val = x;
+					break;
+				case 'z':
+					val = z;
+					break;
+			}
+			return xString.startsWith("-") ? -val : val;
+		}
+		
+		public int getRotatedZ() {
+			String rotationString = rotations[rotation];
+			String xString = rotationString.split(",")[1];
+			int val = 0;
+			switch (xString.charAt(xString.length())) {
+				case 'x':
+					val = x;
+					break;
+				case 'z':
+					val = z;
+					break;
+			}
+			return xString.startsWith("-") ? -val : val;
 		}
 		
 	}
