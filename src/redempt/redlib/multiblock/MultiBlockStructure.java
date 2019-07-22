@@ -193,7 +193,7 @@ public class MultiBlockStructure {
 			String rotationString = rotations[rotation];
 			String xString = rotationString.split(",")[0];
 			int val = 0;
-			switch (xString.charAt(xString.length())) {
+			switch (xString.charAt(xString.length() - 1)) {
 				case 'x':
 					val = x;
 					break;
@@ -208,7 +208,7 @@ public class MultiBlockStructure {
 			String rotationString = rotations[rotation];
 			String xString = rotationString.split(",")[1];
 			int val = 0;
-			switch (xString.charAt(xString.length())) {
+			switch (xString.charAt(xString.length() - 1)) {
 				case 'x':
 					val = x;
 					break;
