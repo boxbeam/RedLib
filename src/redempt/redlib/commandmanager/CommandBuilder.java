@@ -105,7 +105,7 @@ public class CommandBuilder {
 	}
 	
 	/**
-	 * Builds and registers this command and its children. Only call this on the root command.
+	 * Builds and registers this command
 	 * @param prefix The command fallback prefix
 	 * @return The registered command
 	 */
