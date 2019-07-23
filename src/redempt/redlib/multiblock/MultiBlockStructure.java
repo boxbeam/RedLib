@@ -60,10 +60,13 @@ public class MultiBlockStructure {
 	/**
 	 * Creates a MultiBlockStructure instance from an info string
 	 * @param info The info string. Get this from {@link MultiBlockStructure#stringify(Location, Location)}
+	 * @param name The name of this multi-block structure
+	 * @param symmetry What kind of symmetry this multi-block structure has - 
+	 * used to determine whether the structure must be rotated when testing if it exists at a given location
 	 * @return
 	 */
-	public static MultiBlockStructure create(String info, String name) {
-		return new MultiBlockStructure(info, name);
+	public static MultiBlockStructure create(String info, String name, Symmetry symmetry) {
+		return new MultiBlockStructure(info, name, symmetry);
 	}
 	
 	private String[][][] data;
@@ -72,8 +75,9 @@ public class MultiBlockStructure {
 	private int dimX;
 	private int dimY;
 	private int dimZ;
+	private Symmetry symmetry;
 	
-	private MultiBlockStructure(String info, String name) {
+	private MultiBlockStructure(String info, String name, Symmetry symmetry) {
 		this.dataString = info;
 		this.name = name;
 		String[] split = info.split(";");
@@ -98,7 +102,7 @@ public class MultiBlockStructure {
 	/**
 	 * Builds this multi-block structure at the given location
 	 * @param loc The location to build the structure at
-	 * @param rotation The number of 90-degree rotations to apply
+	 * @param rotation The number of 90-degree clockwise rotations to apply
 	 */
 	public void build(Location loc, int rotation) {
 		Rotator rotator = new Rotator(rotation);
@@ -129,7 +133,56 @@ public class MultiBlockStructure {
 		return name;
 	}
 	
+	public boolean existsAt(Location loc) {
+		Block block = loc.getBlock();
+		for (int x = 0; x < dimX; x++) {
+			for (int y = 0; y < dimY; y++) {
+				for (int z = 0; z < dimZ; z++) {
+					if (compare(data[x][y][z], block) && test(loc, x, y, z, symmetry.getRotationsNeeded())) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 	
+	private boolean test(Location loc, int x, int y, int z, int[] rotations) {
+		for (int rot : rotations) {
+			if (test(loc, x, y, z, rot)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean test(Location loc, int xPos, int yPos, int zPos, int rotation) {
+//		Rotator rotator = new Rotator(0);
+		for (int x = 0; x < dimX; x++) {
+			for (int y = 0; y < dimY; y++) {
+				for (int z = 0; z < dimZ; z++) {
+					int xp = x - xPos;
+					int yp = y - yPos;
+					int zp = z - zPos;
+					Block block = loc.clone().add(xp, yp, zp).getBlock();
+					if (!compare(data[x][y][z], block)) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+	
+	private boolean compare(String data, Block block) {
+		int midVersion = Integer.parseInt(RedLib.getServerVersion().split("\\.")[1]);
+		if (midVersion >= 13) {
+			return block.getBlockData().getAsString().equals(data);
+		} else {
+			String[] split = data.split(":");
+			return block.getType() == Material.valueOf(split[0]) && block.getData() == Byte.parseByte(split[1]);
+		}
+	}
 	
 	@Override
 	public boolean equals(Object o) {
@@ -166,15 +219,25 @@ public class MultiBlockStructure {
 	
 	public static enum Symmetry {
 		
-		SINGLE_AXIS_SYMMETRY,
-		DOUBLE_AXIS_SYMMETRY,
-		NO_SYMMETRY;
+		SINGLE_AXIS_SYMMETRY(new int[] {0, 2}),
+		DOUBLE_AXIS_SYMMETRY(new int[] {0}),
+		NO_SYMMETRY(new int[] {0, 1, 2, 3});
+		
+		private int[] rotationsNeeded;
+		
+		private Symmetry(int[] rotationsNeeded) {
+			this.rotationsNeeded = rotationsNeeded;
+		}
+		
+		public int[] getRotationsNeeded() {
+			return rotationsNeeded.clone();
+		}
 		
 	}
 	
 	private static class Rotator {
 		
-		private static String[] rotations = {"x,z", "-y,z", "-x,-z", "y,-z"};
+		private static String[] rotations = {"x,z", "-z,x", "-x,-z", "z,-x"};
 		
 		private int rotation;
 		private int x;
