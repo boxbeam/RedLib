@@ -134,45 +134,74 @@ public class MultiBlockStructure {
 		return name;
 	}
 	
-	public boolean existsAt(Location loc) {
+	/**
+	 * Gets the dimensions of this multi-block structure. [x, y, z]
+	 * @return The dimensions of this multi-block structure
+	 */
+	public int[] getDimensions() {
+		return new int[] {dimX, dimY, dimZ};
+	}
+	
+	/**
+	 * Gets the Structure at the given block, if it exists.
+	 * The given location can be any part of the multi-block structure.
+	 * @param loc The location to check at
+	 * @return The structure at this block, or null if it does not exist
+	 */
+	public Structure getAt(Location loc) {
 		Block block = loc.getBlock();
 		for (int x = 0; x < dimX; x++) {
 			for (int y = 0; y < dimY; y++) {
 				for (int z = 0; z < dimZ; z++) {
-					if (compare(data[x][y][z], block) && test(loc, x, y, z, symmetry.getRotationsNeeded())) {
-						return true;
+					Structure s;
+					if (compare(data[x][y][z], block) && (s = test(loc, x, y, z, symmetry.getRotationsNeeded())) != null) {
+						return s;
 					}
 				}
 			}
 		}
-		return false;
+		return null;
 	}
 	
-	private boolean test(Location loc, int x, int y, int z, int[] rotations) {
+	/**
+	 * Checks if this multi-block structure exists at the location specified.
+	 * The given location can be any part of the multi-block structure.
+	 * @param loc The location to check at
+	 * @return Whether this multi-block structure exists at this location
+	 */
+	public boolean existsAt(Location loc) {
+		return getAt(loc) != null;
+	}
+	
+	private Structure test(Location loc, int x, int y, int z, int[] rotations) {
 		for (int rot : rotations) {
-			if (test(loc, x, y, z, rot)) {
-				return true;
+			Structure s;
+			if ((s = test(loc, x, y, z, rot)) != null) {
+				return s;
 			}
 		}
-		return false;
+		return null;
 	}
 	
-	private boolean test(Location loc, int xPos, int yPos, int zPos, int rotation) {
-//		Rotator rotator = new Rotator(0);
+	private Structure test(Location loc, int xPos, int yPos, int zPos, int rotation) {
+		Rotator rotator = new Rotator(rotation);
 		for (int x = 0; x < dimX; x++) {
 			for (int y = 0; y < dimY; y++) {
 				for (int z = 0; z < dimZ; z++) {
-					int xp = x - xPos;
+					rotator.setLocation(x - xPos, z - zPos);
+					int xp = rotator.getRotatedX();
 					int yp = y - yPos;
-					int zp = z - zPos;
+					int zp = rotator.getRotatedZ();
 					Block block = loc.clone().add(xp, yp, zp).getBlock();
 					if (!compare(data[x][y][z], block)) {
-						return false;
+						return null;
 					}
 				}
 			}
 		}
-		return true;
+		rotator.setLocation(xPos, zPos);
+		loc = loc.subtract(rotator.getRotatedX(), yPos, rotator.getRotatedZ());
+		return new Structure(this, loc, rotation);
 	}
 	
 	private boolean compare(String data, Block block) {
@@ -220,7 +249,7 @@ public class MultiBlockStructure {
 	
 	public static enum Symmetry {
 		
-		SINGLE_AXIS_SYMMETRY(new int[] {0, 2}),
+		SINGLE_AXIS_SYMMETRY(new int[] {0, 1}),
 		DOUBLE_AXIS_SYMMETRY(new int[] {0}),
 		NO_SYMMETRY(new int[] {0, 1, 2, 3});
 		
@@ -236,7 +265,7 @@ public class MultiBlockStructure {
 		
 	}
 	
-	private static class Rotator {
+	protected static class Rotator {
 		
 		private static String[] rotations = {"x,z", "-z,x", "-x,-z", "z,-x"};
 		
