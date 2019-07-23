@@ -80,6 +80,7 @@ public class MultiBlockStructure {
 	private MultiBlockStructure(String info, String name, Symmetry symmetry) {
 		this.dataString = info;
 		this.name = name;
+		this.symmetry = symmetry;
 		String[] split = info.split(";");
 		String[] dimSplit = split[0].split("x");
 		dimX = Integer.parseInt(dimSplit[0]);
