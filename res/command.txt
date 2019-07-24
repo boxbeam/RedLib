@@ -6,7 +6,7 @@ structure,struct {
 		help Get a structure dev tool
 		hook wand
 	}
-	create string:name* symmetry:symmetry* {
+	create string:name* {
 		help Register a structure from the selected points
 		hook create
 		user player
