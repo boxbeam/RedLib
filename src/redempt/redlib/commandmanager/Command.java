@@ -198,10 +198,9 @@ public class Command implements Listener {
 	/**
 	 * Registers this command and its children
 	 * @param prefix The fallback prefix
-	 * @param listener The listener object containing method hooks
+	 * @param listener The listener objects containing method hooks
 	 */
-	public void register(String prefix, Object listener) {
-		this.listener = listener;
+	public void register(String prefix, Object... listeners) {
 		Field field;
 		try {
 			field = Bukkit.getServer().getClass().getDeclaredField("commandMap");
@@ -222,16 +221,19 @@ public class Command implements Listener {
 				
 			};
 			map.register(prefix, cmd);
-			for (Method method : listener.getClass().getDeclaredMethods()) {
-				if (method.isAnnotationPresent(CommandHook.class)) {
-					CommandHook cmdHook = method.getAnnotation(CommandHook.class);
-					if (cmdHook.value().equals(hook)) {
-						methodHook = method;
-						Class<?>[] params = method.getParameterTypes();
-						if (!CommandSender.class.isAssignableFrom(params[0])) {
-							throw new IllegalStateException("The first argument must be CommandSender or one of its subclasses! [" + method.getName() + ", " + method.getClass().getName() + "]");
+			for (Object listener : listeners) {
+				for (Method method : listener.getClass().getDeclaredMethods()) {
+					if (method.isAnnotationPresent(CommandHook.class)) {
+						CommandHook cmdHook = method.getAnnotation(CommandHook.class);
+						if (cmdHook.value().equals(hook)) {
+							methodHook = method;
+							this.listener = listener;
+							Class<?>[] params = method.getParameterTypes();
+							if (!CommandSender.class.isAssignableFrom(params[0])) {
+								throw new IllegalStateException("The first argument must be CommandSender or one of its subclasses! [" + method.getName() + ", " + method.getClass().getName() + "]");
+							}
+							break;
 						}
-						break;
 					}
 				}
 			}
@@ -239,27 +241,29 @@ public class Command implements Listener {
 			e.printStackTrace();
 		}
 		for (Command child : children) {
-			child.registerHook(listener);
+			child.registerHook(listeners);
 		}
 	}
 	
-	protected void registerHook(Object listener) {
-		this.listener = listener;
-		for (Method method : listener.getClass().getDeclaredMethods()) {
-			if (method.isAnnotationPresent(CommandHook.class)) {
-				CommandHook cmdHook = method.getAnnotation(CommandHook.class);
-				if (cmdHook.value().equals(hook)) {
-					methodHook = method;
-					Class<?>[] params = method.getParameterTypes();
-					if (!CommandSender.class.isAssignableFrom(params[0])) {
-						throw new IllegalStateException("The first argument must be CommandSender or one of its subclasses! [" + method.getName() + ", " + method.getClass().getName() + "]");
+	protected void registerHook(Object... listeners) {
+		for (Object listener : listeners) {
+			for (Method method : listener.getClass().getDeclaredMethods()) {
+				if (method.isAnnotationPresent(CommandHook.class)) {
+					CommandHook cmdHook = method.getAnnotation(CommandHook.class);
+					if (cmdHook.value().equals(hook)) {
+						methodHook = method;
+						Class<?>[] params = method.getParameterTypes();
+						this.listener = listener;
+						if (!CommandSender.class.isAssignableFrom(params[0])) {
+							throw new IllegalStateException("The first argument must be CommandSender or one of its subclasses! [" + method.getName() + ", " + method.getClass().getName() + "]");
+						}
+						break;
 					}
-					break;
 				}
 			}
 		}
 		for (Command child : children) {
-			child.registerHook(listener);
+			child.registerHook(listeners);
 		}
 	}
 	

@@ -1,0 +1,14 @@
+structure,struct {
+	help The structure base command
+	permission redlib.admin
+	wand {
+		user player
+		help Get a structure dev tool
+		hook wand
+	}
+	create string:name* symmetry:symmetry* {
+		help Register a structure from the selected points
+		hook create
+		user player
+	}
+}

@@ -104,9 +104,10 @@ public class MultiBlockStructure {
 	 * Builds this multi-block structure at the given location
 	 * @param loc The location to build the structure at
 	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 * @param mirror Whether to mirror the structure on the X axis
 	 */
-	public void build(Location loc, int rotation) {
-		Rotator rotator = new Rotator(rotation);
+	public void build(Location loc, int rotation, boolean mirror) {
+		Rotator rotator = new Rotator(rotation, mirror);
 		for (int x = 0; x < dimX; x++) {
 			for (int y = 0; y < dimY; y++) {
 				for (int z = 0; z < dimZ; z++) {
@@ -123,7 +124,16 @@ public class MultiBlockStructure {
 	 * @param loc The location to build the structure at
 	 */
 	public void build(Location loc) {
-		build(loc, 0);
+		build(loc, 0, false);
+	}
+	
+	/**
+	 * Builds this multi-block structure at the given location
+	 * @param loc The location to build the structure at
+	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 */
+	public void build(Location loc, int rotation) {
+		build(loc, rotation, false);
 	}
 	
 	/**
@@ -176,15 +186,21 @@ public class MultiBlockStructure {
 	private Structure test(Location loc, int x, int y, int z, int[] rotations) {
 		for (int rot : rotations) {
 			Structure s;
-			if ((s = test(loc, x, y, z, rot)) != null) {
+			if ((s = test(loc, x, y, z, rot, false)) != null) {
+				return s;
+			}
+		}
+		for (int rot : rotations) {
+			Structure s;
+			if ((s = test(loc, x, y, z, rot, true)) != null) {
 				return s;
 			}
 		}
 		return null;
 	}
 	
-	private Structure test(Location loc, int xPos, int yPos, int zPos, int rotation) {
-		Rotator rotator = new Rotator(rotation);
+	private Structure test(Location loc, int xPos, int yPos, int zPos, int rotation, boolean mirror) {
+		Rotator rotator = new Rotator(rotation, mirror);
 		for (int x = 0; x < dimX; x++) {
 			for (int y = 0; y < dimY; y++) {
 				for (int z = 0; z < dimZ; z++) {
@@ -201,7 +217,7 @@ public class MultiBlockStructure {
 		}
 		rotator.setLocation(xPos, zPos);
 		loc = loc.subtract(rotator.getRotatedX(), yPos, rotator.getRotatedZ());
-		return new Structure(this, loc, rotation);
+		return new Structure(this, loc, rotator);
 	}
 	
 	private boolean compare(String data, Block block) {
@@ -265,23 +281,37 @@ public class MultiBlockStructure {
 		
 	}
 	
-	protected static class Rotator {
+	public static class Rotator {
 		
 		private static String[] rotations = {"x,z", "-z,x", "-x,-z", "z,-x"};
 		
 		private int rotation;
-		private int x;
-		private int z;
+		private boolean mirrored;
+		private int x = 0;
+		private int z = 0;
 		
-		public Rotator(int rotation) {
+		protected Rotator(int rotation, boolean mirrored) {
+			while (rotation < 0) {
+				rotation += 4;
+			}
 			this.rotation = rotation % 4;
+			this.mirrored = mirrored;
 		}
 		
+		/**
+		 * Sets the relative coordinates this Rotator will rotate
+		 * @param x The relative X coordinate
+		 * @param z The relative Z coordinate
+		 */
 		public void setLocation(int x, int z) {
-			this.x = x;
+			this.x = mirrored ? -x : x;
 			this.z = z;
 		}
 		
+		/**
+		 * Gets the rotated relative X
+		 * @return The rotated relative X
+		 */
 		public int getRotatedX() {
 			String rotationString = rotations[rotation];
 			String xString = rotationString.split(",")[0];
@@ -297,6 +327,10 @@ public class MultiBlockStructure {
 			return xString.startsWith("-") ? -val : val;
 		}
 		
+		/**
+		 * Gets the rotated relative Z
+		 * @return The rotated relative Z
+		 */
 		public int getRotatedZ() {
 			String rotationString = rotations[rotation];
 			String xString = rotationString.split(",")[1];
@@ -310,6 +344,38 @@ public class MultiBlockStructure {
 					break;
 			}
 			return xString.startsWith("-") ? -val : val;
+		}
+		
+		/**
+		 * Gets a Rotator which will negate the operations of this Rotator
+		 * @return The inverse Rotator
+		 */
+		public Rotator getInverse() {
+			return new Rotator(-rotation, mirrored);
+		}
+		
+		/**
+		 * Gets a clone of this Rotator
+		 * @return The clone of this Rotator
+		 */
+		public Rotator clone() {
+			return new Rotator(rotation, mirrored);
+		}
+		
+		/**
+		 * Gets the rotation, in number of 90-degree clockwise rotations
+		 * @return The rotation
+		 */
+		public int getRotation() {
+			return rotation;
+		}
+		
+		/**
+		 * Gets whether this rotator mirrors over the X axis
+		 * @return Whether this rotator mirrors over the X axis
+		 */
+		public boolean isMirrored() {
+			return mirrored;
 		}
 		
 	}

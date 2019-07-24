@@ -13,12 +13,12 @@ public class Structure {
 	
 	private MultiBlockStructure type;
 	private Location loc;
-	private int rotation;
+	private Rotator rotator;
 	
-	protected Structure(MultiBlockStructure type, Location loc, int rotation) {
+	protected Structure(MultiBlockStructure type, Location loc, Rotator rotator) {
 		this.type = type;
 		this.loc = loc;
-		this.rotation = rotation;
+		this.rotator = rotator;
 	}
 	
 	/**
@@ -44,8 +44,8 @@ public class Structure {
 	 * to get to its current rotation.
 	 * @return The rotation of this structure
 	 */
-	public int getRotation() {
-		return rotation;
+	public Rotator getRotator() {
+		return rotator.clone();
 	}
 	
 	/**
@@ -55,7 +55,6 @@ public class Structure {
 	 */
 	public List<StructureBlock> getByType(Material type) {
 		ArrayList<StructureBlock> blocks = new ArrayList<>();
-		Rotator rotator = new Rotator(rotation);
 		int[] dimensions = this.type.getDimensions();
 		for (int x = 0; x < dimensions[0]; x++) {
 			for (int y = 0; y < dimensions[1]; y++) {
@@ -85,13 +84,32 @@ public class Structure {
 		int[] dim = type.getDimensions();
 		if (x < 0 || y < 0 || z < 0
 				|| x > dim[0] || y > dim[1] || z > dim[2]) {
-			throw new IndexOutOfBoundsException("Dimensions outside bounds of structure");
+			throw new IndexOutOfBoundsException("Location outside bounds of structure");
 		}
-		Rotator rotator = new Rotator(rotation);
 		rotator.setLocation(x, z);
-		return new StructureBlock(loc.getWorld().getBlockAt(rotator.getRotatedX(), y, rotator.getRotatedZ()),
+		return new StructureBlock(loc.getWorld().getBlockAt(rotator.getRotatedX(), y + loc.getBlockY(), rotator.getRotatedZ()),
 				this,
 				x, y, z);
+	}
+	
+	/**
+	 * Gets a relative block in this Structure from an absolute block in the world
+	 * @param block The absolute block which is part of this Structure
+	 * @return The relative block
+	 */
+	public StructureBlock getBlock(Block block) {
+		Location offset = block.getLocation().subtract(loc);
+		Rotator rotator = this.rotator.getInverse();
+		int[] dim = type.getDimensions();
+		rotator.setLocation(offset.getBlockX(), offset.getBlockZ());
+		int x = rotator.getRotatedX();
+		int y = offset.getBlockY();
+		int z = rotator.getRotatedZ();
+		if (x < 0 || y < 0 || z < 0
+				|| x > dim[0] || y > dim[1] || z > dim[2]) {
+			throw new IndexOutOfBoundsException("Location outside bounds of structure");
+		}
+		return new StructureBlock(block, this, x, y, z);
 	}
 	
 	public static class StructureBlock {
@@ -118,6 +136,30 @@ public class Structure {
 		 */
 		public int[] getRelativeCoordinates() {
 			return new int[] {relX, relY, relZ};
+		}
+		
+		/**
+		 * Gets the relative X of this block
+		 * @return The relative X of this block
+		 */
+		public int getRelativeX() {
+			return relX;
+		}
+		
+		/**
+		 * Gets the relative Y of this block
+		 * @return The relative Y of this block
+		 */
+		public int getRelativeY() {
+			return relY;
+		}
+		
+		/**
+		 * Gets the relative Z of this block
+		 * @return The relative Z of this block
+		 */
+		public int getRelativeZ() {
+			return relZ;
 		}
 		
 		/**
