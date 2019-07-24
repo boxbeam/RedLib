@@ -1,8 +1,5 @@
 package redempt.redlib;
 
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -10,11 +7,9 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import redempt.redlib.commandmanager.Command;
-import redempt.redlib.commandmanager.Command.CommandArgumentType;
 import redempt.redlib.commandmanager.CommandBuilder;
 import redempt.redlib.dev.CommandListener;
 import redempt.redlib.dev.StructureTool;
-import redempt.redlib.multiblock.MultiBlockStructure.Symmetry;
 
 public class RedLib extends JavaPlugin {
 	
@@ -42,16 +37,8 @@ public class RedLib extends JavaPlugin {
 		helpEntry = config.getString("helpEntry");
 		
 		if (devMode) {
-			Command.fromStream(this.getResource("command.txt"),
-						new CommandArgumentType<Symmetry>("symmetry", s -> {
-							try {
-								return Symmetry.valueOf(s.toUpperCase());
-							} catch (NoSuchElementException e) {
-								return null;
-							}
-						})
-						.tabStream(c -> Arrays.stream(Symmetry.values()).map(Symmetry::toString)
-					)).register("redlib",
+			Command.fromStream(this.getResource("command.txt"))
+					.register("redlib",
 					new CommandListener(),
 					StructureTool.enable());
 		} else {

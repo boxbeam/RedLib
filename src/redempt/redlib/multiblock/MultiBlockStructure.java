@@ -65,8 +65,8 @@ public class MultiBlockStructure {
 	 * used to determine whether the structure must be rotated when testing if it exists at a given location
 	 * @return
 	 */
-	public static MultiBlockStructure create(String info, String name, Symmetry symmetry) {
-		return new MultiBlockStructure(info, name, symmetry);
+	public static MultiBlockStructure create(String info, String name) {
+		return new MultiBlockStructure(info, name);
 	}
 	
 	private String[][][] data;
@@ -75,12 +75,10 @@ public class MultiBlockStructure {
 	private int dimX;
 	private int dimY;
 	private int dimZ;
-	private Symmetry symmetry;
 	
-	private MultiBlockStructure(String info, String name, Symmetry symmetry) {
+	private MultiBlockStructure(String info, String name) {
 		this.dataString = info;
 		this.name = name;
-		this.symmetry = symmetry;
 		String[] split = info.split(";");
 		String[] dimSplit = split[0].split("x");
 		dimX = Integer.parseInt(dimSplit[0]);
@@ -164,7 +162,7 @@ public class MultiBlockStructure {
 			for (int y = 0; y < dimY; y++) {
 				for (int z = 0; z < dimZ; z++) {
 					Structure s;
-					if (compare(data[x][y][z], block) && (s = test(loc, x, y, z, symmetry.getRotationsNeeded())) != null) {
+					if (compare(data[x][y][z], block) && (s = test(loc, x, y, z)) != null) {
 						return s;
 					}
 				}
@@ -183,14 +181,14 @@ public class MultiBlockStructure {
 		return getAt(loc) != null;
 	}
 	
-	private Structure test(Location loc, int x, int y, int z, int[] rotations) {
-		for (int rot : rotations) {
+	private Structure test(Location loc, int x, int y, int z) {
+		for (int rot = 0; rot < 4; rot++) {
 			Structure s;
 			if ((s = test(loc, x, y, z, rot, false)) != null) {
 				return s;
 			}
 		}
-		for (int rot : rotations) {
+		for (int rot = 0; rot < 4; rot++) {
 			Structure s;
 			if ((s = test(loc, x, y, z, rot, true)) != null) {
 				return s;
@@ -261,24 +259,6 @@ public class MultiBlockStructure {
 			state.setData(new MaterialData(type, dataValue));
 			state.update();
 		}
-	}
-	
-	public static enum Symmetry {
-		
-		SINGLE_AXIS_SYMMETRY(new int[] {0, 1}),
-		DOUBLE_AXIS_SYMMETRY(new int[] {0}),
-		NO_SYMMETRY(new int[] {0, 1, 2, 3});
-		
-		private int[] rotationsNeeded;
-		
-		private Symmetry(int[] rotationsNeeded) {
-			this.rotationsNeeded = rotationsNeeded;
-		}
-		
-		public int[] getRotationsNeeded() {
-			return rotationsNeeded.clone();
-		}
-		
 	}
 	
 	public static class Rotator {

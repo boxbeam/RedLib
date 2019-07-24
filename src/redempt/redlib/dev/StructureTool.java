@@ -19,7 +19,6 @@ import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.CommandHook;
 import redempt.redlib.itemutils.ItemBuilder;
 import redempt.redlib.multiblock.MultiBlockStructure;
-import redempt.redlib.multiblock.MultiBlockStructure.Symmetry;
 import redempt.redlib.multiblock.Structure;
 import redempt.redlib.multiblock.Structure.StructureBlock;
 
@@ -98,7 +97,7 @@ public class StructureTool implements Listener {
 	}
 	
 	@CommandHook("create")
-	public void createStructure(Player player, String name, Symmetry symmetry) {
+	public void createStructure(Player player, String name) {
 		Location[] locs = locations.get(player.getUniqueId());
 		if (locs[0] == null || locs[1] == null) {
 			player.sendMessage(ChatColor.RED + "You must set 2 locations with the structure wand (/struct wand) first!");
@@ -108,7 +107,7 @@ public class StructureTool implements Listener {
 			player.sendMessage(ChatColor.RED + "Locations must be in the same world!");
 			return;
 		}
-		MultiBlockStructure mbs = MultiBlockStructure.create(MultiBlockStructure.stringify(locs[0], locs[1]), name, symmetry);
+		MultiBlockStructure mbs = MultiBlockStructure.create(MultiBlockStructure.stringify(locs[0], locs[1]), name);
 		structures.put(player.getUniqueId(), mbs);
 		player.sendMessage(ChatColor.GREEN + "Structure registered! Left click it with your wand to get debug info.");
 	}
