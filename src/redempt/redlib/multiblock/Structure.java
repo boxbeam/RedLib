@@ -9,6 +9,11 @@ import org.bukkit.block.Block;
 
 import redempt.redlib.multiblock.MultiBlockStructure.Rotator;
 
+/**
+ * Represents an instance of a multi-block structure in the world
+ * @author Redempt
+ *
+ */
 public class Structure {
 	
 	private MultiBlockStructure type;
