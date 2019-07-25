@@ -29,7 +29,8 @@ public class StructureTool implements Listener {
 				.setName(ChatColor.GREEN + "Multi-Block Structure Tool")
 				.addLore(ChatColor.BLUE + "Right-click two corners of a structure")
 				.addLore(ChatColor.BLUE + "and type '/struct create' to create a test")
-				.addLore(ChatColor.BLUE + "structure.");
+				.addLore(ChatColor.BLUE + "structure. Type '/struct print' to get the")
+				.addLore(ChatColor.BLUE + "data string for the structure.");
 	}
 	
 	public static StructureTool enable() {
@@ -110,6 +111,25 @@ public class StructureTool implements Listener {
 		MultiBlockStructure mbs = MultiBlockStructure.create(MultiBlockStructure.stringify(locs[0], locs[1]), name);
 		structures.put(player.getUniqueId(), mbs);
 		player.sendMessage(ChatColor.GREEN + "Structure registered! Left click it with your wand to get debug info.");
+	}
+	
+	@CommandHook("print")
+	public void print(Player player) {
+		Location[] locs = locations.get(player.getUniqueId());
+		if (locs[0] == null || locs[1] == null) {
+			player.sendMessage(ChatColor.RED + "You must set 2 locations with the structure wand (/struct wand) first!");
+			return;
+		}
+		if (!locs[0].getWorld().equals(locs[1].getWorld())) {
+			player.sendMessage(ChatColor.RED + "Locations must be in the same world!");
+			return;
+		}
+		String mbs = MultiBlockStructure.stringify(locs[0], locs[1]);
+		player.sendMessage(ChatColor.GREEN + "Multi-block structure string:");
+		player.sendMessage(mbs);
+		player.sendMessage(ChatColor.GREEN + "A copy of this string has also been printed to console.");
+		System.out.println("Multi-block structure string:");
+		System.out.println(mbs);
 	}
 	
 }

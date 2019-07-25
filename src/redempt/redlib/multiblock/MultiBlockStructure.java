@@ -1,5 +1,11 @@
 package redempt.redlib.multiblock;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.bukkit.Bukkit;
@@ -45,7 +51,6 @@ public class MultiBlockStructure {
 			for (int y = minY; y <= maxY; y++) {
 				for (int z = minZ; z <= maxZ; z++) {
 					Block block = new Location(start.getWorld(), x, y, z).getBlock();
-					block.getType();
 					if (midVersion >= 13) {
 						output += block.getBlockData().getAsString() + ";";
 					} else {
@@ -54,19 +59,110 @@ public class MultiBlockStructure {
 				}
 			}
 		}
-		return output;
+		output = minify(output);
+		return output.substring(0, output.length() - 1);
 	}
 	
 	/**
 	 * Creates a MultiBlockStructure instance from an info string
 	 * @param info The info string. Get this from {@link MultiBlockStructure#stringify(Location, Location)}
-	 * @param name The name of this multi-block structure
-	 * @param symmetry What kind of symmetry this multi-block structure has - 
-	 * used to determine whether the structure must be rotated when testing if it exists at a given location
+	 * @param name The name of the multi-block structure
 	 * @return
 	 */
 	public static MultiBlockStructure create(String info, String name) {
-		return new MultiBlockStructure(info, name);
+		return new MultiBlockStructure(info, name, true);
+	}
+	
+	/**
+	 * Creates a MultiBlockStructure instance from an info string
+	 * @param info The info string. Get this from {@link MultiBlockStructure#stringify(Location, Location)}
+	 * @param name The name of the multi-block structure
+	 * @param strictMode Whether block data is taken into account. Only checks material if false. Defaults to true.
+	 * @return
+	 */
+	public static MultiBlockStructure create(String info, String name, boolean strictMode) {
+		return new MultiBlockStructure(info, name, strictMode);
+	}
+	
+	private static String minify(String data) {
+		String[] split = data.replace("minecraft:", "").split(";");
+		int same = 0;
+		String output = split[0] + ";";
+		for (int i = 1; i < split.length - 1; i++) {
+			if (split[i].equals(split[i + 1])) {
+				same += same == 0 ? 2 : 1;
+				continue;
+			} else if (same > 0) {
+				output += split[i - 1] + "*" + same + ";";
+				same = 0;
+				continue;
+			}
+			output += split[i] + ";";
+		}
+		if (same > 0) {
+			output += split[split.length - 1] + "*" + same + ";";
+		} else {
+			output += split[split.length - 1];
+		}
+		Map<String, Integer> count = new HashMap<>();
+		split = output.split(";");
+		for (int i = 1; i < split.length; i++) {
+			String str = split[i];
+			if (str.contains("*")) {
+				str = str.substring(0, str.indexOf('*'));
+			}
+			if (!count.containsKey(str)) {
+				count.put(str, 1);
+				continue;
+			}
+			count.put(str, count.get(str) + 1);
+		}
+		List<String> replace = new ArrayList<>();
+		for (Entry<String, Integer> entry : count.entrySet()) {
+			if (entry.getValue() >= 2) {
+				replace.add(entry.getKey());
+			}
+		}
+		String prepend = "";
+		for (int i = 0; i < replace.size(); i++) {
+			String str = replace.get(i);
+			prepend += str + ";";
+			output = output.replace(str, i + "");
+		}
+		if (replace.size() > 0) {
+			output = "(" + prepend.substring(0, prepend.length() - 1) + ")" + output;
+		}
+		return output;
+	}
+	
+	public static String expand(String data) {
+		List<String> replace = null;
+		if (data.startsWith("(")) {
+			String list = data.substring(1, data.indexOf(')'));
+			String[] split = list.split(";");
+			replace = Arrays.asList(split);
+			data = data.substring(data.indexOf(')') + 1);
+		}
+		String output = "";
+		for (String str : data.split(";")) {
+			String[] split = str.split("\\*");
+			String val = "";
+			try {
+				int index = Integer.parseInt(split[0]);
+				val = replace.get(index); 
+			} catch (NumberFormatException e) {
+				val = split[0];
+			}
+			if (split.length > 1) {
+				int times = Integer.parseInt(split[1]);
+				for (int i = 0; i < times; i++) {
+					output += val + ";";
+				}
+				continue;
+			}
+			output += val + ";";
+		}
+		return output;
 	}
 	
 	private String[][][] data;
@@ -75,17 +171,29 @@ public class MultiBlockStructure {
 	private int dimX;
 	private int dimY;
 	private int dimZ;
+	private boolean strictMode = true;
 	
-	private MultiBlockStructure(String info, String name) {
+	private MultiBlockStructure(String info, String name, boolean strictMode) {
+		info = expand(info);
 		this.dataString = info;
 		this.name = name;
+		this.strictMode = strictMode;
 		String[] split = info.split(";");
 		String[] dimSplit = split[0].split("x");
 		dimX = Integer.parseInt(dimSplit[0]);
 		dimY = Integer.parseInt(dimSplit[1]);
 		dimZ = Integer.parseInt(dimSplit[2]);
+		data = parse(info);
+	}
+	
+	private static String[][][] parse(String info) {
+		String[] split = info.split(";");
+		String[] dimSplit = split[0].split("x");
+		int dimX = Integer.parseInt(dimSplit[0]);
+		int dimY = Integer.parseInt(dimSplit[1]);
+		int dimZ = Integer.parseInt(dimSplit[2]);
 		
-		data = new String[dimX][dimY][dimZ];
+		String[][][] data = new String[dimX][dimY][dimZ];
 		
 		int pos = 1;
 		for (int x = 0; x < dimX; x++) {
@@ -96,6 +204,7 @@ public class MultiBlockStructure {
 				}
 			}
 		}
+		return data;
 	}
 	
 	/**
@@ -158,40 +267,28 @@ public class MultiBlockStructure {
 	 */
 	public Structure getAt(Location loc) {
 		Block block = loc.getBlock();
-		for (int x = 0; x < dimX; x++) {
-			for (int y = 0; y < dimY; y++) {
-				for (int z = 0; z < dimZ; z++) {
-					Structure s;
-					if (compare(data[x][y][z], block) && (s = test(loc, x, y, z)) != null) {
-						return s;
+		for (int rot = 0; rot < 4; rot++) {
+			for (int x = 0; x < dimX; x++) {
+				for (int y = 0; y < dimY; y++) {
+					for (int z = 0; z < dimZ; z++) {
+						Structure s;
+						if (compare(data[x][y][z], block, strictMode) && (s = test(loc, x, y, z, rot, false)) != null) {
+							return s;
+						}
 					}
 				}
 			}
 		}
-		return null;
-	}
-	
-	/**
-	 * Checks if this multi-block structure exists at the location specified.
-	 * The given location can be any part of the multi-block structure.
-	 * @param loc The location to check at
-	 * @return Whether this multi-block structure exists at this location
-	 */
-	public boolean existsAt(Location loc) {
-		return getAt(loc) != null;
-	}
-	
-	private Structure test(Location loc, int x, int y, int z) {
 		for (int rot = 0; rot < 4; rot++) {
-			Structure s;
-			if ((s = test(loc, x, y, z, rot, false)) != null) {
-				return s;
-			}
-		}
-		for (int rot = 0; rot < 4; rot++) {
-			Structure s;
-			if ((s = test(loc, x, y, z, rot, true)) != null) {
-				return s;
+			for (int x = 0; x < dimX; x++) {
+				for (int y = 0; y < dimY; y++) {
+					for (int z = 0; z < dimZ; z++) {
+						Structure s;
+						if (compare(data[x][y][z], block, strictMode) && (s = test(loc, x, y, z, rot, true)) != null) {
+							return s;
+						}
+					}
+				}
 			}
 		}
 		return null;
@@ -207,7 +304,7 @@ public class MultiBlockStructure {
 					int yp = y - yPos;
 					int zp = rotator.getRotatedZ();
 					Block block = loc.clone().add(xp, yp, zp).getBlock();
-					if (!compare(data[x][y][z], block)) {
+					if (!compare(data[x][y][z], block, strictMode)) {
 						return null;
 					}
 				}
@@ -218,12 +315,19 @@ public class MultiBlockStructure {
 		return new Structure(this, loc, rotator);
 	}
 	
-	private boolean compare(String data, Block block) {
+	private static boolean compare(String data, Block block, boolean strictMode) {
 		int midVersion = Integer.parseInt(RedLib.getServerVersion().split("\\.")[1]);
 		if (midVersion >= 13) {
+			data = data.startsWith("minecraft:") ? data : ("minecraft:" + data);
+			if (!strictMode) {
+				return block.getType() == Bukkit.createBlockData(data).getMaterial();
+			}
 			return block.getBlockData().getAsString().equals(data);
 		} else {
 			String[] split = data.split(":");
+			if (!strictMode) {
+				return block.getType() == Material.valueOf(split[0]);
+			}
 			return block.getType() == Material.valueOf(split[0]) && block.getData() == Byte.parseByte(split[1]);
 		}
 	}

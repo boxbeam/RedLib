@@ -11,4 +11,9 @@ structure,struct {
 		hook create
 		user player
 	}
+	print {
+		help Prints the structure data for the selected points
+		hook print
+		user player
+	}
 }

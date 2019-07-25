@@ -74,6 +74,44 @@ public class Structure {
 	}
 	
 	/**
+	 * Get all blocks in this Structure
+	 * @return The list of blocks in this Structure
+	 */
+	public List<StructureBlock> getBlocks() {
+		ArrayList<StructureBlock> blocks = new ArrayList<>();
+		int[] dimensions = this.type.getDimensions();
+		for (int x = 0; x < dimensions[0]; x++) {
+			for (int y = 0; y < dimensions[1]; y++) {
+				for (int z = 0; z < dimensions[2]; z++) {
+					rotator.setLocation(x, z);
+					Block b = 
+						loc.getWorld().getBlockAt(rotator.getRotatedX() + loc.getBlockX(),
+						y + loc.getBlockY(),
+						rotator.getRotatedZ() + loc.getBlockZ());
+					blocks.add(new StructureBlock(b, this, x, y, z));
+				}
+			}
+		}
+		return blocks;
+	}
+	
+	/**
+	 * Checks whether this Structure is intact (in the same rotation and has all the correct blocks)
+	 * @return Whether this Structure is intact
+	 */
+	public boolean isIntact() {
+		Structure struct = type.getAt(loc);
+		if (struct == null) {
+			return false;
+		}
+		Rotator rot = struct.getRotator();
+		if (rot.getRotation() != rotator.getRotation() || rot.isMirrored() != rotator.isMirrored()) {
+			return false;
+		}
+		return true;
+	}
+	
+	/**
 	 * Gets a relative block in this Structure
 	 * @param x The relative X of the block
 	 * @param y The relative Y of the block

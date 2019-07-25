@@ -51,6 +51,7 @@ public class RedLib extends JavaPlugin {
 				})
 				.build("redlib");
 		}
+		
 	}
 	
 	public static String getServerVersion() {
