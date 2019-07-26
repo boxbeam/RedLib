@@ -70,7 +70,7 @@ public class MultiBlockStructure {
 	 * @return
 	 */
 	public static MultiBlockStructure create(String info, String name) {
-		return new MultiBlockStructure(info, name, true);
+		return new MultiBlockStructure(info, name, true, false);
 	}
 	
 	/**
@@ -81,7 +81,19 @@ public class MultiBlockStructure {
 	 * @return
 	 */
 	public static MultiBlockStructure create(String info, String name, boolean strictMode) {
-		return new MultiBlockStructure(info, name, strictMode);
+		return new MultiBlockStructure(info, name, strictMode, false);
+	}
+	
+	/**
+	 * Creates a MultiBlockStructure instance from an info string
+	 * @param info The info string. Get this from {@link MultiBlockStructure#stringify(Location, Location)}
+	 * @param name The name of the multi-block structure
+	 * @param strictMode Whether block data is taken into account. Only checks material if false. Defaults to true.
+	 * @param ignoreAir If true, air in the original structure is skipped when checking blocks. Defaults to false.
+	 * @return
+	 */
+	public static MultiBlockStructure create(String info, String name, boolean strictMode, boolean ignoreAir) {
+		return new MultiBlockStructure(info, name, strictMode, ignoreAir);
 	}
 	
 	private static String minify(String data) {
@@ -172,8 +184,9 @@ public class MultiBlockStructure {
 	private int dimY;
 	private int dimZ;
 	private boolean strictMode = true;
+	private boolean ignoreAir = false;
 	
-	private MultiBlockStructure(String info, String name, boolean strictMode) {
+	private MultiBlockStructure(String info, String name, boolean strictMode, boolean ignoreAir) {
 		info = expand(info);
 		this.dataString = info;
 		this.name = name;
@@ -272,7 +285,7 @@ public class MultiBlockStructure {
 				for (int y = 0; y < dimY; y++) {
 					for (int z = 0; z < dimZ; z++) {
 						Structure s;
-						if (compare(data[x][y][z], block, strictMode) && (s = test(loc, x, y, z, rot, false)) != null) {
+						if (compare(data[x][y][z], block) && (s = test(loc, x, y, z, rot, false)) != null) {
 							return s;
 						}
 					}
@@ -284,7 +297,7 @@ public class MultiBlockStructure {
 				for (int y = 0; y < dimY; y++) {
 					for (int z = 0; z < dimZ; z++) {
 						Structure s;
-						if (compare(data[x][y][z], block, strictMode) && (s = test(loc, x, y, z, rot, true)) != null) {
+						if (compare(data[x][y][z], block) && (s = test(loc, x, y, z, rot, true)) != null) {
 							return s;
 						}
 					}
@@ -304,7 +317,7 @@ public class MultiBlockStructure {
 					int yp = y - yPos;
 					int zp = rotator.getRotatedZ();
 					Block block = loc.clone().add(xp, yp, zp).getBlock();
-					if (!compare(data[x][y][z], block, strictMode)) {
+					if (!compare(data[x][y][z], block)) {
 						return null;
 					}
 				}
@@ -315,18 +328,24 @@ public class MultiBlockStructure {
 		return new Structure(this, loc, rotator);
 	}
 	
-	private static boolean compare(String data, Block block, boolean strictMode) {
+	private boolean compare(String data, Block block) {
 		int midVersion = Integer.parseInt(RedLib.getServerVersion().split("\\.")[1]);
 		if (midVersion >= 13) {
 			data = data.startsWith("minecraft:") ? data : ("minecraft:" + data);
 			if (!strictMode) {
 				return block.getType() == Bukkit.createBlockData(data).getMaterial();
 			}
+			if (ignoreAir && Bukkit.createBlockData(data).getMaterial() == Material.AIR) {
+				return true;
+			}
 			return block.getBlockData().getAsString().equals(data);
 		} else {
 			String[] split = data.split(":");
 			if (!strictMode) {
 				return block.getType() == Material.valueOf(split[0]);
+			}
+			if (ignoreAir && split[0].equals("AIR")) {
+				return true;
 			}
 			return block.getType() == Material.valueOf(split[0]) && block.getData() == Byte.parseByte(split[1]);
 		}
