@@ -1,6 +1,6 @@
 structure,struct {
 	help The structure base command
-	permission redlib.admin
+	permission redlib.dev
 	wand {
 		user player
 		help Get a structure dev tool
@@ -14,6 +14,19 @@ structure,struct {
 	print {
 		help Prints the structure data for the selected points
 		hook print
+		user player
+	}
+}
+itemhelper,itemhelp,ih {
+	permission redlib.dev
+	setname string:name*... {
+		help Sets the name of an item
+		hook setName
+		user player
+	}
+	addlore string:lore*... {
+		help Adds a line of lore to an item
+		hook addLore
 		user player
 	}
 }

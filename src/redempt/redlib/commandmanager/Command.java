@@ -221,6 +221,7 @@ public class Command implements Listener {
 				
 			};
 			map.register(prefix, cmd);
+			loop:
 			for (Object listener : listeners) {
 				for (Method method : listener.getClass().getDeclaredMethods()) {
 					if (method.isAnnotationPresent(CommandHook.class)) {
@@ -232,7 +233,7 @@ public class Command implements Listener {
 							if (!CommandSender.class.isAssignableFrom(params[0])) {
 								throw new IllegalStateException("The first argument must be CommandSender or one of its subclasses! [" + method.getName() + ", " + method.getClass().getName() + "]");
 							}
-							break;
+							break loop;
 						}
 					}
 				}
@@ -246,6 +247,7 @@ public class Command implements Listener {
 	}
 	
 	protected void registerHook(Object... listeners) {
+		loop:
 		for (Object listener : listeners) {
 			for (Method method : listener.getClass().getDeclaredMethods()) {
 				if (method.isAnnotationPresent(CommandHook.class)) {
@@ -257,7 +259,7 @@ public class Command implements Listener {
 						if (!CommandSender.class.isAssignableFrom(params[0])) {
 							throw new IllegalStateException("The first argument must be CommandSender or one of its subclasses! [" + method.getName() + ", " + method.getClass().getName() + "]");
 						}
-						break;
+						break loop;
 					}
 				}
 			}

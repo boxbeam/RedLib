@@ -8,7 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import redempt.redlib.commandmanager.Command;
 import redempt.redlib.commandmanager.CommandBuilder;
-import redempt.redlib.dev.CommandListener;
+import redempt.redlib.dev.ItemHelper;
 import redempt.redlib.dev.StructureTool;
 
 public class RedLib extends JavaPlugin {
@@ -39,10 +39,10 @@ public class RedLib extends JavaPlugin {
 		if (devMode) {
 			Command.fromStream(this.getResource("command.txt"))
 					.register("redlib",
-					new CommandListener(),
+					new ItemHelper(),
 					StructureTool.enable());
 		} else {
-			new CommandBuilder("struct", "structure")
+			new CommandBuilder("struct", "structure", "itemhelper", "itemhelp", "ih")
 				.permission("redlib.admin")
 				.help("Developer mode is disabled.")
 				.hook((c) -> {
@@ -51,7 +51,6 @@ public class RedLib extends JavaPlugin {
 				})
 				.build("redlib");
 		}
-		
 	}
 	
 	public static String getServerVersion() {
