@@ -184,6 +184,19 @@ ItemStack item = new ItemBuilder(Material.DIAMOND_SWORD)
 ```
 There are plenty more methods to both `ItemUtils` and `ItemBuilder`, like for adding enchantments or attributes, or setting durability. Check out [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/itemutils/ItemBuilder.java) and [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/itemutils/ItemUtils.java) for more info.
 
+## Inventory GUI
+Another thing that's always annoying to do manually is create GUIs in Spigot. RedLib has an InventoryGUI class and ItemButton class that will make this a bit easier. To create an InventoryGUI, simply call its constructor with a pre-existing Inventory. Then you can add buttons to it at a given position:
+
+```
+InventoryGUI gui = new InventoryGUI(Bukkit.createInventory(null, 27));
+ItemBuilder icon = new ItemBuilder(Material.DIAMOND_SWORD)
+	.setName(ChatColor.RED + "Die.")
+	.setLore(ChatColor.GREEN + "Click this to die.");
+ItemButton button = ItemButton.create(icon, e -> e.getWhoClicked().damage(1000));
+gui.addButton(button, 1, 2);
+```
+And that's really all there is to be said about the InventoryGUI. It's simple but powerful. For more info, check out [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/inventorygui/InventoryGUI.java) and [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/inventorygui/ItemButton.java).
+
 ## Multi-block structures
 This is probably a bit niche, but creating large multi-block structures can be annoying, and without a helper class, it's nearly impossible. RedLib has a very powerful and easy-to-use multi-block structure library built in to help with this.
 
