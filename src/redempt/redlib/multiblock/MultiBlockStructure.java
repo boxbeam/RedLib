@@ -97,7 +97,8 @@ public class MultiBlockStructure {
 	}
 	
 	private static String minify(String data) {
-		String[] split = data.replace("minecraft:", "").split(";");
+		data = data.replace("minecraft:", "");
+		String[] split = data.split(";");
 		int same = 0;
 		String output = split[0] + ";";
 		for (int i = 1; i < split.length - 1; i++) {
@@ -135,6 +136,7 @@ public class MultiBlockStructure {
 				replace.add(entry.getKey());
 			}
 		}
+		replace.sort((a, b) -> b.length() - a.length());
 		String prepend = "";
 		for (int i = 0; i < replace.size(); i++) {
 			String str = replace.get(i);
@@ -142,12 +144,12 @@ public class MultiBlockStructure {
 			output = output.replace(str, i + "");
 		}
 		if (replace.size() > 0) {
-			output = "(" + prepend.substring(0, prepend.length() - 1) + ")" + output;
+			output = "(" + prepend.substring(0, prepend.length() - 1) + ")" + output + ";";
 		}
 		return output;
 	}
 	
-	public static String expand(String data) {
+	private static String expand(String data) {
 		List<String> replace = null;
 		if (data.startsWith("(")) {
 			String list = data.substring(1, data.indexOf(')'));

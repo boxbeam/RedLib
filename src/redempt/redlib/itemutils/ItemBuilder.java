@@ -41,6 +41,17 @@ public class ItemBuilder extends ItemStack {
 	}
 	
 	/**
+	 * Sets the stack size of this ItemBuilder
+	 * @param amount The number of items in the stack
+	 * @return The ItemBuilder with the new stack size
+	 */
+	public ItemBuilder setCount(int amount) {
+		ItemBuilder clone = new ItemBuilder(this.clone());
+		clone.setAmount(amount);
+		return clone;
+	}
+	
+	/**
 	 * Adds an enchantment to this ItemBuilder
 	 * @param enchant The enchantment to add
 	 * @param level The level of the enchantment
