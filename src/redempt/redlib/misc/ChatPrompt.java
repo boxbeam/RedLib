@@ -62,6 +62,7 @@ public class ChatPrompt implements Listener {
 		e.setCancelled(true);
 		if (e.getMessage().equalsIgnoreCase("cancel")) {
 			p.cancel(CancelReason.PLAYER_CANCELLED);
+			return;
 		}
 		p.respond(e.getMessage());
 	}
