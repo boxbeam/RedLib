@@ -605,7 +605,7 @@ public class Command implements Listener {
 		/**
 		 * The CommandArgumentType for a Player
 		 */
-		public static CommandArgumentType<Player> playerType = new CommandArgumentType<Player>("player", Bukkit::getPlayer)
+		public static CommandArgumentType<Player> playerType = new CommandArgumentType<Player>("player", name -> Bukkit.getPlayer(name))
 				.tabStream(c -> Bukkit.getOnlinePlayers().stream().map(Player::getName));
 		
 		private Function<String, T> func = null;
