@@ -108,7 +108,7 @@ public class StructureTool implements Listener {
 			player.sendMessage(ChatColor.RED + "Locations must be in the same world!");
 			return;
 		}
-		MultiBlockStructure mbs = MultiBlockStructure.create(MultiBlockStructure.stringify(locs[0], locs[1]), name);
+		MultiBlockStructure mbs = MultiBlockStructure.create(MultiBlockStructure.stringify(locs[0], locs[1]), name, false, true);
 		structures.put(player.getUniqueId(), mbs);
 		player.sendMessage(ChatColor.GREEN + "Structure registered! Left click it with your wand to get debug info.");
 	}

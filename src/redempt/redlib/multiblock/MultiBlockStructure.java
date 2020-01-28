@@ -54,13 +54,14 @@ public class MultiBlockStructure {
 					if (midVersion >= 13) {
 						output += block.getBlockData().getAsString() + ";";
 					} else {
-						output += block.getType() + ":" + block.getData();
+						output += block.getType() + ":" + block.getData() + ";";
 					}
 				}
 			}
 		}
+		output = output.substring(0, output.length() - 1);
 		output = minify(output);
-		return output.substring(0, output.length() - 1);
+		return output;
 	}
 	
 	/**
