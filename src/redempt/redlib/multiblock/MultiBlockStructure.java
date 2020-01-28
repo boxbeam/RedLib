@@ -13,10 +13,10 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 
 import redempt.redlib.RedLib;
-import redempt.redlib.multiblock.Structure.StructureBlock;
 
 /**
  * A utility class to create interactive multi-block structures
@@ -225,6 +225,41 @@ public class MultiBlockStructure {
 	}
 	
 	/**
+	 * Sends ghost blocks of this multi-block structure to the given player at the given location
+	 * @param loc The location to visualize the structure at
+	 * @param relX The relative X in the structure to visualize centered at
+	 * @param relY The relative Y in the structure to visualize centered at
+	 * @param relZ The relative Z in the structure to visualize centered at
+	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 * @param mirror Whether to mirror the structure on the X axis
+	 */
+	public void visualize(Player player, Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
+		Rotator rotator = new Rotator(rotation, mirror);
+		for (int x = 0; x < dimX; x++) {
+			for (int y = 0; y < dimY; y++) {
+				for (int z = 0; z < dimZ; z++) {
+					rotator.setLocation(x, z);
+					Location l = loc.clone().add(rotator.getRotatedX(), y, rotator.getRotatedZ());
+					rotator.setLocation(relX, relZ);
+					l.subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
+					sendBlock(player, l, data[x][y][z]);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Sends ghost blocks of this multi-block structure to the given player at the given location
+	 * @param loc The location to visualize the structure at
+	 * @param relX The relative X in the structure to visualize centered at
+	 * @param relY The relative Y in the structure to visualize centered at
+	 * @param relZ The relative Z in the structure to visualize centered at
+	 */
+	public void visualize(Player player, Location loc, int relX, int relY, int relZ) {
+		visualize(player, loc, relX, relY, relZ, 0, false);
+	}
+	
+	/**
 	 * Builds this multi-block structure at the given location
 	 * @param loc The location to build the structure at
 	 * @param relX The relative X in the structure to build centered at
@@ -235,18 +270,40 @@ public class MultiBlockStructure {
 	 */
 	public void build(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
 		Rotator rotator = new Rotator(rotation, mirror);
-		Rotator inverse = rotator.getInverse();
 		for (int x = 0; x < dimX; x++) {
 			for (int y = 0; y < dimY; y++) {
 				for (int z = 0; z < dimZ; z++) {
 					rotator.setLocation(x, z);
 					Location l = loc.clone().add(rotator.getRotatedX(), y, rotator.getRotatedZ());
-					inverse.setLocation(relX, relZ);
-					l.add(inverse.getRotatedX(), relY, inverse.getRotatedZ());
+					rotator.setLocation(relX, relZ);
+					l.subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
 					setBlock(l, data[x][y][z]);
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Builds this multi-block structure at the given location
+	 * @param loc The location to build the structure at
+	 * @param relX The relative X in the structure to build centered at
+	 * @param relY The relative Y in the structure to build centered at
+	 * @param relZ The relative Z in the structure to build centered at
+	 */
+	public void build(Location loc, int relX, int relY, int relZ) {
+		build(loc, relX, relY, relZ, 0, false);
+	}
+	
+	/**
+	 * Builds this multi-block structure at the given location
+	 * @param loc The location to build the structure at
+	 * @param relX The relative X in the structure to build centered at
+	 * @param relY The relative Y in the structure to build centered at
+	 * @param relZ The relative Z in the structure to build centered at
+	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 */
+	public void build(Location loc, int relX, int relY, int relZ, int rotation) {
+		build(loc, relX, relY, relZ, rotation, false);
 	}
 	
 	/**
@@ -391,6 +448,18 @@ public class MultiBlockStructure {
 			BlockState state = loc.getBlock().getState();
 			state.setData(new MaterialData(type, dataValue));
 			state.update();
+		}
+	}
+	
+	private void sendBlock(Player player, Location loc, String data) {
+		int midVersion = Integer.parseInt(RedLib.getServerVersion().split("\\.")[1]);
+		if (midVersion >= 13) {
+			player.sendBlockChange(loc, Bukkit.createBlockData(data));
+		} else {
+			String[] split = data.split(":");
+			Material type = Material.valueOf(split[0]);
+			byte dataValue = Byte.parseByte(split[1]);
+			player.sendBlockChange(loc, type, dataValue);
 		}
 	}
 	
