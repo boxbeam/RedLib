@@ -200,7 +200,7 @@ And that's really all there is to be said about the InventoryGUI. It's simple bu
 ## Multi-block structures
 This is probably a bit niche, but creating large multi-block structures can be annoying, and without a helper class, it's nearly impossible. RedLib has a very powerful and easy-to-use multi-block structure library built in to help with this.
 
-To get started, you're first going to want to go into RedLib's `plugin.yml` and set the flag `devMode: true` to enable the dev tools. Once in-game, build your multi-block structure. Use the multi-block structure tool to select two corners of it, and run `/struct create [name]`. The name doesn't matter much here.
+To get started, you're first going to want to go into RedLib's `config.yml` and set the flag `devMode: true` to enable the dev tools. Once in-game, build your multi-block structure. Use the multi-block structure tool to select two corners of it, and run `/struct create [name]`. The name doesn't matter much here.
 
 Once the structure is created, you can left-click the wand on any block and it will give you info about it. If it's not part of the structure you defined, it will simply tell you that. If it _is_ part of the structure you defined, it will tell you the name of the structure, the rotation of the structure, and whether it is flipped or not (because the utility class automatically checks for rotations of your structure). It will also tell you the relative coordinates of the block you clicked in the structure. The same block in the structure will always have the same relative coordinates, regardless of rotation, mirroring, and location. It's good to note these down if you want certain blocks to do certain things when the structure is clicked.
 
