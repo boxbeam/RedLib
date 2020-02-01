@@ -228,7 +228,7 @@ public class InventoryGUI implements Listener {
 	
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
-		if (e.getInventory().equals(inventory)) {
+		if (e.getClickedInventory().equals(inventory)) {
 			if (openSlots.contains(e.getSlot())) {
 				onClickOpenSlot.accept(e);
 				return;
