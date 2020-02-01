@@ -1,13 +1,18 @@
 package redempt.redlib.inventorygui;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -21,6 +26,10 @@ public class InventoryGUI implements Listener {
 	
 	private final Inventory inventory;
 	private List<ItemButton> buttons = new ArrayList<>();
+	private Set<Integer> openSlots = new HashSet<>();
+	private Consumer<InventoryClickEvent> onClickOpenSlot = (e) -> {};
+	private boolean returnItems = true;
+	private boolean destroyOnClose = true;
 	
 	/**
 	 * Creates a new GUI from an inventory
@@ -96,13 +105,117 @@ public class InventoryGUI implements Listener {
 	}
 	
 	/**
+	 * Opens a slot so that items can be placed in it
+	 * @param slot The slot to open
+	 */
+	public void openSlot(int slot) {
+		openSlots.add(slot);
+	}
+	
+	/**
+	 * Opens slots so that items can be placed in them
+	 * @param start The start of the open slot section, inclusive
+	 * @param end The end of the open slot section, exclusive
+	 */
+	public void openSlots(int start, int end) {
+		for (int i = start; i < end; i++) {
+			openSlots.add(i);
+		}
+	}
+	
+	/**
+	 * Closes a slot so that items can't be placed in it
+	 * @param slot The slot to open
+	 */
+	public void closeSlot(int slot) {
+		openSlots.remove(slot);
+	}
+	
+	/**
+	 * Closes slots so that items can't be placed in them
+	 * @param start The start of the closed slot section, inclusive
+	 * @param end The end of the open closed section, exclusive
+	 */
+	public void closeSlots(int start, int end) {
+		for (int i = start; i < end; i++) {
+			openSlots.remove(i);
+		}
+	}
+	
+	/**
+	 * Gets the open slots
+	 * @return The set of open slots
+	 */
+	public Set<Integer> getOpenSlots() {
+		return openSlots;
+	}
+	
+	/**
+	 * Returns whether or not items in open slots are returned to the player when this inventory is destroyed
+	 * @return Whether or not items in open slots are returned to the player when this inventory is destroyed
+	 */
+	public boolean returnsItems() {
+		return returnItems;
+	}
+	
+	/**
+	 * Sets whether items in open slots are returned to the player when this inventory is destroyed
+	 * @param returnItems Whether items in open slots should be returned to the player when this inventory is destroyed
+	 */
+	public void setReturnsItems(boolean returnItems) {
+		this.returnItems = returnItems;
+	}
+	
+	/**
+	 * Returns whether this GUI is destroyed when it has been closed by all viewers
+	 * @return Whether this GUI is destroyed when it has been closed by all viewers
+	 */
+	public boolean destroysOnClose() {
+		return destroyOnClose;
+	}
+	
+	/**
+	 * Sets whether this GUI is destroyed when it has been closed by all viewers
+	 * @param destroyOnClose Whether this GUI is destroyed when it has been closed by all viewers
+	 */
+	public void setDestroyOnClose(boolean destroyOnClose) {
+		this.destroyOnClose = destroyOnClose;
+	}
+	
+	/**
+	 * Sets the handler for when an open slot is clicked
+	 * @param handler The handler for when an open slot is clicked
+	 */
+	public void setOnClickOpenSlot(Consumer<InventoryClickEvent> handler) {
+		this.onClickOpenSlot = handler;
+	}
+	
+	/**
+	 * Remove this inventory as a listener and clean everything up to prevent memory leaks.
+	 * Call this when the GUI is no longer being used.
+	 * @param lastViewer The last Player who was viewing this GUI, to have the items returned to them.
+	 */
+	public void destroy(Player lastViewer) {
+		HandlerList.unregisterAll(this);
+		if (returnItems && lastViewer != null) {
+			for (int slot : openSlots) {
+				ItemStack item = inventory.getItem(slot);
+				if (item == null) {
+					continue;
+				}
+				lastViewer.getInventory().addItem(item).values().forEach(i -> lastViewer.getWorld().dropItem(lastViewer.getLocation(), i));
+			}
+		}
+		inventory.clear();
+		buttons.clear();
+	}
+	
+	/**
 	 * Remove this inventory as a listener and clean everything up to prevent memory leaks.
 	 * Call this when the GUI is no longer being used.
 	 */
 	public void destroy() {
-		HandlerList.unregisterAll(this);
-		inventory.clear();
-		buttons.clear();
+		destroy(null);
 	}
 	
 	/**
@@ -116,6 +229,10 @@ public class InventoryGUI implements Listener {
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
 		if (e.getInventory().equals(inventory)) {
+			if (openSlots.contains(e.getSlot())) {
+				onClickOpenSlot.accept(e);
+				return;
+			}
 			e.setCancelled(true);
 			for (ItemButton button : buttons) {
 				if (button.getItem().equals(e.getCurrentItem()) && e.getSlot() == button.getSlot()) {
@@ -126,22 +243,33 @@ public class InventoryGUI implements Listener {
 		}
 	}
 	
+	@EventHandler
+	public void onClose(InventoryCloseEvent e) {
+		if (e.getInventory().equals(inventory) && destroyOnClose) {
+			if (e.getViewers().size() <= 1) {
+				destroy((Player) e.getPlayer());
+			}
+		}
+	}
+	
 	/**
 	 * Gets the state of the GUI, which can be restored later
 	 * @return The state of this GUI
 	 */
 	public GUIState getState() {
-		return new GUIState(buttons, inventory.getContents(), this);
+		return new GUIState(buttons, openSlots, inventory.getContents(), this);
 	}
 	
 	public static class GUIState {
 		
 		private List<ItemButton> buttons;
+		private Set<Integer> openSlots;
 		private ItemStack[] contents;
 		private InventoryGUI gui;
 		
-		private GUIState(List<ItemButton> buttons, ItemStack[] contents, InventoryGUI gui) {
+		private GUIState(List<ItemButton> buttons, Set<Integer> openSlots, ItemStack[] contents, InventoryGUI gui) {
 			this.buttons = new ArrayList<>(buttons);
+			this.openSlots = new HashSet<>(openSlots);
 			this.contents = contents.clone();
 			this.gui = gui;
 		}
@@ -152,6 +280,7 @@ public class InventoryGUI implements Listener {
 		public void restore() {
 			gui.clear();
 			gui.buttons = new ArrayList<>(buttons);
+			gui.openSlots = new HashSet<>(openSlots);
 			gui.inventory.setContents(contents.clone());
 		}
 		
