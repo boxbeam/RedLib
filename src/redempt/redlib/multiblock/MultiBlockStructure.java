@@ -195,6 +195,7 @@ public class MultiBlockStructure {
 		this.dataString = info;
 		this.name = name;
 		this.strictMode = strictMode;
+		this.ignoreAir = ignoreAir;
 		String[] split = info.split(";");
 		String[] dimSplit = split[0].split("x");
 		dimX = Integer.parseInt(dimSplit[0]);
@@ -398,21 +399,21 @@ public class MultiBlockStructure {
 	private boolean compare(String data, Block block) {
 		int midVersion = Integer.parseInt(RedLib.getServerVersion().split("\\.")[1]);
 		if (midVersion >= 13) {
-			data = data.startsWith("minecraft:") ? data : ("minecraft:" + data);
-			if (!strictMode) {
-				return block.getType() == Bukkit.createBlockData(data).getMaterial();
-			}
+			data = data.startsWith("minecraft:") ? data : "minecraft:" + data;
 			if (ignoreAir && Bukkit.createBlockData(data).getMaterial() == Material.AIR) {
 				return true;
+			}
+			if (!strictMode) {
+				return block.getType() == Bukkit.createBlockData(data).getMaterial();
 			}
 			return block.getBlockData().getAsString().equals(data);
 		} else {
 			String[] split = data.split(":");
-			if (!strictMode) {
-				return block.getType() == Material.valueOf(split[0]);
-			}
 			if (ignoreAir && split[0].equals("AIR")) {
 				return true;
+			}
+			if (!strictMode) {
+				return block.getType() == Material.valueOf(split[0]);
 			}
 			return block.getType() == Material.valueOf(split[0]) && block.getData() == Byte.parseByte(split[1]);
 		}

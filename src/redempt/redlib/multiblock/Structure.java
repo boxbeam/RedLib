@@ -130,7 +130,7 @@ public class Structure {
 			throw new IndexOutOfBoundsException("Location outside bounds of structure");
 		}
 		rotator.setLocation(x, z);
-		return new StructureBlock(loc.getWorld().getBlockAt(rotator.getRotatedX(), y + loc.getBlockY(), rotator.getRotatedZ()),
+		return new StructureBlock(loc.getWorld().getBlockAt(rotator.getRotatedX() + loc.getBlockX(), y + loc.getBlockY(), rotator.getRotatedZ() + loc.getBlockZ()),
 				this,
 				x, y, z);
 	}
