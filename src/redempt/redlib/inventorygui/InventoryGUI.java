@@ -235,7 +235,7 @@ public class InventoryGUI implements Listener {
 			}
 			e.setCancelled(true);
 			for (ItemButton button : buttons) {
-				if (button.getItem().equals(e.getCurrentItem()) && e.getSlot() == button.getSlot()) {
+				if (e.getSlot() == button.getSlot()) {
 					button.onClick(e);
 					break;
 				}
