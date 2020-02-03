@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -228,6 +229,12 @@ public class InventoryGUI implements Listener {
 	
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
+		if (inventory.equals(e.getView().getTopInventory()) && !inventory.equals(e.getClickedInventory()) && e.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+			if (openSlots.size() > 0) {
+				onClickOpenSlot.accept(e);
+				return;
+			}
+		}
 		if (inventory.equals(e.getClickedInventory())) {
 			if (openSlots.contains(e.getSlot())) {
 				onClickOpenSlot.accept(e);
