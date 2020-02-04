@@ -45,7 +45,7 @@ public class Command implements Listener {
 	private CommandArgument[] args;
 	private String[] names;
 	private String permission;
-	private SenderType type = SenderType.EVERYONE;
+	private SenderType type;
 	protected String hook;
 	private Method methodHook;
 	private String help;
@@ -318,6 +318,7 @@ public class Command implements Listener {
 			return true;
 		}
 		if (methodHook != null) {
+			type = type == null ? SenderType.EVERYONE : type;
 			switch (type) {
 				case EVERYONE:
 					break;
