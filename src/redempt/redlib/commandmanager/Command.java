@@ -45,7 +45,7 @@ public class Command implements Listener {
 	private CommandArgument[] args;
 	private String[] names;
 	private String permission;
-	private SenderType type;
+	private SenderType type = SenderType.EVERYONE;
 	protected String hook;
 	private Method methodHook;
 	private String help;
