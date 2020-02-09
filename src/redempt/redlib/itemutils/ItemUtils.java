@@ -10,6 +10,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -159,6 +160,46 @@ public class ItemUtils {
 		ItemStack clone = item.clone();
 		clone.setItemMeta(meta);
 		return clone;
+	}
+	
+	/**
+	 * Counts the number of the given item in the given inventory
+	 * @param inv The inventory to count the items in
+	 * @param item The item to count
+	 * @return The number of items found
+	 */
+	public static int count(Inventory inv, ItemStack item) {
+		int count = 0;
+		for (ItemStack i : inv) {
+			if (item.isSimilar(i)) {
+				count += i.getAmount();
+			}
+		}
+		return count;
+	}
+	
+	/**
+	 * Removes the specified amount of the given item from the given inventory
+	 * @param inv The inventory to remove the items from
+	 * @param item The item to be removed
+	 * @param amount The amount of items to remove
+	 * @return Whether the amount specified could be removed. False if it removed less than specified.
+	 */
+	public static boolean remove(Inventory inv, ItemStack item, int amount) {
+		ItemStack[] contents = inv.getContents();
+		for (int i = 0; i < contents.length && amount > 0; i++) {
+			if (!item.isSimilar(contents[i])) {
+				continue;
+			}
+			if (amount >= contents[i].getAmount()) {
+				amount -= contents[i].getAmount();
+				contents[i] = null;
+				continue;
+			}
+			contents[i].setAmount(contents[i].getAmount() - amount);
+			return true;
+		}
+		return false;
 	}
 	
 }
