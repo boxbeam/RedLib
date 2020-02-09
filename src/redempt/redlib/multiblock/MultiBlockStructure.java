@@ -278,6 +278,7 @@ public class MultiBlockStructure {
 					Location l = loc.clone().add(rotator.getRotatedX(), y, rotator.getRotatedZ());
 					rotator.setLocation(relX, relZ);
 					l.subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
+					System.out.println(rotator.rotate(data[x][y][z]));
 					setBlock(l, data[x][y][z]);
 				}
 			}
@@ -467,6 +468,7 @@ public class MultiBlockStructure {
 	public static class Rotator {
 		
 		private static String[] rotations = {"x,z", "-z,x", "-x,-z", "z,-x"};
+		private static String[] blockDirections = {"north", "east", "south", "west"};
 		
 		private int rotation;
 		private boolean mirrored;
@@ -479,6 +481,39 @@ public class MultiBlockStructure {
 			}
 			this.rotation = rotation % 4;
 			this.mirrored = mirrored;
+		}
+		
+		/**
+		 * Rotates block data. NOTE: Only works for 1.13+
+		 * @param data The block data to rotate
+		 * @return The rotated block data
+		 */
+		public String rotate(String data) {
+			if (!data.contains("facing=")) {
+				return data;
+			}
+			int start = data.indexOf("facing=") + 7;
+			int end = data.indexOf(",", start);
+			end = end == -1 ? data.indexOf("]", start) : end;
+			String facing = data.substring(start, end);
+			int num = -1;
+			for (int i = 0; i < blockDirections.length; i++) {
+				if (facing.equals(blockDirections[i])) {
+					num = i;
+					break;
+				}
+			}
+			if (num == -1) {
+				return data;
+			}
+			num += rotation;
+			if (num == 1 || num == 3) {
+				num += 2;
+			}
+			num %= 4;
+			facing = blockDirections[num];
+			data = data.substring(0, start) + facing + data.substring(end);
+			return data;
 		}
 		
 		/**
