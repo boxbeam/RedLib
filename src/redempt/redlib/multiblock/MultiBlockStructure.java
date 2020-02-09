@@ -589,7 +589,7 @@ public class MultiBlockStructure {
 				return data;
 			}
 			num += rotation;
-			if (num == 1 || num == 3) {
+			if (mirrored && (num == 1 || num == 3)) {
 				num += 2;
 			}
 			num %= 4;

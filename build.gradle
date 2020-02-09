@@ -32,9 +32,33 @@ sourceSets {
 		}
 	}
 }
-task updateJars(type: Copy) {
-	from 'build/libs'
-	into serverDir
+task updateJars {
+	doLast {
+		copy {
+			from 'build/libs'
+			into '/home/redempt/Desktop/Spigot/1.8/plugins'
+		}
+		copy {
+			from 'build/libs'
+			into '/home/redempt/Desktop/Spigot/1.11/plugins'
+		}
+		copy {
+			from 'build/libs'
+			into '/home/redempt/Desktop/Spigot/1.12/plugins'
+		}
+		copy {
+			from 'build/libs'
+			into '/home/redempt/Desktop/Spigot/1.13/plugins'
+		}
+		copy {
+			from 'build/libs'
+			into '/home/redempt/Desktop/Spigot/1.14/plugins'
+		}
+		copy {
+			from 'build/libs'
+			into '/home/redempt/Desktop/Spigot/1.15/plugins'
+		}
+	}
 }
 task reloadServer {
 	def folder = file(serverDir + "/reload")
