@@ -475,7 +475,7 @@ public class MultiBlockStructure {
 		private int x = 0;
 		private int z = 0;
 		
-		protected Rotator(int rotation, boolean mirrored) {
+		public Rotator(int rotation, boolean mirrored) {
 			while (rotation < 0) {
 				rotation += 4;
 			}
