@@ -60,13 +60,6 @@ task updateJars {
 		}
 	}
 }
-task reloadServer {
-	def folder = file(serverDir + "/reload")
-	if (file(serverDir).exists()) {
-		file(serverDir + "/reload").text = rootProject.name	
-	}
-}
-task deploy(dependsOn: ["jar", "updateJars", "reloadServer"]) {
+task deploy(dependsOn: ["jar", "updateJars"]) {
 	updateJars.mustRunAfter jar
-	reloadServer.mustRunAfter updateJars
 }
