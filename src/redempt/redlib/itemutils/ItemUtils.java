@@ -197,8 +197,10 @@ public class ItemUtils {
 				continue;
 			}
 			contents[i].setAmount(contents[i].getAmount() - amount);
+			inv.setContents(contents);
 			return true;
 		}
+		inv.setContents(contents);
 		return false;
 	}
 	
