@@ -72,7 +72,19 @@ public class InventoryGUI implements Listener {
 	}
 	
 	/**
-	 * Fill a section of the inventory with the given 
+	 * Fill a section of the inventory with the given item
+	 * @param start The starting index to fill from, inclusive
+	 * @param The ending index to fill to, exclusive
+	 * @param item The item to set in these slots
+	 */
+	public void fill(int start, int end, ItemStack item) {
+		for (int i = start; i < end; i++) {
+			inventory.setItem(i, item.clone());
+		}
+	}
+	
+	/**
+	 * Fill a section of the inventory with the given item
 	 * @param x1 The X position to fill from, inclusive
 	 * @param y1 The Y position to fill from, inclusive
 	 * @param x2 The X position to fill to, exclusive
