@@ -194,6 +194,10 @@ public class ItemUtils {
 			if (amount >= contents[i].getAmount()) {
 				amount -= contents[i].getAmount();
 				contents[i] = null;
+				if (amount == 0) {
+					inv.setContents(contents);
+					return true;
+				}
 				continue;
 			}
 			contents[i].setAmount(contents[i].getAmount() - amount);
