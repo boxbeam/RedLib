@@ -140,7 +140,18 @@ public void smite(Player sender, Player target) {
 	sender.sendMessage(ChatColor.GREEN + "You smited " + target.getName() + "!");
 }
 ```
-If an optional argument isn't provided, the method hook will be `null`.
+If an optional argument isn't provided, the method hook will be `null`. That means you have to use wrapper classes of primitive types in your hook method's arguments: `Integer` instead of `int`, since `int` is not nullable.
+
+However, a default value can be specified:
+```
+givelava int:num?(1) {
+	hook givelava
+	help Gives you the specified amount of lava
+	permission givelava.use
+	user player
+}
+```
+By putting a parenthetical expression at the end of the argument, you can tell the command manager to use a default value if the optional argument is not provided. Note that this is evaluated immediately, and the CommandArgumentType will be passed `null` in place of the CommandSender it usually takes. Since the argument now has a default value, it will never be `null`, so it's safe to use a primitive type like `int` again.
 
 Now that I've touched on most of the basics, here are child commands:
 
