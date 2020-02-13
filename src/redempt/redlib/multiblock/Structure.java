@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 import redempt.redlib.multiblock.MultiBlockStructure.Rotator;
+import redempt.redlib.region.Region;
 
 /**
  * Represents an instance of a multi-block structure in the world
@@ -114,6 +115,16 @@ public class Structure {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * Gets the region this Structure occupies
+	 * @return The region this Structure occupies
+	 */
+	public Region getRegion() {
+		int[] dimensions = this.getType().getDimensions();
+		Location end = new Location(loc.getWorld(), dimensions[0], dimensions[1], dimensions[2]);
+		return new Region(loc.clone(), end);
 	}
 	
 	/**
