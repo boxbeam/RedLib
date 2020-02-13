@@ -1,6 +1,7 @@
 package redempt.redlib.region;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,6 +14,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import redempt.redlib.RedLib;
+import redempt.redlib.misc.Path;
 
 /**
  * A tool which can be given to players and used to select a Region, or just any two points
@@ -84,6 +86,19 @@ public class SelectionTool implements Listener {
 			return null;
 		}
 		return new Region(locations[0], locations[1]);
+	}
+	
+	/**
+	 * Creates a path of Locations, one block apart, based on the locations selected by the player
+	 * @param uuid The UUID of the player
+	 * @return The Region selected by the player, or null if the player has not selected 2 locations
+	 */
+	public List<Location> getPath(UUID uuid) {
+		Location[] locations = selections.get(uuid);
+		if (locations[0] == null || locations[1] == null) {
+			return null;
+		}
+		return Path.getPath(locations[0], locations[1]);
 	}
 	
 }
