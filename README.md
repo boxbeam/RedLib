@@ -47,7 +47,7 @@ Now, there are a lot of new flags here, and they're fairly self-explanatory, but
 - permission: The permission needed to run the command. This is inherited by child commands (we'll get there soon) and automatically checked.
 - help: The message shown in the help page and given to the user if they use the command improperly.
 - user: What type of sender this command can be executed by. Should be one of `player`, `console`, or `everyone`.
-And there's also another new thing: The argument. `string:player` specifies an argument. It will be passed as a String, and in the help screen, the name of the argument will be `string:player`.
+And there's also another new thing: The argument. `string:player` specifies an argument. It will be passed as a String, and in the help screen, the name of the argument will be shown as `string:player`.
 
 So let's look at what this command's hook might look like:
 
@@ -63,9 +63,9 @@ public void smite(Player sender, String target) {
 	sender.sendMessage(ChatColor.GREEN + "You smited " + victim.getName() + "!");
 }
 ```
-All hook methods must take the sender as the first argument. Since this method is limited to being called by players, it's okay to use `Player` as the first argument's type rather than `CommandSender`.
+All hook methods must take the sender as the first argument. Since this method is limited to being called by players, it's okay to use `Player` as the first argument's type rather than `CommandSender` because console will be disallowed from using it.
 
-This is still a bit clunky. Rather than converting the String argument to a `Player` in the command hook method, there's something much easier we can do. Let's go back and register our command a little bit differently:
+But this is still a bit clunky. Rather than converting the String argument to a `Player` in the command hook method, there's something much easier we can do. Let's go back and register our command a little bit differently:
 
 ```
 @Override
@@ -75,21 +75,23 @@ public void onEnable() {
 	Command.fromStream(this.getResource("command.txt"), playerType).register("smite", listener);
 }
 ```
-You can give the command manager a `CommandArgumentType`, which tells it how to convert it from a String argument from a command to whatever type it represents. We then pass it to the method which loads the command info from the file. Optionally, you can add a tab provider, which takes the `CommandSender` tab completing and returns a list of possible completions. The ones which don't match the partial argument the sender has already typed are automatically removed by the command manager.
+You can give the command manager a `CommandArgumentType`, which tells it how to convert it from a String argument from a command to whatever type it represents. In this case, `Bukkit::getPlayer` is a `Function<String, Player>` which will convert the `String` argument to a `Player` for any command hook methods. We then pass it to the method which loads the command info from the file. Optionally, you can add a tab provider to the `CommandArgumentType`, which is a lambda that takes the `CommandSender` tab completing and returns a list of possible completions. The ones which don't match the partial argument the sender has already typed are automatically removed by the command manager.
 
 Default types you can use are: `int`, `double`, `string`, `float`, and `long`.
 
-We also specify a name for this `CommandArgumentType`, which we can now use in the command file:
+We also specify a name for this `CommandArgumentType`, `"player"` which we can now use in the command file:
 
 ```
-smite player:player* {
+smite player:target* {
 	permission smite.use
 	user player
 	help Smites the specified player
 	hook smite
 }
 ```
-Note the `*` at the end of the argument. This isn't required, but it means that, in the help screen, the command will be shown as `smite <player>` instead of `smite <player:player>`. Anyways, now that we have specified `player` as the argument type and registered it in the command file, so we can now use it in the listener:
+The `CommandArgumentType` for `Player` is not included by default, but you don't need to define the type yourself. Since it's so common, it can be found at `CommandArgumentType.playerType`.
+
+Note the `*` at the end of the argument. This isn't required, but it means that, in the help screen, the command will be shown as `smite <target>` instead of `smite <player:target>`. Anyways, now that we have specified `player` as the argument type and registered it in the command file, so we can now use it in the listener:
 
 ```
 @CommandHook("smite")
@@ -100,7 +102,7 @@ public void smite(Player sender, Player target) {
 ```
 Much nicer! If the sender provides an invalid player (if the Function we gave it to convert a String to a Player returns null), the sender will be shown the help screen.
 
-Now, what if you have a command that takes an arbitrary number of arguments? No problem! You can specify consuming arguments in the command file, which consume all arguments following them. Obviously, they have to be the last argument in the command:
+Now, what if you have a command that takes an arbitrary number of arguments? No problem! You can specify varargs in the command file, which consume all arguments following them and will be passed to the `Function<String, T>` of the respective `CommandArgumentType`. All you have to do is put `...` at the end of the argument. Obviously, they have to be the last argument in the command:
 
 ```
 broadcast string:message*... {
@@ -138,15 +140,13 @@ public void smite(Player sender, Player target) {
 	sender.sendMessage(ChatColor.GREEN + "You smited " + target.getName() + "!");
 }
 ```
-If an optional argument isn't provided, you'll get `null`.
+If an optional argument isn't provided, the method hook will be `null`.
 
-Now that I've touched on most of the basics, child commands:
+Now that I've touched on most of the basics, here are child commands:
 
 ```
 base {
 	//Commands don't need hooks! You can create commands that exist only to contain child commands.
-	help This is a base command
-	permission base.use
 	//The child will inherit the permission requirement of the parent unless otherwise specified
 	child {
 		hook childCommand
@@ -154,7 +154,7 @@ base {
 	}
 }
 ```
-Pretty simple. Running `/base child` will call the child command.
+Pretty simple. Running `/base child` will call the child command's method hook. The method hook for the base command will not be called even if it is defined. You can nest child commands in child commands, as deep as you want.
 
 Since this is getting a bit long, for more info on the command manager, check out [this](https://github.com/Redempt/RedLib/blob/master/src/example/ExampleListener.java) and [this](https://github.com/Redempt/RedLib/blob/master/src/example/examplecmd.txt).
 
@@ -195,6 +195,20 @@ ItemBuilder icon = new ItemBuilder(Material.DIAMOND_SWORD)
 ItemButton button = ItemButton.create(icon, e -> e.getWhoClicked().damage(1000));
 gui.addButton(button, 1, 2);
 ```
+
+You can also open slots within the inventory, allowing players to place items into it. This is handy for GUIs that need to allow the player to interact with the items in them.
+
+```
+InventoryGUI gui = new InventoryGUI(Bukkit.createInventory(null, 27));
+gui.openSlot(11);
+```
+
+Opening the slot means that the player can place and remove items from the slot. You can set a listener callback for when the player interacts with open slots using the `setOnClickOpenSlot` method.
+
+If an `InventoryGUI` has open slots, the items in open slots will be automatically returned to the player when the inventory is closed. The player who receives the item will be the last player who closed the inventory. To disable this behavior, you can call `setReturnsItems(false);`.
+
+By default, an `InventoryGUI` will be destroyed once all viewers have closed the inventory. This is because most GUIs are transient: created new each time a player runs a command or clicks some element in the world, and never used again once closed. This behavior can be disabled by calling`setDestroyOnClose(false);`.
+
 And that's really all there is to be said about the InventoryGUI. It's simple but powerful. For more info, check out [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/inventorygui/InventoryGUI.java) and [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/inventorygui/ItemButton.java).
 
 ## Multi-block structures
@@ -206,8 +220,19 @@ Once the structure is created, you can left-click the wand on any block and it w
 
 If you want to register it as a structure programmatically, you should run `/struct print` and copy the string it gives you. Once you have that, you can use `MultiBlockStructure.create()` and pass it that string along with a name to create the multi-block structure handler.
 
-Once you have a `MultiBlockStructure` instance, you can use it to check for the existence of that structure anywhere in the world. By running `existsAt(Location)`, you can check if it exists at that location (this can be any block in the structure, and the structure can be rotated or mirrored horizontally). By running `getAt(Location)`, you can get an instance of `Structure`, which will be more useful than simply checking for the existence of the structure.
+Once you have a `MultiBlockStructure` instance, you can use it to check for the existence of that structure anywhere in the world. By running `getAt(Location)`, you can get an instance of `Structure`, or `null` if it doesn't exist there. Using the `Structure` instance, you can get relative blocks within the structure and access more in-depth info about it.
 
 With a `Structure` instance, you can get relative blocks within the structure (using the relative coordinates you may or may not have noted down earlier), check its rotation/mirroring, and get all of the blocks in it (by type if you want).
 
 For more info, check out [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/multiblock/MultiBlockStructure.java) and [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/multiblock/Structure.java).
+
+## Regions
+Also maybe a bit niche, but the Region utilities let you easily define regions of blocks in the world. You can create a `SelectionTool` with a custom item which allows players to select a region, and then get the region selected as a `Region` object. With the `Region` object, you can iterate all the blocks with `forEachBlock`. This will potentially be expanded in the future to include methods to move and resize the region.
+
+For more info, check out [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/region/SelectionTool.java) and [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/region/Region.java).
+
+## Miscellaneous
+
+ChatPrompt - Allows you to send a prompt to a player in chat and get their response in a callback.
+
+Path - Allows you to get all of the blocks along a certain path, either specifying a start and end location, a start location and vector, or just a start location with a direction. Useful for creating lines of particle effects.
