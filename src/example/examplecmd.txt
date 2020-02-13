@@ -49,6 +49,14 @@ test {
 		user player
 	}
 	
+	//If the command argument type name and command argument name are both the same (player and player), the type will automatically be hidden in the help menu
+	//By putting parenthesis after an optional argument, you can specify a default value
+	damage player:player int:amount*?(1) {
+		hook damage
+		help Damages the specified player with the given amount, or 1
+		permission damage.someone
+	} 
+	
 	//This command's name is broadcast
 	//Putting ... at the end of an argument will make it consume all arguments following it
 	//Must be the last argument

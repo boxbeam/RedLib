@@ -78,6 +78,12 @@ public class ExampleListener {
 		sender.damage(1000);
 	}
 	
+	//You can take the optional argument as an int here, because it will never be null. It will be 1 by default.
+	@CommandHook("damage")
+	public void damage(CommandSender sender, Player target, int damage) {
+		target.damage(damage);
+	}
+	
 	@CommandHook("broadcast")
 	//This command's last argument consumes
 	//That means that it will ignore spaces once it reaches that argument
