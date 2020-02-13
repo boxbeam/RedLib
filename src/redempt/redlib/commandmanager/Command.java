@@ -151,6 +151,7 @@ public class Command implements Listener {
 			for (int i = 0; i < cmdArgs.size(); i++) {
 				if (cmdArgs.get(i).isOptional()) {
 					cmdArgs.remove(i);
+					i = -1;
 					diff--;
 					if (diff <= 0) {
 						break;
