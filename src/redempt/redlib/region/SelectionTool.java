@@ -44,6 +44,7 @@ public class SelectionTool implements Listener {
 		Location[] locations = selections.getOrDefault(e.getPlayer().getUniqueId(), new Location[2]);
 		if (locations[0] != null && locations[1] != null) {
 			locations[0] = null;
+			locations[1] = null;
 		}
 		if (locations[0] == null) {
 			locations[0] = e.getClickedBlock().getLocation();

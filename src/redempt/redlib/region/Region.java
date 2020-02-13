@@ -93,9 +93,9 @@ public class Region {
 	 */
 	public void forEachBlock(Consumer<Block> lambda) {
 		int[] dimensions = this.getBlockDimensions();
-		for (int x = 0; x < dimensions[0]; x++) {
-			for (int y = 0; y < dimensions[1]; y++) {
-				for (int z = 0; z < dimensions[2]; z++) {
+		for (int x = 0; x <= dimensions[0]; x++) {
+			for (int y = 0; y <= dimensions[1]; y++) {
+				for (int z = 0; z <= dimensions[2]; z++) {
 					Location loc = getStart().add(x, y, z);
 					lambda.accept(loc.getBlock());
 				}
@@ -117,9 +117,9 @@ public class Region {
 			this.region = region;
 			int[] dimensions = region.getBlockDimensions();
 			blocks = new BlockState[dimensions[0]][dimensions[1]][dimensions[2]];
-			for (int x = 0; x < dimensions[0]; x++) {
-				for (int y = 0; y < dimensions[1]; y++) {
-					for (int z = 0; z < dimensions[2]; z++) {
+			for (int x = 0; x <= dimensions[0]; x++) {
+				for (int y = 0; y <= dimensions[1]; y++) {
+					for (int z = 0; z <= dimensions[2]; z++) {
 						Location loc = region.getStart().add(x, y, z);
 						blocks[x][y][z] = loc.getBlock().getState();
 					}
@@ -132,9 +132,9 @@ public class Region {
 		 */
 		public void restore() {
 			int[] dimensions = region.getBlockDimensions();
-			for (int x = 0; x < dimensions[0]; x++) {
-				for (int y = 0; y < dimensions[1]; y++) {
-					for (int z = 0; z < dimensions[2]; z++) {
+			for (int x = 0; x <= dimensions[0]; x++) {
+				for (int y = 0; y <= dimensions[1]; y++) {
+					for (int z = 0; z <= dimensions[2]; z++) {
 						blocks[x][y][z].update(true, false);
 					}
 				}
