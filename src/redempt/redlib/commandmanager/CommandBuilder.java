@@ -97,6 +97,7 @@ public class CommandBuilder {
 			
 		};
 		args = new CommandArgument[] {new CommandArgument(new CommandArgumentType<String>("string", s -> s),
+				0,
 				argName,
 				false,
 				true,

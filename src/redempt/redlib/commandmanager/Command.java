@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -148,49 +149,91 @@ public class Command implements Listener {
 		List<CommandArgument> cmdArgs = Arrays.stream(c).collect(Collectors.toList());
 		if (cmdArgs.size() > args.length) {
 			int diff = cmdArgs.size() - args.length;
-			for (int i = 0; i < cmdArgs.size(); i++) {
-				if (cmdArgs.get(i).isOptional()) {
-					cmdArgs.remove(i);
-					i -= 1;
-					diff--;
-					if (diff <= 0) {
-						break;
-					}
+			int optional = (int) cmdArgs.stream().filter(CommandArgument::isOptional).count();
+			CommandArgument[] cargs = c.clone();
+			for (int i = 0; i < cargs.length; i++) {
+				if (cargs[i].isOptional()) {
+					cargs[i] = null;
 				}
 			}
-			if (diff > 0) {
-				return null;
+			List<CommandArgument> used = new ArrayList<>();
+			if (optional >= diff) {
+				for (int i = 0; i < args.length && diff > 0; i++) {
+					String argString = args[i];
+					List<CommandArgument> optionals = new ArrayList<>();
+					if (!cmdArgs.get(i).isOptional()) {
+						continue;
+					}
+					optionals.add(cmdArgs.get(i));
+					for (int j = i - 1; j >= 0; j--) {
+						CommandArgument arg = cmdArgs.get(j);
+						if (arg.isOptional()) {
+							optionals.add(arg);
+						} else {
+							break;
+						}
+					}
+					for (int j = i + 1; j < cmdArgs.size(); j++) {
+						CommandArgument arg = cmdArgs.get(j);
+						if (arg.isOptional()) {
+							optionals.add(arg);
+						} else {
+							break;
+						}
+					}
+					optionals.removeIf(arg -> {
+						try {
+							return arg.getType().convert(sender, argString) == null;
+						} catch (Exception e) {
+							return true;
+						}
+					});
+					if (optionals.size() > 1 && !optionals.stream().allMatch(arg -> arg.getType().getName().equals("string"))) {
+						optionals.removeIf(arg -> arg.getType().getName().equals("string"));
+					}
+					optionals.removeAll(used);
+					if (optionals.size() == 0) {
+						continue;
+					}
+					CommandArgument chosen = optionals.get(0);
+					used.add(chosen);
+					cargs[i] = chosen;
+					diff--;
+				}
 			}
+			cmdArgs = Arrays.stream(cargs).filter(arg -> arg != null).collect(Collectors.toList());
 		}
 		if (cmdArgs.size() != args.length && (c.length == 0 || !c[c.length - 1].consumes())) {
 			return null;
 		}
 		Object[] output = new Object[c.length + 1];
 		output[0] = sender;
-		for (int i = 1; i < output.length; i++) {
-			if (!cmdArgs.contains(c[i - 1])) {
-				output[i] = null;
-				continue;
-			}
-			if (c[i - 1].consumes()) {
-				if (i < c.length) {
+		for (CommandArgument arg : cmdArgs) {
+			if (arg.consumes()) {
+				if (arg.pos != c.length - 1) {
 					throw new IllegalArgumentException("Consuming argument must be the last argument!");
 				}
 				String combine = "";
-				for (int x = i - 1; x < args.length; x++) {
+				for (int x = cmdArgs.size() - 1; x < args.length; x++) {
 					combine += args[x] + " ";
 				}
-				combine = combine.substring(0, combine.length() - 1);
-				output[i] = c[i - 1].getType().convert(sender, combine);
+				try {
+					combine = combine.substring(0, combine.length() - 1);
+					output[arg.getPosition() + 1] = arg.getType().convert(sender, combine);
+				} catch (Exception e) {
+					return null;
+				}
 				return output;
 			}
 			try {
-				output[i] = c[i - 1].getType().convert(sender, args[i - 1]);
+				output[arg.getPosition() + 1] = Objects.requireNonNull(arg.getType().convert(sender, args[cmdArgs.indexOf(arg)]));
 			} catch (Exception e) {
 				return null;
 			}
-			if (output[i] == null) {
-				return null;
+		}
+		for (CommandArgument arg : c) {
+			if (arg.isOptional() && output[arg.getPosition() + 1] == null) {
+				output[arg.getPosition() + 1] = arg.getDefaultValue();
 			}
 		}
 		return output;
@@ -402,6 +445,35 @@ public class Command implements Listener {
 		return fromLines(lines, 0, types);
 	}
 	
+	private static String[] splitArgs(String args) {
+		List<String> split = new ArrayList<>();
+		String combine = "";
+		int depth = 0;
+		for (char c : args.toCharArray()) {
+			switch (c) {
+				case '(':
+					depth++;
+					break;
+				case ')':
+					depth--;
+					break;
+				case ' ':
+					if (depth == 0) {
+						split.add(combine);
+						combine = "";
+					} else {
+						combine += c;
+					}
+					continue;
+			}
+			combine += c;
+		}
+		if (combine.length() > 0) {
+			split.add(combine);
+		}
+		return split.toArray(new String[split.size()]);
+	}
+	
 	private static CommandCollection fromLines(List<String> lines, int lineNumber, CommandArgumentType<?>... types) {
 		int depth = 0;
 		String help = null;
@@ -419,7 +491,7 @@ public class Command implements Listener {
 				depth++;
 				if (depth == 1) {
 					line = line.replaceAll("\\{$", "").trim();
-					String[] split = line.split(" ");
+					String[] split = splitArgs(line);
 					names = split[0].split(",");
 					for (int i = 1; i < split.length; i++) {
 						String[] argSplit = split[i].split(":");
@@ -434,9 +506,42 @@ public class Command implements Listener {
 						boolean hideType = false;
 						boolean optional = false;
 						boolean consumes = false;
+						Object defaultValue = null;
 						if (name.endsWith("...")) {
 							consumes = true;
 							name = name.substring(0, name.length() - 3);
+						}
+						int startIndex = -1;
+						if ((startIndex = name.indexOf('(')) != -1) {
+							int pdepth = 0;
+							int length = 0;
+							for (int j = startIndex; j < name.length(); j++) {
+								char c = name.charAt(j);
+								length++;
+								if (c == '(') {
+									pdepth++;
+								}
+								if (c == ')') {
+									pdepth--;
+									if (pdepth == 0) {
+										break;
+									}
+								}
+							}
+							if (pdepth != 0) {
+								throw new IllegalStateException("Unbalanced parenthesis in argument: " + name + ", line " + pos);
+							}
+							if (startIndex + length < name.length()) {
+								throw new IllegalStateException("Invalid format for argument " + name + ": Cannot define any info after default value (parenthesis), line " + pos);
+							}
+							String value = name.substring(startIndex + 1, startIndex + length - 1);
+							name = name.substring(0, startIndex);
+							try {
+								defaultValue = argType.convert(null, value);
+							} catch (Exception e) {
+								e.printStackTrace();
+								throw new IllegalArgumentException("Invalid default argument value " + value + ", line " + pos + ". Note that default values are evaluated immediately, so the CommandSender passed to the CommandArgumentType will ne null.");
+							}
 						}
 						if (name.endsWith("*?") || name.endsWith("?*")) {
 							hideType = true;
@@ -451,7 +556,14 @@ public class Command implements Listener {
 							optional = true;
 							name = name.substring(0, name.length() - 1);
 						}
-						args.add(new CommandArgument(argType, name, optional, hideType, consumes));
+						if (name.equals(argType.getName())) {
+							hideType = true;
+						}
+						CommandArgument arg = new CommandArgument(argType, i - 1, name, optional, hideType, consumes);
+						if (arg.isOptional()) {
+							arg.setDefaultValue(defaultValue);
+						}
+						args.add(arg);
 					}
 				} else if (depth == 2) {
 					children.addAll(fromLines(lines, pos, types).getCommands());
@@ -563,13 +675,28 @@ public class Command implements Listener {
 		private boolean optional;
 		private boolean hideType;
 		private boolean consume;
+		private Object defaultValue = null;
+		private int pos;
 		
-		public CommandArgument(CommandArgumentType<?> type, String name, boolean optional, boolean hideType, boolean consume) {
+		public CommandArgument(CommandArgumentType<?> type, int pos, String name, boolean optional, boolean hideType, boolean consume) {
 			this.name = name;
 			this.type = type;
+			this.pos = pos;
 			this.optional = optional;
 			this.hideType = hideType;
 			this.consume = consume;
+		}
+		
+		public void setDefaultValue(Object value) {
+			this.defaultValue = value;
+		}
+		
+		public Object getDefaultValue() {
+			return defaultValue;
+		}
+		
+		public int getPosition() {
+			return pos;
 		}
 		
 		public CommandArgumentType<?> getType() {
