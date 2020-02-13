@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -37,7 +38,7 @@ public class SelectionTool implements Listener {
 	
 	@EventHandler
 	public void onClick(PlayerInteractEvent e) {
-		if (e.getClickedBlock() == null || e.getItem() == null) {
+		if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null) {
 			return;
 		}
 		if (!item.isSimilar(e.getItem())) {
