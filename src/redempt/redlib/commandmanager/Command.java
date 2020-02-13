@@ -41,6 +41,16 @@ public class Command implements Listener {
 		types.add(new CommandArgumentType<Float>("float", Float::parseFloat));
 		types.add(new CommandArgumentType<Long>("long", (Function<String, Long>) Long::parseLong));
 		types.add(new CommandArgumentType<String>("string", s -> s));
+		types.add(new CommandArgumentType<Boolean>("boolean", s -> {
+			switch (s.toLowerCase()) {
+				case "true":
+					return true;
+				case "false":
+					return false;
+				default:
+					return null;
+			}
+		}));
 	}
 	
 	private CommandArgument[] args;
