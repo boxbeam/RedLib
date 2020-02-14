@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 public class PlayerWrapper {
 	
 	public static Player wrap(Player player, String... disable) {
-		return (Player) Proxy.newProxyInstance(player.getClass().getClassLoader(), new Class<?>[] {player.getClass()}, new InvocationHandler() {
+		return (Player) Proxy.newProxyInstance(player.getClass().getClassLoader(), new Class<?>[] {Player.class}, new InvocationHandler() {
 			
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
