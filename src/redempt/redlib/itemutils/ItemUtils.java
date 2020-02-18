@@ -9,6 +9,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -206,6 +207,37 @@ public class ItemUtils {
 		}
 		inv.setContents(contents);
 		return false;
+	}
+	
+	/**
+	 * Give the player the specified items, dropping them on the ground if there is not enough room
+	 * @param player The player to give the items to
+	 * @param items The items to be given
+	 */
+	public static void give(Player player, ItemStack... items) {
+		player.getInventory().addItem(items).values().forEach(i -> player.getWorld().dropItem(player.getLocation(), i));
+	}
+	
+	/**
+	 * Gives the player the specified amount of the specified item, dropping them on the ground if there is not enough room
+	 * @param player The player to give the items to
+	 * @param item The item to be given to the player
+	 * @param amount The amount the player should be given
+	 */
+	public static void give(Player player, ItemStack item, int amount) {
+		if (amount < 1) {
+			throw new IllegalArgumentException("Amount must be greater than 0");
+		}
+		int stackSize = item.getType().getMaxStackSize();
+		while (amount > stackSize) {
+			ItemStack clone = item.clone();
+			clone.setAmount(stackSize);
+			give(player, clone);
+			amount -= stackSize;
+		}
+		ItemStack clone = item.clone();
+		clone.setAmount(amount);
+		give(player, clone);
 	}
 	
 }
