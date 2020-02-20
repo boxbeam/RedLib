@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -33,7 +32,7 @@ public class EventListener<T extends Event> implements Listener {
 	public EventListener(Plugin plugin, Class<T> eventClass, BiConsumer<EventListener<T>, T> handler) {
 		this.handler = handler;
 		try {
-			Method method = eventClass.getDeclaredMethod("getHandlerList");
+			Method method = eventClass.getMethod("getHandlerList");
 			method.setAccessible(true);
 			HandlerList list = (HandlerList) method.invoke(null);
 	        for (Map.Entry<Class<? extends Event>, Set<RegisteredListener>> entry : plugin.getPluginLoader().createRegisteredListeners(this, plugin).entrySet()) {
