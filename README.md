@@ -261,3 +261,5 @@ For more info, check out [this](https://github.com/Redempt/RedLib/blob/master/sr
 ChatPrompt - Allows you to send a prompt to a player in chat and get their response in a callback.
 
 Path - Allows you to get all of the blocks along a certain path, either specifying a start and end location, a start location and vector, or just a start location with a direction. Useful for creating lines of particle effects.
+
+EventListener - Allows you to define a listener for an event with a lambda rather than having to create a class for it or invoke the anonymous class definition
