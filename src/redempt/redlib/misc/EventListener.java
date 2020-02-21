@@ -22,6 +22,7 @@ import org.bukkit.plugin.RegisteredListener;
 public class EventListener<T extends Event> implements Listener {
 	
 	private BiConsumer<EventListener<T>, T> handler;
+	private Class<T> eventClass;
 	
 	/**
 	 * Creates and registers a Listener for the given event
@@ -31,6 +32,7 @@ public class EventListener<T extends Event> implements Listener {
 	 */
 	public EventListener(Plugin plugin, Class<T> eventClass, BiConsumer<EventListener<T>, T> handler) {
 		this.handler = handler;
+		this.eventClass = eventClass;
 		try {
 			Method method = eventClass.getMethod("getHandlerList");
 			method.setAccessible(true);
@@ -45,7 +47,9 @@ public class EventListener<T extends Event> implements Listener {
 	
 	@EventHandler
 	public void handleEvent(T event) {
-		handler.accept(this, event);
+		if (event.getClass().equals(eventClass)) {
+			handler.accept(this, event);
+		}
 	}
 	
 	/**
