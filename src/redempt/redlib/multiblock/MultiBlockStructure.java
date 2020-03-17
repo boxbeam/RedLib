@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.bukkit.Bukkit;
@@ -275,6 +277,37 @@ public class MultiBlockStructure {
 		return data;
 	}
 	
+	private void forEachData(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror, BiConsumer<Location, String> callback) {
+		Rotator rotator = new Rotator(rotation, mirror);
+		for (int x = 0; x < dimX; x++) {
+			for (int y = 0; y < dimY; y++) {
+				for (int z = 0; z < dimZ; z++) {
+					rotator.setLocation(x, z);
+					Location l = loc.clone().add(rotator.getRotatedX(), y, rotator.getRotatedZ());
+					rotator.setLocation(relX, relZ);
+					l.subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
+					callback.accept(l, rotator.rotate(data[x][y][z]));
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Iterates each block which would be set if this structure is built
+	 * @param loc The location the structure would be built at
+	 * @param relX The relative X in the structure to center at
+	 * @param relY The relative Y in the structure to center at
+	 * @param relZ The relative Z in the structure to center at
+	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 * @param mirror Whether to mirror the structure on the X axis
+	 * @param callback The callback to be called, passed the {@link BlockState} which would be set if the structure is built here
+	 */
+	public void forEachBlock(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror, Consumer<BlockState> callback) {
+		forEachData(loc, relX, relY, relZ, rotation, mirror, (l, s) -> {
+			callback.accept(getStateToSet(l, s));
+		});
+	}
+	
 	/**
 	 * Uses a Predicate to test each block where this structure would be built
 	 * @param loc The location to test the conditions at
@@ -287,21 +320,13 @@ public class MultiBlockStructure {
 	 * @return Whether every location passed the check
 	 */
 	public boolean canBuild(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror, Predicate<Location> filter) {
-		Rotator rotator = new Rotator(rotation, mirror);
-		for (int x = 0; x < dimX; x++) {
-			for (int y = 0; y < dimY; y++) {
-				for (int z = 0; z < dimZ; z++) {
-					rotator.setLocation(x, z);
-					Location l = loc.clone().add(rotator.getRotatedX(), y, rotator.getRotatedZ());
-					rotator.setLocation(relX, relZ);
-					l.subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
-					if (!filter.test(l)) {
-						return false;
-					}
-				}
+		boolean[] canBuild = {true};
+		forEachData(loc, relX, relY, relZ, rotation, mirror, (l, d) -> {
+			if (!filter.test(l)) {
+				canBuild[0] = false;
 			}
-		}
-		return true;
+		});
+		return canBuild[0];
 	}
 	
 	/**
@@ -347,18 +372,9 @@ public class MultiBlockStructure {
 	 * @param mirror Whether to mirror the structure on the X axis
 	 */
 	public void visualize(Player player, Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
-		Rotator rotator = new Rotator(rotation, mirror);
-		for (int x = 0; x < dimX; x++) {
-			for (int y = 0; y < dimY; y++) {
-				for (int z = 0; z < dimZ; z++) {
-					rotator.setLocation(x, z);
-					Location l = loc.clone().add(rotator.getRotatedX(), y, rotator.getRotatedZ());
-					rotator.setLocation(relX, relZ);
-					l.subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
-					sendBlock(player, l, rotator.rotate(data[x][y][z]));
-				}
-			}
-		}
+		forEachData(loc, relX, relY, relZ, rotation, mirror, (l, d) -> {
+			sendBlock(player, l, d);
+		});
 	}
 	
 	/**
@@ -382,18 +398,12 @@ public class MultiBlockStructure {
 	 * @param mirror Whether to mirror the structure on the X axis
 	 */
 	public void build(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
-		Rotator rotator = new Rotator(rotation, mirror);
-		for (int x = 0; x < dimX; x++) {
-			for (int y = 0; y < dimY; y++) {
-				for (int z = 0; z < dimZ; z++) {
-					rotator.setLocation(x, z);
-					Location l = loc.clone().add(rotator.getRotatedX(), y, rotator.getRotatedZ());
-					rotator.setLocation(relX, relZ);
-					l.subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
-					setBlock(l, rotator.rotate(data[x][y][z]));
-				}
+		forEachData(loc, relX, relY, relZ, rotation, mirror, (l, d) -> {
+			BlockState state = getStateToSet(l, d);
+			if (state != null) {
+				state.update();
 			}
-		}
+		});
 	}
 	
 	/**
@@ -450,6 +460,20 @@ public class MultiBlockStructure {
 	 */
 	public int[] getDimensions() {
 		return new int[] {dimX, dimY, dimZ};
+	}
+	
+	/**
+	 * @return Whether this structure ignores air in the data when building and checking for presence
+	 */
+	public boolean ignoresAir() {
+		return ignoreAir;
+	}
+	
+	/**
+	 * @return Whether this structure ignores data other than block type when checking for presence
+	 */
+	public boolean isStrictMode() {
+		return strictMode;
 	}
 	
 	/**
@@ -550,24 +574,26 @@ public class MultiBlockStructure {
 		return dataString;
 	}
 	
-	private void setBlock(Location loc, String data) {
+	public BlockState getStateToSet(Location loc, String data) {
 		int midVersion = Integer.parseInt(RedLib.getServerVersion().split("\\.")[1]);
 		if (midVersion >= 13) {
 			BlockData blockData = Bukkit.createBlockData(data);
 			if (ignoreAir && blockData.getMaterial() == Material.AIR) {
-				return;
+				return null;
 			}
-			loc.getBlock().setBlockData(blockData);
+			BlockState state = loc.getBlock().getState();
+			state.setBlockData(blockData);
+			return state;
 		} else {
 			String[] split = data.split(":");
 			Material type = Material.valueOf(split[0]);
 			if (ignoreAir && type == Material.AIR) {
-				return;
+				return null;
 			}
 			byte dataValue = Byte.parseByte(split[1]);
 			BlockState state = loc.getBlock().getState();
 			state.setData(new MaterialData(type, dataValue));
-			state.update();
+			return state;
 		}
 	}
 	
