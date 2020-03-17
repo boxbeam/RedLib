@@ -401,7 +401,7 @@ public class MultiBlockStructure {
 		forEachData(loc, relX, relY, relZ, rotation, mirror, (l, d) -> {
 			BlockState state = getStateToSet(l, d);
 			if (state != null) {
-				state.update();
+				state.update(true);
 			}
 		});
 	}
