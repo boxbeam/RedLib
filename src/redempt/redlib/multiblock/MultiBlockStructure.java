@@ -574,7 +574,7 @@ public class MultiBlockStructure {
 		return dataString;
 	}
 	
-	public BlockState getStateToSet(Location loc, String data) {
+	private BlockState getStateToSet(Location loc, String data) {
 		int midVersion = Integer.parseInt(RedLib.getServerVersion().split("\\.")[1]);
 		if (midVersion >= 13) {
 			BlockData blockData = Bukkit.createBlockData(data);
