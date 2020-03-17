@@ -1,5 +1,9 @@
 package redempt.redlib.multiblock;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -71,7 +75,7 @@ public class MultiBlockStructure {
 	 * Creates a MultiBlockStructure instance from an info string
 	 * @param info The info string. Get this from {@link MultiBlockStructure#stringify(Location, Location)}
 	 * @param name The name of the multi-block structure
-	 * @return
+	 * @return The multi-block structure
 	 */
 	public static MultiBlockStructure create(String info, String name) {
 		return new MultiBlockStructure(info, name, true, false);
@@ -82,7 +86,7 @@ public class MultiBlockStructure {
 	 * @param info The info string. Get this from {@link MultiBlockStructure#stringify(Location, Location)}
 	 * @param name The name of the multi-block structure
 	 * @param strictMode Whether block data is taken into account. Only checks material if false. Defaults to true.
-	 * @return
+	 * @return The multi-block structure
 	 */
 	public static MultiBlockStructure create(String info, String name, boolean strictMode) {
 		return new MultiBlockStructure(info, name, strictMode, false);
@@ -94,10 +98,54 @@ public class MultiBlockStructure {
 	 * @param name The name of the multi-block structure
 	 * @param strictMode Whether block data is taken into account. Only checks material if false. Defaults to true.
 	 * @param ignoreAir If true, air in the original structure is skipped when checking blocks. Defaults to false.
-	 * @return
+	 * @return The multi-block structure
 	 */
 	public static MultiBlockStructure create(String info, String name, boolean strictMode, boolean ignoreAir) {
 		return new MultiBlockStructure(info, name, strictMode, ignoreAir);
+	}
+	
+	/**
+	 * Creates a MultiBlockStructure instance from an input stream containing the info string
+	 * @param stream The input stream. Get this from {@link org.bukkit.plugin.java.JavaPlugin#getResource(String)}
+	 * @param name The name of the multi-block structure
+	 * @param strictMode Whether block data is taken into account. Only checks material if false. Defaults to true.
+	 * @param ignoreAir If true, air in the original structure is skipped when checking blocks. Defaults to false.
+	 * @return The multi-block structure
+	 */
+	public static MultiBlockStructure create(InputStream stream, String name, boolean strictMode, boolean ignoreAir) {
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+			String line;
+			String combine = "";
+			while ((line = reader.readLine()) != null) {
+				combine += line;
+			}
+			return create(combine, name, strictMode, ignoreAir);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	/**
+	 * Creates a MultiBlockStructure instance from an input stream containing the info string
+	 * @param stream The input stream. Get this from {@link org.bukkit.plugin.java.JavaPlugin#getResource(String)}
+	 * @param name The name of the multi-block structure
+	 * @param strictMode Whether block data is taken into account. Only checks material if false. Defaults to true.
+	 * @return The multi-block structure
+	 */
+	public static MultiBlockStructure create(InputStream stream, String name, boolean strictMode) {
+		return create(stream, name, strictMode, false);
+	}
+	
+	/**
+	 * Creates a MultiBlockStructure instance from an input stream containing the info string
+	 * @param stream The input stream. Get this from {@link org.bukkit.plugin.java.JavaPlugin#getResource(String)}
+	 * @param name The name of the multi-block structure
+	 * @return The multi-block structure
+	 */
+	public static MultiBlockStructure create(InputStream stream, String name) {
+		return create(stream, name, true, false);
 	}
 	
 	private static String minify(String data) {
