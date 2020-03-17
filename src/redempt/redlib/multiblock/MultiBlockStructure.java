@@ -309,6 +309,36 @@ public class MultiBlockStructure {
 	}
 	
 	/**
+	 * Iterates each block which would be set if this structure is built
+	 * @param loc The location the structure would be built at
+	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 * @param mirror Whether to mirror the structure on the X axis
+	 * @param callback The callback to be called, passed the {@link BlockState} which would be set if the structure is built here
+	 */
+	public void forEachBlock(Location loc, int rotation, boolean mirror, Consumer<BlockState> callback) {
+		forEachBlock(loc, 0, 0, 0, rotation, mirror, callback);
+	}
+	
+	/**
+	 * Iterates each block which would be set if this structure is built
+	 * @param loc The location the structure would be built at
+	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 * @param callback The callback to be called, passed the {@link BlockState} which would be set if the structure is built here
+	 */
+	public void forEachBlock(Location loc, int rotation, Consumer<BlockState> callback) {
+		forEachBlock(loc, 0, 0, 0, rotation, false, callback);
+	}
+	
+	/**
+	 * Iterates each block which would be set if this structure is built
+	 * @param loc The location the structure would be built at
+	 * @param callback The callback to be called, passed the {@link BlockState} which would be set if the structure is built here
+	 */
+	public void forEachBlock(Location loc, Consumer<BlockState> callback) {
+		forEachBlock(loc, 0, 0, 0, 0, false, callback);
+	}
+	
+	/**
 	 * Uses a Predicate to test each block where this structure would be built
 	 * @param loc The location to test the conditions at
 	 * @param relX The relative X in the structure to test centered at
