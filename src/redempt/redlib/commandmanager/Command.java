@@ -260,7 +260,7 @@ public class Command implements Listener {
 			field = Bukkit.getServer().getClass().getDeclaredField("commandMap");
 			field.setAccessible(true);
 			SimpleCommandMap map = (SimpleCommandMap) field.get(Bukkit.getServer());
-			org.bukkit.command.Command cmd = new org.bukkit.command.Command(names[0], help == null ? "None" : help, "", Arrays.stream(names).filter(s -> !s.equals(names[0])).collect(Collectors.toList())) {
+			org.bukkit.command.Command cmd = new org.bukkit.command.Command(names[0], help == null ? "None" : help, "", Arrays.stream(names).skip(1).collect(Collectors.toList())) {
 
 				@Override
 				public boolean execute(CommandSender sender, String name, String[] args) {
