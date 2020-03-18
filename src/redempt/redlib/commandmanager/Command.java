@@ -22,7 +22,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 
 import redempt.redlib.RedLib;
 
@@ -30,7 +29,7 @@ import redempt.redlib.RedLib;
  * Represents a command which can be registered
  * @author Redempt
  */
-public class Command implements Listener {
+public class Command {
 	
 	private static List<CommandArgumentType<?>> types = new ArrayList<>();
 	protected List<Command> children = new ArrayList<>();
