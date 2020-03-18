@@ -34,7 +34,7 @@ test {
 	}
 	
 	//Default argument types are:
-	//int, float, double, long, string
+	//int, float, double, long, string, boolean
 	
 	//This subcommand's name is kill
 	//It takes one argument of the *custom type* player
