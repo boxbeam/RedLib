@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -195,7 +196,7 @@ public class MultiBlockStructure {
 		for (int i = 0; i < replace.size(); i++) {
 			String str = replace.get(i);
 			prepend += str + ";";
-			output = output.replace(str, i + "");
+			output = output.replaceAll("(?<=;|^)" + Pattern.quote(str) + "(?=[^a-z]|$)", i + "");
 		}
 		if (replace.size() > 0) {
 			output = "(" + prepend.substring(0, prepend.length() - 1) + ")" + output + ";";
