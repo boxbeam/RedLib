@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,20 +54,24 @@ public class MultiBlockStructure {
 		int maxZ = Math.max(start.getBlockZ(), end.getBlockZ());
 		
 		int midVersion = Integer.parseInt(RedLib.getServerVersion().split("\\.")[1]);
-		
+		int blocks = Math.abs(maxX - minX + 1) * Math.abs(maxY - minY + 1) * Math.abs(maxZ - minZ + 1);
 		String output = (maxX - minX + 1) + "x" + (maxY - minY + 1) + "x" + (maxZ - minZ + 1) + ";";
+		String[] data = new String[blocks];
+		int index = 0;
 		for (int x = minX; x <= maxX; x++) {
 			for (int y = minY; y <= maxY; y++) {
 				for (int z = minZ; z <= maxZ; z++) {
-					Block block = new Location(start.getWorld(), x, y, z).getBlock();
+					Block block = start.getWorld().getBlockAt(x, y, z);
 					if (midVersion >= 13) {
-						output += block.getBlockData().getAsString() + ";";
+						data[index] = block.getBlockData().getAsString();
 					} else {
 						output += block.getType() + ":" + block.getData() + ";";
 					}
+					index++;
 				}
 			}
 		}
+		output += String.join(";", data) + ";";
 		output = output.substring(0, output.length() - 1);
 		output = minify(output);
 		return output;
@@ -205,33 +208,32 @@ public class MultiBlockStructure {
 	}
 	
 	private static String expand(String data) {
-		List<String> replace = null;
+		String[] replace = null;
 		if (data.startsWith("(")) {
 			String list = data.substring(1, data.indexOf(')'));
-			String[] split = list.split(";");
-			replace = Arrays.asList(split);
+			replace = list.split(";");
 			data = data.substring(data.indexOf(')') + 1);
 		}
-		String output = "";
+		List<String> stuff = new ArrayList<>();
 		for (String str : data.split(";")) {
 			String[] split = str.split("\\*");
 			String val = "";
 			try {
 				int index = Integer.parseInt(split[0]);
-				val = replace.get(index); 
+				val = replace[index];
 			} catch (NumberFormatException e) {
 				val = split[0];
 			}
 			if (split.length > 1) {
 				int times = Integer.parseInt(split[1]);
 				for (int i = 0; i < times; i++) {
-					output += val + ";";
+					stuff.add(val);
 				}
 				continue;
 			}
-			output += val + ";";
+			stuff.add(val);
 		}
-		return output;
+		return String.join(";", stuff) + ";";
 	}
 	
 	private String[][][] data;
@@ -245,6 +247,7 @@ public class MultiBlockStructure {
 	
 	private MultiBlockStructure(String info, String name, boolean strictMode, boolean ignoreAir) {
 		info = expand(info);
+		long time = System.currentTimeMillis();
 		this.dataString = info;
 		this.name = name;
 		this.strictMode = strictMode;
@@ -254,16 +257,13 @@ public class MultiBlockStructure {
 		dimX = Integer.parseInt(dimSplit[0]);
 		dimY = Integer.parseInt(dimSplit[1]);
 		dimZ = Integer.parseInt(dimSplit[2]);
-		data = parse(info);
+		data = parse(info, dimX, dimY, dimZ);
+		long diff = System.currentTimeMillis() - time;
+		Bukkit.broadcastMessage("Took " + diff + "ms to parse multi-block structure info");
 	}
 	
-	private static String[][][] parse(String info) {
+	private static String[][][] parse(String info, int dimX, int dimY, int dimZ) {
 		String[] split = info.split(";");
-		String[] dimSplit = split[0].split("x");
-		int dimX = Integer.parseInt(dimSplit[0]);
-		int dimY = Integer.parseInt(dimSplit[1]);
-		int dimZ = Integer.parseInt(dimSplit[2]);
-		
 		String[][][] data = new String[dimX][dimY][dimZ];
 		
 		int pos = 1;

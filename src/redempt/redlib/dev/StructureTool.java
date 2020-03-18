@@ -1,5 +1,10 @@
 package redempt.redlib.dev;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -29,7 +34,7 @@ public class StructureTool implements Listener {
 				.setName(ChatColor.GREEN + "Multi-Block Structure Tool")
 				.addLore(ChatColor.BLUE + "Right-click two corners of a structure")
 				.addLore(ChatColor.BLUE + "and type '/struct create' to create a test")
-				.addLore(ChatColor.BLUE + "structure. Type '/struct print' to get the")
+				.addLore(ChatColor.BLUE + "structure. Type '/struct export' to get the")
 				.addLore(ChatColor.BLUE + "data string for the structure.");
 	}
 	
@@ -113,8 +118,9 @@ public class StructureTool implements Listener {
 		player.sendMessage(ChatColor.GREEN + "Structure registered! Left click it with your wand to get debug info.");
 	}
 	
-	@CommandHook("print")
-	public void print(Player player) {
+	@SuppressWarnings("deprecation")
+	@CommandHook("export")
+	public void export(Player player) {
 		Location[] locs = locations.get(player.getUniqueId());
 		if (locs[0] == null || locs[1] == null) {
 			player.sendMessage(ChatColor.RED + "You must set 2 locations with the structure wand (/struct wand) first!");
@@ -124,12 +130,17 @@ public class StructureTool implements Listener {
 			player.sendMessage(ChatColor.RED + "Locations must be in the same world!");
 			return;
 		}
-		String mbs = MultiBlockStructure.stringify(locs[0], locs[1]);
-		player.sendMessage(ChatColor.GREEN + "Multi-block structure string:");
-		player.sendMessage(mbs);
-		player.sendMessage(ChatColor.GREEN + "A copy of this string has also been printed to console.");
-		System.out.println("Multi-block structure string:");
-		System.out.println(mbs);
+		player.sendMessage(ChatColor.GREEN + "Scanning blocks...");
+		Bukkit.getScheduler().scheduleAsyncDelayedTask(RedLib.plugin, () -> {
+			String mbs = MultiBlockStructure.stringify(locs[0], locs[1]);
+			player.sendMessage(ChatColor.GREEN + "The multi-block structure string has been exported to plugins/RedLib/structure.dat.");
+			try {
+				Path path = Paths.get("plugins/RedLib/structure.dat");
+				Files.write(path, mbs.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 	
 }
