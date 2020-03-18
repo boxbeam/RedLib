@@ -22,7 +22,7 @@ Let's admit it: Writing commands for Spigot plugins is a pain. Before I had this
 
 Well, the command manager aspect of RedLib is designed to allow you to do very little work and handles virtually everything for you. Rather than registering commands like you normally would with Spigot, you can instead write a command file which specifies the basic info of the command, and the command manager takes it from there. It will generate help pages, verify permissions, cast arguments, and hook directly into methods in your code.
 
-The command file is the core piece of information that the command manager needs to create commands for you. It's meant to be very easy and intuitive to write. Here, I will give an example of how to use it. For more specific and complete tutorials, check out [this](https://github.com/Redempt/RedLib/blob/master/src/example/ExampleListener.java) and [this](https://github.com/Redempt/RedLib/blob/master/src/example/examplecmd.txt).
+The command file is the core piece of information that the command manager needs to create commands for you. It's meant to be very easy and intuitive to write. Here, I will give an example of how to use it. For more specific and complete tutorials, check out [this](https://github.com/Redempt/RedLib/blob/master/example/ExampleListener.java) and [this](https://github.com/Redempt/RedLib/blob/master/example/examplecmd.txt).
 
 To define a command, this is all you need:
 
@@ -183,7 +183,7 @@ base {
 ```
 Pretty simple. Running `/base child` will call the child command's method hook. The method hook for the base command will not be called even if it is defined. You can nest child commands in child commands, as deep as you want.
 
-Since this is getting a bit long, for more info on the command manager, check out [this](https://github.com/Redempt/RedLib/blob/master/src/example/ExampleListener.java) and [this](https://github.com/Redempt/RedLib/blob/master/src/example/examplecmd.txt).
+Since this is getting a bit long, for more info on the command manager, check out [this](https://github.com/Redempt/RedLib/blob/master/example/ExampleListener.java) and [this](https://github.com/Redempt/RedLib/blob/master/example/examplecmd.txt).
 
 ## Item utilities
 One of the most consistently annoying parts of Spigot is making items. We all know it. This part of RedLib is very simple, so I'm going to keep the section it short and sweet.
