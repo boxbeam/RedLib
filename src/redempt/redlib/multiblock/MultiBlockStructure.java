@@ -35,8 +35,9 @@ import redempt.redlib.RedLib;
 public class MultiBlockStructure {
 	
 	/**
-	 * Use this to get the info to build a multi-block structure.
+	 * Use this to get the info to construct a multi-block structure.
 	 * Should be hard-coded.
+	 * You can use the multi-block structure tool (/struct wand) as long as devMode is true
 	 * @param start One bounding corner of the region
 	 * @param end The other bounding corner of the region
 	 * @return A string representing all of the block data for the region
@@ -54,24 +55,21 @@ public class MultiBlockStructure {
 		int maxZ = Math.max(start.getBlockZ(), end.getBlockZ());
 		
 		int midVersion = Integer.parseInt(RedLib.getServerVersion().split("\\.")[1]);
-		int blocks = Math.abs(maxX - minX + 1) * Math.abs(maxY - minY + 1) * Math.abs(maxZ - minZ + 1);
 		String output = (maxX - minX + 1) + "x" + (maxY - minY + 1) + "x" + (maxZ - minZ + 1) + ";";
-		String[] data = new String[blocks];
-		int index = 0;
+		StringBuilder builder = new StringBuilder();
 		for (int x = minX; x <= maxX; x++) {
 			for (int y = minY; y <= maxY; y++) {
 				for (int z = minZ; z <= maxZ; z++) {
 					Block block = start.getWorld().getBlockAt(x, y, z);
 					if (midVersion >= 13) {
-						data[index] = block.getBlockData().getAsString();
+						builder.append(block.getBlockData().getAsString()).append(';');
 					} else {
 						output += block.getType() + ":" + block.getData() + ";";
 					}
-					index++;
 				}
 			}
 		}
-		output += String.join(";", data) + ";";
+		output += builder.toString();
 		output = output.substring(0, output.length() - 1);
 		output = minify(output);
 		return output;
@@ -214,7 +212,7 @@ public class MultiBlockStructure {
 			replace = list.split(";");
 			data = data.substring(data.indexOf(')') + 1);
 		}
-		List<String> stuff = new ArrayList<>();
+		StringBuilder builder = new StringBuilder();
 		for (String str : data.split(";")) {
 			String[] split = str.split("\\*");
 			String val = "";
@@ -227,13 +225,13 @@ public class MultiBlockStructure {
 			if (split.length > 1) {
 				int times = Integer.parseInt(split[1]);
 				for (int i = 0; i < times; i++) {
-					stuff.add(val);
+					builder.append(val).append(';');
 				}
 				continue;
 			}
-			stuff.add(val);
+			builder.append(val).append(';');
 		}
-		return String.join(";", stuff) + ";";
+		return builder.toString() + ";";
 	}
 	
 	private String[][][] data;
@@ -247,7 +245,6 @@ public class MultiBlockStructure {
 	
 	private MultiBlockStructure(String info, String name, boolean strictMode, boolean ignoreAir) {
 		info = expand(info);
-		long time = System.currentTimeMillis();
 		this.dataString = info;
 		this.name = name;
 		this.strictMode = strictMode;
@@ -258,8 +255,6 @@ public class MultiBlockStructure {
 		dimY = Integer.parseInt(dimSplit[1]);
 		dimZ = Integer.parseInt(dimSplit[2]);
 		data = parse(info, dimX, dimY, dimZ);
-		long diff = System.currentTimeMillis() - time;
-		Bukkit.broadcastMessage("Took " + diff + "ms to parse multi-block structure info");
 	}
 	
 	private static String[][][] parse(String info, int dimX, int dimY, int dimZ) {
