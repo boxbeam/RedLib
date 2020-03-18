@@ -122,8 +122,9 @@ public class Command implements Listener {
 		String name = names[0];
 		if (parent != null) {
 			name = parent.getExpandedName() + " " + name;
+			return name;
 		}
-		return name;
+		return "/" + name;
 	}
 	
 	private static String[] parseArgs(String input) {
@@ -278,8 +279,8 @@ public class Command implements Listener {
 			loop:
 			for (Object listener : listeners) {
 				for (Method method : listener.getClass().getDeclaredMethods()) {
-					if (method.isAnnotationPresent(CommandHook.class)) {
-						CommandHook cmdHook = method.getAnnotation(CommandHook.class);
+					CommandHook cmdHook = method.getAnnotation(CommandHook.class);
+					if (cmdHook != null) {
 						if (cmdHook.value().equals(hook)) {
 							methodHook = method;
 							this.listener = listener;
@@ -300,7 +301,7 @@ public class Command implements Listener {
 		}
 	}
 	
-	protected void registerHook(Object... listeners) {
+	private void registerHook(Object... listeners) {
 		loop:
 		for (Object listener : listeners) {
 			for (Method method : listener.getClass().getDeclaredMethods()) {
@@ -435,7 +436,7 @@ public class Command implements Listener {
 	}
 	
 	/**
-	 * Loads commands from a command file in stream form. Use Plugin#getResource for this
+	 * Loads commands from a command file in stream form. Use {@link org.bukkit.plugin.java.JavaPlugin#getResource} for this
 	 * @param stream The InputStream to load commands from
 	 * @param types Custom argument types
 	 * @return The commands loaded from the stream
@@ -500,13 +501,13 @@ public class Command implements Listener {
 			if (line.endsWith("{")) {
 				depth++;
 				if (depth == 1) {
-					line = line.replaceAll("\\{$", "").trim();
+					line = line.substring(0, line.length() - 1).trim();
 					String[] split = splitArgs(line);
 					names = split[0].split(",");
 					for (int i = 1; i < split.length; i++) {
 						String[] argSplit = split[i].split(":");
 						if (argSplit.length != 2) {
-							throw new IllegalStateException("Invalid argument " + split[i] + ", line " + pos);
+							throw new IllegalStateException("Invalid command argument syntax" + split[i] + ", line " + pos);
 						}
 						CommandArgumentType<?> argType = getType(argSplit[0], types);
 						if (argType == null) {
@@ -542,7 +543,7 @@ public class Command implements Listener {
 								throw new IllegalStateException("Unbalanced parenthesis in argument: " + name + ", line " + pos);
 							}
 							if (startIndex + length < name.length()) {
-								throw new IllegalStateException("Invalid format for argument " + name + ": Cannot define any info after default value (parenthesis), line " + pos);
+								throw new IllegalStateException("Invalid format for argument " + name + ": Cannot define any argument info after default value (parenthesis), line " + pos);
 							}
 							String value = name.substring(startIndex + 1, startIndex + length - 1);
 							name = name.substring(0, startIndex);
@@ -550,7 +551,7 @@ public class Command implements Listener {
 								defaultValue = argType.convert(null, value);
 							} catch (Exception e) {
 								e.printStackTrace();
-								throw new IllegalArgumentException("Invalid default argument value " + value + ", line " + pos + ". Note that default values are evaluated immediately, so the CommandSender passed to the CommandArgumentType will ne null.");
+								throw new IllegalArgumentException("Invalid default argument value " + value + ", line " + pos + ". Note that default values are evaluated immediately, so the CommandSender passed to the CommandArgumentType will be null.");
 							}
 						}
 						if (name.endsWith("*?") || name.endsWith("?*")) {
@@ -582,16 +583,16 @@ public class Command implements Listener {
 			if (depth == 1) {
 				if (line.startsWith("help ")) {
 					if (help != null) {
-						help += "\n" + line.replaceAll("^help ", "");
+						help += "\n" + line.replaceFirst("^help ", "");
 					} else {
-						help = line.replaceAll("^help ", "");
+						help = line.replaceFirst("^help ", "");
 					}
 				}
 				if (line.startsWith("permission ")) {
-					permission = line.replaceAll("^permission ", "");
+					permission = line.replaceFirst("^permission ", "");
 				}
 				if (line.startsWith("user")) {
-					switch (line.replaceAll("^users? ", "")) {
+					switch (line.replaceFirst("^users? ", "")) {
 						case "player":
 						case "players":
 							type = SenderType.PLAYER;
