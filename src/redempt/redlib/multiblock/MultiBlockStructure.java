@@ -421,14 +421,16 @@ public class MultiBlockStructure {
 	 * @param relZ The relative Z in the structure to build centered at
 	 * @param rotation The number of 90-degree clockwise rotations to apply
 	 * @param mirror Whether to mirror the structure on the X axis
+	 * @return The Structure instance that was created
 	 */
-	public void build(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
+	public Structure build(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
 		forEachData(loc, relX, relY, relZ, rotation, mirror, (l, d) -> {
 			BlockState state = getStateToSet(l, d);
 			if (state != null) {
-				state.update(true);
+				state.update(true, false);
 			}
 		});
+		return getAt(loc, relX, relY, relZ, rotation, mirror);
 	}
 	
 	/**
@@ -437,9 +439,10 @@ public class MultiBlockStructure {
 	 * @param relX The relative X in the structure to build centered at
 	 * @param relY The relative Y in the structure to build centered at
 	 * @param relZ The relative Z in the structure to build centered at
+	 * @return The Structure instance that was created
 	 */
-	public void build(Location loc, int relX, int relY, int relZ) {
-		build(loc, relX, relY, relZ, 0, false);
+	public Structure build(Location loc, int relX, int relY, int relZ) {
+		return build(loc, relX, relY, relZ, 0, false);
 	}
 	
 	/**
@@ -449,26 +452,29 @@ public class MultiBlockStructure {
 	 * @param relY The relative Y in the structure to build centered at
 	 * @param relZ The relative Z in the structure to build centered at
 	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 * @return The Structure instance that was created
 	 */
-	public void build(Location loc, int relX, int relY, int relZ, int rotation) {
-		build(loc, relX, relY, relZ, rotation, false);
+	public Structure build(Location loc, int relX, int relY, int relZ, int rotation) {
+		return build(loc, relX, relY, relZ, rotation, false);
 	}
 	
 	/**
 	 * Builds this multi-block structure at the given location
 	 * @param loc The location to build the structure at
+	 * @return The Structure instance that was created
 	 */
-	public void build(Location loc) {
-		build(loc, 0, 0, 0, 0, false);
+	public Structure build(Location loc) {
+		return build(loc, 0, 0, 0, 0, false);
 	}
 	
 	/**
 	 * Builds this multi-block structure at the given location
 	 * @param loc The location to build the structure at
 	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 * @return The Structure instance that was created
 	 */
-	public void build(Location loc, int rotation) {
-		build(loc, 0, 0, 0, rotation, false);
+	public Structure build(Location loc, int rotation) {
+		return build(loc, 0, 0, 0, rotation, false);
 	}
 	
 	/**
@@ -510,11 +516,12 @@ public class MultiBlockStructure {
 	public Structure getAt(Location loc) {
 		Block block = loc.getBlock();
 		for (int rot = 0; rot < 4; rot++) {
+			Rotator rotator = new Rotator(rot, false);
 			for (int x = 0; x < dimX; x++) {
 				for (int y = 0; y < dimY; y++) {
 					for (int z = 0; z < dimZ; z++) {
 						Structure s;
-						if (compare(data[x][y][z], block) && (s = test(loc, x, y, z, rot, false)) != null) {
+						if (compare(data[x][y][z], block, rotator) && (s = test(loc, x, y, z, rotator)) != null) {
 							return s;
 						}
 					}
@@ -522,11 +529,12 @@ public class MultiBlockStructure {
 			}
 		}
 		for (int rot = 0; rot < 4; rot++) {
+			Rotator rotator = new Rotator(rot, true);
 			for (int x = 0; x < dimX; x++) {
 				for (int y = 0; y < dimY; y++) {
 					for (int z = 0; z < dimZ; z++) {
 						Structure s;
-						if (compare(data[x][y][z], block) && (s = test(loc, x, y, z, rot, true)) != null) {
+						if (compare(data[x][y][z], block, rotator) && (s = test(loc, x, y, z, rotator)) != null) {
 							return s;
 						}
 					}
@@ -536,8 +544,27 @@ public class MultiBlockStructure {
 		return null;
 	}
 	
-	private Structure test(Location loc, int xPos, int yPos, int zPos, int rotation, boolean mirror) {
+	/**
+	 * Gets the Structure at the given block, if it exists. All parameters must be known.
+	 * Significantly faster than {@link MultiBlockStructure#getAt(Location)}
+	 * @param loc The location to check at
+	 * @param relX The relative X in the structure of the location
+	 * @param relY The relative Y in the structure of the location
+	 * @param relZ The relative Z in the structure of the location
+	 * @param rotation The rotation of the structure
+	 * @param mirror Whether the structure is mirrored
+	 * @return The structure at this block, or null if it does not exist
+	 */
+	public Structure getAt(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
+		Structure s;
 		Rotator rotator = new Rotator(rotation, mirror);
+		if (compare(data[relX][relY][relZ], loc.getBlock(), rotator) && (s = test(loc, relX, relY, relZ, rotator)) != null) {
+			return s;
+		}
+		return null;
+	}
+	
+	private Structure test(Location loc, int xPos, int yPos, int zPos, Rotator rotator) {
 		for (int x = 0; x < dimX; x++) {
 			for (int y = 0; y < dimY; y++) {
 				for (int z = 0; z < dimZ; z++) {
@@ -546,7 +573,7 @@ public class MultiBlockStructure {
 					int yp = y - yPos;
 					int zp = rotator.getRotatedZ();
 					Block block = loc.clone().add(xp, yp, zp).getBlock();
-					if (!compare(data[x][y][z], block)) {
+					if (!compare(data[x][y][z], block, rotator)) {
 						return null;
 					}
 				}
@@ -557,8 +584,9 @@ public class MultiBlockStructure {
 		return new Structure(this, loc, rotator);
 	}
 	
-	private boolean compare(String data, Block block) {
+	private boolean compare(String data, Block block, Rotator rotator) {
 		if (midVersion >= 13) {
+			data = rotator.rotate(data);
 			data = data.startsWith("minecraft:") ? data : "minecraft:" + data;
 			if (ignoreAir && Bukkit.createBlockData(data).getMaterial() == Material.AIR) {
 				return true;
@@ -667,30 +695,68 @@ public class MultiBlockStructure {
 		 * @return The rotated block data
 		 */
 		public String rotate(String data) {
-			if (!data.contains("facing=")) {
-				return data;
-			}
-			int start = data.indexOf("facing=") + 7;
-			int end = data.indexOf(",", start);
-			end = end == -1 ? data.indexOf("]", start) : end;
-			String facing = data.substring(start, end);
-			int num = -1;
-			for (int i = 0; i < blockDirections.length; i++) {
-				if (facing.equals(blockDirections[i])) {
-					num = i;
-					break;
+			rotate:
+			if (midVersion >= 13) {
+				if (data.contains("facing=")) {
+					int start = data.indexOf("facing=") + 7;
+					int end = data.indexOf(',', start);
+					end = end == -1 ? data.indexOf(']', start) : end;
+					String facing = data.substring(start, end);
+					int num = -1;
+					for (int i = 0; i < blockDirections.length; i++) {
+						if (facing.equals(blockDirections[i])) {
+							num = i;
+							break;
+						}
+					}
+					if (num == -1) {
+						return data;
+					}
+					if (mirrored && (num == 1 || num == 3)) {
+						num += 2;
+					}
+					num += rotation;
+					num %= 4;
+					facing = blockDirections[num];
+					data = data.substring(0, start) + facing + data.substring(end);
+				}
+				if (data.contains("axis=")) {
+					int start = data.indexOf("axis=") + 5;
+					int end = data.indexOf(',', start);
+					end = end == -1 ? data.indexOf(']', start) : end;
+					String axis = data.substring(start, end);
+					if (rotation % 2 != 0) {
+						if (axis.equals("x")) {
+							axis = "z";
+						} else if (axis.equals("z")) {
+							axis = "x";
+						}
+					}
+					data = data.substring(0, start) + axis + data.substring(end);
+				}
+				boolean[] directions = new boolean[blockDirections.length];
+				for (int i = 0; i < blockDirections.length; i++) {
+					int start = data.indexOf(blockDirections[i] + "=");
+					if (start == -1) {
+						break rotate;
+					}
+					start += blockDirections[i].length() + 1;
+					int end = data.indexOf(',', start);
+					end = end == -1 ? data.indexOf(']', start) : end;
+					directions[i] = data.substring(start, end).equals("true");
+				}
+				for (int i = 0; i < directions.length; i++) {
+					int dir = ((i - (rotation % 4)) + 4) % 4;
+					if (mirrored && (i == 0 || i == 2)) {
+						dir += 2;
+					}
+					dir %= 4;
+					int start = data.indexOf(blockDirections[i] + "=") + blockDirections[i].length() + 1;
+					int end = data.indexOf(',', start);
+					end = end == -1 ? data.indexOf(']', start) : end;
+					data = data.substring(0, start) + directions[dir] + data.substring(end);
 				}
 			}
-			if (num == -1) {
-				return data;
-			}
-			num += rotation;
-			if (mirrored && (num == 1 || num == 3)) {
-				num += 2;
-			}
-			num %= 4;
-			facing = blockDirections[num];
-			data = data.substring(0, start) + facing + data.substring(end);
 			return data;
 		}
 		
