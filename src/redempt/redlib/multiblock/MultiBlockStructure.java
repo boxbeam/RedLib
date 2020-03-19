@@ -1,5 +1,6 @@
 package redempt.redlib.multiblock;
 
+import static redempt.redlib.RedLib.midVersion;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,7 +55,6 @@ public class MultiBlockStructure {
 		int maxY = Math.max(start.getBlockY(), end.getBlockY());
 		int maxZ = Math.max(start.getBlockZ(), end.getBlockZ());
 		
-		int midVersion = Integer.parseInt(RedLib.getServerVersion().split("\\.")[1]);
 		String output = (maxX - minX + 1) + "x" + (maxY - minY + 1) + "x" + (maxZ - minZ + 1) + ";";
 		StringBuilder builder = new StringBuilder();
 		for (int x = minX; x <= maxX; x++) {
@@ -559,7 +559,6 @@ public class MultiBlockStructure {
 	}
 	
 	private boolean compare(String data, Block block) {
-		int midVersion = Integer.parseInt(RedLib.getServerVersion().split("\\.")[1]);
 		if (midVersion >= 13) {
 			data = data.startsWith("minecraft:") ? data : "minecraft:" + data;
 			if (ignoreAir && Bukkit.createBlockData(data).getMaterial() == Material.AIR) {
@@ -601,7 +600,6 @@ public class MultiBlockStructure {
 	}
 	
 	private BlockState getStateToSet(Location loc, String data) {
-		int midVersion = Integer.parseInt(RedLib.getServerVersion().split("\\.")[1]);
 		if (midVersion >= 13) {
 			BlockData blockData = Bukkit.createBlockData(data);
 			if (ignoreAir && blockData.getMaterial() == Material.AIR) {
@@ -624,7 +622,6 @@ public class MultiBlockStructure {
 	}
 	
 	private void sendBlock(Player player, Location loc, String data) {
-		int midVersion = Integer.parseInt(RedLib.getServerVersion().split("\\.")[1]);
 		if (midVersion >= 13) {
 			BlockData blockData = Bukkit.createBlockData(data);
 			if (ignoreAir && blockData.getMaterial() == Material.AIR) {

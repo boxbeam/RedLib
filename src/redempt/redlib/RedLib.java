@@ -17,6 +17,7 @@ public class RedLib extends JavaPlugin {
 	public static String helpEntry;
 	public static boolean devMode = false;
 	public static Plugin plugin;
+	public static int midVersion = Integer.parseInt(getServerVersion().split("\\.")[1]);
 	
 	@Override
 	public void onEnable() {
