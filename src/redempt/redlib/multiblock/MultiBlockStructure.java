@@ -1,6 +1,7 @@
 package redempt.redlib.multiblock;
 
 import static redempt.redlib.RedLib.midVersion;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +25,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
-
-import redempt.redlib.RedLib;
 
 /**
  * A utility class to create interactive multi-block structures
