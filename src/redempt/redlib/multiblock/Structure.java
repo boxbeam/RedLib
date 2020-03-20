@@ -158,6 +158,11 @@ public class Structure {
 		return new StructureBlock(block, this, x, y, z);
 	}
 	
+	/**
+	 * Represents a block in a Structure instance
+	 * @author Redempt
+	 *
+	 */
 	public static class StructureBlock {
 		
 		private int relX;

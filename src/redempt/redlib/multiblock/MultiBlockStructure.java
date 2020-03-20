@@ -611,7 +611,7 @@ public class MultiBlockStructure {
 	public boolean equals(Object o) {
 		if (o instanceof MultiBlockStructure) {
 			MultiBlockStructure structure = (MultiBlockStructure) o;
-			return structure.dataString.equals(dataString);
+			return structure.dataString.equals(dataString) && structure.name.equals(name);
 		}
 		return super.equals(o);
 	}
@@ -666,6 +666,11 @@ public class MultiBlockStructure {
 		}
 	}
 	
+	/**
+	 * Used to rotate blocks and block sections when building or testing for the presence of a MultiBlockStructure
+	 * @author Redempt
+	 *
+	 */
 	public static class Rotator {
 		
 		private static String[] rotations = {"x,z", "-z,x", "-x,-z", "z,-x"};
