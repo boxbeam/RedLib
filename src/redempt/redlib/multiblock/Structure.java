@@ -106,15 +106,7 @@ public class Structure {
 	 * @return Whether this Structure is intact
 	 */
 	public boolean isIntact() {
-		Structure struct = type.getAt(loc);
-		if (struct == null) {
-			return false;
-		}
-		Rotator rot = struct.getRotator();
-		if (rot.getRotation() != rotator.getRotation() || rot.isMirrored() != rotator.isMirrored()) {
-			return false;
-		}
-		return true;
+		return type.getAt(loc, 0, 0, 0, rotator.getRotation(), rotator.isMirrored()) != null;
 	}
 	
 	/**
