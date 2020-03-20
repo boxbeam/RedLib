@@ -41,6 +41,7 @@ public class MultiBlockStructure {
 	 * @param start One bounding corner of the region
 	 * @param end The other bounding corner of the region
 	 * @return A string representing all of the block data for the region
+	 * @throws IllegalArgumentException if the specified locations are not in the same world
 	 */
 	public static String stringify(Location start, Location end) {
 		if (!start.getWorld().equals(end.getWorld())) {

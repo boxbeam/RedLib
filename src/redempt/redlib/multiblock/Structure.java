@@ -125,6 +125,7 @@ public class Structure {
 	 * @param y The relative Y of the block
 	 * @param z The relative Z of the block
 	 * @return The relative block
+	 * @throws IndexOutOfBoundsException if the specified coordinates are not within the bounds of this Structure
 	 */
 	public StructureBlock getRelative(int x, int y, int z) {
 		int[] dim = type.getDimensions();
@@ -142,6 +143,7 @@ public class Structure {
 	 * Gets a relative block in this Structure from an absolute block in the world
 	 * @param block The absolute block which is part of this Structure
 	 * @return The relative block
+	 * @throws IllegalArgumentException if the specified block is not within the bounds of this Structure
 	 */
 	public StructureBlock getBlock(Block block) {
 		Location offset = block.getLocation().subtract(loc);
@@ -153,7 +155,7 @@ public class Structure {
 		int z = rotator.getRotatedZ();
 		if (x < 0 || y < 0 || z < 0
 				|| x > dim[0] || y > dim[1] || z > dim[2]) {
-			throw new IndexOutOfBoundsException("Location outside bounds of structure");
+			throw new IllegalArgumentException("Location outside bounds of structure");
 		}
 		return new StructureBlock(block, this, x, y, z);
 	}
