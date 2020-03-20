@@ -24,6 +24,7 @@ import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
 
 import redempt.redlib.RedLib;
+import redempt.redlib.commandmanager.exceptions.CommandParseException;
 
 /**
  * Represents a command which can be registered
@@ -439,6 +440,7 @@ public class Command {
 	 * @param stream The InputStream to load commands from
 	 * @param types Custom argument types
 	 * @return The commands loaded from the stream
+	 * @throws CommandParseException if the command file cannot be parsed
 	 */
 	public static CommandCollection fromStream(InputStream stream, CommandArgumentType<?>... types) {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
@@ -506,11 +508,11 @@ public class Command {
 					for (int i = 1; i < split.length; i++) {
 						String[] argSplit = split[i].split(":");
 						if (argSplit.length != 2) {
-							throw new IllegalStateException("Invalid command argument syntax" + split[i] + ", line " + pos);
+							throw new CommandParseException("Invalid command argument syntax" + split[i] + ", line " + pos);
 						}
 						CommandArgumentType<?> argType = getType(argSplit[0], types);
 						if (argType == null) {
-							throw new IllegalStateException("Missing command argument type " + argSplit[0] + ", line " + pos);
+							throw new CommandParseException("Missing command argument type " + argSplit[0] + ", line " + pos);
 						}
 						String name = argSplit[1];
 						boolean hideType = false;
@@ -539,10 +541,10 @@ public class Command {
 								}
 							}
 							if (pdepth != 0) {
-								throw new IllegalStateException("Unbalanced parenthesis in argument: " + name + ", line " + pos);
+								throw new CommandParseException("Unbalanced parenthesis in argument: " + name + ", line " + pos);
 							}
 							if (startIndex + length < name.length()) {
-								throw new IllegalStateException("Invalid format for argument " + name + ": Cannot define any argument info after default value (parenthesis), line " + pos);
+								throw new CommandParseException("Invalid format for argument " + name + ": Cannot define any argument info after default value (parenthesis), line " + pos);
 							}
 							String value = name.substring(startIndex + 1, startIndex + length - 1);
 							name = name.substring(0, startIndex);
@@ -550,7 +552,7 @@ public class Command {
 								defaultValue = argType.convert(null, value);
 							} catch (Exception e) {
 								e.printStackTrace();
-								throw new IllegalArgumentException("Invalid default argument value " + value + ", line " + pos + ". Note that default values are evaluated immediately, so the CommandSender passed to the CommandArgumentType will be null.");
+								throw new CommandParseException("Invalid default argument value " + value + ", line " + pos + ". Note that default values are evaluated immediately, so the CommandSender passed to the CommandArgumentType will be null.");
 							}
 						}
 						if (name.endsWith("*?") || name.endsWith("?*")) {
