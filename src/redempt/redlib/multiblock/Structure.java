@@ -2,10 +2,13 @@ package redempt.redlib.multiblock;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
 
 import redempt.redlib.multiblock.MultiBlockStructure.Rotator;
 import redempt.redlib.region.Region;
@@ -60,23 +63,14 @@ public class Structure {
 	 * @return The list of blocks in this Structure of that type
 	 */
 	public List<StructureBlock> getByType(Material type) {
-		ArrayList<StructureBlock> blocks = new ArrayList<>();
-		int[] dimensions = this.type.getDimensions();
-		for (int x = 0; x < dimensions[0]; x++) {
-			for (int y = 0; y < dimensions[1]; y++) {
-				for (int z = 0; z < dimensions[2]; z++) {
-					rotator.setLocation(x, z);
-					Block b;
-					if ((b = loc.getWorld().getBlockAt(rotator.getRotatedX() + loc.getBlockX(),
-							y + loc.getBlockY(),
-							rotator.getRotatedZ() + loc.getBlockZ()
-							)).getType() == type) {
-						blocks.add(new StructureBlock(b, this, x, y, z));
-					}
-				}
-			}
-		}
-		return blocks;
+		ItemStack item = new ItemStack(type);
+		// Don't ask my why this is what's needed. I don't get it either.
+		// It seems as if this enum isn't actually consistent. Passing
+		// Material.DIAMOND_BLOCK from another plugin resulted in a Material whose toString() yielded
+		// "_BLOCK", which makes no sense. This fixes it somehow. I believe this has to do
+		// with the cross-compatibility for 1.8 and 1.13+.
+		Material realType = item.getType();
+		return getBlocks().stream().filter(s -> s.getBlock().getType() == realType).collect(Collectors.toList());
 	}
 	
 	/**
