@@ -15,7 +15,7 @@ import redempt.redlib.commandmanager.Command.SenderType;
 import redempt.redlib.commandmanager.exceptions.CommandParseException;
 
 /**
- * Used to get ContextProviders and CommandArgumentTypes for a command, then parse it
+ * Used to get ContextProviders and CommandArgumentTypes for a command file, then parse it
  * @author Redempt
  *
  */
@@ -27,7 +27,7 @@ public class CommandFactory {
 	
 	/**
 	 * Constructs a CommandFactory to parse input from the given stream. Use {@link org.bukkit.plugin.java.JavaPlugin#getResource} for this
-	 * @param stream
+	 * @param stream The stream to read the command info from
 	 */
 	public CommandFactory(InputStream stream) {
 		this.stream = stream;
