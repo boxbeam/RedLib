@@ -88,7 +88,7 @@ But this is still a bit clunky. Rather than converting the String argument to a 
 public void onEnable() {
 	CommandArgumentType<Player> playerType = new CommandArgumentType<Player>("player", Bukkit::getPlayer)
 	.tabStream(sender -> Bukkit.getOnlinePlayers().map(Player::getName));
-	Command.fromStream(this.getResource("command.txt"), playerType).register("smite", listener);
+	new CommandFactory(this.getResource("command.txt")).setArgTypes(playerType).register("smite", listener);
 }
 ```
 You can give the command manager a `CommandArgumentType`, which tells it how to convert it from a String argument from a command to whatever type it represents. In this case, `Bukkit::getPlayer` is a `Function<String, Player>` which will convert the `String` argument to a `Player` for any command hook methods. We then pass it to the method which loads the command info from the file. Optionally, you can add a tab provider to the `CommandArgumentType`, which is a lambda that takes the `CommandSender` tab completing and returns a list of possible completions. The ones which don't match the partial argument the sender has already typed are automatically removed by the command manager.
@@ -169,7 +169,7 @@ givelava int:num?(1) {
 ```
 By putting a parenthetical expression at the end of the argument, you can tell the command manager to use a default value if the optional argument is not provided. Note that this is evaluated immediately, and the CommandArgumentType will be passed `null` in place of the CommandSender it usually takes. Since the argument now has a default value, it will never be `null`, so it's safe to use a primitive type like `int` again.
 
-Now that I've touched on most of the basics, here are child commands:
+Child commands can be created by simply nesting command bodies inside each other.
 
 ```
 base {
@@ -183,7 +183,51 @@ base {
 ```
 Pretty simple. Running `/base child` will call the child command's method hook. The method hook for the base command will not be called even if it is defined. You can nest child commands in child commands, as deep as you want.
 
-Since this is getting a bit long, for more info on the command manager, check out [this](https://github.com/Redempt/RedLib/blob/master/example/ExampleListener.java) and [this](https://github.com/Redempt/RedLib/blob/master/example/examplecmd.txt).
+There are some cases where you have to get a lot of context on the player for a command, and you have to do a lot of null checks. This is normally fine, but when you have many commands which require similar context, you often end up having to copy-paste the context. It usually looks like this:
+
+```
+@CommandHook("leavefaction")
+public void leaveFaction(Player sender) {
+	Faction faction = Faction.getFaction(player);
+	if (faction == null) {
+		player.sendMessage(ChatColor.RED + "You do not belong to a faction!");
+		return;
+	}
+	faction.removePlayer(player);
+	player.sendMessage(ChatColor.GREEN + "You successfully left your faction!");
+}
+```
+You can use context arguments in your command file like this:
+
+```
+faction {
+	leave {
+		help Leaves the faction you are in
+		hook leavefaction
+		user player
+		context faction
+	}
+}
+```
+Now all you need to do is register the context provider:
+
+```
+new CommandFactory(this.getResource("command.txt")).setContextProviders(
+	new ContextProvider<Faction>("faction", ChatColor.RED + "You do not belong to a faction!", c -> Faction.getFaction((Player) c))).parse()...
+```
+And with that registered, you can take a Faction argument at the end of your arguments list for your method:
+
+```
+@CommandHook("leavefaction")
+public void leaveFaction(Player player, Faction faction) {
+	//Null check on faction has already been done, player will be shown error if it is null and this method will not be called
+	faction.removePlayer(player);
+	player.sendMessage("You successfully left your faction!");
+}
+```
+You can register as many context providers as you want, as long as you take them as arguments in the same order they're listed in the command file at the end of your method's argument list.
+
+For more info on the command manager in the form of examples, check out [this](https://github.com/Redempt/RedLib/blob/master/example/ExampleListener.java) and [this](https://github.com/Redempt/RedLib/blob/master/example/examplecmd.txt).
 
 ## Item utilities
 One of the most consistently annoying parts of Spigot is making items. We all know it. This part of RedLib is very simple, so I'm going to keep the section it short and sweet.
