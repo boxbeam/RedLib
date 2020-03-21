@@ -1,10 +1,6 @@
 package redempt.redlib.commandmanager;
 
-import java.io.BufferedReader;
-import java.io.EOFException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -54,6 +50,7 @@ public class Command {
 	}
 	
 	private CommandArgument[] args;
+	private ContextProvider<?>[] contextProviders;
 	private String[] names;
 	private String permission;
 	private SenderType type;
@@ -61,13 +58,14 @@ public class Command {
 	private Method methodHook;
 	private String help;
 	private Object listener;
-	private boolean topLevel = false;
+	protected boolean topLevel = false;
 	protected Command parent = null;
 	private boolean hideSub = false;
 	
-	protected Command(String[] names, CommandArgument[] args, String help, String permission, SenderType type, String hook, List<Command> children, boolean hideSub) {
+	protected Command(String[] names, CommandArgument[] args, ContextProvider<?>[] providers, String help, String permission, SenderType type, String hook, List<Command> children, boolean hideSub) {
 		this.names = names;
 		this.args = args;
+		this.contextProviders = providers;
 		this.permission = permission;
 		this.type = type;
 		this.hook = hook;
@@ -156,12 +154,12 @@ public class Command {
 		return args.toArray(new String[args.size()]);
 	}
 	
-	private static Object[] processArgs(String[] args, CommandArgument[] c, CommandSender sender) {
-		List<CommandArgument> cmdArgs = Arrays.stream(c).collect(Collectors.toList());
-		if (cmdArgs.size() > args.length) {
-			int diff = cmdArgs.size() - args.length;
+	private Object[] processArgs(String[] sargs, CommandSender sender) {
+		List<CommandArgument> cmdArgs = Arrays.stream(args).collect(Collectors.toList());
+		if (cmdArgs.size() > sargs.length) {
+			int diff = cmdArgs.size() - sargs.length;
 			int optional = (int) cmdArgs.stream().filter(CommandArgument::isOptional).count();
-			CommandArgument[] cargs = c.clone();
+			CommandArgument[] cargs = args.clone();
 			for (int i = 0; i < cargs.length; i++) {
 				if (cargs[i].isOptional()) {
 					cargs[i] = null;
@@ -169,8 +167,8 @@ public class Command {
 			}
 			List<CommandArgument> used = new ArrayList<>();
 			if (optional >= diff) {
-				for (int i = 0; i < args.length && diff > 0; i++) {
-					String argString = args[i];
+				for (int i = 0; i < sargs.length && diff > 0; i++) {
+					String argString = sargs[i];
 					List<CommandArgument> optionals = new ArrayList<>();
 					if (!cmdArgs.get(i).isOptional()) {
 						continue;
@@ -214,19 +212,19 @@ public class Command {
 			}
 			cmdArgs = Arrays.stream(cargs).filter(arg -> arg != null).collect(Collectors.toList());
 		}
-		if (cmdArgs.size() != args.length && (c.length == 0 || !c[c.length - 1].consumes())) {
+		if (cmdArgs.size() != sargs.length && (args.length == 0 || !args[args.length - 1].consumes())) {
 			return null;
 		}
-		Object[] output = new Object[c.length + 1];
+		Object[] output = new Object[args.length + 1];
 		output[0] = sender;
 		for (CommandArgument arg : cmdArgs) {
 			if (arg.consumes()) {
-				if (arg.pos != c.length - 1) {
+				if (arg.pos != args.length - 1) {
 					throw new IllegalArgumentException("Consuming argument must be the last argument!");
 				}
 				String combine = "";
-				for (int x = cmdArgs.size() - 1; x < args.length; x++) {
-					combine += args[x] + " ";
+				for (int x = cmdArgs.size() - 1; x < sargs.length; x++) {
+					combine += sargs[x] + " ";
 				}
 				try {
 					combine = combine.substring(0, combine.length() - 1);
@@ -237,15 +235,33 @@ public class Command {
 				return output;
 			}
 			try {
-				output[arg.getPosition() + 1] = Objects.requireNonNull(arg.getType().convert(sender, args[cmdArgs.indexOf(arg)]));
+				output[arg.getPosition() + 1] = Objects.requireNonNull(arg.getType().convert(sender, sargs[cmdArgs.indexOf(arg)]));
 			} catch (Exception e) {
 				return null;
 			}
 		}
-		for (CommandArgument arg : c) {
+		for (CommandArgument arg : args) {
 			if (arg.isOptional() && output[arg.getPosition() + 1] == null) {
 				output[arg.getPosition() + 1] = arg.getDefaultValue();
 			}
+		}
+		return output;
+	}
+	
+	private Object[] getContext(CommandSender sender) {
+		Object[] output = new Object[contextProviders.length];
+		for (int i = 0; i < output.length; i++) {
+			Object obj = contextProviders[i].provide(sender);
+			if (obj == null) {
+				String error = contextProviders[i].getErrorMessage();
+				if (error != null) {
+					sender.sendMessage(error);
+				} else {
+					showHelp(sender);
+				}
+				return null;
+			}
+			output[i] = obj;
 		}
 		return output;
 	}
@@ -285,8 +301,13 @@ public class Command {
 							methodHook = method;
 							this.listener = listener;
 							Class<?>[] params = method.getParameterTypes();
+							int expectedLength = args.length + contextProviders.length + 1;
+							if (params.length != expectedLength) {
+								throw new IllegalStateException("Incorrect number of arguments for method hook! [" + method.getDeclaringClass().getName() + "." + method.getName() + "] "
+										+ "Argument count should be " + expectedLength + ", got " + params.length);
+							}
 							if (!CommandSender.class.isAssignableFrom(params[0])) {
-								throw new IllegalStateException("The first argument must be CommandSender or one of its subclasses! [" + method.getName() + ", " + method.getClass().getName() + "]");
+								throw new IllegalStateException("The first argument must be CommandSender or one of its subclasses! [" + method.getDeclaringClass().getName() + "." + method.getName() + "]");
 							}
 							break loop;
 						}
@@ -310,9 +331,14 @@ public class Command {
 					if (cmdHook.value().equals(hook)) {
 						methodHook = method;
 						Class<?>[] params = method.getParameterTypes();
+						int expectedLength = args.length + contextProviders.length + 1;
+						if (params.length != expectedLength) {
+							throw new IllegalStateException("Incorrect number of arguments for method hook! [" + method.getDeclaringClass().getName() + "." + method.getName() + "] "
+									+ "Argument count should be " + expectedLength + ", got " + params.length);
+						}
 						this.listener = listener;
 						if (!CommandSender.class.isAssignableFrom(params[0])) {
-							throw new IllegalStateException("The first argument must be CommandSender or one of its subclasses! [" + method.getName() + ", " + method.getClass().getName() + "]");
+							throw new IllegalStateException("The first argument must be CommandSender or one of its subclasses! [" + method.getDeclaringClass().getName() + "." + method.getName() + "]");
 						}
 						break loop;
 					}
@@ -390,10 +416,20 @@ public class Command {
 					}
 					break;
 			}
-			Object[] objArgs = processArgs(parseArgs(String.join(" ", args)), this.args, sender);
+			Object[] objArgs = processArgs(parseArgs(String.join(" ", args)), sender);
 			if (objArgs != null) {
+				int size = objArgs.length + contextProviders.length;
+				Object[] arr = new Object[size];
+				System.arraycopy(objArgs, 0, arr, 0, objArgs.length);
+				if (contextProviders.length > 0) {
+					Object[] context = getContext(sender);
+					if (context == null) {
+						return true;
+					}
+					System.arraycopy(context, 0, arr, objArgs.length, context.length);
+				}
 				try {
-					methodHook.invoke(listener, objArgs);
+					methodHook.invoke(listener, arr);
 					return true;
 				} catch (IllegalAccessException | InvocationTargetException e) {
 					e.printStackTrace();
@@ -435,210 +471,7 @@ public class Command {
 		return true;
 	}
 	
-	/**
-	 * Loads commands from a command file in stream form. Use {@link org.bukkit.plugin.java.JavaPlugin#getResource} for this
-	 * @param stream The InputStream to load commands from
-	 * @param types Custom argument types
-	 * @return The commands loaded from the stream
-	 * @throws CommandParseException if the command file cannot be parsed
-	 */
-	public static CommandCollection fromStream(InputStream stream, CommandArgumentType<?>... types) {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-		String line = "";
-		List<String> lines = new ArrayList<>();
-		try {
-			while ((line = reader.readLine()) != null) {
-				lines.add(line);
-			}
-		} catch (EOFException e) {
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return fromLines(lines, 0, types);
-	}
-	
-	private static String[] splitArgs(String args) {
-		List<String> split = new ArrayList<>();
-		String combine = "";
-		int depth = 0;
-		for (char c : args.toCharArray()) {
-			switch (c) {
-				case '(':
-					depth++;
-					break;
-				case ')':
-					depth--;
-					break;
-				case ' ':
-					if (depth == 0) {
-						split.add(combine);
-						combine = "";
-					} else {
-						combine += c;
-					}
-					continue;
-			}
-			combine += c;
-		}
-		if (combine.length() > 0) {
-			split.add(combine);
-		}
-		return split.toArray(new String[split.size()]);
-	}
-	
-	private static CommandCollection fromLines(List<String> lines, int lineNumber, CommandArgumentType<?>... types) {
-		int depth = 0;
-		String help = null;
-		String[] names = null;
-		List<CommandArgument> args = new ArrayList<>();
-		String permission = null;
-		String hook = null;
-		SenderType type = SenderType.EVERYONE;
-		List<Command> commands = new ArrayList<>();
-		List<Command> children = new ArrayList<>();
-		boolean hideSub = false;
-		for (int pos = lineNumber; pos < lines.size(); pos++) {
-			String line = lines.get(pos).trim();
-			if (line.endsWith("{")) {
-				depth++;
-				if (depth == 1) {
-					line = line.substring(0, line.length() - 1).trim();
-					String[] split = splitArgs(line);
-					names = split[0].split(",");
-					for (int i = 1; i < split.length; i++) {
-						String[] argSplit = split[i].split(":");
-						if (argSplit.length != 2) {
-							throw new CommandParseException("Invalid command argument syntax" + split[i] + ", line " + pos);
-						}
-						CommandArgumentType<?> argType = getType(argSplit[0], types);
-						if (argType == null) {
-							throw new CommandParseException("Missing command argument type " + argSplit[0] + ", line " + pos);
-						}
-						String name = argSplit[1];
-						boolean hideType = false;
-						boolean optional = false;
-						boolean consumes = false;
-						Object defaultValue = null;
-						if (name.endsWith("...")) {
-							consumes = true;
-							name = name.substring(0, name.length() - 3);
-						}
-						int startIndex = -1;
-						if ((startIndex = name.indexOf('(')) != -1) {
-							int pdepth = 0;
-							int length = 0;
-							for (int j = startIndex; j < name.length(); j++) {
-								char c = name.charAt(j);
-								length++;
-								if (c == '(') {
-									pdepth++;
-								}
-								if (c == ')') {
-									pdepth--;
-									if (pdepth == 0) {
-										break;
-									}
-								}
-							}
-							if (pdepth != 0) {
-								throw new CommandParseException("Unbalanced parenthesis in argument: " + name + ", line " + pos);
-							}
-							if (startIndex + length < name.length()) {
-								throw new CommandParseException("Invalid format for argument " + name + ": Cannot define any argument info after default value (parenthesis), line " + pos);
-							}
-							String value = name.substring(startIndex + 1, startIndex + length - 1);
-							name = name.substring(0, startIndex);
-							try {
-								defaultValue = argType.convert(null, value);
-							} catch (Exception e) {
-								e.printStackTrace();
-								throw new CommandParseException("Invalid default argument value " + value + ", line " + pos + ". Note that default values are evaluated immediately, so the CommandSender passed to the CommandArgumentType will be null.");
-							}
-						}
-						if (name.endsWith("*?") || name.endsWith("?*")) {
-							hideType = true;
-							optional = true;
-							name = name.substring(0, name.length() - 2);
-						}
-						if (name.endsWith("*")) {
-							hideType = true;
-							name = name.substring(0, name.length() - 1);
-						}
-						if (name.endsWith("?")) {
-							optional = true;
-							name = name.substring(0, name.length() - 1);
-						}
-						if (name.equals(argType.getName())) {
-							hideType = true;
-						}
-						CommandArgument arg = new CommandArgument(argType, i - 1, name, optional, hideType, consumes);
-						if (arg.isOptional()) {
-							arg.setDefaultValue(defaultValue);
-						}
-						args.add(arg);
-					}
-				} else if (depth == 2) {
-					children.addAll(fromLines(lines, pos, types).getCommands());
-				}
-			}
-			if (depth == 1) {
-				if (line.startsWith("help ")) {
-					if (help != null) {
-						help += "\n" + line.replaceFirst("^help ", "");
-					} else {
-						help = line.replaceFirst("^help ", "");
-					}
-				}
-				if (line.startsWith("permission ")) {
-					permission = line.replaceFirst("^permission ", "");
-				}
-				if (line.startsWith("user")) {
-					switch (line.replaceFirst("^users? ", "")) {
-						case "player":
-						case "players":
-							type = SenderType.PLAYER;
-							break;
-						case "console":
-						case "server":
-							type = SenderType.CONSOLE;
-							break;
-						default:
-							type = SenderType.EVERYONE;
-							break;
-					}
-				}
-				if (line.equalsIgnoreCase("hidesub")) {
-					hideSub = true;
-				}
-				if (line.startsWith("hook ")) {
-					hook = line.replaceAll("^hook ", "");
-				}
-			}
-			if (line.equals("}")) {
-				depth--;
-				if (depth == 0) {
-					commands.add(new Command(names, args.toArray(new CommandArgument[args.size()]), help, permission, type, hook, children, hideSub));
-					children = new ArrayList<>();
-					names = null;
-					args = new ArrayList<>();
-					help = null;
-					permission = null;
-					type = null;
-					hook = null;
-					hideSub = false;
-					if (lineNumber != 0) {
-						return new CommandCollection(commands);
-					}
-				}
-			}
-		}
-		if (lineNumber == 0) {
-			commands.stream().forEach(c -> c.topLevel = true);
-		}
-		return new CommandCollection(commands);
-	}
-	
-	private static CommandArgumentType<?> getType(String name, CommandArgumentType<?>[] types) {
+	protected static CommandArgumentType<?> getType(String name, CommandArgumentType<?>[] types) {
 		for (CommandArgumentType<?> type : Command.types) {
 			if (type.getName().equals(name)) {
 				return type;
@@ -678,6 +511,18 @@ public class Command {
 	 */
 	public String getPermission() {
 		return permission;
+	}
+	
+	/**
+	 * Loads commands from a command file in stream form. Use {@link org.bukkit.plugin.java.JavaPlugin#getResource} for this
+	 * @param stream The InputStream to load commands from
+	 * @param argTypes Custom argument types
+	 * @return The commands loaded from the stream
+	 * @throws CommandParseException if the command file cannot be parsed
+	 * @deprecated Outdated. Use {@link CommandFactory#parse()}
+	 */
+	public static CommandCollection fromStream(InputStream stream, CommandArgumentType<?>... types) {
+		return new CommandFactory(stream).setArgTypes(types).parse();
 	}
 	
 	protected static class CommandArgument {
@@ -760,6 +605,9 @@ public class Command {
 		 * @param convert The Function<String, T> to convert from a String to whatever type this converts to
 		 */
 		public CommandArgumentType(String name, Function<String, T> convert) {
+			if (name.contains(" ")) {
+				throw new IllegalArgumentException("Command argument type name cannot contain a space");
+			}
 			func = convert;
 			this.name = name;
 		}
@@ -770,6 +618,9 @@ public class Command {
 		 * @param convert The BiFunction<CommandSender, String, T> to convert from a String to whatever type this converts to
 		 */
 		public CommandArgumentType(String name, BiFunction<CommandSender, String, T> convert) {
+			if (name.contains(" ")) {
+				throw new IllegalArgumentException("Command argument type name cannot contain a space");
+			}
 			bifunc = convert;
 			this.name = name;
 		}
@@ -816,7 +667,7 @@ public class Command {
 		
 		/**
 		 * Converts an argument to another type
-		 * @param sender The sender of the comand
+		 * @param sender The sender of the command
 		 * @param argument The argument to be converted
 		 * @return The converted argument for use in a method hook
 		 */

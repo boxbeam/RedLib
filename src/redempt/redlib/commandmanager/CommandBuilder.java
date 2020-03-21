@@ -111,7 +111,7 @@ public class CommandBuilder {
 	 * @return The registered command
 	 */
 	public Command build(String prefix) {
-		Command command = new Command(names, args, help, permission, type, listener == null ? null : "_", new ArrayList<>(), hideSub);
+		Command command = new Command(names, args, new ContextProvider<?>[] {}, help, permission, type, listener == null ? null : "_", new ArrayList<>(), hideSub);
 		command.register(prefix, listener == null ? new Object() : listener);
 		return command;
 	}

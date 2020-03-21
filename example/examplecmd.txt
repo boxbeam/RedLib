@@ -61,11 +61,22 @@ test {
 	//Putting ... at the end of an argument will make it consume all arguments following it
 	//Must be the last argument
 	//All arguments will be passed to the hook method as a single String
-	//Aliases are separated by commas
+	//Aliases are separated by commas in the command name. /broadcast and /bc will work the same.
 	broadcast,bc string:message*... {
 		hook broadcast
 		help Broadcasts a message
 		permission message.broadcast
 		user everyone
 	}
+	
+	killmount {
+		help Kills your mount
+		hook healmount
+		user player
+		permission kill.mount
+		//Context is a tag which means that additional info will be passed in the arguments of your method hook
+		//The context comes from context providers, which you give to the CommandFactory when creating the command
+		context mount
+	}
+	
 }

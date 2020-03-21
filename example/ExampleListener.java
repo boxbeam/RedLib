@@ -7,11 +7,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.entity.Entity;
 
 import redempt.redlib.commandmanager.Command;
 import redempt.redlib.commandmanager.Command.CommandArgumentType;
 import redempt.redlib.commandmanager.CommandCollection;
 import redempt.redlib.commandmanager.CommandHook;
+import redempt.redlib.commandmanager.CommandFactory;
+import redempt.redlib.commandmanager.ContextProvider;
+
 
 /**
  * @author Redempt
@@ -40,7 +44,15 @@ public class ExampleListener {
 		//You can then pass as many custom argument types as you need
 		//The CommandCollection represents all commands loaded from the command file
 		//Multiple commands can be loaded from a single command file
-		CommandCollection cmds = Command.fromStream(plugin.getResource("examplecmd.txt"), playerType);
+		CommandCollection cmds = new CommandFactory(plugin.getResource("examplecmd.txt"))
+				.setArgTypes(CommandArgumentType.playerType)
+				//Registers a context provider which adds context that will be passed as an argument
+				//To commands which specify that they need it using the 'context' flag
+				//If they return null, they will show the error message - the second argument
+				//The error message is optional, and the player will be shown the help menu instead if none is provided
+				//This is useful if you have a lot of copy-pasted null checks between many commands for contextual information relating to the player
+				.setContextProviders(new ContextProvider<Entity>("mount", ChatColor.RED + "You must be riding a mount to do this!", c -> ((Player) c).getVehicle()))
+				.parse();
 		
 		//Prefix is the fallback prefix, like /minecraft:kill or /bukkit:plugins
 		//The second argument is a listener Object which contains methods hooks
@@ -90,6 +102,13 @@ public class ExampleListener {
 	//Since there is only one argument, that means all arguments will be passed as a single string here
 	public void broadcast(CommandSender sender, String message) {
 		Bukkit.broadcastMessage(ChatColor.GREEN + "Broadcast: " + message);
+	}
+	
+	@CommandHook("healmount")
+	//You must take the context as an additional argument after the sender argument and all command arguments
+	public void healMount(Player sender, Entity mount) {
+		mount.remove();
+		sender.sendMessage(ChatColor.GREEN + "Killed your mount! :)");
 	}
 	
 }
