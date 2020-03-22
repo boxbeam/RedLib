@@ -11,7 +11,7 @@ structure,struct {
 		hook create
 		user player
 	}
-	export {
+	export string:filename*?(structure) {
 		help Prints the structure data for the selected points
 		hook export
 		user player

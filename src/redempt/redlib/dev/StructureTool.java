@@ -120,7 +120,7 @@ public class StructureTool implements Listener {
 	
 	@SuppressWarnings("deprecation")
 	@CommandHook("export")
-	public void export(Player player) {
+	public void export(Player player, String filename) {
 		Location[] locs = locations.get(player.getUniqueId());
 		if (locs[0] == null || locs[1] == null) {
 			player.sendMessage(ChatColor.RED + "You must set 2 locations with the structure wand (/struct wand) first!");
@@ -133,9 +133,9 @@ public class StructureTool implements Listener {
 		player.sendMessage(ChatColor.GREEN + "Scanning blocks...");
 		Bukkit.getScheduler().scheduleAsyncDelayedTask(RedLib.plugin, () -> {
 			String mbs = MultiBlockStructure.stringify(locs[0], locs[1]);
-			player.sendMessage(ChatColor.GREEN + "The multi-block structure string has been exported to plugins/RedLib/structure.dat.");
+			player.sendMessage(ChatColor.GREEN + "The multi-block structure string has been exported to plugins/RedLib/" + filename + ".dat");
 			try {
-				Path path = Paths.get("plugins/RedLib/structure.dat");
+				Path path = Paths.get("plugins/RedLib/").resolve(filename + ".dat");
 				Files.write(path, mbs.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 			} catch (IOException e) {
 				e.printStackTrace();
