@@ -300,6 +300,8 @@ For more info, check out [this](https://github.com/Redempt/RedLib/blob/master/sr
 ## Regions
 Also maybe a bit niche, but the Region utilities let you easily define regions of blocks in the world. You can create a `SelectionTool` with a custom item which allows players to select a region, and then get the region selected as a `Region` object. With the `Region` object, you can iterate all the blocks with `forEachBlock`. This will potentially be expanded in the future to include methods to move and resize the region.
 
+You can also protect the region from changes from certain sources. To do this, all you have to do is call `Structure#protect(ProtectionType... types)`. The `ProtectionType` enum comes with some pre-defined categories that make it simple: `ProtectionType.DIRECT_PLAYER`, for example, is for any changes made to blocks directly by players. `ProtectionType.NATURAL` represents natural changes, like crop growth.
+
 For more info, check out [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/region/SelectionTool.java) and [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/region/Region.java).
 
 ## Miscellaneous
