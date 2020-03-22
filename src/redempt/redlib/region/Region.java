@@ -74,8 +74,9 @@ public class Region {
 	 * @return Whether the location is inside this Region
 	 */
 	public boolean isInside(Location loc) {
-		return loc.getX() >= start.getX() && loc.getY() >= start.getY() && loc.getZ() >= start.getZ() &&
-				loc.getX() <= end.getX() && loc.getY() <= end.getY() && loc.getZ() <= end.getZ();
+		return loc.getWorld().getName().equals(start.getWorld().getName()) &&
+				loc.getX() >= start.getX() && loc.getY() >= start.getY() && loc.getZ() >= start.getZ() &&
+				loc.getX() < end.getX() && loc.getY() < end.getY() && loc.getZ() < end.getZ();
 	}
 	
 	/**
