@@ -257,15 +257,19 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * Every protection type
 		 */
-		public static ProtectionType[] ALL = values();
+		public static final ProtectionType[] ALL = values();
 		/**
 		 * All protection types relating to actions taken directly by players - Breaking, placing, and interacting with blocks
 		 */
-		public static ProtectionType[] DIRECT_PLAYERS = {BREAK_BLOCK, PLACE_BLOCK, INTERACT, CONTAINER_ACCESS};
+		public static final ProtectionType[] DIRECT_PLAYERS = {BREAK_BLOCK, PLACE_BLOCK, INTERACT, CONTAINER_ACCESS};
 		/**
 		 * All protection types relating to actions usually taken by players which indirectly affect blocks - Pistons, redstone, explosions, and falling blocks
 		 */
-		public static ProtectionType[] INDIRECT_PLAYERS = {PISTONS, REDSTONE, ENTITY_EXPLOSION, BLOCK_EXPLOSION, FALLING_BLOCK};
+		public static final ProtectionType[] INDIRECT_PLAYERS = {PISTONS, REDSTONE, ENTITY_EXPLOSION, BLOCK_EXPLOSION, FALLING_BLOCK};
+		/**
+		 * All protection types relating to natural processes not caused by players
+		 */
+		public static final ProtectionType[] NATURAL = {GROWTH, FADE, FLOW};
 		
 		/**
 		 * Gets all protection types except those specified
