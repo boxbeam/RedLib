@@ -6,6 +6,8 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 
+import redempt.redlib.region.ProtectionPolicy.ProtectionType;
+
 /**
  * Represents a cubic region in a world
  * @author Redempt
@@ -22,6 +24,10 @@ public class Region {
 	 * @param end The second corner
 	 */
 	public Region(Location start, Location end) {
+		setLocations(start, end);
+	}
+	
+	private void setLocations(Location start, Location end) {
 		if (!start.getWorld().equals(end.getWorld())) {
 			throw new IllegalArgumentException("Locations must be in the same world");
 		}
@@ -35,6 +41,15 @@ public class Region {
 		
 		this.start = new Location(start.getWorld(), minX, minY, minZ);
 		this.end = new Location(end.getWorld(), maxX, maxY, maxZ);
+	}
+	
+	/**
+	 * Change the corners of this Region
+	 * @param start The first corner
+	 * @param end The second corner
+	 */
+	public void redefine(Location start, Location end) {
+		setLocations(start, end);
 	}
 	
 	/**
@@ -85,6 +100,15 @@ public class Region {
 	 */
 	public RegionState getState() {
 		return new RegionState(this);
+	}
+	
+	/**
+	 * Protect this region with the given protection types
+	 * @param types The events to protect against. See {@link ProtectionType#ALL} and {@link ProtectionType#allExcept(ProtectionType...)}
+	 * @return The {@link ProtectedRegion}
+	 */
+	public ProtectedRegion protect(ProtectionType... types) {
+		return new ProtectedRegion(this, types);
 	}
 	
 	/**
