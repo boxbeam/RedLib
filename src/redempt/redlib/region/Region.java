@@ -118,9 +118,9 @@ public class Region {
 	 */
 	public void forEachBlock(Consumer<Block> lambda) {
 		int[] dimensions = this.getBlockDimensions();
-		for (int x = 0; x <= dimensions[0]; x++) {
-			for (int y = 0; y <= dimensions[1]; y++) {
-				for (int z = 0; z <= dimensions[2]; z++) {
+		for (int x = 0; x < dimensions[0]; x++) {
+			for (int y = 0; y < dimensions[1]; y++) {
+				for (int z = 0; z < dimensions[2]; z++) {
 					Location loc = getStart().add(x, y, z);
 					lambda.accept(loc.getBlock());
 				}

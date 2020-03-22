@@ -19,6 +19,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
 
@@ -187,6 +189,20 @@ public class ProtectionPolicy implements Listener {
 		}
 	}
 	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onBlockFade(BlockFadeEvent e) {
+		if (protections.contains(ProtectionType.FADE) && protectionCheck.test(e.getBlock())) {
+			e.setCancelled(true);
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onFlow(BlockFromToEvent e) {
+		if (protections.contains(ProtectionType.FLOW) && protectionCheck.test(e.getToBlock())) {
+			e.setCancelled(true);
+		}
+	}
+	
 	public static enum ProtectionType {
 		
 		/**
@@ -228,7 +244,15 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * Crop growth and block spreading/formation
 		 */
-		GROWTH;
+		GROWTH,
+		/**
+		 * Blocks fading
+		 */
+		FADE,
+		/**
+		 * Lava and water flowing
+		 */
+		FLOW;
 		
 		/**
 		 * Every protection type
