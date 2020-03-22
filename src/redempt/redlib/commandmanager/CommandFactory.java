@@ -222,6 +222,7 @@ public class CommandFactory {
 					children = new ArrayList<>();
 					names = null;
 					args = new ArrayList<>();
+					contextProviders = new ArrayList<>();
 					help = null;
 					permission = null;
 					type = null;
