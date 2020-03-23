@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -106,11 +107,21 @@ public class ProtectionPolicy implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onInteract(PlayerInteractEvent e) {
-		if (e.getAction() != Action.RIGHT_CLICK_BLOCK) {
+		if (e.getAction() != Action.RIGHT_CLICK_BLOCK || !protectionCheck.test(e.getClickedBlock())) {
 			return;
 		}
+		if (e.getClickedBlock().getType().toString().endsWith("ANVIL") && protections.contains(ProtectionType.ANVIL_BREAK)) {
+			if (RedLib.midVersion >= 13) {
+				BlockData data = e.getClickedBlock().getBlockData();
+				String s = data.getAsString();
+				s = s.substring(s.indexOf("anvil"));
+				data = Bukkit.createBlockData(s);
+				e.getClickedBlock().setBlockData(data);
+			}
+		}
 		ProtectionType type = e.getClickedBlock().getState() instanceof InventoryHolder ? ProtectionType.CONTAINER_ACCESS : ProtectionType.INTERACT;
-		if (protections.contains(type) && protectionCheck.test(e.getClickedBlock())) {
+		if (protections.contains(type)) {
+			e.getClickedBlock();
 			if (canBypass(e.getPlayer(), type)) {
 				return;
 			}
@@ -250,7 +261,11 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * Lava and water flowing
 		 */
-		FLOW;
+		FLOW,
+		/**
+		 * Players using an anvil damaging it (1.13+ only)
+		 */
+		ANVIL_BREAK;
 		
 		/**
 		 * Every protection type
