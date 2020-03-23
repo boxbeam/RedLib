@@ -197,7 +197,7 @@ public class MultiBlockStructure {
 		for (int i = 0; i < replace.size(); i++) {
 			String str = replace.get(i);
 			prepend += str + ";";
-			output = output.replaceAll("(?<=;|^)" + Pattern.quote(str) + "(?=[^a-z]|$)", i + "");
+			output = output.replaceAll("(?<=;|^)" + Pattern.quote(str) + "(?=[^a-z_]|$)", i + "");
 		}
 		if (replace.size() > 0) {
 			output = "(" + prepend.substring(0, prepend.length() - 1) + ")" + output + ";";
