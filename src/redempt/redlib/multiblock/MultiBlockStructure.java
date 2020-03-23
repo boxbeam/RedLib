@@ -589,7 +589,6 @@ public class MultiBlockStructure {
 					int zp = rotator.getRotatedZ();
 					Block block = loc.clone().add(xp, yp, zp).getBlock();
 					if (!compare(data[x][y][z], block, rotator)) {
-						block.setType(Material.COAL_ORE);
 						return null;
 					}
 				}
