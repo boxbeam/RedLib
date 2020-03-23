@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
@@ -180,6 +181,22 @@ public class ItemUtils {
 	}
 	
 	/**
+	 * Counts the number of items of the given type in the given inventory
+	 * @param inv The inventory to count the items in
+	 * @param type The type of item to count
+	 * @return The number of items found
+	 */
+	public static int count(Inventory inv, Material type) {
+		int count = 0;
+		for (ItemStack i : inv) {
+			if (i != null && i.getType() == type) {
+				count += i.getAmount();
+			}
+		}
+		return count;
+	}
+	
+	/**
 	 * Removes the specified amount of the given item from the given inventory
 	 * @param inv The inventory to remove the items from
 	 * @param item The item to be removed
@@ -190,6 +207,36 @@ public class ItemUtils {
 		ItemStack[] contents = inv.getContents();
 		for (int i = 0; i < contents.length && amount > 0; i++) {
 			if (!item.isSimilar(contents[i])) {
+				continue;
+			}
+			if (amount >= contents[i].getAmount()) {
+				amount -= contents[i].getAmount();
+				contents[i] = null;
+				if (amount == 0) {
+					inv.setContents(contents);
+					return true;
+				}
+				continue;
+			}
+			contents[i].setAmount(contents[i].getAmount() - amount);
+			inv.setContents(contents);
+			return true;
+		}
+		inv.setContents(contents);
+		return false;
+	}
+	
+	/**
+	 * Removes the specified amount of the given item type from the given inventory
+	 * @param inv The inventory to remove the items from
+	 * @param type The item type to be removed
+	 * @param amount The amount of items to remove
+	 * @return Whether the amount specified could be removed. False if it removed less than specified.
+	 */
+	public static boolean remove(Inventory inv, Material type, int amount) {
+		ItemStack[] contents = inv.getContents();
+		for (int i = 0; i < contents.length && amount > 0; i++) {
+			if (contents[i] == null || contents[i].getType() != type) {
 				continue;
 			}
 			if (amount >= contents[i].getAmount()) {
@@ -238,6 +285,16 @@ public class ItemUtils {
 		ItemStack clone = item.clone();
 		clone.setAmount(amount);
 		give(player, clone);
+	}
+	
+	/**
+	 * Gives the player the specified amount of the specified item type, dropping them on the ground if there is not enough room
+	 * @param player The player to give the items to
+	 * @param type The item type to be given to the player
+	 * @param amount The amount the player should be given
+	 */
+	public static void give(Player player, Material type, int amount) {
+		give(player, new ItemStack(type), amount);
 	}
 	
 }
