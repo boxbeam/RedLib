@@ -235,6 +235,7 @@ public class ItemUtils {
 	 * @return Whether the amount specified could be removed. False if it removed less than specified.
 	 */
 	public static boolean remove(Inventory inv, Material type, int amount) {
+		type = new ItemStack(type).getType();
 		ItemStack[] contents = inv.getContents();
 		for (int i = 0; i < contents.length && amount > 0; i++) {
 			if (contents[i] == null || contents[i].getType() != type) {
