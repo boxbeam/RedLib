@@ -187,6 +187,7 @@ public class ItemUtils {
 	 * @return The number of items found
 	 */
 	public static int count(Inventory inv, Material type) {
+		type = new ItemStack(type).getType();
 		int count = 0;
 		for (ItemStack i : inv) {
 			if (i != null && i.getType() == type) {
