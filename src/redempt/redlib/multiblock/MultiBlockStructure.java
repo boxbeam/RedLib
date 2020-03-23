@@ -589,6 +589,7 @@ public class MultiBlockStructure {
 					int zp = rotator.getRotatedZ();
 					Block block = loc.clone().add(xp, yp, zp).getBlock();
 					if (!compare(data[x][y][z], block, rotator)) {
+						block.setType(Material.COAL_ORE);
 						return null;
 					}
 				}
@@ -606,10 +607,14 @@ public class MultiBlockStructure {
 			if (ignoreAir && Bukkit.createBlockData(data).getMaterial() == Material.AIR) {
 				return true;
 			}
+			BlockData bdata = Bukkit.createBlockData(data);
+			String type = data.substring(0, data.indexOf('[') == -1 ? data.length() : data.indexOf('['));
+			String otherBlockData = block.getBlockData().getAsString();
+			String otherType = otherBlockData.substring(0, otherBlockData.indexOf('[') == -1 ? otherBlockData.length() : otherBlockData.indexOf('['));
 			if (!strictMode) {
-				return block.getType() == Bukkit.createBlockData(data).getMaterial();
+				return type.equals(otherType);
 			}
-			return block.getBlockData().getAsString().equals(data);
+			return block.getBlockData().matches(bdata);
 		} else {
 			String[] split = data.split(":");
 			if (ignoreAir && split[0].equals("AIR")) {
