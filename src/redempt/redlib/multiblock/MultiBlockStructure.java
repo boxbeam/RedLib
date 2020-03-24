@@ -445,7 +445,7 @@ public class MultiBlockStructure {
 				state.update(true, false);
 			}
 		});
-		return getAt(loc, relX, relY, relZ, rotation, mirror);
+		return assumeAt(loc, relX, relY, relZ, rotation, mirror);
 	}
 	
 	/**
@@ -566,7 +566,7 @@ public class MultiBlockStructure {
 	 * @param relX The relative X in the structure of the location
 	 * @param relY The relative Y in the structure of the location
 	 * @param relZ The relative Z in the structure of the location
-	 * @param rotation The rotation of the structure
+	 * @param rotation The number of clockwise rotations applied to the structure
 	 * @param mirror Whether the structure is mirrored
 	 * @return The structure at this block, or null if it does not exist
 	 */
@@ -577,6 +577,53 @@ public class MultiBlockStructure {
 			return s;
 		}
 		return null;
+	}
+	
+	/**
+	 * Gets the Structure at the given block, performing no checks to ensure it exists.
+	 * @param loc The location of the Structure
+	 * @param relX The relative X of the location within the Structure
+	 * @param relY The relative Y of the location within the Structure
+	 * @param relZ The relative Z of the location within the Structure
+	 * @param rotation The number of clockwise rotations applied to the structure
+	 * @param mirror Whether the structure is mirrored
+	 * @return The Structure instance
+	 */
+	public Structure assumeAt(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
+		Rotator rotator = new Rotator(rotation, mirror);
+		rotator.setLocation(relX, relZ);
+		loc = loc.clone().subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
+		return new Structure(this, loc, rotator);
+	}
+	
+	/**
+	 * Gets the Structure at the given block, performing no checks to ensure it exists.
+	 * @param loc The location of the Structure
+	 * @param rotation The number of clockwise rotations applied to the structure
+	 * @param mirror Whether the structure is mirrored
+	 * @return The Structure instance
+	 */
+	public Structure assumeAt(Location loc, int rotation, boolean mirror) {
+		return assumeAt(loc, 0, 0, 0, rotation, mirror);
+	}
+	
+	/**
+	 * Gets the Structure at the given block, performing no checks to ensure it exists.
+	 * @param loc The location of the Structure
+	 * @param rotation The number of clockwise rotations applied to the structure
+	 * @return The Structure instance
+	 */
+	public Structure assumeAt(Location loc, int rotation) {
+		return assumeAt(loc, 0, 0, 0, rotation, false);
+	}
+	
+	/**
+	 * Gets the Structure at the given block, performing no checks to ensure it exists.
+	 * @param loc The location of the Structure
+	 * @return The Structure instance
+	 */
+	public Structure assumeAt(Location loc) {
+		return assumeAt(loc, 0, 0, 0, 0, false);
 	}
 	
 	private Structure test(Location loc, int xPos, int yPos, int zPos, Rotator rotator) {
@@ -595,7 +642,7 @@ public class MultiBlockStructure {
 			}
 		}
 		rotator.setLocation(xPos, zPos);
-		loc = loc.subtract(rotator.getRotatedX(), yPos, rotator.getRotatedZ());
+		loc = loc.clone().subtract(rotator.getRotatedX(), yPos, rotator.getRotatedZ());
 		return new Structure(this, loc, rotator);
 	}
 	
