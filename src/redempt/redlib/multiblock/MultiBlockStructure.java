@@ -525,6 +525,7 @@ public class MultiBlockStructure {
 	/**
 	 * Gets the Structure at the given block, if it exists.
 	 * The given location can be any part of the multi-block structure.
+	 * This is very computationally expensive for larger structures, and should be avoided if possible, as it checks every possible rotation and mirroring of the structure.
 	 * @param loc The location to check at
 	 * @return The structure at this block, or null if it does not exist
 	 */
