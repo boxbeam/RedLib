@@ -103,6 +103,14 @@ public class Region implements Listener {
 	}
 	
 	/**
+	 * Gets the center of this Region
+	 * @return A Location representing the center of this Region
+	 */
+	public Location getCenter() {
+		return start.clone().add(end).multiply(0.5);
+	}
+	
+	/**
 	 * Check whether a location is inside this Region
 	 * @param loc The location to check
 	 * @return Whether the location is inside this Region
