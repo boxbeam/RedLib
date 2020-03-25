@@ -5,11 +5,13 @@ import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.util.Vector;
 
 import redempt.redlib.RedLib;
 import redempt.redlib.region.ProtectionPolicy.ProtectionType;
@@ -133,6 +135,49 @@ public class Region implements Listener {
 	 */
 	public RegionState getState() {
 		return new RegionState(this);
+	}
+	
+	public Region clone() {
+		return new Region(start, end);
+	}
+	
+	/**
+	 * Expands the region in all directions
+	 * @param amount The amount to expand the region by
+	 */
+	public void expand(int amount) {
+		expand(amount, amount, amount, amount, amount, amount);
+	}
+	
+	/**
+	 * Expand the region
+	 * @param posX The amount to expand the region in the positive X direction
+	 * @param negX The amount to expand the region in the negative X direction
+	 * @param posY The amount to expand the region in the positive Y direction
+	 * @param negY The amount to expand the region in the negative Y direction
+	 * @param posZ The amount to expand the region in the positive Z direction
+	 * @param negZ The amount to expand the region in the negative Z direction
+	 */
+	public void expand(int posX, int negX, int posY, int negY, int posZ, int negZ) {
+		start = start.add(negX, negY, negZ);
+		end = end.add(posX, posY, posZ);
+		setLocations(start, end);
+	}
+	
+	/**
+	 * Expand the region in a given direction
+	 * @param direction The direction to expand the region in
+	 * @param amount The amount to expand the region in the given direction
+	 */
+	public void expand(BlockFace direction, int amount) {
+		Vector vec = direction.getDirection();
+		vec = vec.multiply(amount);
+		if (vec.getX() + vec.getY() + vec.getZ() > 1) {
+			end = end.add(vec);
+		} else {
+			start = start.add(vec);
+		}
+		setLocations(start, end);
 	}
 	
 	/**
