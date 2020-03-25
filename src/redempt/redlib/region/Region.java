@@ -2,18 +2,26 @@ package redempt.redlib.region;
 
 import java.util.function.Consumer;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
 
+import redempt.redlib.RedLib;
 import redempt.redlib.region.ProtectionPolicy.ProtectionType;
+import redempt.redlib.region.events.RegionEnterEvent;
+import redempt.redlib.region.events.RegionExitEvent;
 
 /**
  * Represents a cubic region in a world
  * @author Redempt
  *
  */
-public class Region {
+public class Region implements Listener {
 	
 	private Location start;
 	private Location end;
@@ -41,6 +49,30 @@ public class Region {
 		
 		this.start = new Location(start.getWorld(), minX, minY, minZ);
 		this.end = new Location(end.getWorld(), maxX, maxY, maxZ);
+	}
+	
+	/**
+	 * Enable RegionEnterEvent and RegionExitEvent for this region
+	 */
+	public void enableEvents() {
+		Bukkit.getPluginManager().registerEvents(this, RedLib.plugin);
+	}
+	
+	/**
+	 * Disable RegionEnterEvent and RegionExitEvent for this region
+	 */
+	public void disableEvents() {
+		HandlerList.unregisterAll(this);
+	}
+	
+	@EventHandler
+	public void onMove(PlayerMoveEvent e) {
+		if (!isInside(e.getFrom()) && isInside(e.getTo())) {
+			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this));
+		}
+		if (!isInside(e.getTo()) && isInside(e.getFrom())) {
+			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this));
+		}
 	}
 	
 	/**
