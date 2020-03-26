@@ -198,6 +198,16 @@ public class Region implements Listener {
 	}
 	
 	/**
+	 * Move the region
+	 * @param x How much to move the region on the X axis
+	 * @param y How much to move the region on the Y axis
+	 * @param z How much to move the region on the Z axis
+	 */
+	public void move(int x, int y, int z) {
+		move(new Vector(x, y, z));
+	}
+	
+	/**
 	 * Protect this region with the given protection types
 	 * @param types The events to protect against. See {@link ProtectionType#ALL} and {@link ProtectionType#allExcept(ProtectionType...)}
 	 * @return The {@link ProtectedRegion}
