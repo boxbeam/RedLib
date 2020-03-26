@@ -92,7 +92,7 @@ public class SelectionTool implements Listener {
 	/**
 	 * Creates a path of Locations, one block apart, based on the locations selected by the player
 	 * @param uuid The UUID of the player
-	 * @return The Region selected by the player, or null if the player has not selected 2 locations
+	 * @return The Path selected by the player, or null if the player has not selected 2 locations
 	 */
 	public List<Location> getPath(UUID uuid) {
 		Location[] locations = selections.get(uuid);
