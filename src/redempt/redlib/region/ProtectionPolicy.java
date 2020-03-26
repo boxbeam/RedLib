@@ -22,6 +22,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 
 import redempt.redlib.RedLib;
 
@@ -120,6 +121,9 @@ public class ProtectionPolicy implements Listener {
 			}
 		}
 		ProtectionType type = e.getClickedBlock().getState() instanceof InventoryHolder ? ProtectionType.CONTAINER_ACCESS : ProtectionType.INTERACT;
+		if (type == ProtectionType.INTERACT && !e.getClickedBlock().getType().isInteractable()) {
+			return;
+		}
 		if (protections.contains(type)) {
 			e.getClickedBlock();
 			if (canBypass(e.getPlayer(), type)) {
