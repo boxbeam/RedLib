@@ -18,11 +18,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 
 import redempt.redlib.RedLib;
 
@@ -216,6 +216,13 @@ public class ProtectionPolicy implements Listener {
 		}
 	}
 	
+	@EventHandler
+	public void onCreatureSpawn(CreatureSpawnEvent e) {
+		if (protections.contains(ProtectionType.MOB_SPAWN) && protectionCheck.test(e.getLocation().getBlock())) {
+			e.setCancelled(true);
+		}
+	}
+	
 	public static enum ProtectionType {
 		
 		/**
@@ -269,7 +276,11 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * Players using an anvil damaging it (1.13+ only)
 		 */
-		ANVIL_BREAK;
+		ANVIL_BREAK,
+		/**
+		 * Mobs spawning
+		 */
+		MOB_SPAWN;
 		
 		/**
 		 * Every protection type
@@ -286,7 +297,7 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * All protection types relating to natural processes not caused by players
 		 */
-		public static final ProtectionType[] NATURAL = {GROWTH, FADE, FLOW};
+		public static final ProtectionType[] NATURAL = {GROWTH, FADE, FLOW, MOB_SPAWN};
 		
 		/**
 		 * Gets all protection types except those specified
