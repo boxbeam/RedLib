@@ -274,6 +274,7 @@ public class MultiBlockStructure {
 	}
 	
 	private void forEachData(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror, BiConsumer<Location, String> callback) {
+		loc = loc.getBlock().getLocation();
 		Rotator rotator = new Rotator(rotation, mirror);
 		for (int x = 0; x < dimX; x++) {
 			for (int y = 0; y < dimY; y++) {
@@ -591,6 +592,7 @@ public class MultiBlockStructure {
 	 * @return The Structure instance
 	 */
 	public Structure assumeAt(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
+		loc = loc.getBlock().getLocation();
 		Rotator rotator = new Rotator(rotation, mirror);
 		rotator.setLocation(relX, relZ);
 		loc = loc.clone().subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
@@ -628,6 +630,7 @@ public class MultiBlockStructure {
 	}
 	
 	private Structure test(Location loc, int xPos, int yPos, int zPos, Rotator rotator) {
+		loc = loc.getBlock().getLocation();
 		for (int x = 0; x < dimX; x++) {
 			for (int y = 0; y < dimY; y++) {
 				for (int z = 0; z < dimZ; z++) {

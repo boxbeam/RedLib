@@ -146,7 +146,7 @@ public class Region implements Listener {
 	}
 	
 	public Region clone() {
-		return new Region(start, end);
+		return new Region(start.clone(), end.clone());
 	}
 	
 	/**
