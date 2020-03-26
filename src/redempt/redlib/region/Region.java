@@ -154,6 +154,7 @@ public class Region implements Listener {
 	 * @param amount The amount to expand the region by
 	 */
 	public void expand(int amount) {
+		System.out.println("Expanding by " + amount);
 		expand(amount, amount, amount, amount, amount, amount);
 	}
 	
@@ -167,7 +168,7 @@ public class Region implements Listener {
 	 * @param negZ The amount to expand the region in the negative Z direction
 	 */
 	public void expand(int posX, int negX, int posY, int negY, int posZ, int negZ) {
-		start = start.add(negX, negY, negZ);
+		start = start.subtract(negX, negY, negZ);
 		end = end.add(posX, posY, posZ);
 		setLocations(start, end);
 	}
