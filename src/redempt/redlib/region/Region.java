@@ -189,6 +189,15 @@ public class Region implements Listener {
 	}
 	
 	/**
+	 * Move the region
+	 * @param v The vector to be applied to both corners of the region
+	 */
+	public void move(Vector v) {
+		start = start.add(v);
+		end = end.add(v);
+	}
+	
+	/**
 	 * Protect this region with the given protection types
 	 * @param types The events to protect against. See {@link ProtectionType#ALL} and {@link ProtectionType#allExcept(ProtectionType...)}
 	 * @return The {@link ProtectedRegion}
