@@ -154,7 +154,6 @@ public class Region implements Listener {
 	 * @param amount The amount to expand the region by
 	 */
 	public void expand(int amount) {
-		System.out.println("Expanding by " + amount);
 		expand(amount, amount, amount, amount, amount, amount);
 	}
 	
