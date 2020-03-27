@@ -21,6 +21,7 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
 
@@ -218,6 +219,9 @@ public class ProtectionPolicy implements Listener {
 	
 	@EventHandler
 	public void onCreatureSpawn(CreatureSpawnEvent e) {
+		if (e.getSpawnReason() == SpawnReason.CUSTOM) {
+			return;
+		}
 		if (protections.contains(ProtectionType.MOB_SPAWN) && protectionCheck.test(e.getLocation().getBlock())) {
 			e.setCancelled(true);
 		}
