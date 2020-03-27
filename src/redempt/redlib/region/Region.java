@@ -1,12 +1,19 @@
 package redempt.redlib.region;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -230,6 +237,29 @@ public class Region implements Listener {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Gets all entities contained in this Region
+	 * @return The entities in this Region
+	 */
+	public List<Entity> getEntities() {
+		List<Entity> entities = new ArrayList<>();
+		for (int cx = start.getChunk().getX(); cx <= end.getChunk().getX(); cx++) {
+			for (int cz = start.getChunk().getZ(); cz <= end.getChunk().getZ(); cz++) {
+				Chunk chunk = start.getWorld().getChunkAt(cx, cz);
+				Arrays.stream(chunk.getEntities()).filter(e -> isInside(e.getLocation())).forEach(entities::add);
+			}
+		}
+		return entities;
+	}
+	
+	/**
+	 * Gets all players contained in this Region
+	 * @return The players in this Region
+	 */
+	public List<Player> getPlayers() {
+		return getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e).collect(Collectors.toList());
 	}
 	
 	/**
