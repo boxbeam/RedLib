@@ -311,3 +311,7 @@ ChatPrompt - Allows you to send a prompt to a player in chat and get their respo
 Path - Allows you to get all of the blocks along a certain path, either specifying a start and end location, a start location and vector, or just a start location with a direction. Useful for creating lines of particle effects.
 
 EventListener - Allows you to define a listener for an event with a lambda rather than having to create a class for it or invoke the anonymous class definition
+
+Hologram - Lets you build and manipulate holograms with armor stands easily
+
+LocationUtils - Lets you check whether a certain location is safe, and find the closest safe location to another location
