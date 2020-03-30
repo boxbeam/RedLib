@@ -70,6 +70,9 @@ public class Hologram {
 				closest = stand;
 			}
 		}
+		if (dist > 1) {
+			return null;
+		}
 		int id = getId(closest);
 		stands.removeIf(s -> getId(s) != id);
 		stands.sort((a, b) -> (int) Math.signum(b.getLocation().getY() - a.getLocation().getY()));
