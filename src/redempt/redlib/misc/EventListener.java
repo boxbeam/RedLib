@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -28,7 +29,7 @@ public class EventListener<T extends Event> implements Listener {
 	 * Creates and registers a Listener for the given event
 	 * @param plugin The plugin registering the listener
 	 * @param eventClass The class of the event being listened for
-	 * @param handler The callback to receive the event
+	 * @param handler The callback to receive the event and this EventListener
 	 */
 	public EventListener(Plugin plugin, Class<T> eventClass, BiConsumer<EventListener<T>, T> handler) {
 		this.handler = handler;
@@ -43,6 +44,16 @@ public class EventListener<T extends Event> implements Listener {
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Creates and registers a Listener for the given event
+	 * @param plugin The plugin registering the listener
+	 * @param eventClass The class of the event being listened for
+	 * @param handler The callback to receive the event
+	 */
+	public EventListener(Plugin plugin, Class<T> eventClass, Consumer<T> handler) {
+		this(plugin, eventClass, (l, e) -> handler.accept(e));
 	}
 	
 	@EventHandler
