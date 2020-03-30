@@ -26,7 +26,7 @@ public class Hologram {
 	static {
 		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 		objective = scoreboard.getObjective("hologramID");
-		if (objective == null) {
+		if (objective != null) {
 			objective = scoreboard.registerNewObjective("hologramID", "dummy", "hologramID");
 		}
 	}
