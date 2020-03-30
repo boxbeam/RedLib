@@ -259,6 +259,30 @@ public class ItemUtils {
 	}
 	
 	/**
+	 * Remove all matching items, returning the number that were removed
+	 * @param inv The inventory to count and remove items from
+	 * @param item The item to count and remove
+	 * @return How many items were removed
+	 */
+	public static int countAndRemove(Inventory inv, ItemStack item) {
+		int count = count(inv, item);
+		remove(inv, item, count);
+		return count;
+	}
+	
+	/**
+	 * Remove all items of a specified type, returning the number that were removed
+	 * @param inv The inventory to count and remove items from
+	 * @param type The item type to count and remove
+	 * @return How many items were removed
+	 */
+	public static int countAndRemove(Inventory inv, Material type) {
+		int count = count(inv, type);
+		remove(inv, type, count);
+		return count;
+	}
+	
+	/**
 	 * Give the player the specified items, dropping them on the ground if there is not enough room
 	 * @param player The player to give the items to
 	 * @param items The items to be given
