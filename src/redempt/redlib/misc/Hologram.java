@@ -120,7 +120,6 @@ public class Hologram {
 		}
 		for (int i = start; i < stands.size(); i++) {
 			ArmorStand stand = stands.get(i);
-			stand.setGravity(true);
 			stand.teleport(new Location(loc.getWorld(), 0, 1, 0));
 			locs[i] = loc.clone();
 			loc.subtract(0, lineSpacing, 0);
