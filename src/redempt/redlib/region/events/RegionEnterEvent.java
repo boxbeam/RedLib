@@ -26,13 +26,14 @@ public class RegionEnterEvent extends Event {
 	
 	private Region region;
 	private Player player;
+	private EnterCause cause;
 	
 	/**
 	 * Constructs a new RegionEnterEvent
 	 * @param player The player who entered the region
 	 * @param region The region that was entered
 	 */
-	public RegionEnterEvent(Player player, Region region) {
+	public RegionEnterEvent(Player player, Region region, EnterCause cause) {
 		this.region = region;
 		this.player = player;
 	}
@@ -49,6 +50,28 @@ public class RegionEnterEvent extends Event {
 	 */
 	public Region getRegion() {
 		return region;
+	}
+	
+	/**
+	 * @return What caused the player to enter the region
+	 */
+	public EnterCause getCause() {
+		return cause;
+	}
+	
+	public static enum EnterCause {
+		/**
+		 * When a player moves into a region
+		 */
+		MOVE,
+		/**
+		 * When a player teleports into a region
+		 */
+		TELEPORT,
+		/**
+		 * When a player joins into a region
+		 */
+		JOIN
 	}
 
 }

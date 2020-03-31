@@ -26,15 +26,17 @@ public class RegionExitEvent extends Event {
 	
 	private Region region;
 	private Player player;
+	private ExitCause cause;
 	
 	/**
 	 * Constructs a new RegionExitEvent
 	 * @param player The player that exited the region
 	 * @param region The region that was exited
 	 */
-	public RegionExitEvent(Player player, Region region) {
+	public RegionExitEvent(Player player, Region region, ExitCause cause) {
 		this.region = region;
 		this.player = player;
+		this.cause = cause;
 	}
 	
 	/**
@@ -50,5 +52,27 @@ public class RegionExitEvent extends Event {
 	public Region getRegion() {
 		return region;
 	}
-
+	
+	/**
+	 * @return What caused the player to exit the region
+	 */
+	public ExitCause getCause() {
+		return cause;
+	}
+	
+	public static enum ExitCause {
+		/**
+		 * When a player moves out of a region
+		 */
+		MOVE,
+		/**
+		 * When a player teleports out of a region
+		 */
+		TELEPORT,
+		/**
+		 * When a player leaves the game whilst in a region
+		 */
+		QUIT
+	}
+	
 }

@@ -17,13 +17,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
 import redempt.redlib.RedLib;
 import redempt.redlib.region.ProtectionPolicy.ProtectionType;
 import redempt.redlib.region.events.RegionEnterEvent;
 import redempt.redlib.region.events.RegionExitEvent;
+import redempt.redlib.region.events.RegionEnterEvent.EnterCause;
+import redempt.redlib.region.events.RegionExitEvent.ExitCause;
 
 /**
  * Represents a cubic region in a world
@@ -77,10 +82,34 @@ public class Region implements Listener {
 	@EventHandler
 	public void onMove(PlayerMoveEvent e) {
 		if (!isInside(e.getFrom()) && isInside(e.getTo())) {
-			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this));
+			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.MOVE));
 		}
 		if (!isInside(e.getTo()) && isInside(e.getFrom())) {
-			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this));
+			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.MOVE));
+		}
+	}
+	
+	@EventHandler
+	public void onTeleport(PlayerTeleportEvent e) {
+		if (!isInside(e.getFrom()) && isInside(e.getTo())) {
+			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.TELEPORT));
+		}
+		if (!isInside(e.getTo()) && isInside(e.getFrom())) {
+			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.TELEPORT));
+		}
+	}
+	
+	@EventHandler
+	public void onJoin(PlayerJoinEvent e) {
+		if (isInside(e.getPlayer().getLocation())) {
+			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.JOIN));
+		}
+	}
+	
+	@EventHandler
+	public void onQuit(PlayerQuitEvent e) {
+		if (isInside(e.getPlayer().getLocation())) {
+			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.QUIT));
 		}
 	}
 	
