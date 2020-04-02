@@ -53,6 +53,7 @@ public class Hologram {
 	 */
 	public static Hologram getAt(Location loc) {
 		List<ArmorStand> stands = new ArrayList<>();
+		loc.getChunk().load();
 		Arrays.stream(loc.getChunk().getEntities())
 			.filter(e -> e instanceof ArmorStand)
 			.map(e -> (ArmorStand) e)
