@@ -26,6 +26,8 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 
+import redempt.redlib.region.Region;
+
 /**
  * A utility class to create interactive multi-block structures
  * @author Redempt
@@ -287,6 +289,56 @@ public class MultiBlockStructure {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Gets the Region this multi-block structure would occupy, were it built here
+	 * @param loc The location of the multi-block structure
+	 * @param relX The relative X in the structure to center at
+	 * @param relY The relative Y in the structure to center at
+	 * @param relZ The relative Z in the structure to center at
+	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 * @param mirror Whether to mirror the structure on the X axis
+	 * @return The Region this multi-block structure would occupy
+	 */
+	public Region getRegion(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
+		loc = loc.getBlock().getLocation();
+		Rotator rotator = new Rotator(rotation, mirror);
+		rotator.setLocation(relX, relZ);
+		Location start = loc.clone().subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
+		rotator.setLocation(dimX, dimZ);
+		Location end = start.clone().add(rotator.getRotatedX(), dimY, rotator.getRotatedZ());
+		return new Region(start, end);
+	}
+	
+	/**
+	 * Gets the Region this multi-block structure would occupy, were it built here
+	 * @param loc The location of the multi-block structure
+	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 * @param mirror Whether to mirror the structure on the X axis
+	 * @return The Region this multi-block structure would occupy
+	 */
+	public Region getRegion(Location loc, int rotation, boolean mirror) {
+		return getRegion(loc, 0, 0, 0, rotation, mirror);
+	}
+	
+	/**
+	 * Gets the Region this multi-block structure would occupy, were it built here
+	 * @param loc The location of the multi-block structure
+	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 * @return The Region this multi-block structure would occupy
+	 */
+	public Region getRegion(Location loc, int rotation) {
+		return getRegion(loc, 0, 0, 0, rotation, false);
+	}
+	
+	/**
+	 * Gets the Region this multi-block structure would occupy, were it built here
+	 * @param loc The location of the multi-block structure
+	 * @return The Region this multi-block structure would occupy
+	 */
+	public Region getRegion(Location loc) {
+		return getRegion(loc, 0, 0, 0, 0, false);
 	}
 	
 	/**
@@ -595,7 +647,7 @@ public class MultiBlockStructure {
 		loc = loc.getBlock().getLocation();
 		Rotator rotator = new Rotator(rotation, mirror);
 		rotator.setLocation(relX, relZ);
-		loc = loc.clone().subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
+		loc.subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
 		return new Structure(this, loc, rotator);
 	}
 	

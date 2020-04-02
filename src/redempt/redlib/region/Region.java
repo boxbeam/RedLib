@@ -31,9 +31,8 @@ import redempt.redlib.region.events.RegionEnterEvent.EnterCause;
 import redempt.redlib.region.events.RegionExitEvent.ExitCause;
 
 /**
- * Represents a cubic region in a world
+ * Represents a rectangular prism region in a world
  * @author Redempt
- *
  */
 public class Region implements Listener {
 	
@@ -266,6 +265,17 @@ public class Region implements Listener {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Check if this Region overlaps with another
+	 * @param o The Region to check against
+	 * @return Whether this Region overlaps with the given Region
+	 */
+	public boolean overlaps(Region o) {
+		return (!(start.getX() > o.end.getX() || o.start.getX() > end.getX()
+				|| start.getY() > o.end.getY() || o.start.getY() > end.getY()
+				|| start.getZ() > o.end.getZ() || o.start.getZ() > end.getZ()));
 	}
 	
 	/**
