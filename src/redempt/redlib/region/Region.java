@@ -139,6 +139,22 @@ public class Region implements Listener {
 	}
 	
 	/**
+	 * @return An array of size 8 containing all corners of this Region
+	 */
+	public Location[] getCorners() {
+		return new Location[] {
+					start,
+					end,
+					new Location(getWorld(), start.getX(), start.getY(), end.getZ()),
+					new Location(getWorld(), start.getX(), end.getY(), start.getZ()),
+					new Location(getWorld(), end.getX(), start.getY(), start.getZ()),
+					new Location(getWorld(), start.getX(), end.getY(), end.getZ()),
+					new Location(getWorld(), end.getX(), end.getY(), start.getZ()),
+					new Location(getWorld(), end.getX(), start.getY(), end.getZ())
+				};
+	}
+	
+	/**
 	 * Gets the center of this Region
 	 * @return A Location representing the center of this Region
 	 */
