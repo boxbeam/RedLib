@@ -38,7 +38,12 @@ public class ProtectionPolicy implements Listener {
 	private Set<ProtectionType> protections = new HashSet<>();
 	private Predicate<Block> protectionCheck;
 	
-	protected ProtectionPolicy(Predicate<Block> protectionCheck, ProtectionType... protections) {
+	/**
+	 * Create a ProtectionPolicy to protect blocks
+	 * @param protectionCheck A predicate which will be used to check whether blocks are protected by this ProtectionPolicy
+	 * @param protections The types of actions to protect against
+	 */
+	public ProtectionPolicy(Predicate<Block> protectionCheck, ProtectionType... protections) {
 		Arrays.stream(protections).forEach(this.protections::add);
 		Bukkit.getPluginManager().registerEvents(this, RedLib.plugin);
 		this.protectionCheck = protectionCheck;
