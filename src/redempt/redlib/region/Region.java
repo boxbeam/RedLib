@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -26,8 +27,8 @@ import org.bukkit.util.Vector;
 import redempt.redlib.RedLib;
 import redempt.redlib.region.ProtectionPolicy.ProtectionType;
 import redempt.redlib.region.events.RegionEnterEvent;
-import redempt.redlib.region.events.RegionExitEvent;
 import redempt.redlib.region.events.RegionEnterEvent.EnterCause;
+import redempt.redlib.region.events.RegionExitEvent;
 import redempt.redlib.region.events.RegionExitEvent.ExitCause;
 
 /**
@@ -268,11 +269,21 @@ public class Region implements Listener {
 	}
 	
 	/**
+	 * @return The World this Region is in
+	 */
+	public World getWorld() {
+		return start.getWorld();
+	}
+	
+	/**
 	 * Check if this Region overlaps with another
 	 * @param o The Region to check against
 	 * @return Whether this Region overlaps with the given Region
 	 */
 	public boolean overlaps(Region o) {
+		if (!o.getWorld().equals(getWorld())) {
+			return false;
+		}
 		return (!(start.getX() > o.end.getX() || o.start.getX() > end.getX()
 				|| start.getY() > o.end.getY() || o.start.getY() > end.getY()
 				|| start.getZ() > o.end.getZ() || o.start.getZ() > end.getZ()));
