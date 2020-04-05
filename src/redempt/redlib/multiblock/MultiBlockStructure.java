@@ -572,6 +572,10 @@ public class MultiBlockStructure {
 						Location l = location.clone().add(rotator.getRotatedX(), iter[1], rotator.getRotatedZ());
 						rotator.setLocation(relX, relZ);
 						l.subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
+						System.out.println("x: " + iter[0]);
+						System.out.println("y: " + iter[1]);
+						System.out.println("z: " + iter[2]);
+						System.out.println("blocks: " + pos);
 						BlockState state = getStateToSet(l, data[iter[0]][iter[1]][iter[2]]);
 						if (state != null) {
 							state.update(true, false);
@@ -581,11 +585,13 @@ public class MultiBlockStructure {
 							return;
 						}
 					}
+					iter[2] = 0;
 				}
+				iter[1] = 0;
 			}
 			callback.accept(assumeAt(location, relX, relY, relZ, rotation, mirror));
 			Bukkit.getScheduler().cancelTask(task[0]);
-		}, 0, 1);
+		}, 1, 1);
 		return task[0];
 	}
 	
