@@ -576,7 +576,7 @@ public class MultiBlockStructure {
 						System.out.println("y: " + iter[1]);
 						System.out.println("z: " + iter[2]);
 						System.out.println("blocks: " + pos);
-						BlockState state = getStateToSet(l, data[iter[0]][iter[1]][iter[2]]);
+						BlockState state = getStateToSet(l, rotator.rotate(data[iter[0]][iter[1]][iter[2]]));
 						if (state != null) {
 							state.update(true, false);
 							pos++;
