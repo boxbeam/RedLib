@@ -26,6 +26,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 
+import redempt.redlib.RedLib;
 import redempt.redlib.region.Region;
 
 /**
@@ -546,6 +547,85 @@ public class MultiBlockStructure {
 	}
 	
 	/**
+	 * Build this multi-block structure over multiple ticks
+	 * @param loc The location to build the structure at
+	 * @param relX The relative X in the structure to build centered at
+	 * @param relY The relative Y in the structure to build centered at
+	 * @param relZ The relative Z in the structure to build centered at
+	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 * @param mirror Whether to mirror the structure on the X axis
+	 * @param blocksPerTick The number of blocks to build per tick
+	 * @param callback A callback to accept the Structure instance that was created when construction is complete
+	 * @return The task number for the Bukkit scheduler task created by this method
+	 */
+	public int buildAsync(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror, int blocksPerTick, Consumer<Structure> callback) {
+		Location location = loc.getBlock().getLocation();
+		Rotator rotator = new Rotator(rotation, mirror);
+		int[] iter = {0, 0, 0};
+		int[] task = {0};
+		task[0] = Bukkit.getScheduler().scheduleSyncRepeatingTask(RedLib.plugin, () -> {
+			int pos = 0;
+			for (; iter[0] < dimX; iter[0]++) {
+				for (; iter[1] < dimY; iter[1]++) {
+					for (; iter[2] < dimZ; iter[2]++) {
+						rotator.setLocation(iter[0], iter[2]);
+						Location l = location.clone().add(rotator.getRotatedX(), iter[1], rotator.getRotatedZ());
+						rotator.setLocation(relX, relZ);
+						l.subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
+						BlockState state = getStateToSet(l, data[iter[0]][iter[1]][iter[2]]);
+						if (state != null) {
+							state.update(true, false);
+							pos++;
+						}
+						if (pos >= blocksPerTick) {
+							return;
+						}
+					}
+				}
+			}
+			callback.accept(assumeAt(location, relX, relY, relZ, rotation, mirror));
+			Bukkit.getScheduler().cancelTask(task[0]);
+		}, 0, 1);
+		return task[0];
+	}
+	
+	/**
+	 * Build this multi-block structure over multiple ticks
+	 * @param loc The location to build the structure at
+	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 * @param mirror Whether to mirror the structure on the X axis
+	 * @param blocksPerTick The number of blocks to build per tick
+	 * @param callback A callback to accept the Structure instance that was created when construction is complete
+	 * @return The task number for the Bukkit scheduler task created by this method
+	 */
+	public int buildAsync(Location loc, int rotation, boolean mirror, int blocksPerTick, Consumer<Structure> callback) {
+		return buildAsync(loc, 0, 0, 0, rotation, mirror, blocksPerTick, callback);
+	}
+	
+	/**
+	 * Build this multi-block structure over multiple ticks
+	 * @param loc The location to build the structure at
+	 * @param rotation The number of 90-degree clockwise rotations to apply
+	 * @param blocksPerTick The number of blocks to build per tick
+	 * @param callback A callback to accept the Structure instance that was created when construction is complete
+	 * @return The task number for the Bukkit scheduler task created by this method
+	 */
+	public int buildAsync(Location loc, int rotation, int blocksPerTick, Consumer<Structure> callback) {
+		return buildAsync(loc, 0, 0, 0, rotation, false, blocksPerTick, callback);
+	}
+	
+	/**
+	 * Build this multi-block structure over multiple ticks
+	 * @param loc The location to build the structure at
+	 * @param blocksPerTick The number of blocks to build per tick
+	 * @param callback A callback to accept the Structure instance that was created when construction is complete
+	 * @return The task number for the Bukkit scheduler task created by this method
+	 */
+	public int buildAsync(Location loc, int blocksPerTick, Consumer<Structure> callback) {
+		return buildAsync(loc, 0, 0, 0, 0, false, blocksPerTick, callback);
+	}
+	
+	/**
 	 * Gets this multi-block structure's name. May be faster to compare this than to use .equals().
 	 * @return The name of this multi-block structure
 	 */
@@ -559,6 +639,13 @@ public class MultiBlockStructure {
 	 */
 	public int[] getDimensions() {
 		return new int[] {dimX, dimY, dimZ};
+	}
+	
+	/**
+	 * @return The volume of this multi-block structure in blocks
+	 */
+	public int getVolume() {
+		return dimX * dimY * dimZ;
 	}
 	
 	/**

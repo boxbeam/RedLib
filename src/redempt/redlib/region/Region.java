@@ -182,6 +182,22 @@ public class Region implements Listener {
 	}
 	
 	/**
+	 * @return The volume of this Region, in cubic meters
+	 */
+	public double getVolume() {
+		double[] dim = getDimensions();
+		return dim[0] * dim[1] * dim[2];
+	}
+	
+	/**
+	 * @return The volume of this Region, in blocks
+	 */
+	public int getBlockVolume() {
+		int[] dim = getBlockDimensions();
+		return dim[0] * dim[1] * dim[2];
+	}
+	
+	/**
 	 * Get the dimensions of this Region [x, y, z]
 	 * @return The dimensions of this Region
 	 */
