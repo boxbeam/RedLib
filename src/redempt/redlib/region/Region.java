@@ -231,10 +231,11 @@ public class Region implements Listener {
 	 */
 	public void expand(BlockFace direction, int amount) {
 		Vector vec = direction.getDirection();
-		vec = vec.multiply(amount);
-		if (vec.getX() + vec.getY() + vec.getZ() > 1) {
+		if (vec.getX() + vec.getY() + vec.getZ() > 0) {
+			vec = vec.multiply(amount);
 			end = end.add(vec);
 		} else {
+			vec = vec.multiply(amount);
 			start = start.add(vec);
 		}
 		setLocations(start, end);
