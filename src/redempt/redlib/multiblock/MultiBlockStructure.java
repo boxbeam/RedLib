@@ -585,7 +585,11 @@ public class MultiBlockStructure {
 				}
 				iter[1] = 0;
 			}
-			callback.accept(assumeAt(location, relX, relY, relZ, rotation, mirror));
+			try {
+				callback.accept(assumeAt(location, relX, relY, relZ, rotation, mirror));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			Bukkit.getScheduler().cancelTask(task[0]);
 		}, 1, 1);
 		return task[0];
