@@ -352,14 +352,16 @@ public class Command {
 	
 	private List<String> tab(CommandSender sender, String[] args) {
 		List<String> completions = new ArrayList<>();
-		for (Command child : children) {
-			if (child.getPermission() != null && !sender.hasPermission(child.getPermission())) {
-				continue;
-			}
-			for (String name : child.getAliases()) {
-				if (name.equalsIgnoreCase(args[0])) {
-					String[] copy = Arrays.copyOfRange(args, 1, args.length);
-					completions.addAll(child.tab(sender, copy));
+		if (args.length > 0) {
+			for (Command child : children) {
+				if (child.getPermission() != null && !sender.hasPermission(child.getPermission())) {
+					continue;
+				}
+				for (String name : child.getAliases()) {
+					if (name.equalsIgnoreCase(args[0])) {
+						String[] copy = Arrays.copyOfRange(args, 1, args.length);
+						completions.addAll(child.tab(sender, copy));
+					}
 				}
 			}
 		}
