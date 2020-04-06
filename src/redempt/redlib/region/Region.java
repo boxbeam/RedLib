@@ -2,7 +2,9 @@ package redempt.redlib.region;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -343,6 +345,19 @@ public class Region implements Listener {
 	 */
 	public List<Player> getPlayers() {
 		return getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e).collect(Collectors.toList());
+	}
+	
+	/**
+	 * @return All the Chunks this Region overlaps
+	 */
+	public Set<Chunk> getChunks() {
+		Set<Chunk> chunks = new HashSet<>();
+		for (int cx = start.getChunk().getX(); cx <= end.getChunk().getX(); cx++) {
+			for (int cz = start.getChunk().getZ(); cz <= end.getChunk().getZ(); cz++) {
+				chunks.add(start.getWorld().getChunkAt(cx, cz));
+			}
+		}
+		return chunks;
 	}
 	
 	/**
