@@ -39,6 +39,9 @@ public class CommandFactory {
 	 * @return This CommandFactory
 	 */
 	public CommandFactory setArgTypes(CommandArgumentType<?>... types) {
+		if (Arrays.stream(types).anyMatch(t -> t == null)) {
+			throw new IllegalArgumentException("Command argument types cannot be null!");
+		}
 		this.argTypes = types;
 		return this;
 	}
@@ -49,6 +52,9 @@ public class CommandFactory {
 	 * @return This CommandFactory
 	 */
 	public CommandFactory setContextProviders(ContextProvider<?>... providers) {
+		if (Arrays.stream(providers).anyMatch(t -> t == null)) {
+			throw new IllegalArgumentException("Context providers cannot be null!");
+		}
 		this.contextProviders = providers;
 		return this;
 	}

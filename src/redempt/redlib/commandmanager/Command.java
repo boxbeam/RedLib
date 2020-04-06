@@ -596,6 +596,46 @@ public class Command {
 		public static CommandArgumentType<Player> playerType = new CommandArgumentType<Player>("player", name -> Bukkit.getPlayer(name))
 				.tabStream(c -> Bukkit.getOnlinePlayers().stream().map(Player::getName));
 		
+		/**
+		 * Creates a CommandArgumentType for an enum, which will accept all of the enum's values as arguments and offer all enum values as tab completions
+		 * @param <T> The enum type
+		 * @param name The name of the CommandArgumentType
+		 * @param clazz The enum class to make a CommandArgumentType from
+		 * @return A CommandArgumentType for the given enum
+		 */
+		public static <T extends Enum> CommandArgumentType<T> of(String name, Class<T> clazz) {
+			if (!clazz.isEnum()) {
+				throw new IllegalArgumentException("Class must be an enum type!");
+			}
+			try {
+				Method getValues = clazz.getDeclaredMethod("values");
+				Object[] values = (Object[]) getValues.invoke(null);
+				List<String> strings = Arrays.stream(values).map(Object::toString).collect(Collectors.toList());
+				return new CommandArgumentType<T>(name, s -> {
+						try {
+							return (T) Enum.valueOf(clazz, s);
+						} catch (Exception e) {
+							return null;
+						}
+					}).tab(c -> strings);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
+		/**
+		 * Creates a CommandArgumentType for a set of possible string inputs
+		 * @param name The name of the CommandArgumentType
+		 * @param values The list of possible inputs
+		 * @return A CommandArgumentType for the given inputs, which will offer tab completion and accept any of the supplied strings, or return null if the given argument does not match any of them
+		 */
+		public static CommandArgumentType<String> of(String name, String... values) {
+			List<String> list = Arrays.stream(values).collect(Collectors.toList());
+			return new CommandArgumentType<String>(name, s -> list.contains(s) ? s : null)
+					.tab(c -> list);
+		}
+		
 		private Function<String, T> func = null;
 		private BiFunction<CommandSender, String, T> bifunc = null;
 		private String name;
