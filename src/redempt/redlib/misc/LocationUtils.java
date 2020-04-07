@@ -106,7 +106,7 @@ public class LocationUtils {
 	 * @return The stringified Location
 	 */
 	public static String toString(Location loc, String separator) {
-		return new StringBuilder().append(loc.getWorld()).append(separator)
+		return new StringBuilder().append(loc.getWorld().getName()).append(separator)
 				.append(loc.getX()).append(separator)
 				.append(loc.getY()).append(separator)
 				.append(loc.getZ()).append(separator).toString();
