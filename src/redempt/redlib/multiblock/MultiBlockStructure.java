@@ -30,7 +30,8 @@ import redempt.redlib.RedLib;
 import redempt.redlib.region.Region;
 
 /**
- * A utility class to create interactive multi-block structures
+ * A utility class intended to create interactive multi-block structures.
+ * Can also be used to store and copy large sections of blocks. 
  * @author Redempt
  *
  */
@@ -67,7 +68,7 @@ public class MultiBlockStructure {
 					if (midVersion >= 13) {
 						builder.append(block.getBlockData().getAsString()).append(';');
 					} else {
-						output += block.getType() + ":" + block.getData() + ";";
+						builder.append(block.getType().toString()).append(":").append(block.getData()).append(";");
 					}
 				}
 			}
