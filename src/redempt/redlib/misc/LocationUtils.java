@@ -1,9 +1,12 @@
 package redempt.redlib.misc;
 
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -94,6 +97,52 @@ public class LocationUtils {
 	 */
 	public static Location getNearestSafeLocation(Location loc, int maxDistance) {
 		return getNearestSafeLocation(loc, maxDistance, l -> true);
+	}
+	
+	/**
+	 * Converts a Location to a String
+	 * @param loc The Location to be stringified
+	 * @param separator The separator to use between pieces of information
+	 * @return The stringified Location
+	 */
+	public static String toString(Location loc, String separator) {
+		return new StringBuilder().append(loc.getWorld()).append(separator)
+				.append(loc.getX()).append(separator)
+				.append(loc.getY()).append(separator)
+				.append(loc.getZ()).append(separator).toString();
+	}
+	
+	/**
+	 * Converts a String back to a Location
+	 * @param string The stringified Location
+	 * @param separator The separator that was used in toString
+	 * @return The Location
+	 */
+	public static Location fromString(String string, String separator) {
+		String[] split = string.split(Pattern.quote(separator));
+		World world = Bukkit.getWorld(split[0]);
+		double x = Double.parseDouble(split[1]);
+		double y = Double.parseDouble(split[2]);
+		double z = Double.parseDouble(split[3]);
+		return new Location(world, x, y, z);
+	}
+	
+	/**
+	 * Converts a Location to a String. The same as calling toString(Location, " ")
+	 * @param loc The Location to be stringified
+	 * @return The stringified Location
+	 */
+	public static String toString(Location loc) {
+		return toString(loc, " ");
+	}
+	
+	/**
+	 * Converts a String back to a Location. The same as calling fromString(String, " ")
+	 * @param string The stringified Location
+	 * @return The Location
+	 */
+	public static Location fromString(String string) {
+		return fromString(string, " ");
 	}
 	
 }
