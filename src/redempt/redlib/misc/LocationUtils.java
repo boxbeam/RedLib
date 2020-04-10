@@ -109,7 +109,7 @@ public class LocationUtils {
 		return new StringBuilder().append(loc.getWorld().getName()).append(separator)
 				.append(loc.getX()).append(separator)
 				.append(loc.getY()).append(separator)
-				.append(loc.getZ()).append(separator).toString();
+				.append(loc.getZ()).toString();
 	}
 	
 	/**
