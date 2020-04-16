@@ -2,8 +2,10 @@ package redempt.redlib.region;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
@@ -19,9 +21,9 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
 
@@ -34,8 +36,9 @@ import redempt.redlib.RedLib;
  */
 public class ProtectionPolicy implements Listener {
 	
-	private List<BiPredicate<Player, ProtectionType>> bypassPolicies = new ArrayList<>();
+	private List<BypassPolicy> bypassPolicies = new ArrayList<>();
 	private Set<ProtectionType> protections = new HashSet<>();
+	private Map<ProtectionType, String> messages = new HashMap<>();
 	private Predicate<Block> protectionCheck;
 	
 	/**
@@ -78,6 +81,14 @@ public class ProtectionPolicy implements Listener {
 	 * @param bypassPolicy The {@link BiPredicate} to determine bypasses by player and protection type
 	 */
 	public void addBypassPolicy(BiPredicate<Player, ProtectionType> bypassPolicy) {
+		bypassPolicies.add((p, t, b) -> bypassPolicy.test(p, t));
+	}
+	
+	/**
+	 * Adds a bypass policy, which allows certain players to bypass certain protection types
+	 * @param bypassPolicy The {@link BypassPolicy} to determine bypasses by player and protection type
+	 */
+	public void addBypassPolicy(BypassPolicy bypassPolicy) {
 		bypassPolicies.add(bypassPolicy);
 	}
 	
@@ -88,27 +99,61 @@ public class ProtectionPolicy implements Listener {
 		bypassPolicies.clear();
 	}
 	
-	private boolean canBypass(Player player, ProtectionType type) {
-		return bypassPolicies.stream().anyMatch(p -> p.test(player, type));
+	/**
+	 * Sets the message to be shown to a player when they attempt to do an action which is protected again
+	 * @param type The type of action the message corresponds to
+	 * @param message The message players should be shown when this type of action is denied
+	 */
+	public void setDenyMessage(ProtectionType type, String message) {
+		messages.put(type, message);
+	}
+	
+	/**
+	 * Sets the message to be shown to a player when they attempt to do an action which is protected again
+	 * @param filter A filter for which types to set the message for
+	 * @param message The message players should be shown when these types of actions are denied
+	 */
+	public void setDenyMessage(Predicate<ProtectionType> filter, String message) {
+		Arrays.stream(ProtectionType.values()).filter(filter).forEach(t -> messages.put(t, message));
+	}
+	
+	/**
+	 * Clear all deny messages
+	 */
+	public void clearDenyMessages() {
+		messages.clear();
+	}
+	
+	private boolean canBypass(Player player, ProtectionType type, Block block) {
+		return bypassPolicies.stream().anyMatch(p -> p.canBypass(player, type, block));
+	}
+	
+	private void sendMessage(Player player, ProtectionType type) {
+		String message = messages.get(type);
+		if (message != null) {
+			player.sendMessage(message);
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBreakBlock(BlockBreakEvent e) {
 		if (protections.contains(ProtectionType.BREAK_BLOCK) && protectionCheck.test(e.getBlock())) {
-			if (canBypass(e.getPlayer(), ProtectionType.BREAK_BLOCK)) {
+			if (canBypass(e.getPlayer(), ProtectionType.BREAK_BLOCK, e.getBlock())) {
 				return;
 			}
 			e.setCancelled(true);
+			sendMessage(e.getPlayer(), ProtectionType.BREAK_BLOCK);
 		}
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockPlace(BlockPlaceEvent e) {
 		if (protections.contains(ProtectionType.PLACE_BLOCK) && protectionCheck.test(e.getBlock())) {
-			if (canBypass(e.getPlayer(), ProtectionType.PLACE_BLOCK)) {
+			if (canBypass(e.getPlayer(), ProtectionType.PLACE_BLOCK, e.getBlock())) {
 				return;
 			}
 			e.setCancelled(true);
+			sendMessage(e.getPlayer(), ProtectionType.PLACE_BLOCK);
 		}
 	}
 	
@@ -132,10 +177,11 @@ public class ProtectionPolicy implements Listener {
 		}
 		if (protections.contains(type)) {
 			e.getClickedBlock();
-			if (canBypass(e.getPlayer(), type)) {
+			if (canBypass(e.getPlayer(), type, e.getClickedBlock())) {
 				return;
 			}
 			e.setCancelled(true);
+			sendMessage(e.getPlayer(), type);
 		}
 	}
 	
