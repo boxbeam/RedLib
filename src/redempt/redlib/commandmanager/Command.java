@@ -251,7 +251,10 @@ public class Command {
 	private Object[] getContext(CommandSender sender) {
 		Object[] output = new Object[contextProviders.length];
 		for (int i = 0; i < output.length; i++) {
-			Object obj = contextProviders[i].provide(sender);
+			Object obj = null;
+			if (sender instanceof Player) {
+				obj = contextProviders[i].provide((Player) sender);
+			}
 			if (obj == null) {
 				String error = contextProviders[i].getErrorMessage();
 				if (error != null) {
@@ -725,7 +728,13 @@ public class Command {
 		 * @return The resulting CommandArgumentType
 		 */
 		public <K> CommandArgumentType<K> map(String name, Function<T, K> func) {
-			return new CommandArgumentType<K>(name, (c, s) -> func.apply(convert(c, s)));
+			return new CommandArgumentType<K>(name, (c, s) -> {
+				T obj = convert(c, s);
+				if (obj == null) {
+					return null;
+				}
+				return func.apply(obj);
+			});
 		}
 		
 		/**
@@ -736,7 +745,13 @@ public class Command {
 		 * @return The resulting CommandArgumentType
 		 */
 		public <K> CommandArgumentType<K> map(String name, BiFunction<CommandSender, T, K> func) {
-			return new CommandArgumentType<K>(name, (c, s) -> func.apply(c, convert(c, s)));
+			return new CommandArgumentType<K>(name, (c, s) -> {
+				T obj = convert(c, s);
+				if (obj == null) {
+					return null;
+				}
+				return func.apply(c, obj);
+			});
 		}
 		
 	}

@@ -1,10 +1,11 @@
 package redempt.redlib.commandmanager;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,16 +25,39 @@ public class ContextProvider<T> {
 			ChatColor.RED + "You must be holding an item to do this!",
 			c -> {
 				@SuppressWarnings("deprecation")
-				ItemStack item = ((Player) c).getItemInHand();
+				ItemStack item = c.getItemInHand();
 				if (item == null || item.getType() == Material.AIR) {
 					return null;
 				}
 				return item.clone();
 			});
 	
+	/**
+	 * Creates a ContextProvider which returns true if the predicate's condition is met, and null otherwise, which will cause the command to fail
+	 * @param name The name of the ContextProvider to be created
+	 * @param error The error message to be shown to the user if the predicate returns false
+	 * @param assertion The predicate which tests the assertion
+	 * @return A ContextProvider which asserts that the given condition is met, and returns false otherwise
+	 */
+	public static ContextProvider<Boolean> assertProvider(String name, String error, Predicate<Player> assertion) {
+		return new ContextProvider<Boolean>(name, error, c -> {
+			return assertion.test(c) ? true : null;
+		});
+	}
+	
+	/**
+	 * Creates a ContextProvider which returns true if the predicate's condition is met, and null otherwise, which will cause the command to fail
+	 * @param name The name of the ContextProvider to be created
+	 * @param assertion The predicate which tests the assertion
+	 * @return A ContextProvider which asserts that the given condition is met, and returns false otherwise
+	 */
+	public static ContextProvider<Boolean> assertProvider(String name, Predicate<Player> assertion) {
+		return assertProvider(name, null, assertion);
+	}
+	
 	private String name;
 	private String error = null;
-	private Function<CommandSender, T> provider;
+	private Function<Player, T> provider;
 	
 	/**
 	 * Constructs a ContextProvider.
@@ -41,7 +65,7 @@ public class ContextProvider<T> {
 	 * @param name The name of this ContextProvider
 	 * @param provider The function to get the needed context for the given sender
 	 */
-	public ContextProvider(String name, Function<CommandSender, T> provider) {
+	public ContextProvider(String name, Function<Player, T> provider) {
 		if (name.contains(" ")) {
 			throw new IllegalArgumentException("Context provider name cannot contain a space");
 		}
@@ -56,7 +80,7 @@ public class ContextProvider<T> {
 	 * @param error The error message to be shown to the user if the provider returns null
 	 * @param provider The function to get the needed context for the given sender
 	 */
-	public ContextProvider(String name, String error, Function<CommandSender, T> provider) {
+	public ContextProvider(String name, String error, Function<Player, T> provider) {
 		this(name, provider);
 		this.error = error;
 	}
@@ -75,7 +99,65 @@ public class ContextProvider<T> {
 		return error;
 	}
 	
-	protected T provide(CommandSender sender) {
+	/**
+	 * Creates a new ContextProvider based on this one which converts from this type to another
+	 * @param <K> The type of the resulting ContextProvider
+	 * @param name The name of the ContextProvider being created
+	 * @param error The error message to be shown to the user if the provider returns null
+	 * @param func The function to convert from the type this ContextProvider returns to the type the new one will
+	 * @return The resulting ContextProvider
+	 */
+	public <K> ContextProvider<K> map(String name, String error, Function<T, K> func) {
+		return new ContextProvider<K>(name, error, c -> {
+			T obj = provide(c);
+			if (obj == null) {
+				return null;
+			}
+			return func.apply(obj);
+		});
+	}
+	
+	/**
+	 * Creates a new ContextProvider based on this one which converts from this type to another
+	 * @param <K> The type of the resulting ContextProvider
+	 * @param name The name of the ContextProvider being created
+	 * @param error The error message to be shown to the user if the provider returns null
+	 * @param func The function to convert from the type this ContextProvider returns to the type the new one will
+	 * @return The resulting ContextProvider
+	 */
+	public <K> ContextProvider<K> map(String name, String error, BiFunction<Player, T, K> func) {
+		return new ContextProvider<K>(name, error, c -> {
+			T obj = provide(c);
+			if (obj == null) {
+				return null;
+			}
+			return func.apply(c, obj);
+		});
+	}
+	
+	/**
+	 * Creates a new ContextProvider based on this one which converts from this type to another
+	 * @param <K> The type of the resulting ContextProvider
+	 * @param name The name of the ContextProvider being created
+	 * @param func The function to convert from the type this ContextProvider returns to the type the new one will
+	 * @return The resulting ContextProvider
+	 */
+	public <K> ContextProvider<K> map(String name, Function<T, K> func) {
+		return map(name, null, func);
+	}
+	
+	/**
+	 * Creates a new ContextProvider based on this one which converts from this type to another
+	 * @param <K> The type of the resulting ContextProvider
+	 * @param name The name of the ContextProvider being created
+	 * @param func The function to convert from the type this ContextProvider returns to the type the new one will
+	 * @return The resulting ContextProvider
+	 */
+	public <K> ContextProvider<K> map(String name, BiFunction<Player, T, K> func) {
+		return map(name, null, func);
+	}
+	
+	protected T provide(Player sender) {
 		return provider.apply(sender);
 	}
 	
