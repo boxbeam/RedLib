@@ -82,7 +82,7 @@ public class Command {
 	 * @param sender The sender to show the help to
 	 */
 	public void showHelp(CommandSender sender) {
-		String title = ChatColor.translateAlternateColorCodes('&', RedLib.helpTitle).replace("%cmdname%", names[0]);
+		String title = RedLib.getMessage("helpTitle").replace("%cmdname%", names[0]);
 		sender.sendMessage(title);
 		sender.sendMessage(getHelpRecursive(sender, 0).trim());
 	}
@@ -91,10 +91,10 @@ public class Command {
 		if (permission != null && !sender.hasPermission(permission)) {
 			return "";
 		}
-		String help = this.help == null ? "" : ChatColor.translateAlternateColorCodes('&', RedLib.helpEntry).replace("%cmdname%", getFullName()).replace("%help%", this.help) + "\n";
+		String help = this.help == null ? "" : RedLib.getMessage("helpEntry").replace("%cmdname%", getFullName()).replace("%help%", this.help) + "\n";
 		if (hideSub && level != 0) {
 			if (help.equals("")) {
-				return ChatColor.translateAlternateColorCodes('&', RedLib.helpEntry).replace("%cmdname%", getFullName()).replace("%help%", "[Hidden subcommands]") + "\n";
+				return RedLib.getMessage("helpEntry").replace("%cmdname%", getFullName()).replace("%help%", "[Hidden subcommands]") + "\n";
 			}
 			return help;
 		}
@@ -393,7 +393,7 @@ public class Command {
 	
 	private boolean execute(CommandSender sender, String[] args) {
 		if (permission != null && !sender.hasPermission(permission)) {
-			sender.sendMessage(ChatColor.RED + "You do not have permission to run this command! (" + permission + ")");
+			sender.sendMessage(RedLib.getMessage("noPermission").replace("%permission%", permission));
 			return true;
 		}
 		if (args.length > 0 && args[0].equalsIgnoreCase("help")) {
@@ -715,6 +715,28 @@ public class Command {
 		 */
 		public T convert(CommandSender sender, String argument) {
 			return func == null ? bifunc.apply(sender, argument) : func.apply(argument);
+		}
+		
+		/**
+		 * Creates a new CommandArgumentType based on this one which converts from this type to another
+		 * @param <K> The type of the resulting CommandArgumentType
+		 * @param name The name of the CommandArgumentType being created
+		 * @param func The function to convert from the type this CommandArgumentType returns to the type the new one will
+		 * @return The resulting CommandArgumentType
+		 */
+		public <K> CommandArgumentType<K> map(String name, Function<T, K> func) {
+			return new CommandArgumentType<K>(name, (c, s) -> func.apply(convert(c, s)));
+		}
+		
+		/**
+		 * Creates a new CommandArgumentType based on this one which converts from this type to another
+		 * @param <K> The type of the resulting CommandArgumentType
+		 * @param name The name of the CommandArgumentType being created
+		 * @param func The function to convert from the type this CommandArgumentType returns to the type the new one will
+		 * @return The resulting CommandArgumentType
+		 */
+		public <K> CommandArgumentType<K> map(String name, BiFunction<CommandSender, T, K> func) {
+			return new CommandArgumentType<K>(name, (c, s) -> func.apply(c, convert(c, s)));
 		}
 		
 	}

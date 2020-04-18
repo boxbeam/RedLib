@@ -13,29 +13,38 @@ import redempt.redlib.dev.StructureTool;
 
 public class RedLib extends JavaPlugin {
 	
-	public static String helpTitle;
-	public static String helpEntry;
 	public static boolean devMode = false;
 	public static Plugin plugin;
 	public static int midVersion = Integer.parseInt(getServerVersion().split("\\.")[1]);
 	
+	private void setDefault(FileConfiguration config, String key, String value) {
+		config.set(key, config.get(key, value));
+	}
+	
+	private void setConfigDefaults() {
+		FileConfiguration config = this.getConfig();
+		setDefault(config, "helpTitle", "&a--[ &eHelp for %cmdname% &a]--");
+		setDefault(config, "helpEntry", "&e%cmdname%&a: %help%");
+		setDefault(config, "noPermission", "&cYou do not have permission to run this command! (%permission%)");
+		setDefault(config, "firstLocationSet", "&aFirst location set!");
+		setDefault(config, "secondLocationSet", "&aSecond location set!");
+		setDefault(config, "cancelPromptMessage", "&cType '%canceltext%' to cancel.");
+		setDefault(config, "cancelText", "cancel");
+		this.saveConfig();
+	}
+	
+	public static String getMessage(String message) {
+		return ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString(message));
+	}
+	
 	@Override
 	public void onEnable() {
 		plugin = this;
+		setConfigDefaults();
 		FileConfiguration config = this.getConfig();
-		if (config.getString("helpTitle") == null) {
-			config.set("helpTitle", "&a--[ &eHelp for %cmdname% &a]--");
-			this.saveConfig();
-		}
-		if (config.getString("helpEntry") == null) {
-			config.set("helpEntry", "&e%cmdname%&a: %help%");
-			this.saveConfig();
-		}
 		if (config.contains("devMode")) {
 			devMode = config.getBoolean("devMode");
 		}
-		helpTitle = config.getString("helpTitle");
-		helpEntry = config.getString("helpEntry");
 		
 		if (devMode) {
 			new CommandFactory(this.getResource("command.txt"))

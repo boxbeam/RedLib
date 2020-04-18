@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,7 +35,7 @@ public class ChatPrompt implements Listener {
 		}
 		prompts.put(player, new Prompt(onResponse, onCancel));
 		player.sendMessage(prompt);
-		player.sendMessage(ChatColor.RED + "Type 'cancel' to canel.");
+		player.sendMessage(RedLib.getMessage("cancelPromptMessage").replace("%cancel%", RedLib.getMessage("cancelText")));
 	}
 	
 	/**
@@ -60,7 +59,7 @@ public class ChatPrompt implements Listener {
 			return;
 		}
 		e.setCancelled(true);
-		if (e.getMessage().equalsIgnoreCase("cancel")) {
+		if (e.getMessage().equalsIgnoreCase(RedLib.getMessage("cancelText"))) {
 			p.cancel(CancelReason.PLAYER_CANCELLED);
 			return;
 		}

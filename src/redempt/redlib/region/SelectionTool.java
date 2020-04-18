@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -51,10 +50,10 @@ public class SelectionTool implements Listener {
 		}
 		if (locations[0] == null) {
 			locations[0] = e.getClickedBlock().getLocation();
-			e.getPlayer().sendMessage(ChatColor.GREEN + "First location selected!");
+			e.getPlayer().sendMessage(RedLib.getMessage("firstLocationSet"));
 		} else if (locations[1] == null) {
 			locations[1] = e.getClickedBlock().getLocation();
-			e.getPlayer().sendMessage(ChatColor.GREEN + "Second location selected!");
+			e.getPlayer().sendMessage(RedLib.getMessage("secondLocationSet"));
 		}
 		selections.put(e.getPlayer().getUniqueId(), locations);
 	}
