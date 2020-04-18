@@ -30,6 +30,7 @@ public class RedLib extends JavaPlugin {
 		setDefault(config, "secondLocationSet", "&aSecond location set!");
 		setDefault(config, "cancelPromptMessage", "&cType '%canceltext%' to cancel.");
 		setDefault(config, "cancelText", "cancel");
+		setDefault(config, "mustHoldItem", "&cYou must be holding an item to do this!");
 		this.saveConfig();
 	}
 	

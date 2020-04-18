@@ -4,10 +4,11 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import redempt.redlib.RedLib;
 
 /**
  * Used to provide context arguments to command method hooks
@@ -22,7 +23,7 @@ public class ContextProvider<T> {
 	 * Returns the item in the player's main hand, or errors if it is air.
 	 */
 	public static ContextProvider<ItemStack> mainHand = new ContextProvider<ItemStack>("mainhand",
-			ChatColor.RED + "You must be holding an item to do this!",
+			RedLib.getMessage("mustHoldItem"),
 			c -> {
 				@SuppressWarnings("deprecation")
 				ItemStack item = c.getItemInHand();
@@ -33,7 +34,7 @@ public class ContextProvider<T> {
 			});
 	
 	/**
-	 * Creates a ContextProvider which returns true if the predicate's condition is met, and null otherwise, which will cause the command to fail
+	 * Creates a ContextProvider which returns true if the predicate's condition is met, and null otherwise, which will cause the command to fail.
 	 * @param name The name of the ContextProvider to be created
 	 * @param error The error message to be shown to the user if the predicate returns false
 	 * @param assertion The predicate which tests the assertion
@@ -46,7 +47,7 @@ public class ContextProvider<T> {
 	}
 	
 	/**
-	 * Creates a ContextProvider which returns true if the predicate's condition is met, and null otherwise, which will cause the command to fail
+	 * Creates a ContextProvider which returns true if the predicate's condition is met, and null otherwise, which will cause the command to fail.
 	 * @param name The name of the ContextProvider to be created
 	 * @param assertion The predicate which tests the assertion
 	 * @return A ContextProvider which asserts that the given condition is met, and returns false otherwise
