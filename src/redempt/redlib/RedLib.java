@@ -31,7 +31,7 @@ public class RedLib extends JavaPlugin {
 			devMode = config.getBoolean("devMode");
 		} else {
 			config.set("devMode", false);
-			
+			this.saveConfig();
 		}
 		
 		if (devMode) {
