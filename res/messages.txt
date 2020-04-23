@@ -1,0 +1,8 @@
+helpTitle: &a--[ &eHelp for %cmdname% &a]--
+helpEntry: &e%cmdname%&a: %help%
+noPermission: &cYou do not have permission to run this command! (%permission%)
+firstLocationSet: &aFirst location set!
+secondLocationSet: &aSecond location set!
+cancelPromptMessage: &cType '%canceltext%' to cancel.
+cancelText: cancel
+mustHoldItem: &cYou must be holding an item to do this!
