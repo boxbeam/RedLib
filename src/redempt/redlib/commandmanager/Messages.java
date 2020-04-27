@@ -94,7 +94,9 @@ public class Messages {
 	private static void write(Map<String, String> map, java.nio.file.Path file) {
 		List<String> lines = map.entrySet().stream().map(e -> e.getKey() + ": " + e.getValue()).collect(Collectors.toList());
 		try {
-			Files.createDirectory(file.getParent());
+			if (!Files.exists(file.getParent())) {
+				Files.createDirectory(file.getParent());
+			}
 			Files.write(file, lines, Charset.defaultCharset(), StandardOpenOption.CREATE);
 		} catch (IOException e) {
 			e.printStackTrace();
