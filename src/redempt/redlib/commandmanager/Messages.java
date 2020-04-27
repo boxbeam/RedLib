@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * Represents a list of messages loaded from a file with defaults
@@ -22,6 +23,8 @@ import org.bukkit.plugin.Plugin;
  *
  */
 public class Messages {
+	
+	private static Map<Plugin, Messages> all = new HashMap<>();
 	
 	/**
 	 * Loads messages from a file and writes missing defaults
@@ -78,6 +81,24 @@ public class Messages {
 		return load(plugin, plugin.getResource("messages.txt"), "messages.txt");
 	}
 	
+	/**
+	 * Determines which plugin is calling this method, finds its loaded messages, and returns the message with the given name.
+	 * @param message The name of the message
+	 * @return The message, which has been formatted with & as the color character. 
+	 */
+	public static String msg(String message) {
+		Exception ex = new Exception();
+		try {
+			Class<?> clazz = Class.forName(ex.getStackTrace()[1].getClassName());
+			Plugin plugin = JavaPlugin.getProvidingPlugin(clazz);
+			Messages msgs = all.get(plugin);
+			return msgs.get(message);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	private static Map<String, String> parse(Stream<String> input) {
 		Map<String, String> map = new HashMap<>();
 		input.allMatch(s -> {
@@ -111,6 +132,7 @@ public class Messages {
 		this.messages = messages;
 		this.defaults = defaults;
 		this.plugin = plugin;
+		all.put(plugin, this);
 	}
 	
 	/**
