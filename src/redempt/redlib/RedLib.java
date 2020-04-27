@@ -5,7 +5,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import redempt.redlib.commandmanager.CommandFactory;
+import redempt.redlib.commandmanager.CommandParser;
 import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.dev.ItemHelper;
 import redempt.redlib.dev.StructureTool;
@@ -35,7 +35,7 @@ public class RedLib extends JavaPlugin {
 		}
 		
 		if (devMode) {
-			new CommandFactory(this.getResource("command.txt"))
+			new CommandParser(this.getResource("command.txt"))
 					.parse()
 					.register("redlib",
 					new ItemHelper(),

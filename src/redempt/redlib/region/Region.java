@@ -168,8 +168,18 @@ public class Region implements Listener {
 	 * Check whether a location is inside this Region
 	 * @param loc The location to check
 	 * @return Whether the location is inside this Region
+	 * @deprecated Unclear name, use {@link Region#contains(Location)}
 	 */
 	public boolean isInside(Location loc) {
+		return contains(loc);
+	}
+	
+	/**
+	 * Check whether a location is inside this Region
+	 * @param loc The location to check
+	 * @return Whether this Region contains the given Location
+	 */
+	public boolean contains(Location loc) {
 		return loc.getWorld().getName().equals(start.getWorld().getName()) &&
 				loc.getX() >= start.getX() && loc.getY() >= start.getY() && loc.getZ() >= start.getZ() &&
 				loc.getX() < end.getX() && loc.getY() < end.getY() && loc.getZ() < end.getZ();

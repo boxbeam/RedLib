@@ -24,7 +24,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class ItemUtils {
 	
 	/**
-	 * Renames an ItemStack
+	 * Renames an ItemStack, functionally identical to {@link ItemUtils#setName(ItemStack, String)} but kept for legacy reasons
 	 * @param item The ItemStack to be renamed
 	 * @param name The name to give the ItemStack
 	 * @return The renamed ItemStack
@@ -35,6 +35,16 @@ public class ItemUtils {
 		ItemStack clone = item.clone();
 		clone.setItemMeta(meta);
 		return clone;
+	}
+	
+	/**
+	 * Renames an ItemStack
+	 * @param item The ItemStack to be renamed
+	 * @param name The name to give the ItemStack
+	 * @return The renamed ItemStack
+	 */
+	public static ItemStack setName(ItemStack item, String name) {
+		return rename(item, name);
 	}
 	
 	/**

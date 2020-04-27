@@ -38,7 +38,7 @@ First, you will need to load and register the command file. Assuming the file is
 ```
 @Override
 public void onEnable() {
-	Command.fromStream(this.getResource("command.txt")).register("prefix", listener);
+	new CommandParser(this.getResource("command.txt")).parse().register("prefix", listener);
 }
 ```
 Now, "prefix" will be the fallback prefix of the command. The listener argument is an object (or objects) that contain method hooks for the command that are called when the command is run. It must be annotated with @CommandHook(arg), with the argument of the annotation being the name of the hook that you specified in the command file.
@@ -88,7 +88,7 @@ But this is still a bit clunky. Rather than converting the String argument to a 
 public void onEnable() {
 	CommandArgumentType<Player> playerType = new CommandArgumentType<Player>("player", Bukkit::getPlayer)
 	.tabStream(sender -> Bukkit.getOnlinePlayers().map(Player::getName));
-	new CommandFactory(this.getResource("command.txt")).setArgTypes(playerType).register("smite", listener);
+	new CommandParser(this.getResource("command.txt")).setArgTypes(playerType).register("smite", listener);
 }
 ```
 You can give the command manager a `CommandArgumentType`, which tells it how to convert it from a String argument from a command to whatever type it represents. In this case, `Bukkit::getPlayer` is a `Function<String, Player>` which will convert the `String` argument to a `Player` for any command hook methods. We then pass it to the method which loads the command info from the file. Optionally, you can add a tab provider to the `CommandArgumentType`, which is a lambda that takes the `CommandSender` tab completing and returns a list of possible completions. The ones which don't match the partial argument the sender has already typed are automatically removed by the command manager.
@@ -212,7 +212,7 @@ faction {
 Now all you need to do is register the context provider:
 
 ```
-new CommandFactory(this.getResource("command.txt")).setContextProviders(
+new CommandParser(this.getResource("command.txt")).setContextProviders(
 	new ContextProvider<Faction>("faction", ChatColor.RED + "You do not belong to a faction!", c -> Faction.getFaction((Player) c))).parse()...
 ```
 And with that registered, you can take a Faction argument at the end of your arguments list for your method:
