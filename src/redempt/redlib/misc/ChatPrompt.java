@@ -12,6 +12,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import redempt.redlib.RedLib;
+import redempt.redlib.commandmanager.Messages;
 
 public class ChatPrompt implements Listener {
 	
@@ -35,7 +36,7 @@ public class ChatPrompt implements Listener {
 		}
 		prompts.put(player, new Prompt(onResponse, onCancel));
 		player.sendMessage(prompt);
-		player.sendMessage(RedLib.getMessage("cancelPromptMessage").replace("%cancel%", RedLib.getMessage("cancelText")));
+		player.sendMessage(Messages.msg("cancelPromptMessage").replace("%cancel%", Messages.msg("cancelText")));
 	}
 	
 	/**
@@ -59,7 +60,7 @@ public class ChatPrompt implements Listener {
 			return;
 		}
 		e.setCancelled(true);
-		if (e.getMessage().equalsIgnoreCase(RedLib.getMessage("cancelText"))) {
+		if (e.getMessage().equalsIgnoreCase(Messages.msg("cancelText"))) {
 			p.cancel(CancelReason.PLAYER_CANCELLED);
 			return;
 		}

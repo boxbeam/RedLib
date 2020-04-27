@@ -1,5 +1,7 @@
 package redempt.redlib.commandmanager;
 
+import static redempt.redlib.commandmanager.Messages.msg;
+
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -19,7 +21,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
 
-import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.exceptions.CommandParseException;
 
 /**
@@ -82,7 +83,7 @@ public class Command {
 	 * @param sender The sender to show the help to
 	 */
 	public void showHelp(CommandSender sender) {
-		String title = RedLib.getMessage("helpTitle").replace("%cmdname%", names[0]);
+		String title = msg("helpTitle").replace("%cmdname%", names[0]);
 		sender.sendMessage(title);
 		sender.sendMessage(getHelpRecursive(sender, 0).trim());
 	}
@@ -91,10 +92,10 @@ public class Command {
 		if (permission != null && !sender.hasPermission(permission)) {
 			return "";
 		}
-		String help = this.help == null ? "" : RedLib.getMessage("helpEntry").replace("%cmdname%", getFullName()).replace("%help%", this.help) + "\n";
+		String help = this.help == null ? "" : msg("helpEntry").replace("%cmdname%", getFullName()).replace("%help%", this.help) + "\n";
 		if (hideSub && level != 0) {
 			if (help.equals("")) {
-				return RedLib.getMessage("helpEntry").replace("%cmdname%", getFullName()).replace("%help%", "[Hidden subcommands]") + "\n";
+				return msg("helpEntry").replace("%cmdname%", getFullName()).replace("%help%", "[Hidden subcommands]") + "\n";
 			}
 			return help;
 		}
@@ -396,7 +397,7 @@ public class Command {
 	
 	private boolean execute(CommandSender sender, String[] args) {
 		if (permission != null && !sender.hasPermission(permission)) {
-			sender.sendMessage(RedLib.getMessage("noPermission").replace("%permission%", permission));
+			sender.sendMessage(msg("noPermission").replace("%permission%", permission));
 			return true;
 		}
 		if (args.length > 0 && args[0].equalsIgnoreCase("help")) {

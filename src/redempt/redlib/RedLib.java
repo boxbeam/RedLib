@@ -16,16 +16,10 @@ public class RedLib extends JavaPlugin {
 	public static Plugin plugin;
 	public static int midVersion = Integer.parseInt(getServerVersion().split("\\.")[1]);
 	
-	private static Messages messages;
-	
-	public static String getMessage(String message) {
-		return messages.get(message);
-	}
-	
 	@Override
 	public void onEnable() {
 		plugin = this;
-		messages = Messages.load(this);
+		Messages.load(this);
 		FileConfiguration config = this.getConfig();
 		if (config.contains("devMode")) {
 			devMode = config.getBoolean("devMode");

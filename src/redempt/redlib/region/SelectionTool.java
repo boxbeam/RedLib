@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import redempt.redlib.RedLib;
+import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.misc.Path;
 
 /**
@@ -50,10 +51,10 @@ public class SelectionTool implements Listener {
 		}
 		if (locations[0] == null) {
 			locations[0] = e.getClickedBlock().getLocation();
-			e.getPlayer().sendMessage(RedLib.getMessage("firstLocationSet"));
+			e.getPlayer().sendMessage(Messages.msg("firstLocationSet"));
 		} else if (locations[1] == null) {
 			locations[1] = e.getClickedBlock().getLocation();
-			e.getPlayer().sendMessage(RedLib.getMessage("secondLocationSet"));
+			e.getPlayer().sendMessage(Messages.msg("secondLocationSet"));
 		}
 		selections.put(e.getPlayer().getUniqueId(), locations);
 	}

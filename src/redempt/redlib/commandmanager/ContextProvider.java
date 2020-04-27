@@ -8,8 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import redempt.redlib.RedLib;
-
 /**
  * Used to provide context arguments to command method hooks
  * @author Redempt
@@ -23,7 +21,7 @@ public class ContextProvider<T> {
 	 * Returns the item in the player's main hand, or errors if it is air.
 	 */
 	public static ContextProvider<ItemStack> mainHand = new ContextProvider<ItemStack>("mainhand",
-			RedLib.getMessage("mustHoldItem"),
+			Messages.msg("mustHoldItem"),
 			c -> {
 				@SuppressWarnings("deprecation")
 				ItemStack item = c.getItemInHand();
