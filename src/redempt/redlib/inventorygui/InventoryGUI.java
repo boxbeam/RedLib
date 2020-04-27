@@ -109,6 +109,13 @@ public class InventoryGUI implements Listener {
 	}
 	
 	/**
+	 * @return All the ItemButtons in this GUI
+	 */
+	public List<ItemButton> getButtons() {
+		return buttons;
+	}
+	
+	/**
 	 * Refresh the inventory.
 	 */
 	public void update() {
