@@ -528,7 +528,7 @@ public class Command {
 	 * @deprecated Outdated. Use {@link CommandFactory#parse()}
 	 */
 	public static CommandCollection fromStream(InputStream stream, CommandArgumentType<?>... types) {
-		return new CommandFactory(stream).setArgTypes(types).parse();
+		return new CommandParser(stream).setArgTypes(types).parse();
 	}
 	
 	protected static class CommandArgument {
