@@ -14,7 +14,7 @@ public class ProtectedRegion {
 	
 	protected ProtectedRegion(Region region, ProtectionType... types) {
 		this.region = region;
-		this.policy = new ProtectionPolicy(b -> region.isInside(b.getLocation()), types);
+		this.policy = new ProtectionPolicy(b -> region.contains(b.getLocation()), types);
 	}
 	
 	/**

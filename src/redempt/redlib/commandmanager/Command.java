@@ -33,12 +33,12 @@ public class Command {
 	protected List<Command> children = new ArrayList<>();
 	
 	static {
-		types.add(new CommandArgumentType<Integer>("int", (Function<String, Integer>) Integer::parseInt));
-		types.add(new CommandArgumentType<Double>("double", Double::parseDouble));
-		types.add(new CommandArgumentType<Float>("float", Float::parseFloat));
-		types.add(new CommandArgumentType<Long>("long", (Function<String, Long>) Long::parseLong));
-		types.add(new CommandArgumentType<String>("string", s -> s));
-		types.add(new CommandArgumentType<Boolean>("boolean", s -> {
+		types.add(new CommandArgumentType<>("int", (Function<String, Integer>) Integer::parseInt));
+		types.add(new CommandArgumentType<>("double", Double::parseDouble));
+		types.add(new CommandArgumentType<>("float", Float::parseFloat));
+		types.add(new CommandArgumentType<>("long", (Function<String, Long>) Long::parseLong));
+		types.add(new CommandArgumentType<>("string", s -> s));
+		types.add(new CommandArgumentType<>("boolean", s -> {
 			switch (s.toLowerCase()) {
 				case "true":
 					return true;
@@ -92,17 +92,18 @@ public class Command {
 		if (permission != null && !sender.hasPermission(permission)) {
 			return "";
 		}
-		String help = this.help == null ? "" : msg("helpEntry").replace("%cmdname%", getFullName()).replace("%help%", this.help) + "\n";
+		StringBuilder help = new StringBuilder();
+		help.append(this.help == null ? "" : msg("helpEntry").replace("%cmdname%", getFullName()).replace("%help%", this.help) + "\n");
 		if (hideSub && level != 0) {
-			if (help.equals("")) {
+			if (help.length() == 0) {
 				return msg("helpEntry").replace("%cmdname%", getFullName()).replace("%help%", "[Hidden subcommands]") + "\n";
 			}
-			return help;
+			return help.toString();
 		}
 		for (Command command : children) {
-			help += command.getHelpRecursive(sender, level + 1);
+			help.append(command.getHelpRecursive(sender, level + 1));
 		}
-		return help;
+		return help.toString();
 	}
 	
 	/**
@@ -128,13 +129,13 @@ public class Command {
 	
 	private static String[] parseArgs(String input) {
 		List<String> args = new ArrayList<>();
-		String combine = "";
+		StringBuilder combine = new StringBuilder();
 		boolean quotes = false;
 		char[] chars = input.toCharArray();
 		for (int i = 0; i < chars.length; i++) {
 			char c = chars[i];
 			if (c == '\\' && i + 1 < chars.length) {
-				combine += chars[i + 1];
+				combine.append(chars[i + 1]);
 				i++;
 				continue;
 			}
@@ -143,14 +144,14 @@ public class Command {
 				continue;
 			}
 			if (c == ' ' && !quotes) {
-				args.add(combine);
-				combine = "";
+				args.add(combine.toString());
+				combine = new StringBuilder();
 				continue;
 			}
-			combine += c;
+			combine.append(c);
 		}
 		if (!combine.equals("")) {
-			args.add(combine);
+			args.add(combine.toString());
 		}
 		return args.toArray(new String[args.size()]);
 	}
@@ -223,10 +224,11 @@ public class Command {
 				if (arg.pos != args.length - 1) {
 					throw new IllegalArgumentException("Consuming argument must be the last argument!");
 				}
-				String combine = "";
+				StringBuilder builder = new StringBuilder();
 				for (int x = cmdArgs.size() - 1; x < sargs.length; x++) {
-					combine += sargs[x] + " ";
+					builder.append(sargs[x]).append(" ");
 				}
+				String combine = builder.toString();
 				try {
 					combine = combine.substring(0, combine.length() - 1);
 					output[arg.getPosition() + 1] = arg.getType().convert(sender, combine);
@@ -273,7 +275,7 @@ public class Command {
 	/**
 	 * Registers this command and its children
 	 * @param prefix The fallback prefix
-	 * @param listener The listener objects containing method hooks
+	 * @param listeners The listener objects containing method hooks
 	 */
 	public void register(String prefix, Object... listeners) {
 		Field field;
@@ -522,10 +524,10 @@ public class Command {
 	/**
 	 * Loads commands from a command file in stream form. Use {@link org.bukkit.plugin.java.JavaPlugin#getResource} for this
 	 * @param stream The InputStream to load commands from
-	 * @param argTypes Custom argument types
+	 * @param types Custom argument types
 	 * @return The commands loaded from the stream
 	 * @throws CommandParseException if the command file cannot be parsed
-	 * @deprecated Outdated. Use {@link CommandFactory#parse()}
+	 * @deprecated Outdated. Use {@link CommandParser#parse()}
 	 */
 	public static CommandCollection fromStream(InputStream stream, CommandArgumentType<?>... types) {
 		return new CommandParser(stream).setArgTypes(types).parse();
@@ -597,7 +599,7 @@ public class Command {
 		/**
 		 * The CommandArgumentType for a Player
 		 */
-		public static CommandArgumentType<Player> playerType = new CommandArgumentType<Player>("player", name -> Bukkit.getPlayer(name))
+		public static CommandArgumentType<Player> playerType = new CommandArgumentType<>("player", Bukkit::getPlayer)
 				.tabStream(c -> Bukkit.getOnlinePlayers().stream().map(Player::getName));
 		
 		/**
@@ -636,7 +638,7 @@ public class Command {
 		 */
 		public static CommandArgumentType<String> of(String name, String... values) {
 			List<String> list = Arrays.stream(values).collect(Collectors.toList());
-			return new CommandArgumentType<String>(name, s -> list.contains(s) ? s : null)
+			return new CommandArgumentType<>(name, s -> list.contains(s) ? s : null)
 					.tab(c -> list);
 		}
 		
@@ -687,9 +689,7 @@ public class Command {
 		 * @return itself
 		 */
 		public CommandArgumentType<T> tabStream(Function<CommandSender, Stream<String>> tab) {
-			this.tab = c -> {
-				return tab.apply(c).collect(Collectors.toList());
-			};
+			this.tab = c -> tab.apply(c).collect(Collectors.toList());
 			return this;
 		}
 		
@@ -729,7 +729,7 @@ public class Command {
 		 * @return The resulting CommandArgumentType
 		 */
 		public <K> CommandArgumentType<K> map(String name, Function<T, K> func) {
-			return new CommandArgumentType<K>(name, (c, s) -> {
+			return new CommandArgumentType<>(name, (c, s) -> {
 				T obj = convert(c, s);
 				if (obj == null) {
 					return null;
@@ -746,7 +746,7 @@ public class Command {
 		 * @return The resulting CommandArgumentType
 		 */
 		public <K> CommandArgumentType<K> map(String name, BiFunction<CommandSender, T, K> func) {
-			return new CommandArgumentType<K>(name, (c, s) -> {
+			return new CommandArgumentType<>(name, (c, s) -> {
 				T obj = convert(c, s);
 				if (obj == null) {
 					return null;
