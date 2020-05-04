@@ -153,6 +153,20 @@ public class Hologram {
 	}
 	
 	/**
+	 * @return The location of the top of this Hologram
+	 */
+	public Location getLocation() {
+		return start;
+	}
+	
+	/**
+	 * @return All the ArmorStands in this Hologram
+	 */
+	public List<ArmorStand> getStands() {
+		return stands;
+	}
+	
+	/**
 	 * Sets the text for a line of this Hologram
 	 * @param line The index of the line to set
 	 * @param text The text to set the line to
