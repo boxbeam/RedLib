@@ -333,4 +333,48 @@ public class ItemUtils {
 		give(player, new ItemStack(type), amount);
 	}
 	
+	/**
+	 * Compares the type, name, and lore of two items
+	 * @param first The first ItemStack
+	 * @param second The second ItemStack
+	 * @return Whether the two items are identical in terms of type, name, and lore. Returns true if both items are null, and false if only one is null.
+	 */
+	public static boolean compare(ItemStack first, ItemStack second) {
+		if (first == second) {
+			return true;
+		}
+		if (first == null || second == null) {
+			return false;
+		}
+		if (first.getType() != second.getType()) {
+			return false;
+		}
+		ItemMeta firstMeta = first.getItemMeta();
+		ItemMeta secondMeta = second.getItemMeta();
+		if (firstMeta.hasDisplayName() != secondMeta.hasDisplayName()) {
+			return false;
+		}
+		if (firstMeta.hasDisplayName()) {
+			if (!firstMeta.getDisplayName().equals(secondMeta.getDisplayName())) {
+				return false;
+			}
+		}
+		if (firstMeta.hasLore() != secondMeta.hasLore()) {
+			return false;
+		}
+		if (firstMeta.hasLore()) {
+			List<String> firstLore = firstMeta.getLore();
+			List<String> secondLore = secondMeta.getLore();
+			if (firstLore.size() != secondLore.size()) {
+				return false;
+			}
+			for (int i = 0; i < firstLore.size(); i++) {
+				if (!firstLore.get(i).equals(secondLore.get(i))) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
 }
