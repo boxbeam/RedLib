@@ -150,7 +150,7 @@ public class Command {
 			}
 			combine.append(c);
 		}
-		if (!combine.equals("")) {
+		if (combine.length() > 0) {
 			args.add(combine.toString());
 		}
 		return args.toArray(new String[args.size()]);
