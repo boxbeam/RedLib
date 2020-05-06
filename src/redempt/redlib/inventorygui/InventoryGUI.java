@@ -255,27 +255,36 @@ public class InventoryGUI implements Listener {
 		}
 		if (!inventory.equals(e.getClickedInventory()) && e.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
 			if (openSlots.size() > 0) {
-				int place = -1;
+				int amount = e.getCurrentItem().getAmount();
 				for (int slot : openSlots) {
-					ItemStack item = inventory.getItem(slot);
-					if (item == null) {
-						place = slot;
+					if (amount <= 0) {
 						break;
 					}
-					if (e.getCurrentItem().isSimilar(item) && e.getCurrentItem().getAmount() + item.getAmount() <= item.getType().getMaxStackSize()) {
-					place = slot;
-					break;
+					ItemStack item = inventory.getItem(slot);
+					if (item == null) {
+						int diff = Math.min(amount, e.getCurrentItem().getType().getMaxStackSize());
+						amount -= diff;
+						ItemStack clone = e.getCurrentItem().clone();
+						clone.setAmount(diff);
+						inventory.setItem(slot, clone);
+						continue;
+					}
+					if (e.getCurrentItem().isSimilar(item)) {
+						int max = item.getType().getMaxStackSize() - item.getAmount();
+						int diff = Math.min(max, e.getCurrentItem().getAmount());
+						amount -= diff;
+						ItemStack clone = inventory.getItem(slot);
+						clone.setAmount(clone.getAmount() + diff);
+						inventory.setItem(slot, clone);
 					}
 				}
-				if (place == -1) {
-					e.setCancelled(true);
+				e.setCancelled(true);
+				if (amount == e.getCurrentItem().getAmount()) {
 					return;
 				}
 				ItemStack item = e.getCurrentItem();
-				e.setCurrentItem(null);
-				ItemStack current = inventory.getItem(place);
-				item.setAmount(item.getAmount() + (current == null ? 0 : current.getAmount()));
-				inventory.setItem(place, item);
+				item.setAmount(amount);
+				e.setCurrentItem(item);
 				Bukkit.getScheduler().scheduleSyncDelayedTask(RedLib.plugin, () -> {
 					((Player) e.getWhoClicked()).updateInventory();
 				});
