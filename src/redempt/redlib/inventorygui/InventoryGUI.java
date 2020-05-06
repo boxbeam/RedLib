@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -18,6 +19,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import redempt.redlib.RedLib;
+import redempt.redlib.itemutils.ItemUtils;
 
 /**
  * @author Redempt
@@ -74,7 +76,7 @@ public class InventoryGUI implements Listener {
 	/**
 	 * Fill a section of the inventory with the given item
 	 * @param start The starting index to fill from, inclusive
-	 * @param The ending index to fill to, exclusive
+	 * @param end The ending index to fill to, exclusive
 	 * @param item The item to set in these slots
 	 */
 	public void fill(int start, int end, ItemStack item) {
@@ -248,13 +250,41 @@ public class InventoryGUI implements Listener {
 	
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
-		if (inventory.equals(e.getView().getTopInventory()) && !inventory.equals(e.getClickedInventory()) && e.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+		if (!inventory.equals(e.getView().getTopInventory())) {
+			return;
+		}
+		if (!inventory.equals(e.getClickedInventory()) && e.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
 			if (openSlots.size() > 0) {
+				int place = -1;
+				for (int slot : openSlots) {
+					ItemStack item = inventory.getItem(slot);
+					if (item == null) {
+						place = slot;
+						break;
+					}
+					if (e.getCurrentItem().isSimilar(item) && e.getCurrentItem().getAmount() + item.getAmount() <= item.getType().getMaxStackSize()) {
+					place = slot;
+					break;
+					}
+				}
+				if (place == -1) {
+					e.setCancelled(true);
+					return;
+				}
+				ItemStack item = e.getCurrentItem();
+				e.setCurrentItem(null);
+				ItemStack current = inventory.getItem(place);
+				item.setAmount(item.getAmount() + (current == null ? 0 : current.getAmount()));
+				inventory.setItem(place, item);
+				Bukkit.getScheduler().scheduleSyncDelayedTask(RedLib.plugin, () -> {
+					((Player) e.getWhoClicked()).updateInventory();
+				});
 				onClickOpenSlot.accept(e);
 				return;
 			}
+			e.setCancelled(true);
 		}
-		if (inventory.equals(e.getClickedInventory())) {
+		if (e.getInventory().equals(e.getClickedInventory())) {
 			if (openSlots.contains(e.getSlot())) {
 				onClickOpenSlot.accept(e);
 				return;
