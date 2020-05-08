@@ -169,6 +169,17 @@ givelava int:num?(1) {
 ```
 By putting a parenthetical expression at the end of the argument, you can tell the command manager to use a default value if the optional argument is not provided. Note that this is evaluated immediately, and the CommandArgumentType will be passed `null` in place of the CommandSender it usually takes. Since the argument now has a default value, it will never be `null`, so it's safe to use a primitive type like `int` again.
 
+If you need a type that's not static, and depends on the sender, you can put `context` before the value.
+
+```smite player:target?(context self) {
+	hook smite
+	help Smites a player, or yourself if no target is specified
+	permission smite.use
+	user player
+}
+```
+This will use the context provider called `self`, which must return a Player, to supply the default value when the command is run without that argument.
+
 Child commands can be created by simply nesting command bodies inside each other.
 
 ```
