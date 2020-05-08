@@ -29,7 +29,7 @@ class CommandArgument {
 	}
 	
 	public Object getDefaultValue(CommandSender sender) {
-		return defaultValue.apply(sender);
+		return defaultValue == null ? null : defaultValue.apply(sender);
 	}
 	
 	public int getPosition() {
