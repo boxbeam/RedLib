@@ -8,8 +8,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
-import redempt.redlib.commandmanager.Command.CommandArgument;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import redempt.redlib.commandmanager.CommandArgument;
 import redempt.redlib.commandmanager.Command.CommandArgumentType;
 import redempt.redlib.commandmanager.Command.SenderType;
 import redempt.redlib.commandmanager.exceptions.CommandParseException;
@@ -112,7 +115,7 @@ public class CommandParser {
 						boolean hideType = false;
 						boolean optional = false;
 						boolean consumes = false;
-						Object defaultValue = null;
+						Function<CommandSender, Object> defaultValue = c -> null;
 						if (name.endsWith("...")) {
 							consumes = true;
 							name = name.substring(0, name.length() - 3);
@@ -142,11 +145,14 @@ public class CommandParser {
 							}
 							String value = name.substring(startIndex + 1, startIndex + length - 1);
 							name = name.substring(0, startIndex);
-							try {
-								defaultValue = argType.convert(null, value);
-							} catch (Exception e) {
-								e.printStackTrace();
-								throw new CommandParseException("Invalid default argument value " + value + ", line " + pos + ". Note that default values are evaluated immediately, so the CommandSender passed to the CommandArgumentType will be null.");
+							if (value.startsWith("context ")) {
+								String pname = value.substring(8);
+								int fpos = pos;
+								ContextProvider<?> provider = Arrays.stream(this.contextProviders).filter(c -> c.getName().equals(pname)).findFirst()
+										.orElseThrow(() -> new CommandParseException("Missing context provider " + pname + ", line " + fpos));
+								defaultValue = c -> provider.provide((Player) c);
+							} else {
+								defaultValue = c -> argType.convert(c, value.startsWith("\\") ? value.substring(1) : value);
 							}
 						}
 						if (name.endsWith("*?") || name.endsWith("?*")) {

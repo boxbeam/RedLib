@@ -245,7 +245,7 @@ public class Command {
 		}
 		for (CommandArgument arg : args) {
 			if (arg.isOptional() && output[arg.getPosition() + 1] == null) {
-				output[arg.getPosition() + 1] = arg.getDefaultValue();
+				output[arg.getPosition() + 1] = arg.getDefaultValue(sender);
 			}
 		}
 		return output;
@@ -531,62 +531,6 @@ public class Command {
 	 */
 	public static CommandCollection fromStream(InputStream stream, CommandArgumentType<?>... types) {
 		return new CommandParser(stream).setArgTypes(types).parse();
-	}
-	
-	protected static class CommandArgument {
-		
-		private CommandArgumentType<?> type;
-		private String name;
-		private boolean optional;
-		private boolean hideType;
-		private boolean consume;
-		private Object defaultValue = null;
-		private int pos;
-		
-		public CommandArgument(CommandArgumentType<?> type, int pos, String name, boolean optional, boolean hideType, boolean consume) {
-			this.name = name;
-			this.type = type;
-			this.pos = pos;
-			this.optional = optional;
-			this.hideType = hideType;
-			this.consume = consume;
-		}
-		
-		public void setDefaultValue(Object value) {
-			this.defaultValue = value;
-		}
-		
-		public Object getDefaultValue() {
-			return defaultValue;
-		}
-		
-		public int getPosition() {
-			return pos;
-		}
-		
-		public CommandArgumentType<?> getType() {
-			return type;
-		}
-		
-		public boolean isOptional() {
-			return optional;
-		}
-		
-		public boolean consumes() {
-			return consume;
-		}
-		
-		@Override
-		public String toString() {
-			String name = hideType ? this.name : type.getName() + ":" + this.name;
-			if (optional) {
-				name = "[" + name + "]";
-			} else {
-				name = "<" + name + ">";
-			}
-			return name;
-		}
-		
 	}
 	
 	/**

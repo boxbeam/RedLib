@@ -32,6 +32,12 @@ public class ContextProvider<T> {
 			});
 	
 	/**
+	 * Use "self" in the command file. Returns the player that ran the command.
+	 * Useful when you need an optional argument of type player to have a default value of the sender
+	 */
+	public static ContextProvider<Player> self = new ContextProvider<>("self", p -> p);
+	
+	/**
 	 * Creates a ContextProvider which returns true if the predicate's condition is met, and null otherwise, which will cause the command to fail.
 	 * @param name The name of the ContextProvider to be created
 	 * @param error The error message to be shown to the user if the predicate returns false
