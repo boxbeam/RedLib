@@ -35,10 +35,10 @@ public class WeightedRandom<T> {
 		if (list.size() == 0) {
 			return null;
 		}
-		int random = (int) Math.round(Math.random() * (total));
+		int random = (int) Math.round(Math.random() * (total - 1));
 		int pos = 0;
 		int roll = 0;
-		while (random > (roll = weights.get(list.get(pos)))) {
+		while (random >= (roll = weights.get(list.get(pos)))) {
 			random -= roll;
 			pos++;
 		}
