@@ -1,6 +1,7 @@
 package redempt.redlib.misc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +44,18 @@ public class WeightedRandom<T> {
 			pos++;
 		}
 		return list.get(pos);
+	}
+	
+	/**
+	 * Gets the chance each outcome has to occur in percentage (0-100)
+	 * @return A map of each outcome to its percentage chance to occur when calling {@link WeightedRandom#roll()}
+	 */
+	public Map<T, Double> getPercentages() {
+		Map<T, Double> percentages = new HashMap<>();
+		weights.forEach((k, v) -> {
+			percentages.put(k, (((double) v) / (double) total) * 100d);
+		});
+		return percentages;
 	}
 	
 	/**
