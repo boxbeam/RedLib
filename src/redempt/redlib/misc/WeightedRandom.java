@@ -59,6 +59,14 @@ public class WeightedRandom<T> {
 	}
 	
 	/**
+	 * Gets the map of weights for this WeightedRandom
+	 * @return The weight map
+	 */
+	public Map<T, Integer> getWeights() {
+		return weights;
+	}
+	
+	/**
 	 * Performs a single roll given a map of outcomes to weights. If you need to roll multiple times, instantiate a WeightedRandom and call roll on that each time instead.
 	 * @param map The map of outcomes to weights
 	 * @param <T> The type being returned
