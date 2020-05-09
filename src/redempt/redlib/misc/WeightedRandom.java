@@ -13,7 +13,7 @@ public class WeightedRandom<T> {
 	
 	private Map<T, Integer> weights;
 	private int total;
-	private List<T> list;
+	private List<T> list = new ArrayList<>();
 	
 	/**
 	 * Creates a WeightedRandom using the map of weights
@@ -29,10 +29,13 @@ public class WeightedRandom<T> {
 	
 	/**
 	 * Rolls and gets a weighted random outcome
-	 * @return A weighted random outcome
+	 * @return A weighted random outcome, or null if there are no possible outcomes
 	 */
 	public T roll() {
-		int random = (int) Math.round(Math.random() * total);
+		if (list.size() == 0) {
+			return null;
+		}
+		int random = (int) Math.round(Math.random() * (total));
 		int pos = 0;
 		int roll = 0;
 		while (random > (roll = weights.get(list.get(pos)))) {
