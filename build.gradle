@@ -60,6 +60,10 @@ task updateJars {
 		}
 	}
 }
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	from javadoc.destinationDir
+	archiveClassifier='javadoc'
+}
 task deploy(dependsOn: ["jar", "updateJars"]) {
 	updateJars.mustRunAfter jar
 }
