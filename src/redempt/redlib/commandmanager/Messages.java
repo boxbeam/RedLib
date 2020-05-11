@@ -84,7 +84,8 @@ public class Messages {
 	/**
 	 * Determines which plugin is calling this method, finds its loaded messages, and returns the message with the given name.
 	 * @param message The name of the message
-	 * @return The message, which has been formatted with & as the color character. 
+	 * @return The message, which has been formatted with & as the color character.
+	 * @throws IllegalStateException if your plugin has not loaded any messages
 	 */
 	public static String msg(String message) {
 		Exception ex = new Exception();
@@ -92,6 +93,9 @@ public class Messages {
 			Class<?> clazz = Class.forName(ex.getStackTrace()[1].getClassName());
 			Plugin plugin = JavaPlugin.getProvidingPlugin(clazz);
 			Messages msgs = all.get(plugin);
+			if (msgs == null) {
+				throw new IllegalStateException("Your plugin has not loaded any messages, or this method is being called from the wrong plugin");
+			}
 			return msgs.get(message);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
