@@ -86,7 +86,9 @@ public class SelectionTool implements Listener {
 		if (locations[0] == null || locations[1] == null) {
 			return null;
 		}
-		return new Region(locations[0], locations[1]);
+		Region region = new Region(locations[0], locations[1]);
+		region.expand(1, 0, 1, 0, 1, 0);
+		return region;
 	}
 	
 	/**
