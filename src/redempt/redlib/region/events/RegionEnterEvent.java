@@ -32,6 +32,7 @@ public class RegionEnterEvent extends Event {
 	 * Constructs a new RegionEnterEvent
 	 * @param player The player who entered the region
 	 * @param region The region that was entered
+	 * @param cause What caused the player to enter the region
 	 */
 	public RegionEnterEvent(Player player, Region region, EnterCause cause) {
 		this.region = region;

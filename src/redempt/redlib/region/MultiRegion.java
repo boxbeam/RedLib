@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 public class MultiRegion {
 	
 	private List<Region> regions = new ArrayList<>();
+	private List<Region> subtract = new ArrayList<>();
 	private BlockFace[] faces = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
 	private Location start;
 	private Location end;
@@ -63,7 +64,17 @@ public class MultiRegion {
 	 * @param region The Region to add
 	 */
 	public void add(Region region) {
-		regions.add(region);
+		regions.add(region.clone());
+	}
+	
+	/**
+	 * Subtracts a Region from this MultiRegion. A subtracted Region overrides all positive Regions,
+	 * meaning adding a Region that overlaps a previously subtracted Region will not add the overlapping blocks.
+	 * Calling {@link MultiRegion#recalculate()} will coalesce into only added Regions,
+	 * @param region The Region to subtract
+	 */
+	public void subtract(Region region) {
+		subtract.add(region.clone());
 	}
 	
 	/**
@@ -75,7 +86,7 @@ public class MultiRegion {
 		if (!getWorld().equals(location.getWorld())) {
 			return false;
 		}
-		return contains(regions, location);
+		return contains(regions, location) && !contains(subtract, location);
 	}
 	
 	private static boolean contains(List<Region> regions, Location loc) {
@@ -107,14 +118,32 @@ public class MultiRegion {
 		for (Region region : regions) {
 			total += region.getBlockVolume();
 		}
+		for (Region region : subtract) {
+			total -= region.getBlockVolume();
+		}
 		return total;
+	}
+	
+	public Location getCenter() {
+		return start.clone().add(end).multiply(0.5);
+	}
+	
+	public Location getStart() {
+		return start;
+	}
+	
+	public Location getEnd() {
+		return end;
 	}
 	
 	/**
 	 * Recalculates this region to ensure it is using the least possible number of sub-regions with no overlaps.
+	 * This will coalesce the MultiRegion into only added Regions, but subtracted Regions will not be included
+	 * in any of the Regions.
 	 */
 	public void recalculate() {
 		List<Region> newRegions = new ArrayList<>();
+		newRegions.addAll(subtract);
 		Location center = start.clone().add(end).multiply(0.5).getBlock().getLocation();
 		Region r = new Region(center, center.clone().add(1, 1, 1));
 		expandToMax(r, newRegions);
@@ -136,7 +165,25 @@ public class MultiRegion {
 				});
 			}
 		}
+		newRegions.removeAll(subtract);
 		regions = newRegions;
+		subtract.clear();
+	}
+	
+	private void expandToMax(Region r, List<Region> exclude) {
+		boolean expanded = true;
+		while (expanded) {
+			expanded = false;
+			for (BlockFace face : faces) {
+				Region clone = r.clone();
+				clone.expand(face.getOppositeFace(), -(clone.measureBlocks(face) - 1));
+				clone.move(face.getDirection());
+				if (clone.stream().map(Block::getLocation).allMatch(l -> this.contains(l) && !contains(exclude, l))) {
+					expanded = true;
+					r.expand(face, 1);
+				}
+			}
+		}
 	}
 	
 	/**
@@ -181,22 +228,6 @@ public class MultiRegion {
 			regions.add(Region.fromString(new StringBuilder(world.getName()).append(" ").append(string).toString()));
 		}
 		return new MultiRegion(regions);
-	}
-	
-	private void expandToMax(Region r, List<Region> exclude) {
-		boolean expanded = true;
-		while (expanded) {
-			expanded = false;
-			for (BlockFace face : faces) {
-				Region clone = r.clone();
-				clone.expand(face.getOppositeFace(), -(clone.measureBlocks(face) - 1));
-				clone.move(face.getDirection());
-				if (clone.stream().map(Block::getLocation).allMatch(l -> this.contains(l) && !contains(exclude, l))) {
-					expanded = true;
-					r.expand(face, 1);
-				}
-			}
-		}
 	}
 	
 }

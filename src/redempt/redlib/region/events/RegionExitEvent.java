@@ -32,6 +32,7 @@ public class RegionExitEvent extends Event {
 	 * Constructs a new RegionExitEvent
 	 * @param player The player that exited the region
 	 * @param region The region that was exited
+	 * @param cause What caused the player to enter the region
 	 */
 	public RegionExitEvent(Player player, Region region, ExitCause cause) {
 		this.region = region;

@@ -594,7 +594,7 @@ public class Command {
 		/**
 		 * Had to make this into a single constructor that takes an Object for Maven reasons
 		 * @param name The name of this command argument type, to be used in the command file
-		 * @param convert The Function<String, T> to convert from a String to whatever type this converts to
+		 * @param convert The {@link Function} to convert from a String to whatever type this converts to
 		 */
 		public CommandArgumentType(String name, Function<String, T> convert) {
 			if (name.contains(" ")) {
@@ -607,7 +607,7 @@ public class Command {
 		/**
 		 * Had to make this into a single constructor that takes an Object for Maven reasons
 		 * @param name The name of this command argument type, to be used in the command file
-		 * @param convert The BiFunction<CommandSender, String, T> to convert from a String to whatever type this converts to
+		 * @param convert The {@link BiFunction} to convert from a String to whatever type this converts to
 		 */
 		public CommandArgumentType(String name, BiFunction<CommandSender, String, T> convert) {
 			if (name.contains(" ")) {

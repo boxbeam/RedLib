@@ -84,7 +84,7 @@ public class Messages {
 	/**
 	 * Determines which plugin is calling this method, finds its loaded messages, and returns the message with the given name.
 	 * @param message The name of the message
-	 * @return The message, which has been formatted with & as the color character.
+	 * @return The message, which has been formatted with {@literal &} as the color character.
 	 * @throws IllegalStateException if your plugin has not loaded any messages
 	 */
 	public static String msg(String message) {
@@ -149,7 +149,7 @@ public class Messages {
 	/**
 	 * Gets a color-formatted message by name
 	 * @param msg The name of the message
-	 * @return The message, which has been formatted with & as the color character.
+	 * @return The message, which has been formatted with {@literal &} as the color character.
 	 */
 	public String get(String msg) {
 		String message = messages.getOrDefault(msg, defaults.get(msg));

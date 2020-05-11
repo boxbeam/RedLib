@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
  * Used to provide context arguments to command method hooks
  * @author Redempt
  *
- * @param <T>
+ * @param <T> The type this ContextProvider provides
  */
 public class ContextProvider<T> {
 	

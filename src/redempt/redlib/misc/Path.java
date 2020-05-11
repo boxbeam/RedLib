@@ -42,6 +42,7 @@ public class Path {
 	 * @param start The start location
 	 * @param direction The vector indicating direction
 	 * @param distance The length of the path
+	 * @param step The step size to use
 	 * @return A list of all the locations between the locations, equidistant
 	 */
 	public static List<Location> getPath(Location start, Vector direction, double distance, double step) {
@@ -54,6 +55,7 @@ public class Path {
 	 * Get the locations from the start along a vector
 	 * @param start The start location
 	 * @param direction The vector indicating direction
+	 * @param distance The max distance to step
 	 * @return A list of all the locations between the locations, equidistant
 	 */
 	public static List<Location> getPath(Location start, Vector direction, double distance) {

@@ -459,6 +459,7 @@ public class MultiBlockStructure {
 	
 	/**
 	 * Sends ghost blocks of this multi-block structure to the given player at the given location
+	 * @param player The player to visualize the structure to
 	 * @param loc The location to visualize the structure at
 	 * @param relX The relative X in the structure to visualize centered at
 	 * @param relY The relative Y in the structure to visualize centered at
@@ -474,6 +475,7 @@ public class MultiBlockStructure {
 	
 	/**
 	 * Sends ghost blocks of this multi-block structure to the given player at the given location
+	 * @param player The player to visualize the structure to
 	 * @param loc The location to visualize the structure at
 	 * @param relX The relative X in the structure to visualize centered at
 	 * @param relY The relative Y in the structure to visualize centered at

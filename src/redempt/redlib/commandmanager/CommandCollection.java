@@ -20,7 +20,7 @@ public class CommandCollection {
 	/**
 	 * Register all commands in this CommandCollection
 	 * @param prefix The fallback prefix of the commands
-	 * @param listener The list of listener objects which contain hooks for the commands in this collection
+	 * @param listeners The list of listener objects which contain hooks for the commands in this collection
 	 */
 	public void register(String prefix, Object... listeners) {
 		commands.stream().forEach(c -> c.register(prefix, listeners));
