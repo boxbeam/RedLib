@@ -72,6 +72,9 @@ public class MultiRegion {
 	 * @return Whether the Location is contained within this MultiRegion
 	 */
 	public boolean contains(Location location) {
+		if (!getWorld().equals(location.getWorld())) {
+			return false;
+		}
 		return contains(regions, location);
 	}
 	
