@@ -22,6 +22,7 @@ import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
 
 import redempt.redlib.commandmanager.exceptions.CommandParseException;
+import redempt.redlib.commandmanager.exceptions.MissingHookException;
 
 /**
  * Represents a command which can be registered
@@ -350,6 +351,9 @@ public class Command {
 					}
 				}
 			}
+		}
+		if (hook != null && methodHook == null) {
+			throw new MissingHookException("Command with hook name " + hook + " has no method hook");
 		}
 		for (Command child : children) {
 			child.registerHook(listeners);
