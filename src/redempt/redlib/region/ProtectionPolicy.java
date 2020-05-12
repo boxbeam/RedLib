@@ -48,7 +48,7 @@ public class ProtectionPolicy implements Listener {
 	 */
 	public ProtectionPolicy(Predicate<Block> protectionCheck, ProtectionType... protections) {
 		Arrays.stream(protections).forEach(this.protections::add);
-		Bukkit.getPluginManager().registerEvents(this, RedLib.plugin);
+		Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
 		this.protectionCheck = protectionCheck;
 	}
 	
@@ -73,7 +73,7 @@ public class ProtectionPolicy implements Listener {
 	 */
 	public void enable() {
 		HandlerList.unregisterAll(this);
-		Bukkit.getPluginManager().registerEvents(this, RedLib.plugin);
+		Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
 	}
 	
 	/**

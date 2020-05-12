@@ -126,7 +126,7 @@ public class Hologram {
 			loc.subtract(0, lineSpacing, 0);
 		}
 		iter = start;
-		task = Bukkit.getScheduler().scheduleSyncDelayedTask(RedLib.plugin, () -> {
+		task = Bukkit.getScheduler().scheduleSyncDelayedTask(RedLib.getInstance(), () -> {
 			for (int i = iter; i < locs.length; i++) {
 				stands.get(i).teleport(locs[i]);
 			}

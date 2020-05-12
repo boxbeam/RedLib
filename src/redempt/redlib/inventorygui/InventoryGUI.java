@@ -40,7 +40,7 @@ public class InventoryGUI implements Listener {
 	 */
 	public InventoryGUI(Inventory inventory) {
 		this.inventory = inventory;
-		Bukkit.getPluginManager().registerEvents(this, RedLib.plugin);
+		Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
 	}
 	
 	/**
@@ -285,7 +285,7 @@ public class InventoryGUI implements Listener {
 				ItemStack item = e.getCurrentItem();
 				item.setAmount(amount);
 				e.setCurrentItem(item);
-				Bukkit.getScheduler().scheduleSyncDelayedTask(RedLib.plugin, () -> {
+				Bukkit.getScheduler().scheduleSyncDelayedTask(RedLib.getInstance(), () -> {
 					((Player) e.getWhoClicked()).updateInventory();
 				});
 				onClickOpenSlot.accept(e);

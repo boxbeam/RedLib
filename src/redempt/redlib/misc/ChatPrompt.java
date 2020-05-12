@@ -50,7 +50,7 @@ public class ChatPrompt implements Listener {
 	}
 	
 	private ChatPrompt() {
-		Bukkit.getPluginManager().registerEvents(this, RedLib.plugin);
+		Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
 	}
 	
 	@EventHandler

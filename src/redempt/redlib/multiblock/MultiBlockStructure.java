@@ -566,7 +566,7 @@ public class MultiBlockStructure {
 		Rotator rotator = new Rotator(rotation, mirror);
 		int[] iter = {0, 0, 0};
 		int[] task = {0};
-		task[0] = Bukkit.getScheduler().scheduleSyncRepeatingTask(RedLib.plugin, () -> {
+		task[0] = Bukkit.getScheduler().scheduleSyncRepeatingTask(RedLib.getInstance(), () -> {
 			int pos = 0;
 			for (; iter[0] < dimX; iter[0]++) {
 				for (; iter[1] < dimY; iter[1]++) {

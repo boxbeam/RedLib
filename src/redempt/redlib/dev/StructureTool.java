@@ -40,7 +40,7 @@ public class StructureTool implements Listener {
 	
 	public static StructureTool enable() {
 		StructureTool tool = new StructureTool();
-		Bukkit.getPluginManager().registerEvents(tool, RedLib.plugin);
+		Bukkit.getPluginManager().registerEvents(tool, RedLib.getInstance());
 		return tool;
 	}
 	
@@ -131,7 +131,7 @@ public class StructureTool implements Listener {
 			return;
 		}
 		player.sendMessage(ChatColor.GREEN + "Scanning blocks...");
-		Bukkit.getScheduler().scheduleAsyncDelayedTask(RedLib.plugin, () -> {
+		Bukkit.getScheduler().scheduleAsyncDelayedTask(RedLib.getInstance(), () -> {
 			String mbs = MultiBlockStructure.stringify(locs[0], locs[1]);
 			player.sendMessage(ChatColor.GREEN + "The multi-block structure string has been exported to plugins/RedLib/" + filename + ".dat");
 			try {

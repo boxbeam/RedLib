@@ -13,12 +13,14 @@ import redempt.redlib.dev.StructureTool;
 public class RedLib extends JavaPlugin {
 	
 	public static boolean devMode = false;
-	public static Plugin plugin;
 	public static int midVersion = Integer.parseInt(getServerVersion().split("\\.")[1]);
+	
+	public static RedLib getInstance() {
+		return RedLib.getPlugin(RedLib.class);
+	}
 	
 	@Override
 	public void onEnable() {
-		plugin = this;
 		Messages.load(this);
 		FileConfiguration config = this.getConfig();
 		if (config.contains("devMode")) {

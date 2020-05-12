@@ -33,7 +33,7 @@ public class SelectionTool implements Listener {
 	 */
 	public SelectionTool(ItemStack item) {
 		this.item = item;
-		Bukkit.getPluginManager().registerEvents(this, RedLib.plugin);
+		Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
 	}
 	
 	@EventHandler

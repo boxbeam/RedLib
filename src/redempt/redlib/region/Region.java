@@ -72,7 +72,7 @@ public class Region implements Listener {
 	 * Enable RegionEnterEvent and RegionExitEvent for this region
 	 */
 	public void enableEvents() {
-		Bukkit.getPluginManager().registerEvents(this, RedLib.plugin);
+		Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
 	}
 	
 	/**
