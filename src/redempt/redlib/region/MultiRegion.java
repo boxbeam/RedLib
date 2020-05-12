@@ -9,9 +9,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -334,7 +332,7 @@ public class MultiRegion extends Region {
 	/**
 	 * Recalculates this region to ensure it is using close to the least possible number of sub-regions with no overlaps.
 	 * This will coalesce the MultiRegion into only added Regions, but subtracted Regions will not be included
-	 * in any of the Regions. Calling this method is pretty expensive, but will make all other operations
+	 * in any of the Regions. Calling this method is somewhat expensive, but will make all other operations
 	 * on this MultiRegion faster.
 	 */
 	public void recalculate() {
@@ -367,7 +365,7 @@ public class MultiRegion extends Region {
 	}
 	
 	private void expandToMax(Region r, List<Region> exclude) {
-		List<BlockFace> faces = new ArrayList<>();
+		Set<BlockFace> faces = new HashSet<>(6);
 		List<BlockFace> toRemove = new ArrayList<>();
 		Arrays.stream(MultiRegion.faces).forEach(faces::add);
 		while (faces.size() > 0) {
