@@ -44,14 +44,16 @@ public class ExampleListener {
 		//You can then pass as many custom argument types as you need
 		//The CommandCollection represents all commands loaded from the command file
 		//Multiple commands can be loaded from a single command file
-		CommandCollection cmds = new CommandFactory(plugin.getResource("examplecmd.txt"))
+		CommandCollection cmds = new CommandParser(plugin.getResource("examplecmd.txt"))
 				.setArgTypes(CommandArgumentType.playerType)
 				//Registers a context provider which adds context that will be passed as an argument
 				//To commands which specify that they need it using the 'context' flag
 				//If they return null, they will show the error message - the second argument
 				//The error message is optional, and the player will be shown the help menu instead if none is provided
 				//This is useful if you have a lot of copy-pasted null checks between many commands for contextual information relating to the player
-				.setContextProviders(new ContextProvider<Entity>("mount", ChatColor.RED + "You must be riding a mount to do this!", c -> ((Player) c).getVehicle()))
+				.setContextProviders(new ContextProvider<Entity>("mount", ChatColor.RED + "You must be riding a mount to do this!", c -> ((Player) c).getVehicle()),
+						//A handy context provider constant which returns the command's sender
+						ContextProvider.self)
 				.parse();
 		
 		//Prefix is the fallback prefix, like /minecraft:kill or /bukkit:plugins
@@ -88,6 +90,14 @@ public class ExampleListener {
 			return;
 		}
 		sender.damage(1000);
+	}
+	
+	@CommandHook("smite")
+	public void smite(Player sender, Player target) {
+		//We don't have to do a null check on the target
+		//Since we specified that it should default to the context provider 'self' if the argument is not supplied,
+		//target will default to the sender.
+		sender.getWorld().strikeLightning(target.getLocation());
 	}
 	
 	//You can take the optional argument as an int here, because it will never be null. It will be 1 by default.

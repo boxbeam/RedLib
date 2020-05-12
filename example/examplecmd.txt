@@ -55,7 +55,16 @@ test {
 		hook damage
 		help Damages the specified player with the given amount, or 1
 		permission damage.someone
-	} 
+	}
+	//This command is very similar to the kill command above
+	//The key difference is that this one is using a context provider called 'self'
+	//This context provider returns the sender, so if no target is specified, it will use the context provider,
+	//Which will pass the command's user to fill that argument rather than null.
+	smite player:target*?(context self) {
+		hook smite
+		help Smites the specified player, or the user
+		user player
+	}
 	
 	//This command's name is broadcast
 	//Putting ... at the end of an argument will make it consume all arguments following it
