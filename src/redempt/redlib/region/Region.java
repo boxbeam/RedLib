@@ -87,34 +87,34 @@ public class Region implements Listener {
 	@EventHandler
 	public void onMove(PlayerMoveEvent e) {
 		if (!contains(e.getFrom()) && contains(e.getTo())) {
-			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.MOVE));
+			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.MOVE, e));
 		}
 		if (!contains(e.getTo()) && contains(e.getFrom())) {
-			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.MOVE));
+			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.MOVE, e));
 		}
 	}
 	
 	@EventHandler
 	public void onTeleport(PlayerTeleportEvent e) {
 		if (!contains(e.getFrom()) && contains(e.getTo())) {
-			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.TELEPORT));
+			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.TELEPORT, e));
 		}
 		if (!contains(e.getTo()) && contains(e.getFrom())) {
-			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.TELEPORT));
+			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.TELEPORT, e));
 		}
 	}
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		if (contains(e.getPlayer().getLocation())) {
-			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.JOIN));
+			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.JOIN, null));
 		}
 	}
 	
 	@EventHandler
 	public void onQuit(PlayerQuitEvent e) {
 		if (contains(e.getPlayer().getLocation())) {
-			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.QUIT));
+			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.QUIT, null));
 		}
 	}
 	
