@@ -35,7 +35,7 @@ import redempt.redlib.region.events.RegionExitEvent;
 import redempt.redlib.region.events.RegionExitEvent.ExitCause;
 
 /**
- * Represents a rectangular prism region in a world
+ * Represents a cuboid region in a world
  * @author Redempt
  */
 public class Region implements Listener {
@@ -52,7 +52,9 @@ public class Region implements Listener {
 		setLocations(start, end);
 	}
 	
-	private void setLocations(Location start, Location end) {
+	protected Region() {}
+	
+	protected void setLocations(Location start, Location end) {
 		if (!start.getWorld().equals(end.getWorld())) {
 			throw new IllegalArgumentException("Locations must be in the same world");
 		}
@@ -84,45 +86,36 @@ public class Region implements Listener {
 	
 	@EventHandler
 	public void onMove(PlayerMoveEvent e) {
-		if (!isInside(e.getFrom()) && isInside(e.getTo())) {
+		if (!contains(e.getFrom()) && contains(e.getTo())) {
 			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.MOVE));
 		}
-		if (!isInside(e.getTo()) && isInside(e.getFrom())) {
+		if (!contains(e.getTo()) && contains(e.getFrom())) {
 			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.MOVE));
 		}
 	}
 	
 	@EventHandler
 	public void onTeleport(PlayerTeleportEvent e) {
-		if (!isInside(e.getFrom()) && isInside(e.getTo())) {
+		if (!contains(e.getFrom()) && contains(e.getTo())) {
 			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.TELEPORT));
 		}
-		if (!isInside(e.getTo()) && isInside(e.getFrom())) {
+		if (!contains(e.getTo()) && contains(e.getFrom())) {
 			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.TELEPORT));
 		}
 	}
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
-		if (isInside(e.getPlayer().getLocation())) {
+		if (contains(e.getPlayer().getLocation())) {
 			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.JOIN));
 		}
 	}
 	
 	@EventHandler
 	public void onQuit(PlayerQuitEvent e) {
-		if (isInside(e.getPlayer().getLocation())) {
+		if (contains(e.getPlayer().getLocation())) {
 			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.QUIT));
 		}
-	}
-	
-	/**
-	 * Change the corners of this Region
-	 * @param start The first corner
-	 * @param end The second corner
-	 */
-	public void redefine(Location start, Location end) {
-		setLocations(start, end);
 	}
 	
 	/**
@@ -260,12 +253,18 @@ public class Region implements Listener {
 		return new RegionState(this);
 	}
 	
+	/**
+	 * Clones this Region
+	 * @return A clone of this Region
+	 */
 	public Region clone() {
 		return new Region(start.clone(), end.clone());
 	}
 	
 	/**
-	 * Expands the region in all directions
+	 * Expands the region in all directions, or retracts if negative. If this is a MultiRegion,
+	 * makes 6 calls to {@link MultiRegion#expand(BlockFace, int)}, meaning it is very expensive.
+	 * Check if this is a MultiRegion before expanding.
 	 * @param amount The amount to expand the region by
 	 */
 	public void expand(int amount) {
@@ -273,7 +272,7 @@ public class Region implements Listener {
 	}
 	
 	/**
-	 * Expand the region
+	 * Expands the region, or retracts where negative values are passed
 	 * @param posX The amount to expand the region in the positive X direction
 	 * @param negX The amount to expand the region in the negative X direction
 	 * @param posY The amount to expand the region in the positive Y direction
@@ -288,7 +287,7 @@ public class Region implements Listener {
 	}
 	
 	/**
-	 * Expand the region in a given direction
+	 * Expand the region in a given direction, or retracts if negative.
 	 * @param direction The direction to expand the region in
 	 * @param amount The amount to expand the region in the given direction
 	 */
@@ -311,6 +310,13 @@ public class Region implements Listener {
 	public void move(Vector v) {
 		start = start.add(v);
 		end = end.add(v);
+	}
+	
+	/**
+	 * @return Whether this is a MultiRegion
+	 */
+	public boolean isMulti() {
+		return false;
 	}
 	
 	/**
@@ -337,15 +343,7 @@ public class Region implements Listener {
 	 * @param lambda The lambda to be run on each Block
 	 */
 	public void forEachBlock(Consumer<Block> lambda) {
-		int[] dimensions = this.getBlockDimensions();
-		for (int x = 0; x < dimensions[0]; x++) {
-			for (int y = 0; y < dimensions[1]; y++) {
-				for (int z = 0; z < dimensions[2]; z++) {
-					Location loc = getStart().add(x, y, z);
-					lambda.accept(loc.getBlock());
-				}
-			}
-		}
+		stream().forEach(lambda);
 	}
 	
 	/**
@@ -356,13 +354,17 @@ public class Region implements Listener {
 	}
 	
 	/**
-	 * Check if this Region overlaps with another
+	 * Check if this Region overlaps with another.
 	 * @param o The Region to check against
 	 * @return Whether this Region overlaps with the given Region
 	 */
 	public boolean overlaps(Region o) {
 		if (!o.getWorld().equals(getWorld())) {
 			return false;
+		}
+		if (o.isMulti()) {
+			MultiRegion multi = (MultiRegion) o;
+			return multi.getRegions().stream().anyMatch(r -> r.overlaps(this));
 		}
 		return (!(start.getX() > o.end.getX() || o.start.getX() > end.getX()
 				|| start.getY() > o.end.getY() || o.start.getY() > end.getY()
@@ -378,7 +380,7 @@ public class Region implements Listener {
 		for (int cx = start.getChunk().getX(); cx <= end.getChunk().getX(); cx++) {
 			for (int cz = start.getChunk().getZ(); cz <= end.getChunk().getZ(); cz++) {
 				Chunk chunk = start.getWorld().getChunkAt(cx, cz);
-				Arrays.stream(chunk.getEntities()).filter(e -> isInside(e.getLocation())).forEach(entities::add);
+				Arrays.stream(chunk.getEntities()).filter(e -> contains(e.getLocation())).forEach(entities::add);
 			}
 		}
 		return entities;
