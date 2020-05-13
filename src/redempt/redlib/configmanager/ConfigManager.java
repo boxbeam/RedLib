@@ -7,8 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * Loads config values into variables annotated with {@link ConfigHook}
@@ -45,6 +45,7 @@ public class ConfigManager {
 	private Object data = null;
 	private boolean registered = false;
 	private List<ConfigField> fields = new ArrayList<>();
+	protected Map<Class<?>, TypeConverter<?>> converters = new HashMap<>();
 	
 	/**
 	 * Instantiates a ConfigManager with the default config name config.yml in the plugin's data folder
@@ -78,6 +79,20 @@ public class ConfigManager {
 	}
 	
 	/**
+	 * Adds a type converter, which will attempt to convert a String from config to another type that
+	 * is not usually able to be stored in config
+	 * @param clazz The class of the type
+	 * @param load A function to convert from a string to the type
+	 * @param save A function to convert from the type to a string
+	 * @param <T> The type
+	 * @return This ConfigManager
+	 */
+	public <T> ConfigManager addConverter(Class<T> clazz, Function<String, T> load, Function<T, String> save) {
+		converters.put(clazz, new TypeConverter<T>(load, save));
+		return this;
+	}
+	
+	/**
 	 * Initiates a ConfigManager using a specific path for the config
 	 * @param path The path
 	 */
@@ -96,7 +111,7 @@ public class ConfigManager {
 			if (hook == null) {
 				continue;
 			}
-			fields.add(new ConfigField(field, hook.value()));
+			fields.add(new ConfigField(field, hook.value(), this));
 		}
 		this.data = data;
 		registered = true;
@@ -114,7 +129,7 @@ public class ConfigManager {
 			if (hook == null) {
 				continue;
 			}
-			fields.add(new ConfigField(field, hook.value()));
+			fields.add(new ConfigField(field, hook.value(), this));
 		}
 		registered = true;
 		return this;

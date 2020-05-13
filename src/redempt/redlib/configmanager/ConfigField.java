@@ -11,10 +11,14 @@ class ConfigField {
 	
 	private Field field;
 	private String path;
+	private ConfigManager manager;
+	private TypeConverter<?> converter;
 	
-	public ConfigField(Field field, String path) {
+	public ConfigField(Field field, String path, ConfigManager manager) {
 		this.field = field;
 		this.path = path;
+		this.manager = manager;
+		converter = manager.converters.get(field.getType());
 		field.setAccessible(true);
 		if (Modifier.isFinal(field.getModifiers())) {
 			throw new ConfigFieldException("Config hook field may not be final!");
@@ -33,10 +37,17 @@ class ConfigField {
 				}
 				ConfigMap<?> map = (ConfigMap<?>) obj;
 				map.section = section;
+				map.manager = manager;
+				map.init();
 				map.load();
 				return;
 			}
-			Object value = config.get(path);
+			Object value;
+			if (converter != null) {
+				value = converter.load(config.getString(path));
+			} else {
+				value = config.get(path);
+			}
 			if (value != null) {
 				field.set(object, value);
 			}
@@ -52,7 +63,11 @@ class ConfigField {
 				map.save();
 				return;
 			}
-			config.set(path, field.get(object));
+			Object value = field.get(object);
+			if (converter != null) {
+				value = converter.save(value);
+			}
+			config.set(path, value);
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}

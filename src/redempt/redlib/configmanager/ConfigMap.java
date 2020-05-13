@@ -15,16 +15,24 @@ class ConfigMap<T> extends HashMap<String, T> {
 	
 	private Class<T> clazz;
 	protected ConfigurationSection section;
+	protected ConfigManager manager;
 	private List<ConfigField> fields = new ArrayList<>();
 	
 	public ConfigMap(Class<T> clazz, ConfigurationSection section) {
 		this.clazz = clazz;
+		this.section = section;
+	}
+	
+	public void init() {
+		if (fields.size() > 0) {
+			return;
+		}
 		for (Field field : clazz.getDeclaredFields()) {
 			ConfigHook hook = field.getAnnotation(ConfigHook.class);
 			if (hook == null) {
 				continue;
 			}
-			fields.add(new ConfigField(field, hook.value()));
+			fields.add(new ConfigField(field, hook.value(), manager));
 		}
 	}
 	
