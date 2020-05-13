@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
@@ -13,8 +14,10 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 /**
  * A utility class to easily modify items
@@ -151,6 +154,36 @@ public class ItemUtils {
 		ItemMeta meta = item.getItemMeta();
 		AttributeModifier modifier = new AttributeModifier(attribute.toString(), amount, operation);
 		meta.addAttributeModifier(attribute, modifier);
+		ItemStack clone = item.clone();
+		clone.setItemMeta(meta);
+		return clone;
+	}
+	
+	/**
+	 * Adds ItemFlags to the item
+	 * @param item The item to add ItemFlags to
+	 * @param flags The ItemFlags to add
+	 * @return The modified item
+	 */
+	public static ItemStack addItemFlags(ItemStack item, ItemFlag... flags) {
+		ItemMeta meta = item.getItemMeta();
+		meta.addItemFlags(flags);
+		ItemStack clone = item.clone();
+		clone.setItemMeta(meta);
+		return clone;
+	}
+	
+	/**
+	 * Adds persistent data to the item
+	 * @param item The item to add persistent data to
+	 * @param key The key to add the data under
+	 * @param type The type of the data
+	 * @param data The data to store
+	 * @return The modified item
+	 */
+	public static <T, Z> ItemStack addPersistentTag(ItemStack item, NamespacedKey key, PersistentDataType<T, Z> type, Z data) {
+		ItemMeta meta = item.getItemMeta();
+		meta.getPersistentDataContainer().set(key, type, data);
 		ItemStack clone = item.clone();
 		clone.setItemMeta(meta);
 		return clone;

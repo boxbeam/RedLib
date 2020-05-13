@@ -1,12 +1,15 @@
 package redempt.redlib.itemutils;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 /**
  * A utility class to easily create items
@@ -130,6 +133,26 @@ public class ItemBuilder extends ItemStack {
 	 */
 	public ItemBuilder addAttribute(Attribute attribute, double amount, Operation operation, EquipmentSlot slot) {
 		return new ItemBuilder(ItemUtils.addAttribute(this, attribute, amount, operation, slot));
+	}
+	
+	/**
+	 * Add ItemFlags to this ItemBuilder
+	 * @param flags The ItemFlags to add
+	 * @return The ItemBuilder with the flags added
+	 */
+	public ItemBuilder addItemFlags(ItemFlag... flags) {
+		return new ItemBuilder(ItemUtils.addItemFlags(this, flags));
+	}
+	
+	/**
+	 * Add persistent tags to this ItemBuilder
+	 * @param key The key to add the data under
+	 * @param type The type of the data
+	 * @param data The data to store
+	 * @return The ItemBuilder with the persistent data added
+	 */
+	public <T, Z> ItemBuilder addPersistentTag(NamespacedKey key, PersistentDataType<T, Z> type, Z data) {
+		return new ItemBuilder(ItemUtils.addPersistentTag(this, key, type, data));
 	}
 	
 }
