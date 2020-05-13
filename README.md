@@ -17,7 +17,7 @@ You may also need to add the jar to your classpath. After that, you should be go
 
 # Usage
 
-## Command manager
+## Command Manager
 Let's admit it: Writing commands for Spigot plugins is a pain. Before I had this tool, I often found myself getting lazy and doing the least amount of work, not creating fleshed-out or good commands.
 
 Well, the command manager aspect of RedLib is designed to allow you to do very little work and handles virtually everything for you. Rather than registering commands like you normally would with Spigot, you can instead write a command file which specifies the basic info of the command, and the command manager takes it from there. It will generate help pages, verify permissions, cast arguments, and hook directly into methods in your code.
@@ -240,7 +240,79 @@ You can register as many context providers as you want, as long as you take them
 
 For more info on the command manager in the form of examples, check out [this](https://github.com/Redempt/RedLib/blob/master/example/ExampleListener.java) and [this](https://github.com/Redempt/RedLib/blob/master/example/examplecmd.txt).
 
-## Item utilities
+## Config Manager
+Another big pain in Spigot is boilerplate code to load and save config values. ConfigManager is a simple yet powerful tool which allows you to load and save values directly from variables in your code. It's so easy to use, anyone could figure it out!
+
+In your main plugin class, you can put the following code:
+
+```
+private static ConfigManager config;
+
+@Override
+public void onEnable() {
+	config = new ConfigManager(this).register(this).saveDefault().load();
+}
+```
+On its own, this really won't do anything. But it's important to note what all of these method calls mean, because they'll become relevant the moment we add a config hook. Instantiating the ConfigManager with a plugin as an argument just instantiates it for the default config, `config.yml` in your plugin's data folder. Calling `register(this)` registers your plugin's config hooks, meaning that's where the data will be loaded to and saved from. Calling `saveDefaults()` means that any values initialized in the hooked variables will be saved into the config. `load()` then loads all the data from config into the variables.
+
+"What variables?" I hear you say. With ConfigManager, all you have to do is create a variable annotated with `@ConfigHook`. It's this simple:
+
+```
+@ConfigHook("delay")
+int delay = 5;
+```
+
+When `register` is called, it will find this variable. The `"delay"` in the `ConfigHook` annotation specifies that the path to the value in the config is `delay`. Notice that it has an initialized value of 5, meaning that when `saveDefaults()` is called, if there isn't a value with the path `delay` in the config, it will be set to `5` and saved. When `load()` is called, it will load whatever value is in the config at the path `delay` into your variable. It works for all types supported by Spigot's YAML parser, including string lists and ItemStacks!
+
+If you call `save()` on the ConfigManager, it will save all the values currently in your variables to config.
+
+But sometimes you need to load configuration sections, too. ConfigManager's still got you covered! All you have to do is write a class with a variable for each value you want to load from each entry in the config section. One example would be if you want to make a grouping system:
+
+```
+public class Group {
+	
+	@ConfigHook("owner)
+	private UUID owner;
+	@ConfigHook("members")
+	private List<String> members;
+	
+	//A constructor with no arguments is required
+	protected Group() {}
+	
+	public Group(UUID leader) {
+		owner = leader;
+		members = new ArrayList<>();
+	}
+	
+}
+```
+And that's all we need, there's just one last step. In your main file again, you can add:
+```
+@ConfigHook("groups.*")
+Map<String, Group> groups = ConfigManager.map(Group.class);
+
+@Override
+public void onEnable() {
+	new ConfigManager(this).addConverter(UUID.class, UUID::fromString, UUID::toString)
+		.register(this).saveDefaults().load();
+}
+```
+Putting `.*` at the end is required, as it specifies that this will use the whole config section. When you call `load()` on your ConfigManager, it will load all the entries from the `group` section into the Map. The section would look like this:
+```
+groups:
+	a:
+		owner: UUID-here
+		members:
+		- member1
+		- member2
+```
+You may also notice that I added a converter for UUID. This is because the Group class stores the owner's UUID, which isn't a data type YAML lets you store directly. All I have to do to make it work, though, is call `addConverter` and pass the class I'm trying to convert, a method to convert it from a string, and a method to convert it back to a string. Neat!
+
+Unfortunately, due to type erasure, it's not possible to convert a `List<String>` to a `List<UUID>`, so you'd probably want to just do that with stream mapping.
+
+For more info and docs for ConfigManager, check out [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/configmanager/ConfigManager.java).
+
+## Item Utilities
 One of the most consistently annoying parts of Spigot is making items. We all know it. This part of RedLib is very simple, so I'm going to keep the section it short and sweet.
 
 ```
@@ -293,7 +365,7 @@ By default, an `InventoryGUI` will be destroyed once all viewers have closed the
 
 And that's really all there is to be said about the InventoryGUI. It's simple but powerful. For more info, check out [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/inventorygui/InventoryGUI.java) and [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/inventorygui/ItemButton.java).
 
-## Multi-block structures
+## Multi-Block Structures
 This is probably a bit niche, but creating large multi-block structures can be annoying, and without a helper class, it's nearly impossible. RedLib has a very powerful and easy-to-use multi-block structure library built in to help with this.
 
 To get started, you're first going to want to go into RedLib's `config.yml` and set the flag `devMode: true` to enable the dev tools. Once in-game, build your multi-block structure. Use the multi-block structure tool to select two corners of it, and run `/struct create [name]`. The name doesn't matter much here.
