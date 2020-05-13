@@ -40,8 +40,8 @@ import redempt.redlib.region.events.RegionExitEvent.ExitCause;
  */
 public class Region implements Listener {
 	
-	private Location start;
-	private Location end;
+	protected Location start;
+	protected Location end;
 	
 	/**
 	 * Construct a Region using 2 corners

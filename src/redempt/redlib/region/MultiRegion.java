@@ -24,8 +24,6 @@ public class MultiRegion extends Region {
 	
 	private List<Region> regions = new ArrayList<>();
 	private List<Region> subtract = new ArrayList<>();
-	private Location start;
-	private Location end;
 	
 	/**
 	 * Construct a MultiRegion using a list of Regions
@@ -171,30 +169,6 @@ public class MultiRegion extends Region {
 			total -= region.getVolume();
 		}
 		return total;
-	}
-	
-	/**
-	 * @return The center of this MultiRegion as defined by the point in the center of the two extreme corners
-	 */
-	@Override
-	public Location getCenter() {
-		return start.clone().add(end).multiply(0.5);
-	}
-	
-	/**
-	 * @return The lower extreme corner - the Location representing the minimum of all coordinates covered by this MultiRegion
-	 */
-	@Override
-	public Location getStart() {
-		return start.clone();
-	}
-	
-	/**
-	 * @return The upper extreme corner - the Location representing the maximum of all coordinates covered by this MultiRegion
-	 */
-	@Override
-	public Location getEnd() {
-		return end.clone();
 	}
 	
 	/**
