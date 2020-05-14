@@ -324,7 +324,7 @@ public class MultiRegion extends Region {
 			for (Region region : regions) {
 				region.stream().map(Block::getLocation)
 						.filter(l -> this.contains(l) && !contains(newRegions, l))
-						.sorted((a, b) -> (int) Math.signum(b.distanceSquared(center) - a.distanceSquared(center)))
+						.sorted((a, b) -> (int) Math.signum(a.distanceSquared(center) - b.distanceSquared(center)))
 						.findFirst().ifPresent(l -> {
 							added[0] = true;
 							Region reg = new Region(l, l.clone().add(1, 1, 1));

@@ -132,7 +132,7 @@ public class Hologram {
 			}
 			task = -1;
 			iter = -1;
-		});
+		}, 2);
 	}
 	
 	/**

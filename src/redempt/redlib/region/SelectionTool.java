@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 
 import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.Messages;
+import redempt.redlib.itemutils.ItemUtils;
 import redempt.redlib.misc.Path;
 
 /**
@@ -41,7 +42,7 @@ public class SelectionTool implements Listener {
 		if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null) {
 			return;
 		}
-		if (!item.isSimilar(e.getItem())) {
+		if (!ItemUtils.compare(e.getItem(), item)) {
 			return;
 		}
 		Location[] locations = selections.getOrDefault(e.getPlayer().getUniqueId(), new Location[2]);

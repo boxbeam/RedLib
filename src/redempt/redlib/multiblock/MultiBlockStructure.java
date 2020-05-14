@@ -160,25 +160,26 @@ public class MultiBlockStructure {
 		data = data.replace("minecraft:", "");
 		String[] split = data.split(";");
 		int same = 0;
-		String output = split[0] + ";";
+		StringBuilder output = new StringBuilder().append(split[0]).append(";");
 		for (int i = 1; i < split.length - 1; i++) {
 			if (split[i].equals(split[i + 1])) {
 				same += same == 0 ? 2 : 1;
 				continue;
 			} else if (same > 0) {
-				output += split[i - 1] + "*" + same + ";";
+				output.append(split[i - 1]).append('*').append(same).append(';');
 				same = 0;
 				continue;
 			}
-			output += split[i] + ";";
+			output.append(split[i]).append(';');
 		}
 		if (same > 0) {
-			output += split[split.length - 1] + "*" + same + ";";
+			output.append(split[split.length - 1]).append('*').append(same).append(';');
 		} else {
-			output += split[split.length - 1];
+			output.append(split[split.length - 1]);
 		}
 		Map<String, Integer> count = new HashMap<>();
-		split = output.split(";");
+		String combine = output.toString();
+		split = combine.split(";");
 		for (int i = 1; i < split.length; i++) {
 			String str = split[i];
 			if (str.contains("*")) {
@@ -196,17 +197,17 @@ public class MultiBlockStructure {
 				replace.add(entry.getKey());
 			}
 		}
-		replace.sort((a, b) -> b.length() - a.length());
-		String prepend = "";
+		replace.sort((a, b) -> a.length() - b.length());
+		StringBuilder prepend = new StringBuilder();
 		for (int i = 0; i < replace.size(); i++) {
 			String str = replace.get(i);
-			prepend += str + ";";
-			output = output.replaceAll("(?<=;|^)" + Pattern.quote(str) + "(?=[^a-z_]|$)", i + "");
+			prepend.append(str).append(';');
+			combine = combine.replaceAll("(?<=;|^)" + Pattern.quote(str) + "(?=[^a-z_]|$)", i + "");
 		}
 		if (replace.size() > 0) {
-			output = "(" + prepend.substring(0, prepend.length() - 1) + ")" + output + ";";
+			combine = "(" + prepend.substring(0, prepend.length() - 1) + ")" + combine + ";";
 		}
-		return output;
+		return combine;
 	}
 	
 	private static String expand(String data) {
