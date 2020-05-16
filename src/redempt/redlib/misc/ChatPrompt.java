@@ -36,7 +36,7 @@ public class ChatPrompt implements Listener {
 		}
 		prompts.put(player, new Prompt(onResponse, onCancel));
 		player.sendMessage(prompt);
-		player.sendMessage(Messages.msg("cancelPromptMessage").replace("%cancel%", Messages.msg("cancelText")));
+		player.sendMessage(Messages.msg("cancelPromptMessage").replace("%canceltext%", Messages.msg("cancelText")));
 	}
 	
 	/**

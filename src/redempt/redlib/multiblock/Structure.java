@@ -125,7 +125,7 @@ public class Structure {
 		int[] dim = type.getDimensions();
 		if (x < 0 || y < 0 || z < 0
 				|| x > dim[0] || y > dim[1] || z > dim[2]) {
-			throw new IndexOutOfBoundsException("Location outside bounds of structure");
+			throw new IndexOutOfBoundsException("Relative location outside bounds of structure: " + x + ", " + y + ", " + z);
 		}
 		rotator.setLocation(x, z);
 		return new StructureBlock(loc.getWorld().getBlockAt(rotator.getRotatedX() + loc.getBlockX(), y + loc.getBlockY(), rotator.getRotatedZ() + loc.getBlockZ()),
