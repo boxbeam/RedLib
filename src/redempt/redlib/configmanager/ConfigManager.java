@@ -40,6 +40,15 @@ public class ConfigManager {
 		return new ConfigMap<T>(clazz);
 	}
 	
+	/**
+	 * Creates a ConfigList from a given type with initial elements. A ConfigList extends ArrayList. The class
+	 * is not accessible, so store it in an ArrayList variable. This method must be used to set the initial
+	 * value for a variable which loads a list from config using type converters.
+	 * @param clazz The class of the type of the list
+	 * @param elements The elements to initialize the list with
+	 * @param <T> The type
+	 * @return A list of the given type which has been populated with the given elements
+	 */
 	public static <T> ConfigList<T> list(Class<T> clazz, T... elements) {
 		ConfigList<T> list = new ConfigList<T>(clazz);
 		for (T elem : elements) {
