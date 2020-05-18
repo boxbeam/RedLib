@@ -18,9 +18,8 @@ class ConfigMap<T> extends HashMap<String, T> {
 	protected ConfigManager manager;
 	private List<ConfigField> fields = new ArrayList<>();
 	
-	public ConfigMap(Class<T> clazz, ConfigurationSection section) {
+	public ConfigMap(Class<T> clazz) {
 		this.clazz = clazz;
-		this.section = section;
 	}
 	
 	public void init() {

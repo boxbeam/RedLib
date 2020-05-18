@@ -37,7 +37,15 @@ public class ConfigManager {
 	 * @return An empty map of the given type, which will be populated when {@link ConfigManager#load()} is called
  	 */
 	public static <T> ConfigMap<T> map(Class<T> clazz) {
-		return new ConfigMap<T>(clazz, null);
+		return new ConfigMap<T>(clazz);
+	}
+	
+	public static <T> ConfigList<T> list(Class<T> clazz, T... elements) {
+		ConfigList<T> list = new ConfigList<T>(clazz);
+		for (T elem : elements) {
+			list.add(elem);
+		}
+		return list;
 	}
 	
 	private YamlConfiguration config;

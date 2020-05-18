@@ -2,10 +2,13 @@ package redempt.redlib.configmanager;
 
 import org.bukkit.configuration.ConfigurationSection;
 import redempt.redlib.configmanager.exceptions.ConfigFieldException;
+import redempt.redlib.configmanager.exceptions.ConfigListException;
 import redempt.redlib.configmanager.exceptions.ConfigMapException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 class ConfigField {
 	
@@ -42,6 +45,23 @@ class ConfigField {
 				map.load();
 				return;
 			}
+			if (List.class.isAssignableFrom(field.getType())) {
+				Object val = field.get(object);
+				if (val instanceof ConfigList) {
+					ConfigList<?> list = (ConfigList<?>) val;
+					Class<?> clazz = list.clazz;
+					List<String> strings = config.getStringList(path);
+					if (strings != null && strings.size() > 0) {
+						list.clear();
+						TypeConverter<?> converter = manager.converters.get(clazz);
+						strings.stream().map(converter::load).forEach(list::castAdd);
+						if (converter == null) {
+							throw new ConfigListException("No TypeConverter exists for type " + clazz.getName());
+						}
+					}
+					return;
+				}
+			}
 			Object value;
 			if (converter != null) {
 				value = converter.load(config.getString(path));
@@ -62,6 +82,21 @@ class ConfigField {
 				ConfigMap<?> map = (ConfigMap<?>) field.get(object);
 				map.save();
 				return;
+			}
+			if (List.class.isAssignableFrom(field.getType())) {
+				Object val = field.get(object);
+				if (val instanceof ConfigList) {
+					ConfigList<?> list = (ConfigList<?>) val;
+					Class<?> clazz = list.clazz;
+					TypeConverter<?> converter = manager.converters.get(clazz);
+					if (converter == null) {
+						throw new ConfigListException("No TypeConverter exists for type " + clazz.getName());
+					}
+					List<String> strings = new ArrayList<>();
+					list.stream().map(converter::save).forEach(strings::add);
+					config.set(path, strings);
+					return;
+				}
 			}
 			Object value = field.get(object);
 			if (converter != null) {
