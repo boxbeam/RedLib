@@ -274,7 +274,7 @@ public class Group {
 	@ConfigHook("owner)
 	private UUID owner;
 	@ConfigHook("members")
-	private List<String> members;
+	private List<UUID> members = ConfigManager.list(UUID.class);
 	
 	//A constructor with no arguments is required
 	protected Group() {}
@@ -306,9 +306,7 @@ groups:
 		- member1
 		- member2
 ```
-You may also notice that I added a converter for UUID. This is because the Group class stores the owner's UUID, which isn't a data type YAML lets you store directly. All I have to do to make it work, though, is call `addConverter` and pass the class I'm trying to convert, a method to convert it from a string, and a method to convert it back to a string. Neat!
-
-Unfortunately, due to type erasure, it's not possible to convert a `List<String>` to a `List<UUID>`, so you'd probably want to just do that with stream mapping.
+You may also notice that I added a converter for UUID. This is because the Group class stores the owner's and members' UUIDs, which isn't a data type YAML lets you store directly. All I have to do to make it work, though, is call `addConverter` and pass the class I'm trying to convert, a method to convert it from a string, and a method to convert it back to a string. Neat!
 
 For more info and docs for ConfigManager, check out [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/configmanager/ConfigManager.java).
 
