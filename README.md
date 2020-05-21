@@ -396,3 +396,5 @@ EventListener - Allows you to define a listener for an event with a lambda rathe
 Hologram - Lets you build and manipulate holograms with armor stands easily
 
 LocationUtils - Lets you check whether a certain location is safe, and find the closest safe location to another location
+
+EntityPersistor - Lets you wrap an Entity using a proxy to ensure that, even if the entity's chunk is unloaded, the Entity reference will remain valid and can be used to manipulate or get info about the entity
