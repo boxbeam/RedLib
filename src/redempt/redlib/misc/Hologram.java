@@ -58,6 +58,7 @@ public class Hologram {
 			.filter(e -> e instanceof ArmorStand)
 			.map(e -> (ArmorStand) e)
 			.filter(s -> getId(s) != 0)
+			.map(EntityPersistor::persist)
 			.forEach(stands::add);
 		if (stands.size() == 0) {
 			return null;
