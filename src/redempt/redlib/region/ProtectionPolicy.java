@@ -24,6 +24,8 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
 
@@ -185,6 +187,26 @@ public class ProtectionPolicy implements Listener {
 		}
 	}
 	
+	@EventHandler
+	public void onBucketEmpty(PlayerBucketEmptyEvent e) {
+		if (protections.contains(ProtectionType.USE_BUCKETS)
+				&& protectionCheck.test(e.getBlockClicked())
+				&& !canBypass(e.getPlayer(), ProtectionType.USE_BUCKETS, e.getBlockClicked())) {
+			e.setCancelled(true);
+			sendMessage(e.getPlayer(), ProtectionType.USE_BUCKETS);
+		}
+	}
+	
+	@EventHandler
+	public void onBucketFill(PlayerBucketFillEvent e) {
+		if (protections.contains(ProtectionType.USE_BUCKETS)
+				&& protectionCheck.test(e.getBlockClicked())
+				&& !canBypass(e.getPlayer(), ProtectionType.USE_BUCKETS, e.getBlockClicked())) {
+			e.setCancelled(true);
+			sendMessage(e.getPlayer(), ProtectionType.USE_BUCKETS);
+		}
+	}
+	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityExplode(EntityExplodeEvent e) {
 		if (protections.contains(ProtectionType.ENTITY_EXPLOSION)) {
@@ -293,6 +315,10 @@ public class ProtectionPolicy implements Listener {
 		 */
 		INTERACT,
 		/**
+		 * Players using buckets to place or collect liquids
+		 */
+		USE_BUCKETS,
+		/**
 		 * Players opening containers
 		 */
 		CONTAINER_ACCESS,
@@ -344,7 +370,7 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * All protection types relating to actions taken directly by players - Breaking, placing, and interacting with blocks
 		 */
-		public static final ProtectionType[] DIRECT_PLAYERS = {BREAK_BLOCK, PLACE_BLOCK, INTERACT, CONTAINER_ACCESS};
+		public static final ProtectionType[] DIRECT_PLAYERS = {BREAK_BLOCK, PLACE_BLOCK, INTERACT, CONTAINER_ACCESS, USE_BUCKETS};
 		/**
 		 * All protection types relating to actions usually taken by players which indirectly affect blocks - Pistons, redstone, explosions, and falling blocks
 		 */
