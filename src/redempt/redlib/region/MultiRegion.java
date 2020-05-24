@@ -100,13 +100,6 @@ public class MultiRegion extends Region {
 		subtract.add(region.clone());
 	}
 	
-	@Override
-	public List<Entity> getEntities() {
-		List<Entity> entities = new ArrayList<>();
-		regions.stream().map(Region::getEntities).forEach(entities::addAll);
-		return entities;
-	}
-	
 	/**
 	 * Checks whether this MultiRegion contains the given Location
 	 * @param location The Location to check
