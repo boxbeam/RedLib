@@ -2,15 +2,12 @@ package redempt.redlib.region;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -71,6 +68,9 @@ public class MultiRegion extends Region {
 	 * @param region The Region to add
 	 */
 	public void add(Region region) {
+		if (!region.getWorld().equals(getWorld())) {
+			throw new IllegalArgumentException("Region is not in the same world as this MultiRegion");
+		}
 		if (region.isMulti()) {
 			MultiRegion multi = (MultiRegion) region;
 			for (Region r : multi.getRegions()) {
@@ -86,10 +86,13 @@ public class MultiRegion extends Region {
 	/**
 	 * Subtracts a Region from this MultiRegion. A subtracted Region overrides all positive Regions,
 	 * meaning adding a Region that overlaps a previously subtracted Region will not add the overlapping blocks.
-	 * Calling {@link MultiRegion#recalculate()} will coalesce into only added Regions,
+	 * Calling {@link MultiRegion#recalculate()} will coalesce into only added Regions.
 	 * @param region The Region to subtract
 	 */
 	public void subtract(Region region) {
+		if (!region.getWorld().equals(getWorld())) {
+			throw new IllegalArgumentException("Region is not in the same world as this MultiRegion");
+		}
 		if (region.isMulti()) {
 			MultiRegion multi = (MultiRegion) region;
 			for (Region r : multi.getRegions()) {
@@ -114,13 +117,6 @@ public class MultiRegion extends Region {
 	
 	private static boolean contains(List<Region> regions, Location loc) {
 		return regions.stream().anyMatch(r -> r.contains(loc));
-	}
-	
-	/**
-	 * @return The World this MultiRegion is in
-	 */
-	public World getWorld() {
-		return start.getWorld();
 	}
 	
 	/**
@@ -317,8 +313,8 @@ public class MultiRegion extends Region {
 			for (Region region : regions) {
 				region.stream().map(Block::getLocation)
 						.filter(l -> this.contains(l) && !contains(newRegions, l))
-						.sorted((a, b) -> (int) Math.signum(a.distanceSquared(center) - b.distanceSquared(center)))
-						.findFirst().ifPresent(l -> {
+						.min((a, b) -> (int) Math.signum(a.distanceSquared(center) - b.distanceSquared(center)))
+						.ifPresent(l -> {
 							added[0] = true;
 							Region reg = new Region(l, l.clone().add(1, 1, 1));
 							expandToMax(reg, newRegions);
