@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -84,7 +85,7 @@ public class Hologram {
 	}
 	
 	private int id;
-	private List<ArmorStand> stands = new ArrayList<>();
+	private List<EntityPersistor<ArmorStand>> stands = new ArrayList<>();
 	private Location start;
 	private double lineSpacing = 0.35;
 	private int task = -1;
@@ -105,7 +106,8 @@ public class Hologram {
 	
 	private Hologram(int id, Location start, List<ArmorStand> stands) {
 		this.id = id;
-		this.stands = stands;
+		this.stands.clear();
+		stands.stream().map(EntityPersistor::wrap).forEach(this.stands::add);
 		this.start = start;
 	}
 	
@@ -121,7 +123,7 @@ public class Hologram {
 			start = iter;
 		}
 		for (int i = start; i < stands.size(); i++) {
-			ArmorStand stand = stands.get(i);
+			ArmorStand stand = stands.get(i).get();
 			stand.teleport(new Location(loc.getWorld(), 0, 1, 0));
 			locs[i] = loc.clone();
 			loc.subtract(0, lineSpacing, 0);
@@ -129,7 +131,7 @@ public class Hologram {
 		iter = start;
 		task = Bukkit.getScheduler().scheduleSyncDelayedTask(RedLib.getInstance(), () -> {
 			for (int i = iter; i < locs.length; i++) {
-				stands.get(i).teleport(locs[i]);
+				stands.get(i).get().teleport(locs[i]);
 			}
 			task = -1;
 			iter = -1;
@@ -141,7 +143,7 @@ public class Hologram {
 	 * @return The line of text at the given index
 	 */
 	public String getLine(int line) {
-		return stands.get(line).getCustomName();
+		return stands.get(line).get().getCustomName();
 	}
 	
 	/**
@@ -164,7 +166,7 @@ public class Hologram {
 	 * @return All the ArmorStands in this Hologram
 	 */
 	public List<ArmorStand> getStands() {
-		return stands;
+		return stands.stream().map(EntityPersistor::get).collect(Collectors.toList());
 	}
 	
 	/**
@@ -173,7 +175,7 @@ public class Hologram {
 	 * @param text The text to set the line to
 	 */
 	public void setLine(int line, String text) {
-		stands.get(line).setCustomName(text);
+		stands.get(line).get().setCustomName(text);
 	}
 	
 	/**
@@ -181,7 +183,7 @@ public class Hologram {
 	 * @param line The line number to remove
 	 */
 	public void remove(int line) {
-		ArmorStand stand = stands.remove(line);
+		ArmorStand stand = stands.remove(line).get();
 		stand.remove();
 		fixStands(0);
 	}
@@ -190,7 +192,7 @@ public class Hologram {
 	 * Clears this Hologram
 	 */
 	public void clear() {
-		stands.forEach(ArmorStand::remove);
+		stands.forEach(s -> s.get().remove());
 		stands.clear();
 	}
 	
@@ -216,7 +218,7 @@ public class Hologram {
 	 */
 	public void append(String text) {
 		ArmorStand stand = spawn(stands.size(), text);
-		stands.add(stand);
+		stands.add(EntityPersistor.wrap(stand));
 		fixStands(stands.size() - 1);
 	}
 	
@@ -235,7 +237,7 @@ public class Hologram {
 	 */
 	public void insert(int line, String text) {
 		ArmorStand stand = spawn(line, text);
-		stands.add(line, stand);
+		stands.add(line, EntityPersistor.wrap(stand));
 		fixStands(line - 1);
 	}
 	
@@ -249,7 +251,7 @@ public class Hologram {
 	private ArmorStand spawn(int line, String text) {
 		Location loc;
 		if (stands.size() > 0) {
-			loc = stands.get(0).getLocation();
+			loc = stands.get(0).get().getLocation();
 			loc.subtract(0, lineSpacing * (double) line, 0);
 		} else {
 			loc = start;

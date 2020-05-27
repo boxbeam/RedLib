@@ -1,7 +1,9 @@
 package redempt.redlib.misc;
 
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -14,7 +16,7 @@ import java.lang.reflect.Proxy;
  * the Entity instance is still valid. If it isn't, it will attempt to replace it with a valid instance by re-fetching
  * the Entity from Bukkit.
  */
-public class EntityPersistor {
+public class EntityPersistor<T extends Entity> {
 	
 	/**
 	 * Wraps an Entity object with a proxy which will attempt to ensure the Entity object remains valid
@@ -23,6 +25,7 @@ public class EntityPersistor {
 	 * interact with {@link Object#equals(Object)} reflexively. You must call .equals() on the Entity
 	 * which has been wrapped, not on another Entity comparing it to this one. This could not be avoided,
 	 * unfortunately, but as long as you are aware of that, it should work fine.
+	 * Seems to break in 1.8 because of API fuckery. Use {@link EntityPersistor#wrap(Entity)}
 	 * @param entity The Entity to wrap
 	 * @param <T> The type of the Entity
 	 * @return The wrapped Entity
@@ -37,6 +40,7 @@ public class EntityPersistor {
 				break;
 			}
 		}
+		System.out.println(clazz.getName());
 		if (!foundInterface) {
 			throw new IllegalArgumentException("The provided object cannot be wrapped!");
 		}
@@ -62,6 +66,49 @@ public class EntityPersistor {
 			}
 			
 		});
+	}
+	
+	/**
+	 * Wraps an Entity in an EntityPersistor. Calling {@link EntityPersistor#get()} will refresh the reference
+	 * if it is invalid. Use for 1.8
+	 * @param entity The Entity to wrap
+	 * @param <T> The type of the Entity
+	 * @return An EntityPersistor wrapping the given Entity
+	 */
+	public static <T extends Entity> EntityPersistor<T> wrap(T entity) {
+		return new EntityPersistor<T>(entity);
+	}
+	
+	private T entity;
+	
+	private EntityPersistor(T entity) {
+		this.entity = entity;
+	}
+	
+	/**
+	 * Gets the Entity held in this EntityPersistor. If the reference is invalid, the EntityPersistor will attempt
+	 * to refresh it.
+	 * @return
+	 */
+	public T get() {
+		refresh:
+		if (!entity.isValid()) {
+			for (Entity entity : this.entity.getLocation().getChunk().getEntities()) {
+				if (entity.getUniqueId().equals(this.entity.getUniqueId())) {
+					this.entity = (T) entity;
+					break refresh;
+				}
+			}
+			for (World world : Bukkit.getWorlds()) {
+				for (Entity entity : world.getEntities()) {
+					if (this.entity.getUniqueId().equals(entity.getUniqueId())) {
+						this.entity = (T) entity;
+						break;
+					}
+				}
+			}
+		}
+		return entity;
 	}
 	
 }
