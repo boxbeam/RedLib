@@ -1,6 +1,10 @@
 package redempt.redlib.commandmanager;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.bukkit.command.CommandSender;
 
@@ -23,7 +27,24 @@ public class CommandCollection {
 	 * @param listeners The list of listener objects which contain hooks for the commands in this collection
 	 */
 	public void register(String prefix, Object... listeners) {
+		mergeBaseCommands();
 		commands.stream().forEach(c -> c.register(prefix, listeners));
+	}
+	
+	private void mergeBaseCommands() {
+		Map<String, List<Command>> names = new HashMap<>();
+		for (Command command : commands) {
+			String name = String.join(", ", command.getAliases());
+			List<Command> cmds = names.getOrDefault(name, new ArrayList<>());
+			cmds.add(command);
+			names.put(name, cmds);
+		}
+		names.forEach((k, v) -> {
+			if (v.size() > 1) {
+				commands.removeAll(v);
+				commands.add(new MergedBaseCommand(v));
+			}
+		});
 	}
 	
 	/**
@@ -75,6 +96,51 @@ public class CommandCollection {
 			}
 		}
 		return null;
+	}
+	
+	private static class MergedBaseCommand extends Command {
+		
+		
+		public MergedBaseCommand(List<Command> commands) {
+			this.children = commands;
+			this.help = commands.get(0).help;
+			this.names = commands.get(0).names;
+			for (Command command : children) {
+				command.topLevel = false;
+				command.parent = this;
+			}
+		}
+		
+		@Override
+		public boolean execute(CommandSender sender, String[] args) {
+			if (children.stream().anyMatch(c -> c.execute(sender, args))) {
+				return true;
+			}
+			sender.sendMessage(Messages.msg("helpTitle").replace("%cmdname%", children.get(0).getName()));
+			sender.sendMessage(getHelpRecursive(sender, 0));
+			return true;
+		}
+		
+		@Override
+		public String getHelpRecursive(CommandSender sender, int level) {
+			return children.stream().map(c -> c.getHelpRecursive(sender, 1)).collect(Collectors.joining("\n"));
+		}
+		
+		@Override
+		public List<String> tab(CommandSender sender, String[] args) {
+			List<String> completions = new ArrayList<>();
+			children.forEach(c -> completions.addAll(c.tab(sender, args)));
+			return completions;
+		}
+		
+		@Override
+		public void register(String prefix, Object... listeners) {
+			super.register(prefix, listeners);
+			for (Command command : children) {
+				command.registerHook(listeners);
+			}
+		}
+		
 	}
 	
 }

@@ -6,3 +6,5 @@ secondLocationSet: &aSecond location set!
 cancelPromptMessage: &cType '%canceltext%' to cancel.
 cancelText: cancel
 mustHoldItem: &cYou must be holding an item to do this!
+playerOnly: &cThis command can only be executed as a player!
+consoleOnly: &cThis command can only be executed as console!

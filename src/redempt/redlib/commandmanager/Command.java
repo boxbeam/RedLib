@@ -53,21 +53,25 @@ public class Command {
 	
 	private CommandArgument[] args;
 	private ContextProvider<?>[] contextProviders;
-	private String[] names;
+	private ContextProvider<?>[] asserters;
+	protected String[] names;
 	private String permission;
 	private SenderType type;
 	protected String hook;
 	private Method methodHook;
-	private String help;
+	protected String help;
 	private Object listener;
 	protected boolean topLevel = false;
 	protected Command parent = null;
 	private boolean hideSub = false;
 	
-	protected Command(String[] names, CommandArgument[] args, ContextProvider<?>[] providers, String help, String permission, SenderType type, String hook, List<Command> children, boolean hideSub) {
+	protected Command() {}
+	
+	protected Command(String[] names, CommandArgument[] args, ContextProvider<?>[] providers, ContextProvider<?>[] asserters, String help, String permission, SenderType type, String hook, List<Command> children, boolean hideSub) {
 		this.names = names;
 		this.args = args;
 		this.contextProviders = providers;
+		this.asserters = asserters;
 		this.permission = permission;
 		this.type = type;
 		this.hook = hook;
@@ -89,7 +93,7 @@ public class Command {
 		sender.sendMessage(getHelpRecursive(sender, 0).trim());
 	}
 	
-	private String getHelpRecursive(CommandSender sender, int level) {
+	protected String getHelpRecursive(CommandSender sender, int level) {
 		if (permission != null && !sender.hasPermission(permission)) {
 			return "";
 		}
@@ -253,6 +257,10 @@ public class Command {
 	}
 	
 	private Object[] getContext(CommandSender sender) {
+		if (!(sender instanceof Player)) {
+			sender.sendMessage(Messages.msg("playerOnly"));
+			return null;
+		}
 		Object[] output = new Object[contextProviders.length];
 		for (int i = 0; i < output.length; i++) {
 			Object obj = null;
@@ -271,6 +279,26 @@ public class Command {
 			output[i] = obj;
 		}
 		return output;
+	}
+	
+	private boolean assertAll(CommandSender sender) {
+		if (!(sender instanceof Player)) {
+			sender.sendMessage(Messages.msg("playerOnly"));
+			return false;
+		}
+		for (ContextProvider<?> provider : asserters) {
+			Object o = provider.provide((Player) sender);
+			if (o == null) {
+				String error = provider.getErrorMessage();
+				if (error != null) {
+					sender.sendMessage(error);
+				} else {
+					showHelp(sender);
+				}
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	/**
@@ -329,7 +357,7 @@ public class Command {
 		}
 	}
 	
-	private void registerHook(Object... listeners) {
+	protected void registerHook(Object... listeners) {
 		loop:
 		for (Object listener : listeners) {
 			for (Method method : listener.getClass().getDeclaredMethods()) {
@@ -360,7 +388,7 @@ public class Command {
 		}
 	}
 	
-	private List<String> tab(CommandSender sender, String[] args) {
+	protected List<String> tab(CommandSender sender, String[] args) {
 		List<String> completions = new ArrayList<>();
 		if (args.length > 0) {
 			for (Command child : children) {
@@ -401,7 +429,7 @@ public class Command {
 		return completions;
 	}
 	
-	private boolean execute(CommandSender sender, String[] args) {
+	protected boolean execute(CommandSender sender, String[] args) {
 		if (permission != null && !sender.hasPermission(permission)) {
 			sender.sendMessage(msg("noPermission").replace("%permission%", permission));
 			return true;
@@ -417,19 +445,22 @@ public class Command {
 					break;
 				case CONSOLE:
 					if (sender instanceof Player) {
-						sender.sendMessage(ChatColor.RED + "This command can only be executed from console!");
+						sender.sendMessage(Messages.msg("consoleOnly"));
 						return true;
 					}
 					break;
 				case PLAYER:
 					if (!(sender instanceof Player)) {
-						sender.sendMessage(ChatColor.RED + "This command can only be executed as a player!");
+						sender.sendMessage(Messages.msg("playerOnly"));
 						return true;
 					}
 					break;
 			}
 			Object[] objArgs = processArgs(parseArgs(String.join(" ", args)), sender);
 			if (objArgs != null) {
+				if (asserters.length > 0 && !assertAll(sender)) {
+					return true;
+				}
 				int size = objArgs.length + contextProviders.length;
 				Object[] arr = new Object[size];
 				System.arraycopy(objArgs, 0, arr, 0, objArgs.length);
@@ -596,7 +627,7 @@ public class Command {
 		private Function<CommandSender, List<String>> tab = null;
 		
 		/**
-		 * Had to make this into a single constructor that takes an Object for Maven reasons
+		 * Create a CommandArgumentType from a name and converter
 		 * @param name The name of this command argument type, to be used in the command file
 		 * @param convert The {@link Function} to convert from a String to whatever type this converts to
 		 */
@@ -609,7 +640,7 @@ public class Command {
 		}
 		
 		/**
-		 * Had to make this into a single constructor that takes an Object for Maven reasons
+		 * Create a CommandArgumentType from a name and converter
 		 * @param name The name of this command argument type, to be used in the command file
 		 * @param convert The {@link BiFunction} to convert from a String to whatever type this converts to
 		 */

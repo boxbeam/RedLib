@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -88,6 +89,7 @@ public class CommandParser {
 		String[] names = null;
 		List<CommandArgument> args = new ArrayList<>();
 		List<ContextProvider<?>> contextProviders = new ArrayList<>();
+		List<ContextProvider<?>> asserters = new ArrayList<>();
 		String permission = null;
 		String hook = null;
 		SenderType type = SenderType.EVERYONE;
@@ -209,13 +211,24 @@ public class CommandParser {
 				}
 				if (line.startsWith("context ")) {
 					contextProviders.clear();
-					String rest = line.replaceFirst("^context ", "");
+					String rest = line.substring(8);
 					String[] split = rest.split(" ");
+					int fpos = pos;
 					for (String name : split) {
-						int fpos = pos;
 						ContextProvider<?> provider = Arrays.stream(this.contextProviders).filter(c -> c.getName().equals(name)).findFirst()
 							.orElseThrow(() -> new CommandParseException("Missing context provider " + name + ", line " + fpos));
 						contextProviders.add(provider);
+					}
+				}
+				if (line.startsWith("assert ")) {
+					asserters.clear();
+					String rest = line.substring(7);
+					String[] split = rest.split(" ");
+					int fpos = pos;
+					for (String name : split) {
+						ContextProvider<?> provider = Arrays.stream(this.contextProviders).filter(c -> c.getName().equals(name)).findFirst()
+								.orElseThrow(() -> new CommandParseException("Missing context provider " + name + ", line " + fpos));
+						asserters.add(provider);
 					}
 				}
 				if (line.equalsIgnoreCase("hidesub")) {
@@ -230,11 +243,13 @@ public class CommandParser {
 				if (depth == 0) {
 					commands.add(new Command(names, args.toArray(new CommandArgument[args.size()]),
 							contextProviders.toArray(new ContextProvider<?>[contextProviders.size()]),
+							asserters.toArray(new ContextProvider<?>[asserters.size()]),
 							help, permission, type, hook, children, hideSub));
 					children = new ArrayList<>();
 					names = null;
 					args = new ArrayList<>();
 					contextProviders = new ArrayList<>();
+					asserters = new ArrayList<>();
 					help = null;
 					permission = null;
 					type = null;
