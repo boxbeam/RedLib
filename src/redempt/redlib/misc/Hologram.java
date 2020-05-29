@@ -257,15 +257,14 @@ public class Hologram {
 			loc = start;
 		}
 		ArmorStand stand = EntityPersistor.persist((ArmorStand) loc.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND));
-		initiate(stand);
-		stand.setCustomName(text);
+		initiate(stand, text);
 		return stand;
 	}
 	
-	private void initiate(ArmorStand stand) {
-		stand.setMarker(true);
-		stand.setVisible(false);
+	private void initiate(ArmorStand stand, String text) {
+		stand.setCustomName(text);
 		stand.setCustomNameVisible(true);
+		stand.setVisible(false);
 		stand.setGravity(false);
 		setId(stand, id);
 	}

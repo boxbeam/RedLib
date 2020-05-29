@@ -23,19 +23,20 @@ import redempt.redlib.itemutils.ItemUtils;
 
 /**
  * @author Redempt
- *
  */
 public class InventoryGUI implements Listener {
 	
 	private final Inventory inventory;
 	private List<ItemButton> buttons = new ArrayList<>();
 	private Set<Integer> openSlots = new HashSet<>();
-	private Consumer<InventoryClickEvent> onClickOpenSlot = (e) -> {};
+	private Consumer<InventoryClickEvent> onClickOpenSlot = (e) -> {
+	};
 	private boolean returnItems = true;
 	private boolean destroyOnClose = true;
 	
 	/**
 	 * Creates a new GUI from an inventory
+	 *
 	 * @param inventory The inventory to create a GUI from
 	 */
 	public InventoryGUI(Inventory inventory) {
@@ -45,6 +46,7 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Gets the inventory this GUI is wrapping
+	 *
 	 * @return The wrapped inventory
 	 */
 	public Inventory getInventory() {
@@ -53,8 +55,9 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Add a button to the GUI in the given slot
+	 *
 	 * @param button The button to be added
-	 * @param slot The slot to add the button to
+	 * @param slot   The slot to add the button to
 	 */
 	public void addButton(ItemButton button, int slot) {
 		button.setSlot(slot);
@@ -64,9 +67,10 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Add a button at the given position in the inventory
+	 *
 	 * @param button The button to be added
-	 * @param x The X position to add the button at
-	 * @param y The Y position to add the button at
+	 * @param x      The X position to add the button at
+	 * @param y      The Y position to add the button at
 	 */
 	public void addButton(ItemButton button, int x, int y) {
 		int slot = x + (y * 9);
@@ -75,9 +79,10 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Fill a section of the inventory with the given item
+	 *
 	 * @param start The starting index to fill from, inclusive
-	 * @param end The ending index to fill to, exclusive
-	 * @param item The item to set in these slots
+	 * @param end   The ending index to fill to, exclusive
+	 * @param item  The item to set in these slots
 	 */
 	public void fill(int start, int end, ItemStack item) {
 		for (int i = start; i < end; i++) {
@@ -87,10 +92,11 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Fill a section of the inventory with the given item
-	 * @param x1 The X position to fill from, inclusive
-	 * @param y1 The Y position to fill from, inclusive
-	 * @param x2 The X position to fill to, exclusive
-	 * @param y2 The Y position to fill to, exclusive
+	 *
+	 * @param x1   The X position to fill from, inclusive
+	 * @param y1   The Y position to fill from, inclusive
+	 * @param x2   The X position to fill to, exclusive
+	 * @param y2   The Y position to fill to, exclusive
 	 * @param item The item to set in these slots
 	 */
 	public void fill(int x1, int y1, int x2, int y2, ItemStack item) {
@@ -103,6 +109,7 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Remove a button from the inventory
+	 *
 	 * @param button The button to be removed
 	 */
 	public void removeButton(ItemButton button) {
@@ -128,6 +135,7 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Opens a slot so that items can be placed in it
+	 *
 	 * @param slot The slot to open
 	 */
 	public void openSlot(int slot) {
@@ -136,8 +144,9 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Opens slots so that items can be placed in them
+	 *
 	 * @param start The start of the open slot section, inclusive
-	 * @param end The end of the open slot section, exclusive
+	 * @param end   The end of the open slot section, exclusive
 	 */
 	public void openSlots(int start, int end) {
 		for (int i = start; i < end; i++) {
@@ -147,6 +156,7 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Closes a slot so that items can't be placed in it
+	 *
 	 * @param slot The slot to open
 	 */
 	public void closeSlot(int slot) {
@@ -155,8 +165,9 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Closes slots so that items can't be placed in them
+	 *
 	 * @param start The start of the closed slot section, inclusive
-	 * @param end The end of the open closed section, exclusive
+	 * @param end   The end of the open closed section, exclusive
 	 */
 	public void closeSlots(int start, int end) {
 		for (int i = start; i < end; i++) {
@@ -166,6 +177,7 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Gets the open slots
+	 *
 	 * @return The set of open slots
 	 */
 	public Set<Integer> getOpenSlots() {
@@ -174,6 +186,7 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Returns whether or not items in open slots are returned to the player when this inventory is destroyed
+	 *
 	 * @return Whether or not items in open slots are returned to the player when this inventory is destroyed
 	 */
 	public boolean returnsItems() {
@@ -182,6 +195,7 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Sets whether items in open slots are returned to the player when this inventory is destroyed
+	 *
 	 * @param returnItems Whether items in open slots should be returned to the player when this inventory is destroyed
 	 */
 	public void setReturnsItems(boolean returnItems) {
@@ -190,6 +204,7 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Returns whether this GUI is destroyed when it has been closed by all viewers
+	 *
 	 * @return Whether this GUI is destroyed when it has been closed by all viewers
 	 */
 	public boolean destroysOnClose() {
@@ -198,6 +213,7 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Sets whether this GUI is destroyed when it has been closed by all viewers
+	 *
 	 * @param destroyOnClose Whether this GUI is destroyed when it has been closed by all viewers
 	 */
 	public void setDestroyOnClose(boolean destroyOnClose) {
@@ -206,6 +222,7 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Sets the handler for when an open slot is clicked
+	 *
 	 * @param handler The handler for when an open slot is clicked
 	 */
 	public void setOnClickOpenSlot(Consumer<InventoryClickEvent> handler) {
@@ -215,6 +232,7 @@ public class InventoryGUI implements Listener {
 	/**
 	 * Remove this inventory as a listener and clean everything up to prevent memory leaks.
 	 * Call this when the GUI is no longer being used.
+	 *
 	 * @param lastViewer The last Player who was viewing this GUI, to have the items returned to them.
 	 */
 	public void destroy(Player lastViewer) {
@@ -319,6 +337,7 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Gets the state of the GUI, which can be restored later
+	 *
 	 * @return The state of this GUI
 	 */
 	public GUIState getState() {

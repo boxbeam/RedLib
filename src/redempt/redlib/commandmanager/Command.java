@@ -1,6 +1,12 @@
 package redempt.redlib.commandmanager;
 
-import static redempt.redlib.commandmanager.Messages.msg;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.entity.Player;
+import redempt.redlib.commandmanager.exceptions.CommandParseException;
+import redempt.redlib.commandmanager.exceptions.MissingHookException;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -15,14 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.entity.Player;
-
-import redempt.redlib.commandmanager.exceptions.CommandParseException;
-import redempt.redlib.commandmanager.exceptions.MissingHookException;
+import static redempt.redlib.commandmanager.Messages.msg;
 
 /**
  * Represents a command which can be registered
