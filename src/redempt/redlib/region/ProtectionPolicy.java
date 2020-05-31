@@ -27,8 +27,11 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.inventory.InventoryHolder;
 
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
 
 /**
@@ -42,6 +45,7 @@ public class ProtectionPolicy implements Listener {
 	private Set<ProtectionType> protections = new HashSet<>();
 	private Map<ProtectionType, String> messages = new HashMap<>();
 	private Predicate<Block> protectionCheck;
+	private Plugin plugin;
 	
 	/**
 	 * Create a ProtectionPolicy to protect blocks
@@ -52,6 +56,18 @@ public class ProtectionPolicy implements Listener {
 		Arrays.stream(protections).forEach(this.protections::add);
 		Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
 		this.protectionCheck = protectionCheck;
+		Exception e = new Exception();
+		for (int i = 0; i < 10 && i < e.getStackTrace().length; i++) {
+			try {
+				Plugin p = JavaPlugin.getProvidingPlugin(Class.forName(e.getStackTrace()[i].getClassName()));
+				if (p != null && !p.getName().equals("RedLib")) {
+					plugin = p;
+					break;
+				}
+			} catch (ClassNotFoundException classNotFoundException) {
+				classNotFoundException.printStackTrace();
+			}
+		}
 	}
 	
 	/**
@@ -137,6 +153,13 @@ public class ProtectionPolicy implements Listener {
 		}
 	}
 	
+	@EventHandler
+	public void onDisablePlugin(PluginDisableEvent e) {
+		if (e.getPlugin().equals(plugin)) {
+			disable();
+		}
+	}
+	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBreakBlock(BlockBreakEvent e) {
 		if (protections.contains(ProtectionType.BREAK_BLOCK) && protectionCheck.test(e.getBlock())) {
@@ -210,14 +233,14 @@ public class ProtectionPolicy implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityExplode(EntityExplodeEvent e) {
 		if (protections.contains(ProtectionType.ENTITY_EXPLOSION)) {
-			e.blockList().removeIf(protectionCheck::test);
+			e.blockList().removeIf(b -> protectionCheck.test(b) && !canBypass(null, ProtectionType.ENTITY_EXPLOSION, b));
 		}
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockExplode(BlockExplodeEvent e) {
 		if (protections.contains(ProtectionType.BLOCK_EXPLOSION)) {
-			e.blockList().removeIf(protectionCheck::test);
+			e.blockList().removeIf(b -> protectionCheck.test(b) && !canBypass(null, ProtectionType.BLOCK_EXPLOSION, b));
 		}
 	}
 	
@@ -227,6 +250,9 @@ public class ProtectionPolicy implements Listener {
 			return;
 		}
 		if (protectionCheck.test(e.getBlock()) || e.getBlocks().stream().anyMatch(protectionCheck::test)) {
+			if (canBypass(null, ProtectionType.PISTONS, e.getBlock()) && e.getBlocks().stream().allMatch(b -> canBypass(null, ProtectionType.PISTONS, b))) {
+				return;
+			}
 			e.setCancelled(true);
 		}
 	}
@@ -237,6 +263,9 @@ public class ProtectionPolicy implements Listener {
 			return;
 		}
 		if (protectionCheck.test(e.getBlock()) || e.getBlocks().stream().anyMatch(protectionCheck::test)) {
+			if (canBypass(null, ProtectionType.PISTONS, e.getBlock()) && e.getBlocks().stream().allMatch(b -> canBypass(null, ProtectionType.PISTONS, b))) {
+				return;
+			}
 			e.setCancelled(true);
 		}
 	}
@@ -244,6 +273,9 @@ public class ProtectionPolicy implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onRedstone(BlockRedstoneEvent e) {
 		if (protections.contains(ProtectionType.REDSTONE) && protectionCheck.test(e.getBlock())) {
+			if (canBypass(null, ProtectionType.REDSTONE, e.getBlock())) {
+				return;
+			}
 			e.setNewCurrent(e.getOldCurrent());
 		}
 	}
@@ -251,6 +283,9 @@ public class ProtectionPolicy implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityChangeBlock(EntityChangeBlockEvent e) {
 		if (e.getEntityType() == EntityType.FALLING_BLOCK && protections.contains(ProtectionType.FALLING_BLOCK) && protectionCheck.test(e.getBlock())) {
+			if (canBypass(null, ProtectionType.FALLING_BLOCK, e.getBlock())) {
+				return;
+			}
 			e.setCancelled(true);
 		}
 	}
@@ -258,6 +293,9 @@ public class ProtectionPolicy implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onGrow(BlockGrowEvent e) {
 		if (protections.contains(ProtectionType.GROWTH) && protectionCheck.test(e.getBlock())) {
+			if (canBypass(null, ProtectionType.GROWTH, e.getBlock())) {
+				return;
+			}
 			e.setCancelled(true);
 		}
 	}
@@ -265,6 +303,9 @@ public class ProtectionPolicy implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onSpread(BlockSpreadEvent e) {
 		if (protections.contains(ProtectionType.GROWTH) && protectionCheck.test(e.getBlock())) {
+			if (canBypass(null, ProtectionType.GROWTH, e.getBlock())) {
+				return;
+			}
 			e.setCancelled(true);
 		}
 	}
@@ -272,6 +313,9 @@ public class ProtectionPolicy implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onForm(BlockFormEvent e) {
 		if (protections.contains(ProtectionType.GROWTH) && protectionCheck.test(e.getBlock())) {
+			if (canBypass(null, ProtectionType.GROWTH, e.getBlock())) {
+				return;
+			}
 			e.setCancelled(true);
 		}
 	}
@@ -279,6 +323,9 @@ public class ProtectionPolicy implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockFade(BlockFadeEvent e) {
 		if (protections.contains(ProtectionType.FADE) && protectionCheck.test(e.getBlock())) {
+			if (canBypass(null, ProtectionType.FADE, e.getBlock())) {
+				return;
+			}
 			e.setCancelled(true);
 		}
 	}
@@ -286,6 +333,9 @@ public class ProtectionPolicy implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onFlow(BlockFromToEvent e) {
 		if (protections.contains(ProtectionType.FLOW) && protectionCheck.test(e.getToBlock())) {
+			if (canBypass(null, ProtectionType.FLOW, e.getBlock())) {
+				return;
+			}
 			e.setCancelled(true);
 		}
 	}
@@ -296,6 +346,9 @@ public class ProtectionPolicy implements Listener {
 			return;
 		}
 		if (protections.contains(ProtectionType.MOB_SPAWN) && protectionCheck.test(e.getLocation().getBlock())) {
+			if (canBypass(null, ProtectionType.MOB_SPAWN, e.getLocation().getBlock())) {
+				return;
+			}
 			e.setCancelled(true);
 		}
 	}

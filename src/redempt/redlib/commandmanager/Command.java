@@ -5,6 +5,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.commandmanager.exceptions.CommandParseException;
 import redempt.redlib.commandmanager.exceptions.MissingHookException;
 
@@ -50,6 +52,7 @@ public class Command {
 		}));
 	}
 	
+	private Plugin plugin;
 	private CommandArgument[] args;
 	private ContextProvider<?>[] contextProviders;
 	private ContextProvider<?>[] asserters;
@@ -364,6 +367,7 @@ public class Command {
 					CommandHook cmdHook = method.getAnnotation(CommandHook.class);
 					if (cmdHook.value().equals(hook)) {
 						methodHook = method;
+						plugin = JavaPlugin.getProvidingPlugin(method.getDeclaringClass());
 						Class<?>[] params = method.getParameterTypes();
 						int expectedLength = args.length + contextProviders.length + 1;
 						if (params.length != expectedLength) {
@@ -429,6 +433,9 @@ public class Command {
 	}
 	
 	protected boolean execute(CommandSender sender, String[] args) {
+		if (plugin != null && !plugin.isEnabled()) {
+			return true;
+		}
 		if (permission != null && !sender.hasPermission(permission)) {
 			sender.sendMessage(msg("noPermission").replace("%permission%", permission));
 			return true;
