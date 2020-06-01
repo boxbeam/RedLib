@@ -140,6 +140,9 @@ public class Structure {
 	 * @throws IllegalArgumentException if the specified block is not within the bounds of this Structure
 	 */
 	public StructureBlock getBlock(Block block) {
+		if (!block.getWorld().equals(loc.getWorld())) {
+			return null;
+		}
 		Location offset = block.getLocation().subtract(loc);
 		Rotator rotator = this.rotator.getInverse();
 		int[] dim = type.getDimensions();
@@ -149,7 +152,7 @@ public class Structure {
 		int z = rotator.getRotatedZ();
 		if (x < 0 || y < 0 || z < 0
 				|| x > dim[0] || y > dim[1] || z > dim[2]) {
-			throw new IllegalArgumentException("Location outside bounds of structure");
+			return null;
 		}
 		return new StructureBlock(block, this, x, y, z);
 	}
