@@ -37,22 +37,36 @@ public class MultiRegion extends Region {
 			}
 			this.regions.add(region);
 		}
-		fixCorners();
+		fixCorners(null);
 	}
 	
-	private void fixCorners() {
+	private void fixCorners(Region r) {
+		if (r == null) {
+			World world = regions.get(0).getWorld();
+			double minX = this.regions.stream().min((a, b) -> (int) Math.signum(a.getStart().getX() - b.getStart().getX())).get().getStart().getX();
+			double minY = this.regions.stream().min((a, b) -> (int) Math.signum(a.getStart().getY() - b.getStart().getY())).get().getStart().getY();
+			double minZ = this.regions.stream().min((a, b) -> (int) Math.signum(a.getStart().getZ() - b.getStart().getZ())).get().getStart().getZ();
+			
+			double maxX = this.regions.stream().max((a, b) -> (int) Math.signum(a.getEnd().getX() - b.getEnd().getX())).get().getEnd().getX();
+			double maxY = this.regions.stream().max((a, b) -> (int) Math.signum(a.getEnd().getY() - b.getEnd().getY())).get().getEnd().getY();
+			double maxZ = this.regions.stream().max((a, b) -> (int) Math.signum(a.getEnd().getZ() - b.getEnd().getZ())).get().getEnd().getZ();
+			
+			start = new Location(world, minX, minY, minZ);
+			end = new Location(world, maxX, maxY, maxZ);
+			return;
+		}
 		World world = regions.get(0).getWorld();
-		double minX = this.regions.stream().min((a, b) -> (int) Math.signum(a.getStart().getX() - b.getStart().getX())).get().getStart().getX();
-		double minY = this.regions.stream().min((a, b) -> (int) Math.signum(a.getStart().getY() - b.getStart().getY())).get().getStart().getY();
-		double minZ = this.regions.stream().min((a, b) -> (int) Math.signum(a.getStart().getZ() - b.getStart().getZ())).get().getStart().getZ();
+		double minX = Math.min(start.getX(), r.getStart().getX());
+		double minY = Math.min(start.getY(), r.getStart().getY());
+		double minZ = Math.min(start.getZ(), r.getStart().getZ());
 		
-		double maxX = this.regions.stream().max((a, b) -> (int) Math.signum(a.getEnd().getX() - b.getEnd().getX())).get().getEnd().getX();
-		double maxY = this.regions.stream().max((a, b) -> (int) Math.signum(a.getEnd().getY() - b.getEnd().getY())).get().getEnd().getY();
-		double maxZ = this.regions.stream().max((a, b) -> (int) Math.signum(a.getEnd().getZ() - b.getEnd().getZ())).get().getEnd().getZ();
+		double maxX = Math.max(end.getX(), r.getEnd().getX());
+		double maxY = Math.max(end.getY(), r.getEnd().getY());
+		double maxZ = Math.max(end.getZ(), r.getEnd().getZ());
 		
 		start = new Location(world, minX, minY, minZ);
 		end = new Location(world, maxX, maxY, maxZ);
-		setLocations(start, end);
+		return;
 	}
 	
 	/**
@@ -76,11 +90,11 @@ public class MultiRegion extends Region {
 			for (Region r : multi.getRegions()) {
 				regions.add(r.clone());
 			}
-			fixCorners();
+			fixCorners(region);
 			return;
 		}
 		regions.add(region.clone());
-		fixCorners();
+		fixCorners(region);
 	}
 	
 	/**
@@ -110,6 +124,10 @@ public class MultiRegion extends Region {
 	 */
 	public boolean contains(Location location) {
 		if (!getWorld().equals(location.getWorld())) {
+			return false;
+		}
+		if (location.getX() < start.getX() || location.getY() < start.getY() || location.getZ() < start.getZ()
+				|| location.getX() > end.getX() || location.getY() > end.getY() || location.getZ() > end.getZ()) {
 			return false;
 		}
 		return contains(regions, location) && !contains(subtract, location);
@@ -161,7 +179,7 @@ public class MultiRegion extends Region {
 	}
 	
 	/**
-	 * @return Whether this is a MultiRegion
+	 * @return Whether this Region is a non-cuboid variant
 	 */
 	@Override
 	public boolean isMulti() {
@@ -203,14 +221,14 @@ public class MultiRegion extends Region {
 		}
 		Region r = new Region(start, end);
 		r.expand(direction.getOppositeFace(), -(r.measureBlocks(direction) - 1));
-		MultiRegion slice = getIntersection(r);
+		BlockSetRegion slice = getIntersection(r);
 		slice.move(direction.getDirection());
 		for (int i = 0; i < amount; i++) {
-			MultiRegion clone = slice.clone();
+			BlockSetRegion clone = slice.clone();
 			clone.move(direction.getDirection().multiply(i));
 			add(clone);
 		}
-		fixCorners();
+		fixCorners(null);
 	}
 	
 	/**
@@ -262,22 +280,16 @@ public class MultiRegion extends Region {
 	 * @param other The Region to check for overlap with
 	 * @return The overlapping portions of the Regions
 	 */
-	public MultiRegion getIntersection(Region other) {
-		MultiRegion[] start = {null};
+	public BlockSetRegion getIntersection(Region other) {
+		BlockSetRegion[] start = {new BlockSetRegion()};
 		other.stream().map(Block::getLocation).forEach(l -> {
 			if (contains(l)) {
-				Region r = new Region(l, l.clone().add(1, 1, 1));
-				if (start[0] == null) {
-					start[0] = new MultiRegion(r);
-				} else {
-					start[0].add(r);
-				}
+				start[0].add(l);
 			}
 		});
 		if (start[0] == null) {
 			return null;
 		}
-		start[0].recalculate();
 		return start[0];
 	}
 	
@@ -299,15 +311,19 @@ public class MultiRegion extends Region {
 	 * on this MultiRegion faster.
 	 */
 	public void recalculate() {
+		List<Region> regions = this.regions;
 		List<Region> newRegions = new ArrayList<>();
+		BlockSetRegion blocks = new BlockSetRegion();
 		newRegions.addAll(subtract);
 		Location center = start.clone().add(end).multiply(0.5).getBlock().getLocation();
 		Region r = new Region(center, center.clone().add(1, 1, 1));
-		expandToMax(r, newRegions);
+		expandToMax(r, blocks);
 		if (contains(center)) {
 			newRegions.add(r);
+			r.stream().forEach(blocks::add);
 		}
 		boolean[] added = {true};
+		List<Region> toRemove = new ArrayList<>();
 		while (added[0]) {
 			added[0] = false;
 			for (Region region : regions) {
@@ -317,17 +333,23 @@ public class MultiRegion extends Region {
 						.ifPresent(l -> {
 							added[0] = true;
 							Region reg = new Region(l, l.clone().add(1, 1, 1));
-							expandToMax(reg, newRegions);
+							expandToMax(reg, blocks);
 							newRegions.add(reg);
+							reg.stream().forEach(blocks::add);
 				});
+				if (region.stream().allMatch(blocks::contains)) {
+					toRemove.add(region);
+				}
 			}
+			regions.removeAll(toRemove);
+			toRemove.clear();
 		}
 		newRegions.removeAll(subtract);
-		regions = newRegions;
+		this.regions = newRegions;
 		subtract.clear();
 	}
 	
-	private void expandToMax(Region r, List<Region> exclude) {
+	private void expandToMax(Region r, BlockSetRegion exclude) {
 		Set<BlockFace> faces = new HashSet<>(6);
 		List<BlockFace> toRemove = new ArrayList<>();
 		Arrays.stream(MultiRegion.faces).forEach(faces::add);
@@ -336,7 +358,7 @@ public class MultiRegion extends Region {
 				Region clone = r.clone();
 				clone.expand(face.getOppositeFace(), -(clone.measureBlocks(face) - 1));
 				clone.move(face.getDirection());
-				if (clone.stream().map(Block::getLocation).allMatch(l -> this.contains(l) && !contains(exclude, l))) {
+				if (clone.stream().map(Block::getLocation).allMatch(l -> this.contains(l) && !exclude.contains(l))) {
 					r.expand(face, 1);
 					continue;
 				}

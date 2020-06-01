@@ -313,7 +313,7 @@ public class Region implements Listener {
 	}
 	
 	/**
-	 * @return Whether this is a MultiRegion
+	 * @return Whether this Region is a non-cuboid variant
 	 */
 	public boolean isMulti() {
 		return false;

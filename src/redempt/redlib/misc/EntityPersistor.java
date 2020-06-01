@@ -40,7 +40,6 @@ public class EntityPersistor<T extends Entity> {
 				break;
 			}
 		}
-		System.out.println(clazz.getName());
 		if (!foundInterface) {
 			throw new IllegalArgumentException("The provided object cannot be wrapped!");
 		}
