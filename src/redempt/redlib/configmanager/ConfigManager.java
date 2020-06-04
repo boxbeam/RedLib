@@ -199,7 +199,7 @@ public class ConfigManager {
 		if (!registered) {
 			throw new IllegalStateException("Config manager is not registered");
 		}
-		fields.forEach(f -> f.load(data, config));
+		fields.forEach(f -> f.save(data, config));
 		try {
 			config.save(file);
 		} catch (IOException e) {

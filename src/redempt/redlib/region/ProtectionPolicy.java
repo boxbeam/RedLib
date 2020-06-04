@@ -212,9 +212,10 @@ public class ProtectionPolicy implements Listener {
 	
 	@EventHandler
 	public void onBucketEmpty(PlayerBucketEmptyEvent e) {
+		Block block = e.getBlockClicked().getRelative(e.getBlockFace());
 		if (protections.contains(ProtectionType.USE_BUCKETS)
-				&& protectionCheck.test(e.getBlockClicked())
-				&& !canBypass(e.getPlayer(), ProtectionType.USE_BUCKETS, e.getBlockClicked())) {
+				&& protectionCheck.test(block)
+				&& !canBypass(e.getPlayer(), ProtectionType.USE_BUCKETS, block)) {
 			e.setCancelled(true);
 			sendMessage(e.getPlayer(), ProtectionType.USE_BUCKETS);
 		}
@@ -222,9 +223,10 @@ public class ProtectionPolicy implements Listener {
 	
 	@EventHandler
 	public void onBucketFill(PlayerBucketFillEvent e) {
+		Block block = e.getBlockClicked().getRelative(e.getBlockFace());
 		if (protections.contains(ProtectionType.USE_BUCKETS)
-				&& protectionCheck.test(e.getBlockClicked())
-				&& !canBypass(e.getPlayer(), ProtectionType.USE_BUCKETS, e.getBlockClicked())) {
+				&& protectionCheck.test(block)
+				&& !canBypass(e.getPlayer(), ProtectionType.USE_BUCKETS, block)) {
 			e.setCancelled(true);
 			sendMessage(e.getPlayer(), ProtectionType.USE_BUCKETS);
 		}
@@ -286,6 +288,9 @@ public class ProtectionPolicy implements Listener {
 			if (canBypass(null, ProtectionType.FALLING_BLOCK, e.getBlock())) {
 				return;
 			}
+			e.setCancelled(true);
+		} else if (e.getEntityType() == EntityType.SILVERFISH && protectionCheck.test(e.getBlock()) && protections.contains(ProtectionType.SILVERFISH)
+				&& !canBypass(null, ProtectionType.SILVERFISH, e.getBlock())) {
 			e.setCancelled(true);
 		}
 	}
@@ -414,7 +419,11 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * Mobs spawning
 		 */
-		MOB_SPAWN;
+		MOB_SPAWN,
+		/**
+		 * Silverfish infesting or breaking blocks
+		 */
+		SILVERFISH;
 		
 		/**
 		 * Every protection type
