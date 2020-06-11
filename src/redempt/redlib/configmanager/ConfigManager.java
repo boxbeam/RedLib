@@ -186,6 +186,7 @@ public class ConfigManager {
 		if (!registered) {
 			throw new IllegalStateException("Config manager is not registered");
 		}
+		config = YamlConfiguration.loadConfiguration(file);
 		fields.forEach(f -> f.load(data, config));
 		return this;
 	}
