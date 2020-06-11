@@ -40,8 +40,7 @@ class ConfigField {
 				}
 				ConfigMap<?> map = (ConfigMap<?>) obj;
 				map.section = section;
-				map.manager = manager;
-				map.init();
+				map.init(manager);
 				map.load();
 				return;
 			}
@@ -80,6 +79,7 @@ class ConfigField {
 		try {
 			if (path.endsWith(".*")) {
 				ConfigMap<?> map = (ConfigMap<?>) field.get(object);
+				map.init(manager);
 				map.save();
 				return;
 			}
@@ -117,6 +117,7 @@ class ConfigField {
 				if (section == null) {
 					section = config.createSection(name);
 					map.section = section;
+					map.init(manager);
 					map.save();
 				}
 				return;
