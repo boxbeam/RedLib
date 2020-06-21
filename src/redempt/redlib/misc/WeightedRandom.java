@@ -67,6 +67,39 @@ public class WeightedRandom<T> {
 	}
 	
 	/**
+	 * Sets another weight in this WeightedRandom
+	 * @param outcome The outcome to set
+	 * @param weight The weight to set
+	 */
+	public void set(T outcome, int weight) {
+		remove(outcome);
+		weights.put(outcome, weight);
+		list.add(outcome);
+		total += weight;
+	}
+	
+	/**
+	 * Removes an outcome from this WeightedRandom
+	 * @param outcome The outcome to remove
+	 */
+	public void remove(T outcome) {
+		Integer weight = weights.remove(outcome);
+		if (weight == null) {
+			return;
+		}
+		total -= weight;
+		list.remove(outcome);
+	}
+	
+	/**
+	 * Creates a copy of this WeightedRandom
+	 * @return An identical copy of this WeightedRandom
+	 */
+	public WeightedRandom<T> clone() {
+		return new WeightedRandom<T>(new HashMap<T, Integer>(weights));
+	}
+	
+	/**
 	 * Performs a single roll given a map of outcomes to weights. If you need to roll multiple times, instantiate a WeightedRandom and call roll on that each time instead.
 	 * @param map The map of outcomes to weights
 	 * @param <T> The type being returned
