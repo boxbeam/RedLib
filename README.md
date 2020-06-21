@@ -308,6 +308,12 @@ groups:
 ```
 You may also notice that I added a converter for UUID. This is because the Group class stores the owner's and members' UUIDs, which isn't a data type YAML lets you store directly. All I have to do to make it work, though, is call `addConverter` and pass the class I'm trying to convert, a method to convert it from a string, and a method to convert it back to a string. Neat!
 
+Lastly, two things to note that make it easier to use the ConfigMap:
+
+If you create a variable of type `ConfigurationSection` and give it `@ConfigHook("_section")`, it will be set to the section the object is being stored in.
+
+The default constructor is called when ConfigMaps load your objects into a map, but the fields of your object will not be populated until after the constructor finishes executing. If you need to access these fields, use `ConfigManager.postInit` in the constructor, which will be called immediately after all fields have been populated.
+
 For more info and docs for ConfigManager, check out [this](https://github.com/Redempt/RedLib/blob/master/src/redempt/redlib/configmanager/ConfigManager.java).
 
 ## Item Utilities
