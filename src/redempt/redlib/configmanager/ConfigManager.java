@@ -8,12 +8,23 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
 /**
  * Loads config values into variables annotated with {@link ConfigHook}
  */
 public class ConfigManager {
+	
+	protected static List<Runnable> postInit = new CopyOnWriteArrayList<>();
+	
+	/**
+	 * Adds a post-init to be run after your object is initialized for a ConfigMap
+	 * @param r The Runnable to run later
+	 */
+	public static void postInit(Runnable r) {
+		postInit.add(r);
+	}
 	
 	/**
 	 * Instantiates a List of Strings inline
@@ -93,6 +104,11 @@ public class ConfigManager {
 		} else {
 			config = new YamlConfiguration();
 		}
+		converters.put(Integer.class, new TypeConverter<>(Integer::parseInt, Object::toString));
+		converters.put(Long.class, new TypeConverter<>(Long::parseLong, Object::toString));
+		converters.put(Double.class, new TypeConverter<>(Double::parseDouble, Object::toString));
+		converters.put(Boolean.class, new TypeConverter<>(Boolean::valueOf, Object::toString));
+		converters.put(Float.class, new TypeConverter<>(Float::parseFloat, Object::toString));
 	}
 	
 	/**

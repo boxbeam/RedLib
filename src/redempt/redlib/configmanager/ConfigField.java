@@ -30,6 +30,10 @@ class ConfigField {
 	
 	public void load(Object object, ConfigurationSection config) {
 		try {
+			if (path.equals("_section") && field.getType().equals(ConfigurationSection.class)) {
+				field.set(object, config);
+				return;
+			}
 			if (path.endsWith(".*")) {
 				String name = path.substring(0, path.length() - 2);
 				ConfigurationSection section = config.getConfigurationSection(name);
@@ -76,6 +80,9 @@ class ConfigField {
 	}
 	
 	public void save(Object object, ConfigurationSection config) {
+		if (path.equals("_section") && field.getType().equals(ConfigurationSection.class)) {
+			return;
+		}
 		try {
 			if (path.endsWith(".*")) {
 				ConfigMap<?> map = (ConfigMap<?>) field.get(object);
@@ -113,6 +120,9 @@ class ConfigField {
 	}
 	
 	public void saveIfAbsent(Object object, ConfigurationSection config) {
+		if (path.equals("_section") && field.getType().equals(ConfigurationSection.class)) {
+			return;
+		}
 		try {
 			if (path.endsWith(".*")) {
 				String name = path.substring(0, path.length() - 2);
@@ -132,6 +142,10 @@ class ConfigField {
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public String getPath() {
+		return path;
 	}
 	
 }

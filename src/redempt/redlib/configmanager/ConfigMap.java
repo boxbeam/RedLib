@@ -6,7 +6,6 @@ import redempt.redlib.configmanager.exceptions.ConfigMapException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +50,8 @@ class ConfigMap<T> extends HashMap<String, T> {
 				throw new ConfigMapException("Class must have a default constructor with no arguments!");
 			}
 		}
+		ConfigManager.postInit.forEach(Runnable::run);
+		ConfigManager.postInit.clear();
 	}
 	
 	public void save() {
@@ -68,6 +69,17 @@ class ConfigMap<T> extends HashMap<String, T> {
 			section.set((String) key, null);
 		}
 		return super.remove(key);
+	}
+	
+	@Override
+	public T put(String key, T value) {
+		T out = super.put(key, value);
+		fields.stream().filter(f -> f.getPath().equals("_section")).findFirst().ifPresent(f -> {
+			ConfigurationSection section = this.section.getConfigurationSection(key);
+			section = section == null ? this.section.createSection(key) : section;
+			f.load(value, section);
+		});
+		return out;
 	}
 	
 }
