@@ -209,4 +209,11 @@ public class ConfigManager {
 		return this;
 	}
 	
+	/**
+	 * @return The configuration this ConfigManager is loading from and saving to
+	 */
+	public YamlConfiguration getConfig() {
+		return config;
+	}
+	
 }

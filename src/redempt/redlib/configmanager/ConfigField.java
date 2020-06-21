@@ -79,6 +79,10 @@ class ConfigField {
 		try {
 			if (path.endsWith(".*")) {
 				ConfigMap<?> map = (ConfigMap<?>) field.get(object);
+				String name = path.substring(0, path.length() - 2);
+				ConfigurationSection section = config.getConfigurationSection(name);
+				section = section == null ? config.createSection(name) : section;
+				map.section = section;
 				map.init(manager);
 				map.save();
 				return;
