@@ -13,11 +13,11 @@ class TypeConverter<T> {
 	}
 	
 	public T load(String string) {
-		return load.apply(string);
+		return string == null ? null : load.apply(string);
 	}
 	
 	public String save(Object obj) {
-		return save.apply((T) obj);
+		return obj == null ? null : save.apply((T) obj);
 	}
 	
 }
