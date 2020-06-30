@@ -9,6 +9,7 @@ import redempt.redlib.commandmanager.CommandParser;
 import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.dev.ItemHelper;
 import redempt.redlib.dev.StructureTool;
+import redempt.redlib.enchants.events.PlayerChangedArmorEvent;
 
 public class RedLib extends JavaPlugin {
 	
@@ -37,6 +38,7 @@ public class RedLib extends JavaPlugin {
 					new ItemHelper(),
 					StructureTool.enable());
 		}
+		PlayerChangedArmorEvent.register();
 	}
 	
 	public static String getServerVersion() {

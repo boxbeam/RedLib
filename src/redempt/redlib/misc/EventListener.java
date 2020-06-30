@@ -34,13 +34,7 @@ public class EventListener<T extends Event> implements Listener {
 	public EventListener(Plugin plugin, Class<T> eventClass, EventPriority priority, BiConsumer<EventListener<T>, T> handler) {
 		this.handler = handler;
 		this.eventClass = eventClass;
-		Bukkit.getPluginManager().registerEvent(eventClass, this, priority, new EventExecutor() {
-			
-			@Override
-			public void execute(Listener listener, Event event) throws EventException {
-				EventListener.this.handleEvent((T) event);
-			}
-		}, plugin);
+		Bukkit.getPluginManager().registerEvent(eventClass, this, priority, (l, e) -> handleEvent((T) e), plugin);
 	}
 	
 	/**
