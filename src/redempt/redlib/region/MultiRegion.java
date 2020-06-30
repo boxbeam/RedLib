@@ -255,7 +255,7 @@ public class MultiRegion extends Region {
 	 * @return A cuboid region guaranteed to have equal or greater coverage compared to this MultiRegion
 	 */
 	public Region toCuboid() {
-		return new Region(start, end);
+		return new Region(this.start, this.end);
 	}
 	
 	/**
