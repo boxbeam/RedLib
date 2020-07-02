@@ -14,10 +14,16 @@ import java.util.Map;
 /**
  * Represents a custom enchantment created by another plugin
  * @param <T> The event type this CustomEnchant handles
+ * @author Redempt
  */
 public abstract class CustomEnchant<T extends Event> {
 	
-	protected static String toRomanNumerals(int num) {
+	/**
+	 * Converts a number to roman numerals, between 1 and 10
+	 * @param num The number to convert
+	 * @return The roman numerals representation of the number
+	 */
+	public static String toRomanNumerals(int num) {
 		switch (num) {
 			case 1:
 				return "I";
@@ -44,7 +50,12 @@ public abstract class CustomEnchant<T extends Event> {
 		}
 	}
 	
-	protected static int fromRomanNumerals(String romanNumerals) {
+	/**
+	 * Converts roman numeral string, between 1 and 10, back to a number
+	 * @param romanNumerals The roman numerals string
+	 * @return The number represented by the roman numerals
+	 */
+	public static int fromRomanNumerals(String romanNumerals) {
 		switch (romanNumerals) {
 			case "I":
 				return 1;

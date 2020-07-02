@@ -21,6 +21,7 @@ public class MultiRegion extends Region {
 	
 	private List<Region> regions = new ArrayList<>();
 	private List<Region> subtract = new ArrayList<>();
+	private boolean clustered = false;
 	
 	/**
 	 * Construct a MultiRegion using a list of Regions
@@ -32,6 +33,9 @@ public class MultiRegion extends Region {
 		}
 		World world = regions.get(0).getWorld();
 		for (Region region : regions) {
+			if (region.isMulti()) {
+				clustered = true;
+			}
 			if (!region.getWorld().equals(world)) {
 				throw new IllegalArgumentException("All regions must be in the same world");
 			}
@@ -85,7 +89,7 @@ public class MultiRegion extends Region {
 		if (!region.getWorld().equals(getWorld())) {
 			throw new IllegalArgumentException("Region is not in the same world as this MultiRegion");
 		}
-		if (region.isMulti()) {
+		if (region.isMulti() && !clustered) {
 			MultiRegion multi = (MultiRegion) region;
 			for (Region r : multi.getRegions()) {
 				regions.add(r.clone());
@@ -259,6 +263,135 @@ public class MultiRegion extends Region {
 	}
 	
 	/**
+	 * automatically clusters regions in clusters of 10 until there are less than 25 top-level regions
+	 */
+	public void autoCluster() {
+		while (regions.size() > 25) {
+			cluster(10);
+		}
+	}
+	
+	/**
+	 * Smartly groups Regions in close proximity into clusters. Since {@link MultiRegion#contains(Location)} first checks
+	 * if the given Location is within the extreme corners of a MultiRegion, this will significantly increase the performance
+	 * of {@link MultiRegion#contains(Location)} for MultiRegions which contain many Regions by allowing it to skip having
+	 * to check {@link Region#contains(Location)} on many nearby Regions. This method can be called multiple times, which
+	 * will further cluster the clusters. It is recommended to use {@link MultiRegion#autoCluster()} in most cases.
+	 * @param per The number of Regions that should be in each cluster
+	 */
+	public void cluster(int per) {
+		clustered = true;
+		Region smallest = null;
+		for (Region region : regions) {
+			if (smallest == null || region.getBlockVolume() < smallest.getBlockVolume()) {
+				smallest = region;
+			}
+		}
+		Location center = smallest.getCenter();
+		regions.sort((a, b) -> (int) Math.signum(a.getCenter().distanceSquared(center) - b.getCenter().distanceSquared(center)));
+		List<Region> list = new ArrayList<>();
+		Set<Region> set = new HashSet<>();
+		set.add(smallest);
+		list.add(smallest);
+		while (set.size() < regions.size()) {
+			Region prev = list.get(list.size() - 1);
+			double radius = getApproxRadius(prev);
+			Location middle = prev.getCenter();
+			Region closest = null;
+			double distance = 0;
+			for (Region region : regions) {
+				if (set.contains(region)) {
+					continue;
+				}
+				double dist = middle.distance(region.getCenter());
+				if (dist / 1.5 <= getApproxRadius(region) + radius) {
+					closest = region;
+					break;
+				}
+				if (closest == null || dist < distance) {
+					distance = dist;
+					closest = region;
+				}
+			}
+			set.add(closest);
+			list.add(closest);
+		}
+		List<Region> cluster = new ArrayList<>();
+		int count = 0;
+		MultiRegion current = null;
+		for (int i = 0; i < list.size(); i++) {
+			Region reg = list.get(i);
+			if (current == null) {
+				current = new MultiRegion(reg);
+			} else {
+				current.add(reg);
+			}
+			count++;
+			if (count >= per) {
+				cluster.add(current);
+				current = null;
+				count = 0;
+			}
+		}
+		if (current != null) {
+			cluster.add(current);
+		}
+		this.regions = cluster;
+	}
+	
+	private double getApproxRadius(Region region) {
+		double[] dim = region.getDimensions();
+		return (dim[0] + dim[1] + dim[2]) / 3;
+	}
+	
+	/**
+	 * Flattens any clusters in this MultiRegion so that it is composed only of cuboid Regions
+	 */
+	public void decluster() {
+		if (!clustered) {
+			return;
+		}
+		clustered = false;
+		List<Region> regions = new ArrayList<>();
+		for (Region region : this.regions) {
+			if (region.isMulti()) {
+				MultiRegion multi = (MultiRegion) region.clone();
+				multi.decluster();
+				regions.addAll(multi.getRegions());
+				continue;
+			}
+			regions.add(region);
+		}
+		this.regions = regions;
+	}
+	
+	/**
+	 * @return Whether this MultiRegion has been clustered into smaller Regions
+	 */
+	public boolean isClustered() {
+		return clustered;
+	}
+	
+	/**
+	 * Recursively gets the number of Regions in this MultiRegion
+	 * @return The total number of cuboid Regions composing this MultiRegion
+	 */
+	public int getRegionCount() {
+		if (!clustered) {
+			return regions.size();
+		}
+		int count = 0;
+		for (Region region : regions) {
+			if (region.isMulti()) {
+				count += ((MultiRegion) region).getRegionCount();
+				continue;
+			}
+			count++;
+		}
+		return count;
+	}
+	
+	/**
 	 * Check if this Region overlaps with another.
 	 * @param o The Region to check against
 	 * @return Whether this Region overlaps with the given Region
@@ -308,9 +441,22 @@ public class MultiRegion extends Region {
 	 * Recalculates this region to ensure it is using close to the least possible number of sub-regions with no overlaps.
 	 * This will coalesce the MultiRegion into only added Regions, but subtracted Regions will not be included
 	 * in any of the Regions. Calling this method is somewhat expensive, but will make all other operations
-	 * on this MultiRegion faster.
+	 * on this MultiRegion faster. After recalculating the regions, automatically clusters them in clusters of 10
+	 * until there are less than 25 top-level regions.
 	 */
 	public void recalculate() {
+		recalculate(true);
+	}
+	
+	/**
+	 * Recalculates this region to ensure it is using close to the least possible number of sub-regions with no overlaps.
+	 * This will coalesce the MultiRegion into only added Regions, but subtracted Regions will not be included
+	 * in any of the Regions. Calling this method is somewhat expensive, but will make all other operations
+	 * on this MultiRegion faster.
+	 * @param autoCluster Whether to automatically cluster regions in clusters of 10 until there are less than 25 top-level regions
+	 */
+	public void recalculate(boolean autoCluster) {
+		decluster();
 		List<Region> regions = this.regions;
 		List<Region> newRegions = new ArrayList<>();
 		BlockSetRegion blocks = new BlockSetRegion();
@@ -347,14 +493,19 @@ public class MultiRegion extends Region {
 		newRegions.removeAll(subtract);
 		this.regions = newRegions;
 		subtract.clear();
+		if (!autoCluster) {
+			return;
+		}
+		autoCluster();
 	}
 	
 	private void expandToMax(Region r, BlockSetRegion exclude) {
-		Set<BlockFace> faces = new HashSet<>(6);
+		List<BlockFace> faces = new ArrayList<>(6);
 		List<BlockFace> toRemove = new ArrayList<>();
 		Arrays.stream(MultiRegion.faces).forEach(faces::add);
 		while (faces.size() > 0) {
-			for (BlockFace face : faces) {
+			for (int i = 0; i < faces.size(); i++) {
+				BlockFace face = faces.get(i);
 				Region clone = r.clone();
 				clone.expand(face.getOppositeFace(), -(clone.measureBlocks(face) - 1));
 				clone.move(face.getDirection());

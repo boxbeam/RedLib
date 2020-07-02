@@ -1,5 +1,6 @@
 package redempt.redlib.misc;
 
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -8,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -125,6 +127,42 @@ public class LocationUtils {
 		double y = Double.parseDouble(split[2]);
 		double z = Double.parseDouble(split[3]);
 		return new Location(world, x, y, z);
+	}
+	
+	/**
+	 * Loads a Location from a String. If the world this Location is in is not yet loaded, waits for it to load, then passes
+	 * the Location to the callback.
+	 * @param string The String to be parsed into a Location
+	 * @param separator The separator used when converting this Location to a String
+	 * @param callback The callback to use the Location once it has been loaded
+	 */
+	public static void fromStringLater(String string, String separator, Consumer<Location> callback) {
+		String[] split = string.split(Pattern.quote(separator));
+		World world = Bukkit.getWorld(split[0]);
+		double x = Double.parseDouble(split[1]);
+		double y = Double.parseDouble(split[2]);
+		double z = Double.parseDouble(split[3]);
+		if (world != null) {
+			callback.accept(new Location(world, x, y, z));
+			return;
+		}
+		new EventListener<>(RedLib.getInstance(), WorldLoadEvent.class, (l, e) -> {
+			if (e.getWorld().getName().equals(split[0])) {
+				World w = Bukkit.getWorld(split[0]);
+				callback.accept(new Location(w, x, y, z));
+				l.unregister();
+			}
+		});
+	}
+	
+	/**
+	 * Loads a Location from a String. If the world this Location is in is not yet loaded, waits for it to load, then passes
+	 * the Location to the callback.
+	 * @param string The String to be parsed into a Location
+	 * @param callback The callback to use the Location once it has been loaded
+	 */
+	public static void fromStringLater(String string, Consumer<Location> callback) {
+		fromStringLater(string, " ", callback);
 	}
 	
 	/**

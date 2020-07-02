@@ -84,7 +84,7 @@ public class SelectionTool implements Listener {
 	 */
 	public Region getRegion(UUID uuid) {
 		Location[] locations = selections.get(uuid);
-		if (locations[0] == null || locations[1] == null) {
+		if (locations == null || locations[0] == null || locations[1] == null) {
 			return null;
 		}
 		Region region = new Region(locations[0], locations[1]);
