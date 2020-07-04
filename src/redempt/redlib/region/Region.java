@@ -1,14 +1,5 @@
 package redempt.redlib.region;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -18,27 +9,23 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
-
 import redempt.redlib.RedLib;
-import redempt.redlib.region.ProtectionPolicy.ProtectionType;
-import redempt.redlib.region.events.RegionEnterEvent;
-import redempt.redlib.region.events.RegionEnterEvent.EnterCause;
-import redempt.redlib.region.events.RegionExitEvent;
-import redempt.redlib.region.events.RegionExitEvent.ExitCause;
+import redempt.redlib.protection.ProtectedRegion;
+import redempt.redlib.protection.ProtectionPolicy.ProtectionType;
+
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Represents a cuboid region in a world
  * @author Redempt
  */
-public class Region implements Listener {
+public class Region {
 	
 	protected Location start;
 	protected Location end;
@@ -74,48 +61,14 @@ public class Region implements Listener {
 	 * Enable RegionEnterEvent and RegionExitEvent for this region
 	 */
 	public void enableEvents() {
-		Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
+		RegionEnterExitListener.getRegionMap().set(this, this);
 	}
 	
 	/**
 	 * Disable RegionEnterEvent and RegionExitEvent for this region
 	 */
 	public void disableEvents() {
-		HandlerList.unregisterAll(this);
-	}
-	
-	@EventHandler
-	public void onMove(PlayerMoveEvent e) {
-		if (!contains(e.getFrom()) && contains(e.getTo())) {
-			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.MOVE, e));
-		}
-		if (!contains(e.getTo()) && contains(e.getFrom())) {
-			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.MOVE, e));
-		}
-	}
-	
-	@EventHandler
-	public void onTeleport(PlayerTeleportEvent e) {
-		if (!contains(e.getFrom()) && contains(e.getTo())) {
-			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.TELEPORT, e));
-		}
-		if (!contains(e.getTo()) && contains(e.getFrom())) {
-			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.TELEPORT, e));
-		}
-	}
-	
-	@EventHandler
-	public void onJoin(PlayerJoinEvent e) {
-		if (contains(e.getPlayer().getLocation())) {
-			Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), this, EnterCause.JOIN, null));
-		}
-	}
-	
-	@EventHandler
-	public void onQuit(PlayerQuitEvent e) {
-		if (contains(e.getPlayer().getLocation())) {
-			Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), this, ExitCause.QUIT, null));
-		}
+		RegionEnterExitListener.getRegionMap().remove(this, this);
 	}
 	
 	/**
@@ -156,16 +109,6 @@ public class Region implements Listener {
 	 */
 	public Location getCenter() {
 		return start.clone().add(end).multiply(0.5);
-	}
-	
-	/**
-	 * Check whether a location is inside this Region
-	 * @param loc The location to check
-	 * @return Whether the location is inside this Region
-	 * @deprecated Unclear name, use {@link Region#contains(Location)}
-	 */
-	public boolean isInside(Location loc) {
-		return contains(loc);
 	}
 	
 	/**
@@ -335,7 +278,7 @@ public class Region implements Listener {
 	 * @return The {@link ProtectedRegion}
 	 */
 	public ProtectedRegion protect(ProtectionType... types) {
-		return new ProtectedRegion(this, types);
+		return new ProtectedRegion(new Region(this.getStart(), this.getEnd()), types);
 	}
 	
 	/**

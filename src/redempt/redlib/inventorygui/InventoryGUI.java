@@ -45,6 +45,15 @@ public class InventoryGUI implements Listener {
 	}
 	
 	/**
+	 * Creates a new GUI, instantiating a new inventory with the given size and name
+	 * @param size The size of the inventory
+	 * @param name The name of the inventory
+	 */
+	public InventoryGUI(int size, String name) {
+		this(Bukkit.createInventory(null, size, name));
+	}
+	
+	/**
 	 * Gets the inventory this GUI is wrapping
 	 *
 	 * @return The wrapped inventory

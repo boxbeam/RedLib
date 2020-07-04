@@ -9,7 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import redempt.redlib.RedLib;
-import redempt.redlib.misc.EventListener;
 
 /**
  * Called when a player changes any piece of armor

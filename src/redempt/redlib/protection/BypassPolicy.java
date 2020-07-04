@@ -1,9 +1,9 @@
-package redempt.redlib.region;
+package redempt.redlib.protection;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import redempt.redlib.region.ProtectionPolicy.ProtectionType;
+import redempt.redlib.protection.ProtectionPolicy.ProtectionType;
 
 /**
  * Represents a policy that allows players to bypass certain protection types for certain blocks

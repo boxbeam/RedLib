@@ -13,7 +13,6 @@ class EquipArmorTrigger implements EnchantTrigger<PlayerChangedArmorEvent> {
 	@Override
 	public void register(CustomEnchant<PlayerChangedArmorEvent> ench) {
 		new EventListener<>(ench.getRegistry().getPlugin(), PlayerChangedArmorEvent.class, e -> {
-			System.out.println("Armor changed");
 			for (int i = 0; i < e.getPreviousArmor().length; i++) {
 				ItemStack prev = e.getPreviousArmor()[i];
 				ItemStack current = e.getNewArmor()[i];

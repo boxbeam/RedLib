@@ -1,6 +1,7 @@
-package redempt.redlib.region;
+package redempt.redlib.protection;
 
-import redempt.redlib.region.ProtectionPolicy.ProtectionType;
+import redempt.redlib.protection.ProtectionPolicy.ProtectionType;
+import redempt.redlib.region.Region;
 
 /**
  * Represents a Region which has been protected using a ProtectionPolicy
@@ -12,9 +13,9 @@ public class ProtectedRegion {
 	private Region region;
 	private ProtectionPolicy policy;
 	
-	protected ProtectedRegion(Region region, ProtectionType... types) {
+	public ProtectedRegion(Region region, ProtectionType... types) {
 		this.region = region;
-		this.policy = new ProtectionPolicy(b -> region.contains(b.getLocation()), types);
+		this.policy = new ProtectionPolicy(region, b -> region.contains(b.getLocation()), types);
 	}
 	
 	/**
