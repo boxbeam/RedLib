@@ -1,5 +1,7 @@
 package redempt.redlib.protection;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -9,6 +11,7 @@ import redempt.redlib.RedLib;
 import redempt.redlib.misc.EventListener;
 import redempt.redlib.protection.ProtectionPolicy.ProtectionType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -65,12 +68,13 @@ class ProtectionListener {
 				List<Block> blocks = null;
 				try {
 					blocks = func.apply(e);
-				} catch (Exception ex) {
+				} catch (NullPointerException ex) {
 					continue;
 				}
 				if (blocks == null) {
 					continue;
 				}
+				blocks = new ArrayList<>(blocks);
 				for (Block block : blocks) {
 					if (!testAll(block, type, player)) {
 						cancel.accept(e, block);

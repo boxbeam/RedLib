@@ -11,6 +11,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
@@ -70,12 +71,12 @@ public class ProtectionPolicy implements Listener {
 		ProtectionListener.protect(PlayerBucketFillEvent.class, ProtectionType.USE_BUCKETS, e -> e.getPlayer(), e -> e.getBlockClicked());
 		ProtectionListener.protect(PlayerBucketEmptyEvent.class, ProtectionType.USE_BUCKETS, e -> e.getPlayer(), e -> e.getBlockClicked());
 		ProtectionListener.protectMultiBlock(BlockPistonExtendEvent.class, ProtectionType.PISTONS, e -> null, (e, b) -> e.setCancelled(true), e -> {
-			List<Block> blocks = e.getBlocks();
+			List<Block> blocks = new ArrayList<>(e.getBlocks());
 			blocks.add(e.getBlock());
 			return blocks;
 		});
 		ProtectionListener.protectMultiBlock(BlockPistonRetractEvent.class, ProtectionType.PISTONS, e -> null, (e, b) -> e.setCancelled(true), e -> {
-			List<Block> blocks = e.getBlocks();
+			List<Block> blocks = new ArrayList<>(e.getBlocks());
 			blocks.add(e.getBlock());
 			return blocks;
 		});
