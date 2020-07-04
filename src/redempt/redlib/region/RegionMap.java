@@ -14,6 +14,31 @@ import java.util.*;
 public class RegionMap<T> {
 	
 	private Map<Coordinate, Set<T>> map = new HashMap<>();
+	private int scale;
+	
+	/**
+	 * Constructs a RegionMap with scale 100
+	 */
+	public RegionMap() {
+		this(100);
+	}
+	
+	/**
+	 * Constructs a RegionMap with the specified scale
+	 * @param scale The distance between things being stored in the internal map. Higher values use less memory
+	 *              but more CPU time. If the regions being used to store objects in this RegionMap are especially large,
+	 *              use a larger scale. If they are very small and there are a lot of them, use a smaller scale.
+	 */
+	public RegionMap(int scale) {
+		this.scale = scale;
+	}
+	
+	/**
+	 * @return The scale of this RegionMap
+	 */
+	public int getScale() {
+		return scale;
+	}
 	
 	/**
 	 * Maps a Region to an object
@@ -21,8 +46,8 @@ public class RegionMap<T> {
 	 * @param object The object to set
 	 */
 	public void set(Region region, T object) {
-		Coordinate start = new Coordinate(region.getStart());
-		Coordinate end = new Coordinate(region.getEnd());
+		Coordinate start = new Coordinate(region.getStart(), scale);
+		Coordinate end = new Coordinate(region.getEnd(), scale);
 		for (int x = start.getX(); x <= end.getX(); x++) {
 			for (int z = start.getZ(); z <= end.getZ(); z++) {
 				Coordinate coord = new Coordinate(start.getWorld(), x, z);
@@ -42,8 +67,8 @@ public class RegionMap<T> {
 	 * @param object The object to remove
 	 */
 	public void remove(Region region, T object) {
-		Coordinate start = new Coordinate(region.getStart());
-		Coordinate end = new Coordinate(region.getEnd());
+		Coordinate start = new Coordinate(region.getStart(), scale);
+		Coordinate end = new Coordinate(region.getEnd(), scale);
 		for (int x = start.getX(); x <= end.getX(); x++) {
 			for (int z = start.getZ(); z <= end.getZ(); z++) {
 				Coordinate coord = new Coordinate(start.getWorld(), x, z);
@@ -64,7 +89,7 @@ public class RegionMap<T> {
 	 * @return A set of objects mapped near the given location
 	 */
 	public Set<T> get(Location location) {
-		return map.getOrDefault(new Coordinate(location), new HashSet<>());
+		return map.getOrDefault(new Coordinate(location, scale), new HashSet<>());
 	}
 	
 	/**
@@ -86,9 +111,9 @@ public class RegionMap<T> {
 			this.world = world;
 		}
 		
-		public Coordinate(Location location) {
-			this.x = location.getBlockX() / 100;
-			this.z = location.getBlockZ() / 100;
+		public Coordinate(Location location, int scale) {
+			this.x = location.getBlockX() / scale;
+			this.z = location.getBlockZ() / scale;
 			this.world = location.getWorld();
 		}
 		

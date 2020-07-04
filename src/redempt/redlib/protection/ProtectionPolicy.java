@@ -60,7 +60,7 @@ public class ProtectionPolicy implements Listener {
 		ProtectionListener.protect(BlockBreakEvent.class, ProtectionType.BREAK_BLOCK, e -> e.getPlayer(), e -> e.getBlock());
 		ProtectionListener.protect(BlockPlaceEvent.class, ProtectionType.PLACE_BLOCK, e -> e.getPlayer(), e -> e.getBlock());
 		ProtectionListener.protect(PlayerInteractEvent.class, ProtectionType.INTERACT, e -> e.getPlayer(), e -> {
-			if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getClickedBlock() == null || !e.getClickedBlock().getType().isInteractable()) {
+			if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getClickedBlock() == null || (RedLib.midVersion >= 13 && !e.getClickedBlock().getType().isInteractable())) {
 				return null;
 			}
 			return e.getClickedBlock();
