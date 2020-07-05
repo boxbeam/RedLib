@@ -14,4 +14,6 @@ public @interface ConfigHook {
 	 */
 	public String value();
 	
+	public int priority() default 1;
+	
 }

@@ -7,9 +7,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Predicate;
 
 class ConfigMap<T> extends HashMap<String, T> {
 	
@@ -32,8 +32,9 @@ class ConfigMap<T> extends HashMap<String, T> {
 			if (hook == null) {
 				continue;
 			}
-			fields.add(new ConfigField(field, hook.value(), manager));
+			fields.add(new ConfigField(field, hook.value(), hook.priority(), manager));
 		}
+		fields.sort(Comparator.comparingInt(f -> f.priority));
 	}
 	
 	public void load() {

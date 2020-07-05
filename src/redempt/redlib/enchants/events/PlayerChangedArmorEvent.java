@@ -12,6 +12,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import redempt.redlib.RedLib;
@@ -120,7 +121,7 @@ class ArmorListener implements Listener {
 			return;
 		}
 		String type = item.getType().toString();
-		if (type.endsWith("_BOOTS") || type.endsWith("_CHESTPLATE") || type.endsWith("_LEGGINGS") || type.endsWith("_BOOTS")) {
+		if (type.endsWith("_BOOTS") || type.endsWith("_CHESTPLATE") || type.endsWith("_LEGGINGS") || type.endsWith("_HELMET")) {
 			check(e.getPlayer());
 		}
 	}
@@ -141,6 +142,11 @@ class ArmorListener implements Listener {
 		}
 		Bukkit.getPluginManager().callEvent(
 				new PlayerChangedArmorEvent(e.getPlayer(), new ItemStack[4], e.getPlayer().getInventory().getArmorContents()));
+	}
+	
+	@EventHandler
+	public void onBreakItem(PlayerItemBreakEvent e) {
+		check(e.getPlayer());
 	}
 	
 }

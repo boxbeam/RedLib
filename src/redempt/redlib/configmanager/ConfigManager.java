@@ -144,8 +144,9 @@ public class ConfigManager {
 			if (hook == null) {
 				continue;
 			}
-			fields.add(new ConfigField(field, hook.value(), this));
+			fields.add(new ConfigField(field, hook.value(), hook.priority(), this));
 		}
+		fields.sort(Comparator.comparingInt(f -> f.priority));
 		this.data = data;
 		registered = true;
 		return this;
@@ -162,8 +163,9 @@ public class ConfigManager {
 			if (hook == null) {
 				continue;
 			}
-			fields.add(new ConfigField(field, hook.value(), this));
+			fields.add(new ConfigField(field, hook.value(), hook.priority(), this));
 		}
+		fields.sort(Comparator.comparingInt(f -> f.priority));
 		registered = true;
 		return this;
 	}

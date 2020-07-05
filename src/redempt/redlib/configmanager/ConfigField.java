@@ -16,8 +16,9 @@ class ConfigField {
 	private String path;
 	private ConfigManager manager;
 	private TypeConverter<?> converter;
+	protected int priority;
 	
-	public ConfigField(Field field, String path, ConfigManager manager) {
+	public ConfigField(Field field, String path, int priority, ConfigManager manager) {
 		this.field = field;
 		this.path = path;
 		this.manager = manager;
@@ -80,10 +81,11 @@ class ConfigField {
 	}
 	
 	public void save(Object object, ConfigurationSection config) {
-		if (path.equals("_section") && field.getType().equals(ConfigurationSection.class)) {
-			return;
-		}
 		try {
+			if (path.equals("_section") && field.getType().equals(ConfigurationSection.class)) {
+				field.set(object, config);
+				return;
+			}
 			if (path.endsWith(".*")) {
 				ConfigMap<?> map = (ConfigMap<?>) field.get(object);
 				String name = path.substring(0, path.length() - 2);
