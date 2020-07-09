@@ -365,13 +365,25 @@ public class MultiBlockStructure {
 	 * @param relX The relative X of the block within this multi-block structure
 	 * @param relY The relative Y of the block within this multi-block structure
 	 * @param relZ The relative Z of the block within this multi-block structure
+	 * @return A BlockState, with the Location passed, with the data at the specified relative location within this multi-block structure.
+	 * This is done for compatibility reasons. For 1.8, MaterialData would make the most sense, while for 1.13+, BlockData would. BlockState can be converted to either.
+	 * @throws ArrayIndexOutOfBoundsException if the relative coordinates do not exist within this structure
+	 */
+	public BlockState getData(Location loc, int relX, int relY, int relZ) {
+		return this.getStateToSet(loc, data[relX][relY][relZ]);
+	}
+	
+	/**
+	 *
+	 * @param relX The relative X of the block within this multi-block structure
+	 * @param relY The relative Y of the block within this multi-block structure
+	 * @param relZ The relative Z of the block within this multi-block structure
 	 * @return A BlockState, with the Location (0, 0, 0) in the default world, with the data at the specified relative location within this multi-block structure.
 	 * This is done for compatibility reasons. For 1.8, MaterialData would make the most sense, while for 1.13+, BlockData would. BlockState can be converted to either.
 	 * @throws ArrayIndexOutOfBoundsException if the relative coordinates do not exist within this structure
 	 */
 	public BlockState getData(int relX, int relY, int relZ) {
-		Location loc = new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
-		return this.getStateToSet(loc, data[relX][relY][relZ]);
+		return getData(new Location(Bukkit.getWorlds().get(0), 0, 0, 0), relX, relY, relZ);
 	}
 	
 	/**

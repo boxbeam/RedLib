@@ -130,6 +130,28 @@ public class LocationUtils {
 	}
 	
 	/**
+	 * Converts a Location to a String representing its location
+	 * @param block The Block location to be stringified
+	 * @param separator The separator to use between pieces of information
+	 * @return The stringified location
+	 */
+	public static String toString(Block block, String separator) {
+		return new StringBuilder().append(block.getWorld().getName()).append(separator)
+				.append(block.getX()).append(separator)
+				.append(block.getY()).append(separator)
+				.append(block.getZ()).toString();
+	}
+	
+	/**
+	 * Converts a Location to a String representing its location
+	 * @param block The Block location to be stringified
+	 * @return The stringified location
+	 */
+	public static String toString(Block block) {
+		return toString(block, " ");
+	}
+	
+	/**
 	 * Loads a Location from a String. If the world this Location is in is not yet loaded, waits for it to load, then passes
 	 * the Location to the callback.
 	 * @param string The String to be parsed into a Location

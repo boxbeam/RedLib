@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.inventory.ItemStack;
 
 import redempt.redlib.multiblock.MultiBlockStructure.Rotator;
@@ -186,6 +187,13 @@ public class Structure {
 		 */
 		public int[] getRelativeCoordinates() {
 			return new int[] {relX, relY, relZ};
+		}
+		
+		/**
+		 * @return The BlockState that the MultiBlockStructure would set at this location if it were built here
+		 */
+		public BlockState getStructureData() {
+			return structure.getType().getData(block.getLocation(), relX, relY, relZ);
 		}
 		
 		/**
