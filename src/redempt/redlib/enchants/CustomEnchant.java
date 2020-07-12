@@ -192,7 +192,7 @@ public abstract class CustomEnchant<T extends Event> {
 	 * @param level The level to apply
 	 * @return The enchanted item
 	 */
-	public final ItemStack apply(ItemStack item, int level) {
+	public ItemStack apply(ItemStack item, int level) {
 		if (item == null) {
 			return null;
 		}
@@ -236,7 +236,7 @@ public abstract class CustomEnchant<T extends Event> {
 	 * @param item The item to remove this CustomEnchant from
 	 * @return The item with the enchant removed
 	 */
-	public final ItemStack remove(ItemStack item) {
+	public ItemStack remove(ItemStack item) {
 		if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {
 			return item;
 		}
@@ -254,7 +254,7 @@ public abstract class CustomEnchant<T extends Event> {
 	 * @param item The item to check the level on
 	 * @return The level on the item, 0 if it is absent or if the item is null
 	 */
-	public final int getLevel(ItemStack item) {
+	public int getLevel(ItemStack item) {
 		if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {
 			return 0;
 		}

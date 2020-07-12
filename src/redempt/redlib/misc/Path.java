@@ -46,7 +46,7 @@ public class Path {
 	 * @return A list of all the locations between the locations, equidistant
 	 */
 	public static List<Location> getPath(Location start, Vector direction, double distance, double step) {
-		direction = direction.clone().normalize().multiply(step);
+		direction = direction.clone().normalize().multiply(distance);
 		Location end = start.clone().add(direction);
 		return getPath(start, end, step);
 	}
