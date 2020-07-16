@@ -44,12 +44,12 @@ public class RegionEnterExitListener {
 		new EventListener<>(RedLib.getInstance(), PlayerTeleportEvent.class, e -> {
 			regionMap.get(e.getFrom()).forEach(r -> {
 				if (r.contains(e.getFrom()) && !r.contains(e.getTo())) {
-					Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), r, ExitCause.MOVE, e));
+					Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), r, ExitCause.TELEPORT, e));
 				}
 			});
 			regionMap.get(e.getTo()).forEach(r -> {
 				if (!r.contains(e.getFrom()) && r.contains(e.getTo())) {
-					Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), r, EnterCause.MOVE, e));
+					Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), r, EnterCause.TELEPORT, e));
 				}
 			});
 		});
