@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import redempt.redlib.RedLib;
 import redempt.redlib.misc.EventListener;
 import redempt.redlib.region.events.RegionEnterEvent;
@@ -40,7 +41,7 @@ public class RegionEnterExitListener {
 				}
 			});
 		});
-		new EventListener<>(RedLib.getInstance(), PlayerMoveEvent.class, e -> {
+		new EventListener<>(RedLib.getInstance(), PlayerTeleportEvent.class, e -> {
 			regionMap.get(e.getFrom()).forEach(r -> {
 				if (r.contains(e.getFrom()) && !r.contains(e.getTo())) {
 					Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getPlayer(), r, ExitCause.MOVE, e));

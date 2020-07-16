@@ -114,6 +114,29 @@ public class SQLHelper implements Closeable {
 	
 	/**
 	 * Executes a SQL query as a prepared statement, setting its fields to the elements of the vararg passed,
+	 * returning the value in the first column of the first row in the results as a String.
+	 * @param query The SQL query to execute
+	 * @param fields A vararg of the fields to set in the prepared statement
+	 * @return The String in the first column of the first row of the returned results, or null if none is present
+	 * @implNote This method exists because {@link ResultSet#getObject(int)} can return an Integer if the String in the
+	 * column can be parsed into one.
+	 */
+	public String querySingleResultString(String query, Object... fields) {
+		try {
+			PreparedStatement statement = prepareStatement(query, fields);
+			ResultSet results = statement.executeQuery();
+			if (!results.next()) {
+				return null;
+			}
+			return results.getString(1);
+		} catch (SQLException e) {
+			sneakyThrow(e);
+			return null;
+		}
+	}
+	
+	/**
+	 * Executes a SQL query as a prepared statement, setting its fields to the elements of the vararg passed,
 	 * returning a list of values in the first column of each row in the results
 	 * @param query The SQL query to execute
 	 * @param fields A vararg of the fields to set in the prepared statement
@@ -129,7 +152,30 @@ public class SQLHelper implements Closeable {
 				list.add((T) results.getObject(1));
 			}
 			results.close();
-			return list;
+		} catch (SQLException e) {
+			sneakyThrow(e);
+		}
+		return list;
+	}
+	
+	/**
+	 * Executes a SQL query as a prepared statement, setting its fields to the elements of the vararg passed,
+	 * returning a String list of values in the first column of each row in the results
+	 * @param query The SQL query to execute
+	 * @param fields A vararg of the fields to set in the prepared statement
+	 * @return A String list of the value in the first column of each row returned by the query
+	 * @implNote This method exists because {@link ResultSet#getObject(int)} can return an Integer if the String in the
+	 * column can be parsed into one.
+	 */
+	public List<String> queryResultStringList(String query, Object... fields) {
+		List<String> list = new ArrayList<>();
+		try {
+			PreparedStatement statement = prepareStatement(query, fields);
+			ResultSet results = statement.executeQuery();
+			while (results.next()) {
+				list.add(results.getString(1));
+			}
+			results.close();
 		} catch (SQLException e) {
 			sneakyThrow(e);
 		}
@@ -256,6 +302,22 @@ public class SQLHelper implements Closeable {
 		public <T> T get(int column) {
 			try {
 				return (T) results.getObject(column);
+			} catch (SQLException e) {
+				sneakyThrow(e);
+				return null;
+			}
+		}
+		
+		/**
+		 * Gets a String in the given column in the current row
+		 * @param column The index of the column to get, starting at 1
+		 * @return The String in the column
+		 * @implNote This method exists because {@link ResultSet#getObject(int)} can return an Integer if the String in the
+		 * column can be parsed into one.
+		 */
+		public String getString(int column) {
+			try {
+				return results.getString(column);
 			} catch (SQLException e) {
 				sneakyThrow(e);
 				return null;
