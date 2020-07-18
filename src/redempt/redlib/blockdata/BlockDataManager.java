@@ -1,6 +1,7 @@
 package redempt.redlib.blockdata;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -10,15 +11,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import redempt.redlib.RedLib;
+import redempt.redlib.blockdata.events.DataBlockBreakEvent;
+import redempt.redlib.blockdata.events.DataBlockDestroyEvent;
+import redempt.redlib.blockdata.events.DataBlockDestroyEvent.DestroyCause;
+import redempt.redlib.blockdata.events.DataBlockMoveEvent;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.region.RegionMap;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Manages {@link DataBlock} instances, which allow you to attach persistent metadata to blocks,
@@ -28,7 +31,7 @@ import java.util.Set;
  */
 public class BlockDataManager implements Listener {
 
-	protected RegionMap<DataBlock> map = new RegionMap<DataBlock>();
+	protected RegionMap<DataBlock> map = new RegionMap<DataBlock>(10);
 	private YamlConfiguration config;
 	private Path file;
 	
@@ -132,58 +135,126 @@ public class BlockDataManager implements Listener {
 	}
 	
 	/**
+	 * Gets all the DataBlocks near an approximate location
+	 * @param loc The location to check near
+	 * @param radius The radius to check in
+	 * @return
+	 */
+	public Set<DataBlock> getNearby(Location loc, int radius) {
+		return map.getNearby(loc, radius);
+	}
+	
+	/**
 	 * @return A set of all DataBlocks managed by this BlockDataManager
 	 */
 	public Set<DataBlock> getAll() {
 		return map.getAll();
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onBreakBlock(BlockBreakEvent e) {
-		map.remove(e.getBlock().getLocation(), getExisting(e.getBlock()));
+		DataBlock db = getExisting(e.getBlock());
+		if (db == null) {
+			return;
+		}
+		DataBlockBreakEvent event = new DataBlockBreakEvent(e, db);
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			e.setCancelled(true);
+			return;
+		}
+		map.remove(e.getBlock().getLocation(), db);
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onBurnBlock(BlockBurnEvent e) {
-		map.remove(e.getBlock().getLocation(), getExisting(e.getBlock()));
+		DataBlock db = getExisting(e.getBlock());
+		if (db == null) {
+			return;
+		}
+		DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, DestroyCause.FIRE);
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			e.setCancelled(true);
+			return;
+		}
+		map.remove(e.getBlock().getLocation(), db);
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onEntityExplode(EntityExplodeEvent e) {
+		List<Block> toRemove = new ArrayList<>();
 		e.blockList().forEach(block -> {
+			DataBlock db = getExisting(block);
+			if (db == null) {
+				return;
+			}
+			DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, DestroyCause.EXPLOSION);
+			Bukkit.getPluginManager().callEvent(event);
+			if (event.isCancelled()) {
+				toRemove.add(block);
+				return;
+			}
 			map.remove(block.getLocation(), getExisting(block));
 		});
+		e.blockList().removeAll(toRemove);
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onBlockExplode(BlockExplodeEvent e) {
+		List<Block> toRemove = new ArrayList<>();
 		e.blockList().forEach(block -> {
+			DataBlock db = getExisting(block);
+			if (db == null) {
+				return;
+			}
+			DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, DestroyCause.EXPLOSION);
+			Bukkit.getPluginManager().callEvent(event);
+			if (event.isCancelled()) {
+				toRemove.add(block);
+				return;
+			}
 			map.remove(block.getLocation(), getExisting(block));
 		});
+		e.blockList().removeAll(toRemove);
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onBlockPush(BlockPistonExtendEvent e) {
 		e.getBlocks().forEach(block -> {
 			DataBlock db = getExisting(block);
 			if (db == null) {
 				return;
 			}
+			Location to = block.getRelative(e.getDirection()).getLocation();
+			DataBlockMoveEvent event = new DataBlockMoveEvent(db, to);
+			Bukkit.getPluginManager().callEvent(event);
+			if (event.isCancelled()) {
+				e.setCancelled(true);
+				return;
+			}
 			map.remove(db.getBlock().getLocation(), db);
-			db.setBlock(block.getRelative(e.getDirection()));
+			db.setBlock(to.getBlock());
 			map.set(db.getBlock().getLocation(), db);
 		});
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onBlockPull(BlockPistonRetractEvent e) {
 		e.getBlocks().forEach(block -> {
 			DataBlock db = getExisting(block);
 			if (db == null) {
 				return;
 			}
+			Location to = block.getRelative(e.getDirection()).getLocation();
+			DataBlockMoveEvent event = new DataBlockMoveEvent(db, to);
+			Bukkit.getPluginManager().callEvent(event);
+			if (event.isCancelled()) {
+				e.setCancelled(true);
+				return;
+			}
 			map.remove(db.getBlock().getLocation(), db);
-			db.setBlock(block.getRelative(e.getDirection()));
+			db.setBlock(to.getBlock());
 			map.set(db.getBlock().getLocation(), db);
 		});
 	}

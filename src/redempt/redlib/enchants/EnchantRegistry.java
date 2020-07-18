@@ -3,6 +3,8 @@ package redempt.redlib.enchants;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import redempt.redlib.commandmanager.ArgType;
+import redempt.redlib.commandmanager.Command.CommandArgumentType;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -146,7 +148,7 @@ public class EnchantRegistry {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new IllegalStateException(e);
 		}
 	}
 	
@@ -240,6 +242,15 @@ public class EnchantRegistry {
 	 */
 	public String getDisplayName(CustomEnchant<?> enchant) {
 		return namer.apply(enchant);
+	}
+	
+	/**
+	 * Gets the CommandArgumentType for CustomEnchants in this registry, with tab completion using IDs
+	 * @param name The name to use for the argument type
+	 * @return A CommandArgumentType for CustomEnchants in this registry
+	 */
+	public CommandArgumentType<? extends CustomEnchant<?>> getEnchantArgType(String name) {
+		return new ArgType<>(name, this::getByName).tabStream(c -> enchants.keySet().stream());
 	}
 	
 }

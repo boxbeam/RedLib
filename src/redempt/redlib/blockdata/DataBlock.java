@@ -91,6 +91,13 @@ public class DataBlock {
 	}
 	
 	/**
+	 * Removes this DataBlock from its BlockDataManager
+	 */
+	public void remove() {
+		manager.remove(this);
+	}
+	
+	/**
 	 * @return The Block this DataBlock stores data for
 	 */
 	public Block getBlock() {
