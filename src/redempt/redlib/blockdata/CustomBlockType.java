@@ -1,112 +1,117 @@
 package redempt.redlib.blockdata;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockDropItemEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import redempt.redlib.RedLib;
-import redempt.redlib.blockdata.events.DataBlockBreakEvent;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+/**
+ * Represents a type of a CustomBlock that can be set
+ * @param <T>
+ */
 public abstract class CustomBlockType<T extends CustomBlock> implements Listener {
 	
 	private BlockDataManager manager;
 	private String typeName;
-	private Plugin plugin;
 	
+	/**
+	 * Construct a CustomBlockType with the type name. You should only call this if you don't use
+	 * {@link CustomBlockRegistry#registerAll(Plugin)} to load custom block types.
+	 * @param typeName The name of this type
+	 */
 	public CustomBlockType(String typeName) {
 		this.typeName = typeName;
 	}
 	
+	/**
+	 * Checks whether the item given matches the item for this CustomBlockType
+	 * @param item The ItemStack to check
+	 * @return Whether the item matches
+	 */
 	public abstract boolean itemMatches(ItemStack item);
-	public abstract void place(Player player, ItemStack item, DataBlock block);
-	public abstract ItemStack getItem(DataBlock block);
 	
-	public final void register(BlockDataManager manager, Plugin plugin) {
+	/**
+	 * Called when this CustomBlockType is placed. Use it to initialize any fields that are needed.
+	 * @param player The player who placed the CustomBlock
+	 * @param item The ItemStack in their hand when it was placed
+	 * @param block The CustomBlock storing the data
+	 */
+	public abstract void place(Player player, ItemStack item, T block);
+	
+	/**
+	 * Gets the item to be dropped when this block is mined
+	 * @param block The CustomBlock that was mined
+	 * @return The ItemStack to drop
+	 */
+	public abstract ItemStack getItem(T block);
+	
+	/**
+	 * @return A unique item name that the item for this CustomBlockType will have
+	 */
+	public abstract String getBaseItemName();
+	
+	protected final void register(BlockDataManager manager) {
 		this.manager = manager;
-		this.plugin = plugin;
-		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 	
+	/**
+	 * Checks whether the type of a block matches this CustomBlockType. Always returns true by default.
+	 * @param material The Material to check
+	 * @return Whether this Material matches the type for this CustomBlockType
+	 */
 	public boolean typeMatches(Material material) {
 		return true;
 	}
 	
+	/**
+	 * @return The name of this CustomBlockType
+	 */
 	public String getName() {
 		return typeName;
 	}
 	
-	public T getCustom(CustomBlockType type, DataBlock db) {
+	/**
+	 * Defines a custom return for a class extending {@link CustomBlock}
+	 * @param db The DataBlock to be passed to the constructor
+	 * @return The CustomBlock sub-class instance
+	 */
+	public T getCustom(DataBlock db) {
 		return null;
 	}
 	
+	/**
+	 * Gets a {@link CustomBlock} of this type at the given block
+	 * @param block The Block to get the CustomBlock at
+	 * @return The CustomBlock of this type at this Block, or null if it is not present
+	 */
 	public final T get(Block block) {
 		DataBlock db = manager.getExisting(block);
 		if (db == null || !db.getString("custom-type").equals(typeName)) {
 			return null;
 		}
-		CustomBlock custom = getCustom(this, db);
+		CustomBlock custom = getCustom(db);
 		if (custom != null) {
 			return (T) custom;
 		}
 		return (T) new CustomBlock(this, db);
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onPlace(BlockPlaceEvent e) {
-		if (typeMatches(e.getBlock().getType()) && itemMatches(e.getItemInHand())) {
-			DataBlock db = manager.getDataBlock(e.getBlock());
-			db.set("custom-type", typeName);
-			place(e.getPlayer(), e.getItemInHand(), db);
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onBreak(DataBlockBreakEvent e) {
-		if (!typeMatches(e.getBlock().getType())) {
-			return;
-		}
-		DataBlock db = e.getDataBlock();
+	/**
+	 * Gets a {@link CustomBlock} of this type from the given DataBlock
+	 * @param db The DataBlock to get the CustomBlock at
+	 * @return The CustomBlock of this type represented by this DataBlock, or null if it is not present
+	 */
+	public final T get(DataBlock db) {
 		if (db == null || !db.getString("custom-type").equals(typeName)) {
-			return;
+			return null;
 		}
-		ItemStack item = getItem(db);
-		if (RedLib.midVersion >= 12) {
-			BlockState state = e.getBlock().getState();
-			e.getParent().setDropItems(false);
-			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-				List<Item> drops = new ArrayList<>();
-				drops.add(e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(0.5, 0.5, 0.5), item));
-				BlockDropItemEvent event = new BlockDropItemEvent(e.getBlock(), state, e.getPlayer(), drops);
-				Bukkit.getPluginManager().callEvent(event);
-				if (event.isCancelled()) {
-					drops.get(0).remove();
-				}
-			});
-		} else {
-			Collection<ItemStack> drops = e.getBlock().getDrops(e.getPlayer().getItemInHand());
-			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-				e.getBlock().getWorld().getNearbyEntities(e.getBlock().getLocation().add(0.5, 0.5, 0.5), 1, 1, 1).stream()
-						.filter(en -> en instanceof Item && en.getTicksLived() < 2).map(en -> (Item) en)
-						.filter(i -> drops.stream().anyMatch(it -> it.isSimilar(i.getItemStack())))
-						.forEach(Entity::remove);
-				e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(0.5, 0.5, 0.5), item);
-			});
+		CustomBlock custom = getCustom(db);
+		if (custom != null) {
+			return (T) custom;
 		}
+		return (T) new CustomBlock(this, db);
 	}
 	
 }

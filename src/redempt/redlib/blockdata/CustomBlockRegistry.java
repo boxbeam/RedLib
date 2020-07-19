@@ -1,27 +1,44 @@
 package redempt.redlib.blockdata;
 
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import redempt.redlib.RedLib;
+import redempt.redlib.blockdata.events.DataBlockBreakEvent;
 import redempt.redlib.misc.EventListener;
+import redempt.redlib.misc.Path;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
  * Loads and registers CustomBlockTypes
  */
-public class CustomBlockRegistry {
+public class CustomBlockRegistry implements Listener {
 	
 	private BlockDataManager manager;
 	private Map<String, CustomBlockType<?>> types = new HashMap<>();
+	private Map<String, CustomBlockType<?>> byItemName = new HashMap<>();
 	private Plugin plugin;
 	
 	/**
@@ -42,16 +59,7 @@ public class CustomBlockRegistry {
 	public CustomBlockRegistry(BlockDataManager manager, Plugin plugin) {
 		this.manager = manager;
 		this.plugin = plugin;
-		new EventListener<>(plugin, PlayerInteractEvent.class, e -> {
-			Block block = e.getClickedBlock();
-			if (block == null) {
-				return;
-			}
-			CustomBlock cb = getCustomBlock(block);
-			if (cb != null) {
-				cb.click(e);
-			}
-		});
+		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 	
 	/**
@@ -97,16 +105,7 @@ public class CustomBlockRegistry {
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
-		new EventListener<>(plugin, PlayerInteractEvent.class, e -> {
-			Block block = e.getClickedBlock();
-			if (block == null) {
-				return;
-			}
-			CustomBlock cb = getCustomBlock(block);
-			if (cb != null) {
-				cb.click(e);
-			}
-		});
+		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 	
 	/**
@@ -114,7 +113,9 @@ public class CustomBlockRegistry {
 	 * @param type The CustomBlockType to register
 	 */
 	public void register(CustomBlockType<?> type) {
-		type.register(manager, plugin);
+		String name = type.getBaseItemName();
+		byItemName.put(name, type);
+		type.register(manager);
 		types.put(type.getName(), type);
 	}
 	
@@ -150,6 +151,109 @@ public class CustomBlockRegistry {
 			return null;
 		}
 		return (T) ctype.get(block);
+	}
+	
+	@EventHandler
+	public void onClick(PlayerInteractEvent e) {
+		Block block = e.getClickedBlock();
+		if (block == null) {
+			return;
+		}
+		CustomBlock cb = getCustomBlock(block);
+		if (cb != null) {
+			cb.click(e);
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public <T extends CustomBlock> void onPlace(BlockPlaceEvent e) {
+		ItemStack item = e.getItemInHand();
+		if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
+			return;
+		}
+		String name = item.getItemMeta().getDisplayName();
+		CustomBlockType<T> type = (CustomBlockType<T>) byItemName.get(name);
+		if (type == null) {
+			return;
+		}
+		if (type.typeMatches(e.getBlock().getType()) && type.itemMatches(e.getItemInHand())) {
+			DataBlock db = manager.getDataBlock(e.getBlock());
+			db.set("custom-type", type.getName());
+			type.place(e.getPlayer(), e.getItemInHand(), type.get(db));
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public <T extends CustomBlock> void onBreak(DataBlockBreakEvent e) {
+		if (e.getPlayer().getGameMode() == GameMode.CREATIVE) {
+			return;
+		}
+		CustomBlock cb = getCustomBlock(e.getBlock());
+		if (cb == null) {
+			return;
+		}
+		CustomBlockType<T> type = (CustomBlockType<T>) cb.getType();
+		DataBlock db = e.getDataBlock();
+		ItemStack item = type.getItem(type.get(db));
+		if (RedLib.midVersion >= 12) {
+			if (!e.getParent().isDropItems()) {
+				return;
+			}
+			BlockState state = e.getBlock().getState();
+			e.getParent().setDropItems(false);
+			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+				List<Item> drops = new ArrayList<>();
+				drops.add(e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), item));
+				BlockDropItemEvent event = new BlockDropItemEvent(e.getBlock(), state, e.getPlayer(), drops);
+				Bukkit.getPluginManager().callEvent(event);
+				if (event.isCancelled()) {
+					drops.get(0).remove();
+				}
+			});
+		} else {
+			Collection<ItemStack> drops = e.getBlock().getDrops(e.getPlayer().getItemInHand());
+			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+				e.getBlock().getWorld().getNearbyEntities(e.getBlock().getLocation().add(0.5, 0.5, 0.5), 1, 1, 1).stream()
+						.filter(en -> en instanceof Item && en.getTicksLived() < 2).map(en -> (Item) en)
+						.filter(i -> drops.stream().anyMatch(it -> it.isSimilar(i.getItemStack())))
+						.forEach(Entity::remove);
+				e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(0.5, 0.5, 0.5), item);
+			});
+		}
+	}
+	
+	@EventHandler
+	public <T extends CustomBlock> void onPickBlock(InventoryCreativeEvent e) {
+		if (e.getCursor() == null || e.getCursor().getType() == Material.AIR
+				|| e.getSlot() > 8 || e.getView().getTopInventory().getType() != InventoryType.CRAFTING
+				|| e.getCursor().getAmount() != 1 || e.getAction() != InventoryAction.PLACE_ALL) {
+			return;
+		}
+		List<Location> path = Path.getPath(e.getWhoClicked().getEyeLocation(), e.getWhoClicked().getLocation().getDirection(), 5);
+		Block block = null;
+		for (Location loc : path) {
+			if (loc.getBlock().getType() != Material.AIR) {
+				block = loc.getBlock();
+				break;
+			}
+		}
+		if (block.getType() == e.getCursor().getType()) {
+			T cb = getCustomBlock(block);
+			if (cb != null) {
+				e.setCancelled(true);
+				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+					CustomBlockType<T> type = (CustomBlockType<T>) cb.getType();
+					ItemStack item = type.getItem(cb);
+					for (int i = 0; i < 9; i++) {
+						if (item.isSimilar(e.getWhoClicked().getInventory().getItem(i))) {
+							e.getWhoClicked().getInventory().setHeldItemSlot(i);
+							return;
+						}
+					}
+					e.getWhoClicked().getInventory().setItem(e.getSlot(), item);
+				});
+			}
+		}
 	}
 	
 }
