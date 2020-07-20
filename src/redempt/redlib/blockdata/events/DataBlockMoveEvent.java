@@ -9,6 +9,7 @@ import redempt.redlib.blockdata.DataBlock;
 
 /**
  * Called when a DataBlock is moved
+ * @author Redempt
  */
 public class DataBlockMoveEvent extends BlockEvent implements Cancellable {
 	

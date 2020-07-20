@@ -33,6 +33,7 @@ import java.util.jar.JarFile;
 
 /**
  * Loads and registers CustomBlockTypes
+ * @author Redempt
  */
 public class CustomBlockRegistry implements Listener {
 	

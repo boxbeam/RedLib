@@ -9,7 +9,8 @@ import org.bukkit.plugin.Plugin;
 
 /**
  * Represents a type of a CustomBlock that can be set
- * @param <T>
+ * @param <T> The type of the CustomBlock represented by this CustomBlockType
+ * @author Redempt
  */
 public abstract class CustomBlockType<T extends CustomBlock> implements Listener {
 	

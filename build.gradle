@@ -20,7 +20,9 @@ repositories {
 	mavenLocal()
 }
 dependencies {
-	compileOnly 'org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT'
+	// Unfortunately, needed for NMS access
+	// Change this to the path to your Spigot jar
+	compileOnly files("/home/redempt/Desktop/Spigot/1.15/spigot-1.15.2.jar")
 }
 sourceSets {
 	main {

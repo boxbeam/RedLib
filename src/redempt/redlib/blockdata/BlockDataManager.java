@@ -10,6 +10,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerChatTabCompleteEvent;
 import redempt.redlib.RedLib;
 import redempt.redlib.blockdata.events.DataBlockBreakEvent;
 import redempt.redlib.blockdata.events.DataBlockDestroyEvent;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Manages {@link DataBlock} instances, which allow you to attach persistent metadata to blocks,
@@ -71,15 +73,17 @@ public class BlockDataManager implements Listener {
 	 */
 	public void load() {
 		config.getKeys(false).forEach(s -> {
-			Block block = LocationUtils.fromString(s).getBlock();
-			DataBlock db = new DataBlock(block, this);
-			Map<String, Object> data = new HashMap<>();
-			ConfigurationSection section = config.getConfigurationSection(s);
-			section.getKeys(false).forEach(key -> {
-				data.put(key, section.get(key));
+			LocationUtils.fromStringLater(s, l -> {
+				Block block = l.getBlock();
+				DataBlock db = new DataBlock(block, this);
+				Map<String, Object> data = new HashMap<>();
+				ConfigurationSection section = config.getConfigurationSection(s);
+				section.getKeys(false).forEach(key -> {
+					data.put(key, section.get(key));
+				});
+				db.data = data;
+				map.set(db.getBlock().getLocation(), db);
 			});
-			db.data = data;
-			map.set(db.getBlock().getLocation(), db);
 		});
 	}
 	

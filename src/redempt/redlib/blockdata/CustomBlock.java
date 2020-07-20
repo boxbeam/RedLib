@@ -5,6 +5,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 /**
  * Represents an instance of a CustomBlockType. Effectively a wrapper for DataBlock.
+ * @author Redempt
  */
 public class CustomBlock {
 	

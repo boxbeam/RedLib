@@ -10,9 +10,13 @@ import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.dev.ItemHelper;
 import redempt.redlib.dev.StructureTool;
 import redempt.redlib.enchants.events.PlayerChangedArmorEvent;
+import redempt.redlib.nms.PacketListener;
 import redempt.redlib.protection.ProtectionPolicy;
 import redempt.redlib.region.RegionEnterExitListener;
 
+/**
+ * @author Redempt
+ */
 public class RedLib extends JavaPlugin {
 	
 	public static boolean devMode = false;
@@ -43,6 +47,11 @@ public class RedLib extends JavaPlugin {
 		PlayerChangedArmorEvent.register();
 		RegionEnterExitListener.register();
 		ProtectionPolicy.registerProtections();
+	}
+	
+	@Override
+	public void onDisable() {
+		PacketListener.disable();
 	}
 	
 	public static String getServerVersion() {

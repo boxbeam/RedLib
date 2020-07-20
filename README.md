@@ -8,8 +8,14 @@ To build the RedLib jar, it is recommended to use Jitpack with Gradle or Maven i
 ```
 git clone https://github.com/Redempt/RedLib
 cd RedLib
+```
+
+Next, open the `build.gradle` and modify line 25 so that the path points to your Spigot jar. Finally, run:
+
+```
 ./gradlew jar
 ```
+
 After running these commands, the jar will be at `build/libs/RedLib.jar`. RedLib is a standalone plugin, so you will need to install it on any servers that have plugins which depend on it, and specify it as a dependency in your plugin.yml like this:
 
 `depend: [RedLib]`

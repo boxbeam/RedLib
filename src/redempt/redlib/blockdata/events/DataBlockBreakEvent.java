@@ -9,6 +9,7 @@ import redempt.redlib.blockdata.DataBlock;
 
 /**
  * Called when a DataBlock is broken by a Player
+ * @author Redempt
  */
 public class DataBlockBreakEvent extends BlockEvent implements Cancellable {
 	
