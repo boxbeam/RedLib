@@ -61,6 +61,26 @@ public class NMSHelper {
 				continue;
 			}
 			classes[i] = args[i].getClass();
+			switch (classes[i].getSimpleName()) {
+				case "Integer":
+					classes[i] = int.class;
+					break;
+				case "Boolean":
+					classes[i] = boolean.class;
+					break;
+				case "Float":
+					classes[i] = float.class;
+					break;
+				case "Double":
+					classes[i] = double.class;
+					break;
+				case "Long":
+					classes[i] = long.class;
+					break;
+				case "Short":
+					classes[i] = short.class;
+					break;
+			}
 		}
 		return classes;
 	}

@@ -77,5 +77,23 @@ public class NMSObject {
 			throw new IllegalArgumentException(e);
 		}
 	}
+	
+	/**
+	 * Sets the value stored in a field in the wrapped object
+	 * @param name The name of the field
+	 * @param obj The object to set. Will be unwrapped if it is an NMSObject.
+	 */
+	public void setField(String name, Object obj) {
+		if (obj instanceof NMSObject) {
+			obj = ((NMSObject) obj).getObject();
+		}
+		try {
+			Field field = this.obj.getClass().getDeclaredField(name);
+			field.setAccessible(true);
+			field.set(this.obj, obj);
+		} catch (IllegalAccessException | NoSuchFieldException e) {
+			throw new IllegalArgumentException(e);
+		}
+	}
 
 }

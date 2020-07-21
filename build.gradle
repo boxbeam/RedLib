@@ -60,6 +60,10 @@ task updateJars {
 			from 'build/libs'
 			into '/home/redempt/Desktop/Spigot/1.15/plugins'
 		}
+		copy {
+			from 'build/libs'
+			into '/home/redempt/Desktop/Spigot/1.16/plugins'
+		}
 	}
 }
 task javadocJar(type: Jar, dependsOn: javadoc) {

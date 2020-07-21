@@ -10,7 +10,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.player.PlayerChatTabCompleteEvent;
 import redempt.redlib.RedLib;
 import redempt.redlib.blockdata.events.DataBlockBreakEvent;
 import redempt.redlib.blockdata.events.DataBlockDestroyEvent;
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Manages {@link DataBlock} instances, which allow you to attach persistent metadata to blocks,
