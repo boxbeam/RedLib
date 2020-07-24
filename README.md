@@ -8,11 +8,6 @@ To build the RedLib jar, it is recommended to use Jitpack with Gradle or Maven i
 ```
 git clone https://github.com/Redempt/RedLib
 cd RedLib
-```
-
-Next, open the `build.gradle` and modify line 25 so that the path points to your Spigot jar. Finally, run:
-
-```
 ./gradlew jar
 ```
 
