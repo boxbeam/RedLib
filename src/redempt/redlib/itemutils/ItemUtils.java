@@ -110,6 +110,19 @@ public class ItemUtils {
 	}
 	
 	/**
+	 * Sets an item to be unbreakable
+	 * @param item The item to make unbreakable
+	 * @return The unbreakable item
+	 */
+	public static ItemStack setUnbreakable(ItemStack item) {
+		item = item.clone();
+		ItemMeta meta = item.getItemMeta();
+		meta.setUnbreakable(true);
+		item.setItemMeta(meta);
+		return item;
+	}
+	
+	/**
 	 * Add an enchantment to an ItemStack
 	 * @param item The ItemStack to be enchanted
 	 * @param enchant The Enchantment to add to the ItemStack

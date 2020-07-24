@@ -19,10 +19,10 @@ class EquipArmorTrigger implements EnchantTrigger<PlayerChangedArmorEvent> {
 				int flevel = ench.getLevel(prev);
 				int slevel = ench.getLevel(current);
 				if (flevel != slevel) {
-					if (flevel != 0) {
+					if (flevel != 0 && ench.appliesTo(prev.getType())) {
 						ench.deactivate(e, flevel);
 					}
-					if (slevel != 0) {
+					if (slevel != 0 && ench.appliesTo(current.getType())) {
 						ench.activate(e, slevel);
 					}
 				}
@@ -31,7 +31,7 @@ class EquipArmorTrigger implements EnchantTrigger<PlayerChangedArmorEvent> {
 		new EventListener<>(ench.getRegistry().getPlugin(), PlayerQuitEvent.class, e -> {
 			for (ItemStack item : e.getPlayer().getInventory().getArmorContents()) {
 				int level = ench.getLevel(item);
-				if (level != 0) {
+				if (level != 0 && ench.appliesTo(item.getType())) {
 					ench.deactivate(new PlayerChangedArmorEvent(e.getPlayer(), e.getPlayer().getInventory().getArmorContents(), new ItemStack[4]), level);
 				}
 			}
@@ -39,7 +39,7 @@ class EquipArmorTrigger implements EnchantTrigger<PlayerChangedArmorEvent> {
 		new EventListener<>(ench.getRegistry().getPlugin(), PlayerJoinEvent.class, e -> {
 			for (ItemStack item : e.getPlayer().getInventory().getArmorContents()) {
 				int level = ench.getLevel(item);
-				if (level != 0) {
+				if (level != 0 && ench.appliesTo(item.getType())) {
 					ench.activate(new PlayerChangedArmorEvent(e.getPlayer(), new ItemStack[4], e.getPlayer().getInventory().getArmorContents()), level);
 				}
 			}

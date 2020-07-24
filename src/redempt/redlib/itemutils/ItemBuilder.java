@@ -155,4 +155,12 @@ public class ItemBuilder extends ItemStack {
 		return new ItemBuilder(ItemUtils.addPersistentTag(this, key, type, data));
 	}
 	
+	/**
+	 * Sets this ItemBuilder to be unbreakable
+	 * @return The ItemBuilder with the unbreakable tag added
+	 */
+	public ItemBuilder unbreakable() {
+		return new ItemBuilder(ItemUtils.setUnbreakable(this));
+	}
+	
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
@@ -29,8 +30,8 @@ public class InventoryGUI implements Listener {
 	private final Inventory inventory;
 	private List<ItemButton> buttons = new ArrayList<>();
 	private Set<Integer> openSlots = new HashSet<>();
-	private Consumer<InventoryClickEvent> onClickOpenSlot = (e) -> {
-	};
+	private BiConsumer<InventoryClickEvent, List<Integer>> onClickOpenSlot = (e, i) -> { };
+	
 	private boolean returnItems = true;
 	private boolean destroyOnClose = true;
 	
@@ -72,6 +73,16 @@ public class InventoryGUI implements Listener {
 		button.setSlot(slot);
 		buttons.add(button);
 		inventory.setItem(slot, button.getItem());
+	}
+	
+	/**
+	 * Add a button to the GUI in the given slot
+	 *
+	 * @param button The button to be added
+	 * @param slot   The slot to add the button to
+	 */
+	public void addButton(int slot, ItemButton button) {
+		addButton(button, slot);
 	}
 	
 	/**
@@ -194,6 +205,14 @@ public class InventoryGUI implements Listener {
 	}
 	
 	/**
+	 * Opens this GUI for a player
+	 * @param player The player to open this GUI for
+	 */
+	public void open(Player player) {
+		player.openInventory(inventory);
+	}
+	
+	/**
 	 * Returns whether or not items in open slots are returned to the player when this inventory is destroyed
 	 *
 	 * @return Whether or not items in open slots are returned to the player when this inventory is destroyed
@@ -235,6 +254,16 @@ public class InventoryGUI implements Listener {
 	 * @param handler The handler for when an open slot is clicked
 	 */
 	public void setOnClickOpenSlot(Consumer<InventoryClickEvent> handler) {
+		this.onClickOpenSlot = (e, i) -> handler.accept(e);
+	}
+	
+	/**
+	 * Sets the handler for when an open slot is clicked
+	 *
+	 * @param handler The handler for when an open slot is clicked, taking the event and list
+	 *                of affected slots
+	 */
+	public void setOnClickOpenSlot(BiConsumer<InventoryClickEvent, List<Integer>> handler) {
 		this.onClickOpenSlot = handler;
 	}
 	
@@ -282,6 +311,7 @@ public class InventoryGUI implements Listener {
 		}
 		if (!inventory.equals(e.getClickedInventory()) && e.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
 			if (openSlots.size() > 0) {
+				List<Integer> slots = new ArrayList<>();
 				int amount = e.getCurrentItem().getAmount();
 				for (int slot : openSlots) {
 					if (amount <= 0) {
@@ -294,6 +324,7 @@ public class InventoryGUI implements Listener {
 						ItemStack clone = e.getCurrentItem().clone();
 						clone.setAmount(diff);
 						inventory.setItem(slot, clone);
+						slots.add(slot);
 						continue;
 					}
 					if (e.getCurrentItem().isSimilar(item)) {
@@ -303,6 +334,7 @@ public class InventoryGUI implements Listener {
 						ItemStack clone = inventory.getItem(slot);
 						clone.setAmount(clone.getAmount() + diff);
 						inventory.setItem(slot, clone);
+						slots.add(slot);
 					}
 				}
 				e.setCancelled(true);
@@ -315,14 +347,16 @@ public class InventoryGUI implements Listener {
 				Bukkit.getScheduler().scheduleSyncDelayedTask(RedLib.getInstance(), () -> {
 					((Player) e.getWhoClicked()).updateInventory();
 				});
-				onClickOpenSlot.accept(e);
+				onClickOpenSlot.accept(e, slots);
 				return;
 			}
 			e.setCancelled(true);
 		}
 		if (e.getInventory().equals(e.getClickedInventory())) {
 			if (openSlots.contains(e.getSlot())) {
-				onClickOpenSlot.accept(e);
+				List<Integer> list = new ArrayList<>();
+				list.add(e.getSlot());
+				onClickOpenSlot.accept(e, list);
 				return;
 			}
 			e.setCancelled(true);

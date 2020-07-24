@@ -168,6 +168,10 @@ public class CustomBlockRegistry implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public <T extends CustomBlock> void onPlace(BlockPlaceEvent e) {
+		DataBlock db = manager.getExisting(e.getBlock());
+		if (db != null) {
+			db.remove();
+		}
 		ItemStack item = e.getItemInHand();
 		if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
 			return;
@@ -178,7 +182,7 @@ public class CustomBlockRegistry implements Listener {
 			return;
 		}
 		if (type.typeMatches(e.getBlock().getType()) && type.itemMatches(e.getItemInHand())) {
-			DataBlock db = manager.getDataBlock(e.getBlock());
+			manager.getDataBlock(e.getBlock());
 			db.set("custom-type", type.getName());
 			type.place(e.getPlayer(), e.getItemInHand(), type.get(db));
 		}
@@ -237,6 +241,9 @@ public class CustomBlockRegistry implements Listener {
 				block = loc.getBlock();
 				break;
 			}
+		}
+		if (block == null) {
+			return;
 		}
 		if (block.getType() == e.getCursor().getType()) {
 			T cb = getCustomBlock(block);

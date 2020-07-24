@@ -88,15 +88,7 @@ public abstract class CustomBlockType<T extends CustomBlock> implements Listener
 	 * @return The CustomBlock of this type at this Block, or null if it is not present
 	 */
 	public final T get(Block block) {
-		DataBlock db = manager.getExisting(block);
-		if (db == null || !db.getString("custom-type").equals(typeName)) {
-			return null;
-		}
-		CustomBlock custom = getCustom(db);
-		if (custom != null) {
-			return (T) custom;
-		}
-		return (T) new CustomBlock(this, db);
+		return get(manager.getExisting(block));
 	}
 	
 	/**
@@ -105,7 +97,7 @@ public abstract class CustomBlockType<T extends CustomBlock> implements Listener
 	 * @return The CustomBlock of this type represented by this DataBlock, or null if it is not present
 	 */
 	public final T get(DataBlock db) {
-		if (db == null || !db.getString("custom-type").equals(typeName)) {
+		if (db == null || !db.getString("custom-type").equals(typeName) || !typeMatches(db.getBlock().getType())) {
 			return null;
 		}
 		CustomBlock custom = getCustom(db);

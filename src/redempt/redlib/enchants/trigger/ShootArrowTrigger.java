@@ -2,6 +2,7 @@ package redempt.redlib.enchants.trigger;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import redempt.redlib.RedLib;
@@ -12,14 +13,17 @@ class ShootArrowTrigger implements EnchantTrigger<ProjectileLaunchEvent> {
 	
 	@Override
 	public void register(CustomEnchant<ProjectileLaunchEvent> ench) {
-		new EventListener<ProjectileLaunchEvent>(ench.getRegistry().getPlugin(), ProjectileLaunchEvent.class, e -> {
+		new EventListener<ProjectileLaunchEvent>(ench.getRegistry().getPlugin(), ProjectileLaunchEvent.class, EventPriority.MONITOR, e -> {
+			if (e.isCancelled()) {
+				return;
+			}
 			ProjectileSource source = e.getEntity().getShooter();
 			if (!(source instanceof Player)) {
 				return;
 			}
 			Player player = (Player) source;
 			int level = ench.getLevel(player.getItemInHand());
-			if (level == 0) {
+			if (level == 0 || !ench.appliesTo(player.getItemInHand().getType())) {
 				if (RedLib.midVersion >= 9) {
 					level = ench.getLevel(player.getInventory().getItemInOffHand());
 				}
