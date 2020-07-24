@@ -182,7 +182,7 @@ public class CustomBlockRegistry implements Listener {
 			return;
 		}
 		if (type.typeMatches(e.getBlock().getType()) && type.itemMatches(e.getItemInHand())) {
-			manager.getDataBlock(e.getBlock());
+			db = manager.getDataBlock(e.getBlock());
 			db.set("custom-type", type.getName());
 			type.place(e.getPlayer(), e.getItemInHand(), type.get(db));
 		}
