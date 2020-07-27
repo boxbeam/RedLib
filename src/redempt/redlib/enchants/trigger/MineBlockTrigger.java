@@ -12,9 +12,6 @@ class MineBlockTrigger implements EnchantTrigger<BlockBreakEvent> {
 	@Override
 	public void register(CustomEnchant<BlockBreakEvent> ench) {
 		new EventListener<>(ench.getRegistry().getPlugin(), BlockBreakEvent.class, EventPriority.MONITOR, (e) -> {
-			if (e.isCancelled()) {
-				return;
-			}
 			int level = ench.getLevel(e.getPlayer().getItemInHand());
 			if (level > 0 && ench.appliesTo(e.getPlayer().getItemInHand().getType())) {
 				ench.activate(e, level);

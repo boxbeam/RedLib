@@ -13,9 +13,6 @@ class TakeDamageTrigger implements EnchantTrigger<EntityDamageEvent> {
 	@Override
 	public void register(CustomEnchant<EntityDamageEvent> ench) {
 		new EventListener<>(ench.getRegistry().getPlugin(), EntityDamageEvent.class, EventPriority.MONITOR, (e) -> {
-			if (e.isCancelled()) {
-				return;
-			}
 			if (!(e.getEntity() instanceof Player)) {
 				return;
 			}

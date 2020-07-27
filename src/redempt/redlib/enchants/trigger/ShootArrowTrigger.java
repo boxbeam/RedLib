@@ -13,10 +13,7 @@ class ShootArrowTrigger implements EnchantTrigger<ProjectileLaunchEvent> {
 	
 	@Override
 	public void register(CustomEnchant<ProjectileLaunchEvent> ench) {
-		new EventListener<ProjectileLaunchEvent>(ench.getRegistry().getPlugin(), ProjectileLaunchEvent.class, EventPriority.MONITOR, e -> {
-			if (e.isCancelled()) {
-				return;
-			}
+		new EventListener<>(ench.getRegistry().getPlugin(), ProjectileLaunchEvent.class, EventPriority.MONITOR, e -> {
 			ProjectileSource source = e.getEntity().getShooter();
 			if (!(source instanceof Player)) {
 				return;

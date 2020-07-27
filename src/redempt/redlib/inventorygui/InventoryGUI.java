@@ -30,6 +30,7 @@ public class InventoryGUI implements Listener {
 	private final Inventory inventory;
 	private List<ItemButton> buttons = new ArrayList<>();
 	private Set<Integer> openSlots = new HashSet<>();
+	private Runnable onDestroy;
 	private BiConsumer<InventoryClickEvent, List<Integer>> onClickOpenSlot = (e, i) -> { };
 	
 	private boolean returnItems = true;
@@ -249,6 +250,15 @@ public class InventoryGUI implements Listener {
 	}
 	
 	/**
+	 * Sets a callback to be run when this GUI is destroyed
+	 *
+	 * @param onDestroy The callback
+	 */
+	public void setOnDestroy(Runnable onDestroy) {
+		this.onDestroy = onDestroy;
+	}
+	
+	/**
 	 * Sets the handler for when an open slot is clicked
 	 *
 	 * @param handler The handler for when an open slot is clicked
@@ -274,6 +284,9 @@ public class InventoryGUI implements Listener {
 	 * @param lastViewer The last Player who was viewing this GUI, to have the items returned to them.
 	 */
 	public void destroy(Player lastViewer) {
+		if (onDestroy != null) {
+			onDestroy.run();
+		}
 		HandlerList.unregisterAll(this);
 		if (returnItems && lastViewer != null) {
 			for (int slot : openSlots) {

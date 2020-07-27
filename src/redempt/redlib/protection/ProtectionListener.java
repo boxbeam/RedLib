@@ -1,7 +1,5 @@
 package redempt.redlib.protection;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -37,6 +35,9 @@ class ProtectionListener {
 	
 	protected static <T extends Event & Cancellable> void protect(Class<T> clazz, ProtectionType type, Function<T, Player> getPlayer, Function<T, Block>... getBlocks) {
 		new EventListener<>(RedLib.getInstance(), clazz, EventPriority.HIGHEST, e -> {
+			if (e.isCancelled()) {
+				return;
+			}
 			Player player = null;
 			if (getPlayer != null) {
 				player = getPlayer.apply(e);

@@ -21,7 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import redempt.redlib.RedLib;
 import redempt.redlib.blockdata.events.DataBlockBreakEvent;
-import redempt.redlib.misc.EventListener;
 import redempt.redlib.misc.Path;
 
 import java.io.File;
