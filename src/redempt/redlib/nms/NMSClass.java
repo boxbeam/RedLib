@@ -43,8 +43,8 @@ public class NMSClass {
 	public NMSObject getInstance(Object... args) {
 		try {
 			NMSHelper.unwrapArgs(args);
-			return new NMSObject(clazz.getConstructor(NMSHelper.getArgTypes(args)).newInstance(args));
-		} catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+			return new NMSObject(NMSHelper.getConstructor(clazz, NMSHelper.getArgTypes(args)).newInstance(args));
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
 			throw new IllegalArgumentException(e);
 		}
 	}

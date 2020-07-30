@@ -874,7 +874,8 @@ public class MultiBlockStructure {
 			}
 			byte dataValue = Byte.parseByte(split[1]);
 			BlockState state = loc.getBlock().getState();
-			state.setData(new MaterialData(type, dataValue));
+			state.setType(type);
+			state.setRawData(dataValue);
 			return state;
 		}
 	}

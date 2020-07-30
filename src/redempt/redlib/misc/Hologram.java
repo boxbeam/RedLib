@@ -28,7 +28,7 @@ public class Hologram {
 		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 		objective = scoreboard.getObjective("hologramID");
 		if (objective == null) {
-			objective = scoreboard.registerNewObjective("hologramID", "dummy", "hologramID");
+			objective = scoreboard.registerNewObjective("hologramID", "dummy");
 		}
 	}
 	
@@ -59,7 +59,6 @@ public class Hologram {
 			.filter(e -> e instanceof ArmorStand)
 			.map(e -> (ArmorStand) e)
 			.filter(s -> getId(s) != 0)
-			.map(EntityPersistor::persist)
 			.forEach(stands::add);
 		if (stands.size() == 0) {
 			return null;
@@ -80,7 +79,6 @@ public class Hologram {
 		stands.removeIf(s -> getId(s) != id);
 		stands.sort((a, b) -> (int) Math.signum(b.getLocation().getY() - a.getLocation().getY()));
 		Hologram hologram = new Hologram(id, stands.get(0).getLocation(), stands);
-		hologram.fixStands(0);
 		return hologram;
 	}
 	
@@ -116,26 +114,14 @@ public class Hologram {
 			return;
 		}
 		Location loc = this.start.clone();
-		Location[] locs = new Location[stands.size()];
-		loc.subtract(0, lineSpacing * (double) start, 0);
-		if (task != -1) {
-			Bukkit.getScheduler().cancelTask(task);
-			start = iter;
+		List<String> lines = new ArrayList<>(this.getStands().size());
+		for (ArmorStand stand : getStands()) {
+			lines.add(stand.getName());
 		}
-		for (int i = start; i < stands.size(); i++) {
-			ArmorStand stand = stands.get(i).get();
-			stand.teleport(new Location(loc.getWorld(), 0, 1, 0));
-			locs[i] = loc.clone();
-			loc.subtract(0, lineSpacing, 0);
+		clear();
+		for (int i = 0; i < lines.size(); i++) {
+			append(lines.get(i));
 		}
-		iter = start;
-		task = Bukkit.getScheduler().scheduleSyncDelayedTask(RedLib.getInstance(), () -> {
-			for (int i = iter; i < locs.length; i++) {
-				stands.get(i).get().teleport(locs[i]);
-			}
-			task = -1;
-			iter = -1;
-		}, 2);
 	}
 	
 	/**
@@ -219,7 +205,6 @@ public class Hologram {
 	public void append(String text) {
 		ArmorStand stand = spawn(stands.size(), text);
 		stands.add(EntityPersistor.wrap(stand));
-		fixStands(stands.size() - 1);
 	}
 	
 	/**
@@ -256,7 +241,7 @@ public class Hologram {
 		} else {
 			loc = start;
 		}
-		ArmorStand stand = EntityPersistor.persist((ArmorStand) loc.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND));
+		ArmorStand stand = (ArmorStand) loc.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
 		initiate(stand, text);
 		return stand;
 	}

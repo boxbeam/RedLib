@@ -26,7 +26,7 @@ public class PacketListener {
 	/**
 	 * Enables the PacketListener. Does nothing if already enabled. Otherwise, registers a packet listener for
 	 * each player currently online, and registers an event listener to add packet listeners to any new
-	 * players who join.
+	 * players who join
 	 */
 	public static void enable() {
 		if (enabled) {

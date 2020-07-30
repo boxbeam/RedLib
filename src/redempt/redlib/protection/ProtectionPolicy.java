@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Container;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
@@ -65,7 +66,13 @@ public class ProtectionPolicy implements Listener {
 			}
 			return e.getClickedBlock();
 		});
-		ProtectionListener.protect(InventoryOpenEvent.class, ProtectionType.CONTAINER_ACCESS, e -> (Player) e.getPlayer(), e -> e.getInventory().getLocation().getBlock());
+		ProtectionListener.protect(InventoryOpenEvent.class, ProtectionType.CONTAINER_ACCESS, e -> (Player) e.getPlayer(), e -> {
+			InventoryHolder holder = e.getInventory().getHolder();
+			if (holder instanceof Container) {
+				return ((Container) holder).getBlock();
+			}
+			return null;
+		});
 		ProtectionListener.protectMultiBlock(EntityExplodeEvent.class, ProtectionType.ENTITY_EXPLOSION, e -> null, (e, b) -> e.blockList().remove(b), e -> e.blockList());
 		ProtectionListener.protectMultiBlock(BlockExplodeEvent.class, ProtectionType.BLOCK_EXPLOSION, e -> null, (e, b) -> e.blockList().remove(b), e -> e.blockList());
 		ProtectionListener.protect(PlayerBucketFillEvent.class, ProtectionType.USE_BUCKETS, e -> e.getPlayer(), e -> e.getBlockClicked());

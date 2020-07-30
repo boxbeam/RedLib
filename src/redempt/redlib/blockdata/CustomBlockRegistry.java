@@ -8,10 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.event.*;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
@@ -20,8 +17,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import redempt.redlib.RedLib;
+import redempt.redlib.blockdata.events.CustomBlockPlaceEvent;
 import redempt.redlib.blockdata.events.DataBlockBreakEvent;
 import redempt.redlib.misc.Path;
+import redempt.redlib.nms.NMSHelper;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -96,7 +95,7 @@ public class CustomBlockRegistry implements Listener {
 				}
 				try {
 					Constructor<?> constructor = clazz.getConstructor();
-					CustomBlockType type = (CustomBlockType) constructor.newInstance();
+					CustomBlockType<?> type = (CustomBlockType<?>) constructor.newInstance();
 					register(type);
 				} catch (NoSuchMethodException e) {
 					throw new IllegalStateException("Class " + clazz.getName() + " does not have a default constructor and could not be loaded");
@@ -165,7 +164,7 @@ public class CustomBlockRegistry implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public <T extends CustomBlock> void onPlace(BlockPlaceEvent e) {
 		DataBlock db = manager.getExisting(e.getBlock());
 		if (db != null) {
@@ -181,6 +180,12 @@ public class CustomBlockRegistry implements Listener {
 			return;
 		}
 		if (type.typeMatches(e.getBlock().getType()) && type.itemMatches(e.getItemInHand())) {
+			CustomBlockPlaceEvent place = new CustomBlockPlaceEvent(e.getBlock(), type, e.getPlayer());
+			Bukkit.getPluginManager().callEvent(place);
+			if (place.isCancelled()) {
+				e.setCancelled(true);
+				return;
+			}
 			db = manager.getDataBlock(e.getBlock());
 			db.set("custom-type", type.getName());
 			type.place(e.getPlayer(), e.getItemInHand(), type.get(db));
@@ -208,9 +213,9 @@ public class CustomBlockRegistry implements Listener {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
 				List<Item> drops = new ArrayList<>();
 				drops.add(e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), item));
-				BlockDropItemEvent event = new BlockDropItemEvent(e.getBlock(), state, e.getPlayer(), drops);
+				Event event = (Event) NMSHelper.getClass("BlockDropItemEvent").getInstance(e.getBlock(), state, e.getPlayer(), drops).getObject();
 				Bukkit.getPluginManager().callEvent(event);
-				if (event.isCancelled()) {
+				if (((Cancellable) event).isCancelled()) {
 					drops.get(0).remove();
 				}
 			});

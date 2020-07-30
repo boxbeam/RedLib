@@ -1,5 +1,6 @@
 package redempt.redlib.nms;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
@@ -98,6 +99,31 @@ public class NMSHelper {
 		methods:
 		for (Method method : methods) {
 			if (!method.getName().equals(name) || method.getParameterCount() != argTypes.length) {
+				continue;
+			}
+			Parameter[] params = method.getParameters();
+			for (int i = 0; i < params.length; i++) {
+				if (!params[i].getType().isAssignableFrom(argTypes[i])) {
+					continue methods;
+				}
+			}
+			return method;
+		}
+		return null;
+	}
+	
+	/**
+	 * Gets a constructor by its parameter types, accounts for cases where the given class might not be the
+	 * exact same type as the parameter the method requires, but is a subclass.
+	 * @param clazz The class to get the constructor in
+	 * @param argTypes The class types for the constructor parameters
+	 * @return The constructor in the class, or null if none was found
+	 */
+	public static Constructor getConstructor(Class<?> clazz, Class<?>[] argTypes) {
+		Constructor[] methods = clazz.getConstructors();
+		methods:
+		for (Constructor method : methods) {
+			if (method.getParameterCount() != argTypes.length) {
 				continue;
 			}
 			Parameter[] params = method.getParameters();
