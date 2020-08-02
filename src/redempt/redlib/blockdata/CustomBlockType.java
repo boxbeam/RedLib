@@ -31,7 +31,9 @@ public abstract class CustomBlockType<T extends CustomBlock> implements Listener
 	 * @param item The ItemStack to check
 	 * @return Whether the item matches
 	 */
-	public abstract boolean itemMatches(ItemStack item);
+	public boolean itemMatches(ItemStack item) {
+		return item.hasItemMeta() && getBaseItemName().equals(item.getItemMeta().getDisplayName());
+	}
 	
 	/**
 	 * Called when this CustomBlockType is placed. Use it to initialize any fields that are needed.

@@ -72,7 +72,7 @@ public class Hologram {
 				closest = stand;
 			}
 		}
-		if (dist > 1) {
+		if (dist > 0.6) {
 			return null;
 		}
 		int id = getId(closest);
@@ -86,8 +86,6 @@ public class Hologram {
 	private List<EntityPersistor<ArmorStand>> stands = new ArrayList<>();
 	private Location start;
 	private double lineSpacing = 0.35;
-	private int task = -1;
-	private int iter = -1;
 	
 	private static int getId(ArmorStand stand) {
 		return objective.getScore(stand.getUniqueId().toString()).getScore();
@@ -109,15 +107,15 @@ public class Hologram {
 		this.start = start;
 	}
 	
-	private void fixStands(int start) {
+	/**
+	 * Removes and re-adds all armor stands in this Hologram
+	 */
+	public void fixStands() {
 		if (stands.size() == 0) {
 			return;
 		}
 		Location loc = this.start.clone();
-		List<String> lines = new ArrayList<>(this.getStands().size());
-		for (ArmorStand stand : getStands()) {
-			lines.add(stand.getName());
-		}
+		List<String> lines = getLines();
 		clear();
 		for (int i = 0; i < lines.size(); i++) {
 			append(lines.get(i));
@@ -138,7 +136,7 @@ public class Hologram {
 	 */
 	public void move(Location loc) {
 		start = loc.clone();
-		fixStands(1);
+		fixStands();
 	}
 	
 	/**
@@ -171,7 +169,7 @@ public class Hologram {
 	public void remove(int line) {
 		ArmorStand stand = stands.remove(line).get();
 		stand.remove();
-		fixStands(0);
+		fixStands();
 	}
 	
 	/**
@@ -195,7 +193,7 @@ public class Hologram {
 	 */
 	public void setLineSpacing(double lineSpacing) {
 		this.lineSpacing = lineSpacing;
-		fixStands(0);
+		fixStands();
 	}
 	
 	/**
@@ -223,7 +221,7 @@ public class Hologram {
 	public void insert(int line, String text) {
 		ArmorStand stand = spawn(line, text);
 		stands.add(line, EntityPersistor.wrap(stand));
-		fixStands(line - 1);
+		fixStands();
 	}
 	
 	/**
@@ -231,6 +229,14 @@ public class Hologram {
 	 */
 	public int size() {
 		return stands.size();
+	}
+	
+	public List<String> getLines() {
+		List<String> lines = new ArrayList<>();
+		for (ArmorStand stand : getStands()) {
+			lines.add(stand.getCustomName());
+		}
+		return lines;
 	}
 	
 	private ArmorStand spawn(int line, String text) {
@@ -251,6 +257,7 @@ public class Hologram {
 		stand.setCustomNameVisible(true);
 		stand.setVisible(false);
 		stand.setGravity(false);
+		stand.setMarker(true);
 		setId(stand, id);
 	}
 	

@@ -9,6 +9,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.event.*;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
@@ -18,7 +19,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import redempt.redlib.RedLib;
 import redempt.redlib.blockdata.events.CustomBlockPlaceEvent;
-import redempt.redlib.blockdata.events.DataBlockBreakEvent;
+import redempt.redlib.blockdata.events.DataBlockDestroyEvent;
+import redempt.redlib.blockdata.events.DataBlockDestroyEvent.DestroyCause;
 import redempt.redlib.misc.Path;
 import redempt.redlib.nms.NMSHelper;
 
@@ -193,41 +195,44 @@ public class CustomBlockRegistry implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public <T extends CustomBlock> void onBreak(DataBlockBreakEvent e) {
-		if (e.getPlayer().getGameMode() == GameMode.CREATIVE) {
-			return;
-		}
-		CustomBlock cb = getCustomBlock(e.getBlock());
-		if (cb == null) {
-			return;
-		}
-		CustomBlockType<T> type = (CustomBlockType<T>) cb.getType();
-		DataBlock db = e.getDataBlock();
-		ItemStack item = type.getItem(type.get(db));
-		if (RedLib.midVersion >= 12) {
-			if (!e.getParent().isDropItems()) {
+	public <T extends CustomBlock> void onBreak(DataBlockDestroyEvent e) {
+		if (e.getCause() == DestroyCause.PLAYER) {
+			if (e.getPlayer().getGameMode() == GameMode.CREATIVE) {
 				return;
 			}
-			BlockState state = e.getBlock().getState();
-			e.getParent().setDropItems(false);
-			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-				List<Item> drops = new ArrayList<>();
-				drops.add(e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), item));
-				Event event = (Event) NMSHelper.getClass("BlockDropItemEvent").getInstance(e.getBlock(), state, e.getPlayer(), drops).getObject();
-				Bukkit.getPluginManager().callEvent(event);
-				if (((Cancellable) event).isCancelled()) {
-					drops.get(0).remove();
+			CustomBlock cb = getCustomBlock(e.getBlock());
+			if (cb == null) {
+				return;
+			}
+			CustomBlockType<T> type = (CustomBlockType<T>) cb.getType();
+			DataBlock db = e.getDataBlock();
+			ItemStack item = type.getItem(type.get(db));
+			if (RedLib.midVersion >= 12) {
+				BlockBreakEvent parent = (BlockBreakEvent) e.getParent();
+				if (!parent.isDropItems()) {
+					return;
 				}
-			});
-		} else {
-			Collection<ItemStack> drops = e.getBlock().getDrops(e.getPlayer().getItemInHand());
-			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-				e.getBlock().getWorld().getNearbyEntities(e.getBlock().getLocation().add(0.5, 0.5, 0.5), 1, 1, 1).stream()
-						.filter(en -> en instanceof Item && en.getTicksLived() < 2).map(en -> (Item) en)
-						.filter(i -> drops.stream().anyMatch(it -> it.isSimilar(i.getItemStack())))
-						.forEach(Entity::remove);
-				e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(0.5, 0.5, 0.5), item);
-			});
+				BlockState state = e.getBlock().getState();
+				parent.setDropItems(false);
+				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+					List<Item> drops = new ArrayList<>();
+					drops.add(e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), item));
+					Event event = (Event) NMSHelper.getClass("BlockDropItemEvent").getInstance(e.getBlock(), state, e.getPlayer(), drops).getObject();
+					Bukkit.getPluginManager().callEvent(event);
+					if (((Cancellable) event).isCancelled()) {
+						drops.get(0).remove();
+					}
+				});
+			} else {
+				Collection<ItemStack> drops = e.getBlock().getDrops(e.getPlayer().getItemInHand());
+				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+					e.getBlock().getWorld().getNearbyEntities(e.getBlock().getLocation().add(0.5, 0.5, 0.5), 1, 1, 1).stream()
+							.filter(en -> en instanceof Item && en.getTicksLived() < 2).map(en -> (Item) en)
+							.filter(i -> drops.stream().anyMatch(it -> it.isSimilar(i.getItemStack())))
+							.forEach(Entity::remove);
+					e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(0.5, 0.5, 0.5), item);
+				});
+			}
 		}
 	}
 	

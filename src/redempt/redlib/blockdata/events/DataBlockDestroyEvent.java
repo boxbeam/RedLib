@@ -1,6 +1,8 @@
 package redempt.redlib.blockdata.events;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockEvent;
 import redempt.redlib.blockdata.DataBlock;
@@ -19,17 +21,37 @@ public class DataBlockDestroyEvent extends BlockEvent implements Cancellable {
 	
 	private DataBlock db;
 	private DestroyCause cause;
+	private Player player;
+	private Event parent;
 	private boolean cancelled = false;
 	
 	/**
 	 * Construct a DataBlockDestroyEvent
 	 * @param db The DataBlock that was destroyed
+	 * @param player The player that broke the block, or null
 	 * @param cause Why it was destroyed
+	 * @param parent The event that caused this event
 	 */
-	public DataBlockDestroyEvent(DataBlock db, DestroyCause cause) {
+	public DataBlockDestroyEvent(DataBlock db, Player player, DestroyCause cause, Event parent) {
 		super(db.getBlock());
 		this.db = db;
+		this.player = player;
 		this.cause = cause;
+		this.parent = parent;
+	}
+	
+	/**
+	 * @return The event that caused this one
+	 */
+	public Event getParent() {
+		return parent;
+	}
+	
+	/**
+	 * @return The Player who broke the DataBlock, or null if it was not a Player.
+	 */
+	public Player getPlayer() {
+		return player;
 	}
 	
 	/**
@@ -73,7 +95,8 @@ public class DataBlockDestroyEvent extends BlockEvent implements Cancellable {
 	public enum DestroyCause {
 		
 		EXPLOSION,
-		FIRE;
+		FIRE,
+		PLAYER;
 		
 	}
 	

@@ -11,7 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import redempt.redlib.RedLib;
-import redempt.redlib.blockdata.events.DataBlockBreakEvent;
+import redempt.redlib.blockdata.events.DataBlockDestroyEvent;
 import redempt.redlib.blockdata.events.DataBlockDestroyEvent;
 import redempt.redlib.blockdata.events.DataBlockDestroyEvent.DestroyCause;
 import redempt.redlib.blockdata.events.DataBlockMoveEvent;
@@ -159,7 +159,7 @@ public class BlockDataManager implements Listener {
 		if (db == null) {
 			return;
 		}
-		DataBlockBreakEvent event = new DataBlockBreakEvent(e, db);
+		DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, e.getPlayer(), DestroyCause.PLAYER, e);
 		Bukkit.getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
 			e.setCancelled(true);
@@ -174,7 +174,7 @@ public class BlockDataManager implements Listener {
 		if (db == null) {
 			return;
 		}
-		DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, DestroyCause.FIRE);
+		DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, null, DestroyCause.FIRE, e);
 		Bukkit.getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
 			e.setCancelled(true);
@@ -191,7 +191,7 @@ public class BlockDataManager implements Listener {
 			if (db == null) {
 				return;
 			}
-			DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, DestroyCause.EXPLOSION);
+			DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, null, DestroyCause.EXPLOSION, e);
 			Bukkit.getPluginManager().callEvent(event);
 			if (event.isCancelled()) {
 				toRemove.add(block);
@@ -210,7 +210,7 @@ public class BlockDataManager implements Listener {
 			if (db == null) {
 				return;
 			}
-			DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, DestroyCause.EXPLOSION);
+			DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, null, DestroyCause.EXPLOSION, e);
 			Bukkit.getPluginManager().callEvent(event);
 			if (event.isCancelled()) {
 				toRemove.add(block);

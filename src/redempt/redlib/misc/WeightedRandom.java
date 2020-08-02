@@ -12,15 +12,49 @@ import java.util.Map;
  */
 public class WeightedRandom<T> {
 	
-	private Map<T, Integer> weights;
-	private int total;
+	private Map<T, Double> weights;
+	private double total;
 	private List<T> list = new ArrayList<>();
+	
+	/**
+	 * Create a new WeightedRandom from a map of outcomes to their weights
+	 * @param map The map of outcomes to their weights
+	 * @param <T> The type of the outcomes
+	 * @return A WeightedRandom which can be used to roll for the given outcome
+	 */
+	public static <T> WeightedRandom<T> fromIntMap(Map<T, Integer> map) {
+		HashMap<T, Double> dmap = new HashMap<>();
+		map.forEach((k, v) -> {
+			dmap.put(k, (double) v);
+		});
+		return new WeightedRandom<T>(dmap, false);
+	}
+	
+	/**
+	 * Create a new WeightedRandom from a map of outcomes to their weights
+	 * @param map The map of outcomes to their weights
+	 * @param <T> The type of the outcomes
+	 * @return A WeightedRandom which can be used to roll for the given outcome
+	 */
+	public static <T> WeightedRandom<T> fromDoubleMap(Map<T, Double> map) {
+		return new WeightedRandom<T>(map, false);
+	}
 	
 	/**
 	 * Creates a WeightedRandom using the map of weights
 	 * @param weights The map of outcomes to weights
+	 * @deprecated Use {@link WeightedRandom#fromIntMap(Map)}
 	 */
 	public WeightedRandom(Map<T, Integer> weights) {
+		this.weights = new HashMap<>();
+		weights.forEach((k, v) -> {
+			this.weights.put(k, (double) v);
+			total += v;
+			list.add(k);
+		});
+	}
+	
+	private WeightedRandom(Map<T, Double> weights, boolean no) {
 		this.weights = weights;
 		weights.forEach((k, v) -> {
 			total += v;
@@ -36,10 +70,10 @@ public class WeightedRandom<T> {
 		if (list.size() == 0) {
 			return null;
 		}
-		int random = (int) Math.round(Math.random() * (total - 1));
+		double random = Math.random() * (total);
 		int pos = 0;
-		int roll = 0;
-		while (random >= (roll = weights.get(list.get(pos)))) {
+		double roll = 0;
+		while (random > (roll = weights.get(list.get(pos)))) {
 			random -= roll;
 			pos++;
 		}
@@ -62,7 +96,7 @@ public class WeightedRandom<T> {
 	 * Gets the map of weights for this WeightedRandom
 	 * @return The weight map
 	 */
-	public Map<T, Integer> getWeights() {
+	public Map<T, Double> getWeights() {
 		return weights;
 	}
 	
@@ -72,6 +106,10 @@ public class WeightedRandom<T> {
 	 * @param weight The weight to set
 	 */
 	public void set(T outcome, int weight) {
+		set(outcome, (double) weight);
+	}
+	
+	public void set(T outcome, double weight) {
 		remove(outcome);
 		weights.put(outcome, weight);
 		list.add(outcome);
@@ -83,7 +121,7 @@ public class WeightedRandom<T> {
 	 * @param outcome The outcome to remove
 	 */
 	public void remove(T outcome) {
-		Integer weight = weights.remove(outcome);
+		Double weight = weights.remove(outcome);
 		if (weight == null) {
 			return;
 		}
@@ -96,7 +134,7 @@ public class WeightedRandom<T> {
 	 * @return An identical copy of this WeightedRandom
 	 */
 	public WeightedRandom<T> clone() {
-		return new WeightedRandom<T>(new HashMap<T, Integer>(weights));
+		return new WeightedRandom<T>(new HashMap<>(weights), false);
 	}
 	
 	/**
