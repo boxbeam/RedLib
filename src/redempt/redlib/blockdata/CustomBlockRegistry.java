@@ -217,7 +217,7 @@ public class CustomBlockRegistry implements Listener {
 				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
 					List<Item> drops = new ArrayList<>();
 					drops.add(e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), item));
-					Event event = (Event) NMSHelper.getClass("BlockDropItemEvent").getInstance(e.getBlock(), state, e.getPlayer(), drops).getObject();
+					Event event = (Event) NMSHelper.getClass("org.bukkit.event.block.BlockDropItemEvent").getInstance(e.getBlock(), state, e.getPlayer(), drops).getObject();
 					Bukkit.getPluginManager().callEvent(event);
 					if (((Cancellable) event).isCancelled()) {
 						drops.get(0).remove();

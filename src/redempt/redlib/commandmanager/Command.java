@@ -6,20 +6,21 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.TabCompleteEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.exceptions.CommandParseException;
 import redempt.redlib.commandmanager.exceptions.MissingHookException;
+import redempt.redlib.misc.EventListener;
 import redempt.redlib.region.MultiRegion;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ public class Command {
 		}));
 	}
 	
-	private Plugin plugin;
+	protected Plugin plugin;
 	private CommandArgument[] args;
 	private ContextProvider<?>[] contextProviders;
 	private ContextProvider<?>[] asserters;
@@ -313,9 +314,9 @@ public class Command {
 	public void register(String prefix, Object... listeners) {
 		Field field;
 		try {
-			field = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+			field = Bukkit.getPluginManager().getClass().getDeclaredField("commandMap");
 			field.setAccessible(true);
-			SimpleCommandMap map = (SimpleCommandMap) field.get(Bukkit.getServer());
+			SimpleCommandMap map = (SimpleCommandMap) field.get(Bukkit.getPluginManager());
 			org.bukkit.command.Command cmd = new org.bukkit.command.Command(names[0], help == null ? "None" : help, "", Arrays.stream(names).skip(1).collect(Collectors.toList())) {
 
 				@Override
@@ -330,7 +331,26 @@ public class Command {
 				}
 				
 			};
+			Class<?> clazz = map.getClass();
+			while (!clazz.getSimpleName().equals("SimpleCommandMap")) {
+				clazz = clazz.getSuperclass();
+			}
+			Field mapField = clazz.getDeclaredField("knownCommands");
+			mapField.setAccessible(true);
+			Map<String, org.bukkit.command.Command> knownCommands = (Map<String, org.bukkit.command.Command>) mapField.get(map);
 			map.register(prefix, cmd);
+			if (plugin == null) {
+				plugin = JavaPlugin.getProvidingPlugin(Class.forName(new Exception().getStackTrace()[1].getClassName()));
+			}
+			new EventListener<>(RedLib.getInstance(), PluginDisableEvent.class, e -> {
+				if (e.getPlugin().equals(plugin)) {
+					try {
+						Arrays.stream(names).forEach(knownCommands::remove);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			});
 			loop:
 			for (Object listener : listeners) {
 				for (Method method : listener.getClass().getDeclaredMethods()) {
@@ -435,9 +455,6 @@ public class Command {
 	}
 	
 	protected boolean execute(CommandSender sender, String[] args) {
-		if (plugin != null && !plugin.isEnabled()) {
-			return true;
-		}
 		if (permission != null && !sender.hasPermission(permission)) {
 			sender.sendMessage(msg("noPermission").replace("%permission%", permission));
 			return true;

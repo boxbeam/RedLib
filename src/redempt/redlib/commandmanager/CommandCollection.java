@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * Represents a collection of commands which can be mass-registered. Can contain any amount of commands, including 0
@@ -28,7 +30,18 @@ public class CommandCollection {
 	 */
 	public void register(String prefix, Object... listeners) {
 		mergeBaseCommands();
-		commands.stream().forEach(c -> c.register(prefix, listeners));
+		Plugin plugin = null;
+		try {
+			Class<?> clazz = Class.forName(new Exception().getStackTrace()[1].getClassName());
+			plugin = JavaPlugin.getProvidingPlugin(clazz);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		Plugin fplugin = plugin;
+		commands.stream().forEach(c -> {
+			c.plugin = fplugin;
+			c.register(prefix, listeners);
+		});
 	}
 	
 	private void mergeBaseCommands() {

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -12,10 +13,10 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -421,6 +422,24 @@ public class ItemUtils {
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Creates a mock inventory clone of the given inventory. Do not try to open this inventory for players,
+	 * it will throw an error.
+	 * @param inv The inventory to clone
+	 * @return A mock clone inventory
+	 */
+	public static Inventory cloneInventory(Inventory inv) {
+		ItemStack[] contents = new ItemStack[inv.getSize()];
+		for (int i = 0; i < inv.getSize(); i++) {
+			ItemStack item = inv.getItem(i);
+			if (item == null) {
+				continue;
+			}
+			contents[i] = item.clone();
+		}
+		return new MockInventory(contents, inv.getHolder(), inv.getType());
 	}
 	
 }
