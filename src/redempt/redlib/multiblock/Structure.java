@@ -108,10 +108,11 @@ public class Structure {
 	 * @return The region this Structure occupies
 	 */
 	public Region getRegion() {
-		int[] dimensions = this.getType().getDimensions();
-		rotator.setLocation(dimensions[0], dimensions[2]);
-		Location end = new Location(loc.getWorld(), rotator.getRotatedX(), dimensions[1], rotator.getRotatedZ()).add(loc);
-		return new Region(loc.clone(), end);
+		int[] dim = this.getType().getDimensions();
+		Location loc = this.getRelative(dim[0] - 1, dim[1] - 1, dim[2] - 1).getBlock().getLocation();
+		Region region = new Region(this.loc, loc);
+		region.expand(1, 0, 1, 0, 1, 0);
+		return region;
 	}
 	
 	/**

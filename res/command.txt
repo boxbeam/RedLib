@@ -1,7 +1,7 @@
 structure,struct {
 	help The structure base command
 	permission redlib.dev
-	wand {
+	tool,wand {
 		user player
 		help Get a structure dev tool
 		hook wand

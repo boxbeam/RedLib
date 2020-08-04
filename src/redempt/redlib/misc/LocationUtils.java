@@ -78,8 +78,8 @@ public class LocationUtils {
 			return loc;
 		}
 		for (int y = 0; Math.abs(y) <= maxDistance; y = y == 0 ? 1 : -y - Math.min(Integer.signum(y), 0)) {
-			for (int x = 0; Math.abs(x) <= Math.abs(y); x = x == 0 ? 1 : -x - Math.min(Integer.signum(x), 0)) {
-				for (int z = 0; Math.abs(z) <= Math.abs(x); z = z == 0 ? 1 : -z - Math.min(Integer.signum(z), 0)) {
+			for (int x = 0; Math.abs(x) <= maxDistance; x = x == 0 ? 1 : -x - Math.min(Integer.signum(x), 0)) {
+				for (int z = 0; Math.abs(z) <= maxDistance; z = z == 0 ? 1 : -z - Math.min(Integer.signum(z), 0)) {
 					Location check = loc.clone().add(x, y, z);
 					if (isSafe(check) && filter.test(check)) {
 						check.setDirection(direction);
