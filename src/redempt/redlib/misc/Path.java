@@ -17,6 +17,7 @@ public class Path {
 	 */
 	public static List<Location> getPath(Location start, Location end, double step) {
 		List<Location> locs = new ArrayList<>();
+		locs.add(start);
 		Vector v = end.clone().subtract(start).toVector();
 		v = v.normalize().multiply(step);
 		Location current = start.clone();
@@ -24,6 +25,7 @@ public class Path {
 			locs.add(current.clone());
 			current = current.add(v);
 		}
+		locs.add(end);
 		return locs;
 	}
 	

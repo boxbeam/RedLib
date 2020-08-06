@@ -40,6 +40,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
+import redempt.redlib.misc.EventListener;
 import redempt.redlib.region.Region;
 import redempt.redlib.region.RegionMap;
 
@@ -120,6 +121,24 @@ public class ProtectionPolicy implements Listener {
 	private Map<ProtectionType, String> messages = new HashMap<>();
 	private Predicate<Block> protectionCheck;
 	private Region bounds;
+	private Plugin plugin;
+	
+	{
+		new EventListener<>(RedLib.getInstance(), PluginDisableEvent.class, (l, e) -> {
+			if (e.getPlugin().equals(plugin)) {
+				disable();
+				l.unregister();
+			}
+		});
+	}
+	
+	protected ProtectionPolicy(Plugin plugin, Region bounds, Predicate<Block> protectionCheck, ProtectionType... protections) {
+		this.plugin = plugin;
+		this.bounds = bounds;
+		Arrays.stream(protections).forEach(this.protections::add);
+		this.protectionCheck = protectionCheck;
+		regionMap.set(bounds, this);
+	}
 	
 	/**
 	 * Create a ProtectionPolicy to protect blocks
@@ -128,6 +147,11 @@ public class ProtectionPolicy implements Listener {
 	 * @param protections The types of actions to protect against
 	 */
 	public ProtectionPolicy(Region bounds, Predicate<Block> protectionCheck, ProtectionType... protections) {
+		try {
+			plugin = JavaPlugin.getProvidingPlugin(Class.forName(new Exception().getStackTrace()[1].getClassName()));
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		this.bounds = bounds;
 		Arrays.stream(protections).forEach(this.protections::add);
 		this.protectionCheck = protectionCheck;
@@ -141,6 +165,11 @@ public class ProtectionPolicy implements Listener {
 	 * @param protections The types of actions to protect against
 	 */
 	public ProtectionPolicy(Predicate<Block> protectionCheck, ProtectionType... protections) {
+		try {
+			plugin = JavaPlugin.getProvidingPlugin(Class.forName(new Exception().getStackTrace()[1].getClassName()));
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		this.protectionCheck = protectionCheck;
 		Arrays.stream(protections).forEach(this.protections::add);
 		globalPolicies.add(this);

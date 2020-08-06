@@ -16,16 +16,6 @@ import java.util.function.Function;
  */
 public class ConfigManager {
 	
-	protected static List<Runnable> postInit = new CopyOnWriteArrayList<>();
-	
-	/**
-	 * Adds a post-init to be run after your object is initialized for a ConfigMap
-	 * @param r The Runnable to run later
-	 */
-	public static void postInit(Runnable r) {
-		postInit.add(r);
-	}
-	
 	/**
 	 * Instantiates a List of Strings inline
 	 * @param strings The Strings to include in the List

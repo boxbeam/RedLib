@@ -11,6 +11,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import redempt.redlib.RedLib;
 import redempt.redlib.protection.ProtectedRegion;
@@ -29,6 +31,7 @@ public class Region {
 	
 	protected Location start;
 	protected Location end;
+	private Set<Chunk> chunkCache = null;
 	
 	/**
 	 * Construct a Region using 2 corners
@@ -55,6 +58,7 @@ public class Region {
 		
 		this.start = new Location(start.getWorld(), minX, minY, minZ);
 		this.end = new Location(end.getWorld(), maxX, maxY, maxZ);
+		chunkCache = null;
 	}
 	
 	/**
@@ -253,6 +257,7 @@ public class Region {
 	public void move(Vector v) {
 		start = start.add(v);
 		end = end.add(v);
+		chunkCache = null;
 	}
 	
 	/**
@@ -278,7 +283,13 @@ public class Region {
 	 * @return The {@link ProtectedRegion}
 	 */
 	public ProtectedRegion protect(ProtectionType... types) {
-		return new ProtectedRegion(new Region(this.getStart(), this.getEnd()), types);
+		try {
+			Plugin plugin = JavaPlugin.getProvidingPlugin(Class.forName(new Exception().getStackTrace()[1].getClassName()));
+			return new ProtectedRegion(plugin, new Region(this.getStart(), this.getEnd()), types);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	/**
@@ -315,17 +326,22 @@ public class Region {
 	}
 	
 	/**
-	 * Gets all entities contained in this Region
+	 * Gets all entities contained in this Region in loaded chunks
 	 * @return The entities in this Region
 	 */
 	public List<Entity> getEntities() {
+		return getEntities(false);
+	}
+	
+	/**
+	 * Gets all entities contained in this Region
+	 * @param load Whether to load chunks to check the entities inside them
+	 * @return The entities in this Region
+	 */
+	public List<Entity> getEntities(boolean load) {
 		List<Entity> entities = new ArrayList<>();
-		for (int cx = start.getChunk().getX(); cx <= end.getChunk().getX(); cx++) {
-			for (int cz = start.getChunk().getZ(); cz <= end.getChunk().getZ(); cz++) {
-				Chunk chunk = start.getWorld().getChunkAt(cx, cz);
-				Arrays.stream(chunk.getEntities()).filter(e -> contains(e.getLocation())).forEach(entities::add);
-			}
-		}
+		Stream<Chunk> chunkStream = load ? getChunks().stream() : getLoadedChunks().stream();
+		chunkStream.map(Chunk::getEntities).forEach(e -> Arrays.stream(e).filter(en -> this.contains(en.getLocation())).forEach(entities::add));
 		return entities;
 	}
 	
@@ -334,17 +350,39 @@ public class Region {
 	 * @return The players in this Region
 	 */
 	public List<Player> getPlayers() {
-		return getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e).collect(Collectors.toList());
+		return getEntities(false).stream().filter(e -> e instanceof Player).map(e -> (Player) e).collect(Collectors.toList());
 	}
 	
 	/**
 	 * @return All the Chunks this Region overlaps
 	 */
 	public Set<Chunk> getChunks() {
+		if (chunkCache == null) {
+			chunkCache = new HashSet<>();
+			for (int cx = start.getChunk().getX(); cx <= end.getChunk().getX(); cx++) {
+				for (int cz = start.getChunk().getZ(); cz <= end.getChunk().getZ(); cz++) {
+					chunkCache.add(start.getWorld().getChunkAt(cx, cz));
+				}
+			}
+			return chunkCache;
+		}
+		return chunkCache;
+	}
+	
+	/**
+	 * @return All the loaded Chunks this Region overlaps
+	 */
+	public Set<Chunk> getLoadedChunks() {
 		Set<Chunk> chunks = new HashSet<>();
+		if (chunkCache != null) {
+			chunkCache.stream().filter(Chunk::isLoaded).forEach(chunks::add);
+			return chunks;
+		}
 		for (int cx = start.getChunk().getX(); cx <= end.getChunk().getX(); cx++) {
 			for (int cz = start.getChunk().getZ(); cz <= end.getChunk().getZ(); cz++) {
-				chunks.add(start.getWorld().getChunkAt(cx, cz));
+				if (start.getWorld().isChunkLoaded(cx, cz)) {
+					chunks.add(start.getWorld().getChunkAt(cx, cz));
+				}
 			}
 		}
 		return chunks;

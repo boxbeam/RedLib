@@ -6,6 +6,7 @@ import redempt.redlib.configmanager.exceptions.ConfigMapException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,9 +18,17 @@ class ConfigMap<T> extends HashMap<String, T> {
 	protected ConfigurationSection section;
 	private ConfigManager manager;
 	private List<ConfigField> fields = new ArrayList<>();
+	private Method postInit = null;
 	
 	public ConfigMap(Class<T> clazz) {
 		this.clazz = clazz;
+		for (Method method : clazz.getDeclaredMethods()) {
+			if (method.getName().equals("postInit") && method.getParameterCount() == 0) {
+				method.setAccessible(true);
+				postInit = method;
+				break;
+			}
+		}
 	}
 	
 	public void init(ConfigManager manager) {
@@ -47,13 +56,14 @@ class ConfigMap<T> extends HashMap<String, T> {
 				T instance = constructor.newInstance();
 				fields.forEach(f -> f.load(instance, section));
 				put(key, instance);
+				if (postInit != null) {
+					postInit.invoke(instance);
+				}
 			} catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
 				throw new ConfigMapException("Class must have a default constructor with no arguments!");
 			}
 		}
-		ConfigManager.postInit.forEach(Runnable::run);
-		ConfigManager.postInit.clear();
 	}
 	
 	public void save() {

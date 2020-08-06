@@ -1,5 +1,6 @@
 package redempt.redlib.protection;
 
+import org.bukkit.plugin.Plugin;
 import redempt.redlib.protection.ProtectionPolicy.ProtectionType;
 import redempt.redlib.region.Region;
 
@@ -12,6 +13,11 @@ public class ProtectedRegion {
 	
 	private Region region;
 	private ProtectionPolicy policy;
+	
+	public ProtectedRegion(Plugin plugin, Region region, ProtectionType... types) {
+		this.region = region;
+		this.policy = new ProtectionPolicy(plugin, region, b -> region.contains(b.getLocation()), types);
+	}
 	
 	public ProtectedRegion(Region region, ProtectionType... types) {
 		this.region = region;

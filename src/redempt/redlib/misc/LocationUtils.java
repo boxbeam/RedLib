@@ -23,7 +23,6 @@ public class LocationUtils {
 	 * @return Whether the block type is a hazard
 	 */
 	public static boolean isHazard(Material type) {
-		type = new ItemStack(type).getType();
 		if (type.toString().contains("LAVA") || type.toString().contains("WATER")) {
 			return true;
 		}
@@ -43,7 +42,7 @@ public class LocationUtils {
 	 */
 	public static boolean isSafe(Location loc) {
 		Block under = loc.clone().subtract(0, 1, 0).getBlock();
-		if (!isHazard(under.getType()) && isFullBlock(under)) {
+		if (under.getType().isSolid()) {
 			Block middle = loc.getBlock();
 			Block above = loc.clone().add(0, 1, 0).getBlock();
 			if (!isHazard(middle.getType()) && !isHazard(above.getType())) {
@@ -53,14 +52,6 @@ public class LocationUtils {
 			}
 		}
 		return false;
-	}
-	
-	private static boolean isFullBlock(Block block) {
-		if (RedLib.midVersion >= 13) {
-			return block.getType().isSolid() && block.getBoundingBox().getVolume() == 1;
-		} else {
-			return block.getType().isOccluding();
-		}
 	}
 	
 	/**
@@ -77,18 +68,27 @@ public class LocationUtils {
 			loc.setDirection(direction);
 			return loc;
 		}
+		Location nearest = null;
+		double dist = 0;
 		for (int y = 0; Math.abs(y) <= maxDistance; y = y == 0 ? 1 : -y - Math.min(Integer.signum(y), 0)) {
 			for (int x = 0; Math.abs(x) <= maxDistance; x = x == 0 ? 1 : -x - Math.min(Integer.signum(x), 0)) {
 				for (int z = 0; Math.abs(z) <= maxDistance; z = z == 0 ? 1 : -z - Math.min(Integer.signum(z), 0)) {
 					Location check = loc.clone().add(x, y, z);
 					if (isSafe(check) && filter.test(check)) {
 						check.setDirection(direction);
-						return check;
+						double distance = check.distanceSquared(loc);
+						if (nearest == null || distance < dist) {
+							nearest = check;
+							dist = distance;
+							if (dist <= 1) {
+								return nearest;
+							}
+						}
 					}
 				}
 			}
 		}
-		return null;
+		return nearest;
 	}
 	
 	/**

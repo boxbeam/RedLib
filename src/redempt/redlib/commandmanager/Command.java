@@ -342,9 +342,10 @@ public class Command {
 			if (plugin == null) {
 				plugin = JavaPlugin.getProvidingPlugin(Class.forName(new Exception().getStackTrace()[1].getClassName()));
 			}
-			new EventListener<>(RedLib.getInstance(), PluginDisableEvent.class, e -> {
+			new EventListener<>(RedLib.getInstance(), PluginDisableEvent.class, (l, e) -> {
 				if (e.getPlugin().equals(plugin)) {
 					try {
+						l.unregister();
 						Arrays.stream(names).forEach(knownCommands::remove);
 					} catch (Exception ex) {
 						ex.printStackTrace();
