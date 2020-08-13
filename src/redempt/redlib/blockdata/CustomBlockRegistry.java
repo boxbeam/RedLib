@@ -188,9 +188,7 @@ public class CustomBlockRegistry implements Listener {
 				e.setCancelled(true);
 				return;
 			}
-			db = manager.getDataBlock(e.getBlock());
-			db.set("custom-type", type.getName());
-			type.place(e.getPlayer(), e.getItemInHand(), type.get(db));
+			type.place(e.getPlayer(), e.getItemInHand(), type.initialize(e.getBlock()));
 		}
 	}
 	

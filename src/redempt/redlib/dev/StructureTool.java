@@ -29,13 +29,16 @@ import redempt.redlib.multiblock.Structure.StructureBlock;
 
 public class StructureTool implements Listener {
 	
+	private static ItemStack tool = new ItemBuilder(Material.BLAZE_ROD)
+			.setName(ChatColor.GREEN + "Multi-Block Structure Tool")
+			.addLore(ChatColor.BLUE + "Right-click two corners of a structure")
+			.addLore(ChatColor.BLUE + "and type '/struct create' to create a test")
+			.addLore(ChatColor.BLUE + "structure. Type '/struct export' to get the")
+			.addLore(ChatColor.BLUE + "data string for the structure.");
+	private static Material skip = null;
+	
 	public static ItemStack getTool() {
-		return new ItemBuilder(Material.BLAZE_ROD)
-				.setName(ChatColor.GREEN + "Multi-Block Structure Tool")
-				.addLore(ChatColor.BLUE + "Right-click two corners of a structure")
-				.addLore(ChatColor.BLUE + "and type '/struct create' to create a test")
-				.addLore(ChatColor.BLUE + "structure. Type '/struct export' to get the")
-				.addLore(ChatColor.BLUE + "data string for the structure.");
+		return tool;
 	}
 	
 	public static StructureTool enable() {
@@ -113,9 +116,15 @@ public class StructureTool implements Listener {
 			player.sendMessage(ChatColor.RED + "Locations must be in the same world!");
 			return;
 		}
-		MultiBlockStructure mbs = MultiBlockStructure.create(MultiBlockStructure.stringify(locs[0], locs[1]), name, false, true);
+		MultiBlockStructure mbs = MultiBlockStructure.create(MultiBlockStructure.stringify(locs[0], locs[1], skip), name, false, true);
 		structures.put(player.getUniqueId(), mbs);
 		player.sendMessage(ChatColor.GREEN + "Structure registered! Left click it with your wand to get debug info.");
+	}
+	
+	@CommandHook("skip")
+	public void skip(Player player, Material type) {
+		skip = type;
+		player.sendMessage(ChatColor.GREEN + "Skip type set!");
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -132,7 +141,7 @@ public class StructureTool implements Listener {
 		}
 		player.sendMessage(ChatColor.GREEN + "Scanning blocks...");
 		Bukkit.getScheduler().scheduleAsyncDelayedTask(RedLib.getInstance(), () -> {
-			String mbs = MultiBlockStructure.stringify(locs[0], locs[1]);
+			String mbs = MultiBlockStructure.stringify(locs[0], locs[1], skip);
 			player.sendMessage(ChatColor.GREEN + "The multi-block structure string has been exported to plugins/RedLib/" + filename + ".dat");
 			try {
 				Path path = Paths.get("plugins/RedLib/").resolve(filename + ".dat");

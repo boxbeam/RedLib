@@ -44,10 +44,11 @@ public class MultiBlockStructure {
 	 * You can use the multi-block structure tool (/struct wand) as long as devMode is true
 	 * @param start One bounding corner of the region
 	 * @param end The other bounding corner of the region
+	 * @param skip A block type to be skipped, in case it was used to select the corners
 	 * @return A string representing all of the block data for the region
 	 * @throws IllegalArgumentException if the specified locations are not in the same world
 	 */
-	public static String stringify(Location start, Location end) {
+	public static String stringify(Location start, Location end, Material skip) {
 		if (!start.getWorld().equals(end.getWorld())) {
 			throw new IllegalArgumentException("Locations must be in the same  world");
 		}
@@ -66,8 +67,16 @@ public class MultiBlockStructure {
 				for (int z = minZ; z <= maxZ; z++) {
 					Block block = start.getWorld().getBlockAt(x, y, z);
 					if (midVersion >= 13) {
+						if (block.getType() == skip) {
+							builder.append("air;");
+							continue;
+						}
 						builder.append(block.getBlockData().getAsString()).append(';');
 					} else {
+						if (block.getType() == skip) {
+							builder.append("AIR:0;");
+							continue;
+						}
 						builder.append(block.getType().toString()).append(":").append(block.getData()).append(";");
 					}
 				}
@@ -77,6 +86,19 @@ public class MultiBlockStructure {
 		output = output.substring(0, output.length() - 1);
 		output = minify(output);
 		return output;
+	}
+	
+	/**
+	 * Use this to get the info to construct a multi-block structure.
+	 * Should be hard-coded.
+	 * You can use the multi-block structure tool (/struct wand) as long as devMode is true
+	 * @param start One bounding corner of the region
+	 * @param end The other bounding corner of the region
+	 * @return A string representing all of the block data for the region
+	 * @throws IllegalArgumentException if the specified locations are not in the same world
+	 */
+	public static String stringify(Location start, Location end) {
+		return stringify(start, end, null);
 	}
 	
 	/**

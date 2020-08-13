@@ -291,6 +291,7 @@ public class SQLHelper implements Closeable {
 			while (next()) {
 				lambda.accept(this);
 			}
+			close();
 		}
 		
 		/**
@@ -330,6 +331,9 @@ public class SQLHelper implements Closeable {
 		@Override
 		public void close() {
 			try {
+				if (results.isClosed()) {
+					return;
+				}
 				results.close();
 			} catch (SQLException e) {
 				sneakyThrow(e);

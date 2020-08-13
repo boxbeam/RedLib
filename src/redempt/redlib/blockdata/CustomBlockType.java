@@ -109,4 +109,15 @@ public abstract class CustomBlockType<T extends CustomBlock> implements Listener
 		return (T) new CustomBlock(this, db);
 	}
 	
+	/**
+	 * Initializes the placement of this CustomBlockType for the given Block. Does not change the block's vanilla type.
+	 * @param block The block to initialize
+	 * @return The initialized CustomBlock
+	 */
+	public final T initialize(Block block) {
+		DataBlock db = manager.getDataBlock(block);
+		db.set("custom-type", typeName);
+		return getCustom(db);
+	}
+	
 }

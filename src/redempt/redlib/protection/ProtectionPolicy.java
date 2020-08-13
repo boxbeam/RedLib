@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.bukkit.Bukkit;
@@ -20,10 +22,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
@@ -114,6 +113,31 @@ public class ProtectionPolicy implements Listener {
 			}
 			return e.getEntity().getLocation().getBlock();
 		});
+	}
+	
+	/**
+	 * Registers a custom event to be protected using a specific ProtectionType
+	 * @param clazz The event class of an event which implements {@link Cancellable}
+	 * @param type The ProtectionType to protect against this event
+	 * @param getPlayer A function to get the player associated with the event - can return null
+	 * @param getBlocks A vararg of functions to get blocks associated with the event
+	 * @param <T> The event type
+	 */
+	public static <T extends Event & Cancellable> void registerProtection(Class<T> clazz, ProtectionType type, Function<T, Player> getPlayer, Function<T, Block>... getBlocks) {
+		ProtectionListener.protect(clazz, type, getPlayer, getBlocks);
+	}
+	
+	/**
+	 * Registers a custom event that cannot be cancelled using {@link Cancellable#setCancelled(boolean)} using a specific ProtectionType
+	 * @param clazz The event class
+	 * @param type The ProtectionType to protect against this event
+	 * @param getPlayer A function to get the player associated with the event - can return null
+	 * @param cancel A consumer to cancel the event
+	 * @param getBlocks A vararg of functions to get the blocks associated with this event
+	 * @param <T> The event type
+	 */
+	public static <T extends Event> void registerProtectionNonCancellable(Class<T> clazz, ProtectionType type, Function<T, Player> getPlayer, Consumer<T> cancel, Function<T, Block>... getBlocks) {
+		ProtectionListener.protectNonCancellable(clazz, type, getPlayer, cancel, getBlocks);
 	}
 	
 	private List<BypassPolicy> bypassPolicies = new ArrayList<>();
@@ -360,7 +384,11 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * Fire destroying blocks
 		 */
-		FIRE;
+		FIRE,
+		/**
+		 * Does nothing by default, but other plugins can register their events to be protected against by this type.
+		 */
+		MISCELLANEOUS;
 		
 		/**
 		 * Every protection type

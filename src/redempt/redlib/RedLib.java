@@ -1,10 +1,13 @@
 package redempt.redlib;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import redempt.redlib.commandmanager.ArgType;
 import redempt.redlib.commandmanager.CommandParser;
 import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.dev.ItemHelper;
@@ -39,6 +42,7 @@ public class RedLib extends JavaPlugin {
 		
 		if (devMode) {
 			new CommandParser(this.getResource("command.txt"))
+					.setArgTypes(ArgType.of("material", Material.class))
 					.parse()
 					.register("redlib",
 					new ItemHelper(),

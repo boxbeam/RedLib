@@ -205,4 +205,23 @@ public class LocationUtils {
 		return fromString(string, " ");
 	}
 	
+	/**
+	 * Waits for a world with the given name to load before calling the callback
+	 * @param worldname The name of the world
+	 * @param callback A callback to be passed the world when it loads
+	 */
+	public static void waitForWorld(String worldname, Consumer<World> callback) {
+		World world = Bukkit.getWorld(worldname);
+		if (world != null) {
+			callback.accept(world);
+			return;
+		}
+		new EventListener<>(RedLib.getInstance(), WorldLoadEvent.class, (l, e) -> {
+			if (e.getWorld().getName().equals(worldname)) {
+				callback.accept(e.getWorld());
+				l.unregister();
+			}
+		});
+	}
+	
 }

@@ -7,13 +7,18 @@ structure,struct {
 		hook wand
 	}
 	create string:name* {
-		help Register a structure from the selected points
+		help Register a structure from the selected points for testing
 		hook create
 		user player
 	}
 	export string:filename*?(structure) {
-		help Prints the structure data for the selected points
+		help Exports the structure data for the selected points to a file
 		hook export
+		user player
+	}
+	skip material:type? {
+		help Sets a block type to skip when scanning, in case you want to use it for the corners
+		hook skip
 		user player
 	}
 }
