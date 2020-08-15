@@ -511,10 +511,6 @@ public class MultiRegion extends Region {
 		int count = 0;
 		for (int i = 0; i < regions.size() && count < limit; i++) {
 			Region region = regions.getFirst();
-			Location center = region.getCenter().getBlock().getLocation();
-			if (contains(center) && !contains(exclude, center)) {
-				return center;
-			}
 			for (Location corner : region.getCorners()) {
 				corner = corner.getBlock().getLocation();
 				if (contains(corner) && !contains(exclude, corner)) {
