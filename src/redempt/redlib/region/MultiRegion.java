@@ -112,13 +112,6 @@ public class MultiRegion extends Region {
 		if (!region.getWorld().equals(getWorld())) {
 			throw new IllegalArgumentException("Region is not in the same world as this MultiRegion");
 		}
-		if (region.isMulti()) {
-			MultiRegion multi = (MultiRegion) region;
-			for (Region r : multi.getRegions()) {
-				subtract.add(r.clone());
-			}
-			return;
-		}
 		subtract.add(region.clone());
 	}
 	
@@ -482,23 +475,22 @@ public class MultiRegion extends Region {
 		while (added[0]) {
 			added[0] = false;
 			for (Region region : regions) {
-				region.stream().map(Block::getLocation)
-						.filter(l -> this.contains(l) && !contains(newRegions, l))
-						.findAny()
-						.ifPresent(l -> {
-							Region reg = new Region(l, l.clone().add(1, 1, 1));
-							if (expandToMax(reg, blocks[0])) {
-								if (blocks[0] == null) {
-									blocks[0] = new MultiRegion(reg);
-								} else {
-									blocks[0].add(reg);
-								}
-								newRegions.add(reg);
-								added[0] = true;
-							}
-				});
 				if (blocks[0] != null && blocks[0].getNonIntersectingVolume(region) == region.getBlockVolume()) {
 					toRemove.add(region);
+					continue;
+				}
+				Location loc = findFreePointRecursive(region, newRegions, (int) Math.log(region.getBlockVolume()) * 2);
+				if (loc != null) {
+					Region reg = new Region(loc, loc.clone().add(1, 1, 1));
+					if (expandToMax(reg, blocks[0])) {
+						if (blocks[0] == null) {
+							blocks[0] = new MultiRegion(reg);
+						} else {
+							blocks[0].add(reg);
+						}
+						newRegions.add(reg);
+						added[0] = true;
+					}
 				}
 			}
 			regions.removeAll(toRemove);
@@ -511,6 +503,39 @@ public class MultiRegion extends Region {
 			return;
 		}
 		autoCluster();
+	}
+	
+	private Location findFreePointRecursive(Region check, List<Region> exclude, int limit) {
+		Deque<Region> regions = new ArrayDeque<>();
+		regions.add(check);
+		int count = 0;
+		for (int i = 0; i < regions.size() && count < limit; i++) {
+			Region region = regions.getFirst();
+			Location center = region.getCenter().getBlock().getLocation();
+			if (contains(center) && !contains(exclude, center)) {
+				return center;
+			}
+			for (Location corner : region.getCorners()) {
+				corner = corner.getBlock().getLocation();
+				if (contains(corner) && !contains(exclude, corner)) {
+					return corner;
+				}
+			}
+			Collections.addAll(regions, binarySplit(region));
+			regions.removeFirst();
+			count++;
+		}
+		return null;
+	}
+	
+	private Region[] binarySplit(Region r) {
+		Location[] corners = r.getCorners();
+		Region[] split = new Region[8];
+		Location center = r.getCenter();
+		for (int i = 0; i < corners.length; i++) {
+			split[i] = new Region(corners[i], center);
+		}
+		return split;
 	}
 	
 	private boolean expandToMax(Region r, MultiRegion exclude) {
@@ -584,7 +609,7 @@ public class MultiRegion extends Region {
 		for (Region region : regions) {
 			stream = Stream.concat(stream, region.stream());
 		}
-		return stream;
+		return stream.filter(b -> subtract.stream().noneMatch(r -> r.contains(b.getLocation())));
 	}
 	
 	/**
