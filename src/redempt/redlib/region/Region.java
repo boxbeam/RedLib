@@ -331,6 +331,9 @@ public class Region {
 	 * @return The intersection Region, or null if there is no intersection
 	 */
 	public Region getIntersection(Region o) {
+		if (o instanceof MultiRegion) {
+			return o.getIntersection(this);
+		}
 		if (!overlaps(o)) {
 			return null;
 		}

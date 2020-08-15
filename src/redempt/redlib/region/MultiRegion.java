@@ -463,6 +463,13 @@ public class MultiRegion extends Region {
 		List<Region> regions = this.regions;
 		List<Region> newRegions = new ArrayList<>();
 		MultiRegion[] blocks = {null};
+		subtract.forEach(r -> {
+			if (blocks[0] == null) {
+				blocks[0] = new MultiRegion(r);
+				return;
+			}
+			blocks[0].add(r);
+		});
 		newRegions.addAll(subtract);
 		Location center = start.clone().add(end).multiply(0.5).getBlock().getLocation();
 		Region r = new Region(center, center.clone().add(1, 1, 1));
