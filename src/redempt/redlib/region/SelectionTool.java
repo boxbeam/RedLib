@@ -8,11 +8,16 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.inventory.ItemStack;
 
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.itemutils.ItemUtils;
@@ -27,6 +32,7 @@ public class SelectionTool implements Listener {
 	
 	private ItemStack item;
 	private Map<UUID, Location[]> selections = new HashMap<>();
+	private Plugin plugin;
 	
 	/**
 	 * Create a SelectionTool with the given item
@@ -35,6 +41,18 @@ public class SelectionTool implements Listener {
 	public SelectionTool(ItemStack item) {
 		this.item = item;
 		Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
+		try {
+			plugin = JavaPlugin.getProvidingPlugin(Class.forName(new Exception().getStackTrace()[1].getClassName()));
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@EventHandler
+	public void onPluginDisable(PluginDisableEvent e) {
+		if (e.getPlugin().equals(plugin)) {
+			HandlerList.unregisterAll(this);
+		}
 	}
 	
 	@EventHandler

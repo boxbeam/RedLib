@@ -2,6 +2,7 @@ package redempt.redlib.region;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -225,10 +226,10 @@ public class MultiRegion extends Region {
 		}
 		Region r = new Region(start, end);
 		r.expand(direction.getOppositeFace(), -(r.measureBlocks(direction) - 1));
-		BlockSetRegion slice = getIntersection(r);
+		MultiRegion slice = getIntersection(r);
 		slice.move(direction.getDirection());
 		for (int i = 0; i < amount; i++) {
-			BlockSetRegion clone = slice.clone();
+			MultiRegion clone = slice.clone();
 			clone.move(direction.getDirection().multiply(i));
 			add(clone);
 		}
@@ -413,17 +414,20 @@ public class MultiRegion extends Region {
 	 * @param other The Region to check for overlap with
 	 * @return The overlapping portions of the Regions
 	 */
-	public BlockSetRegion getIntersection(Region other) {
-		BlockSetRegion[] start = {new BlockSetRegion()};
-		other.stream().map(Block::getLocation).forEach(l -> {
-			if (contains(l)) {
-				start[0].add(l);
+	public MultiRegion getIntersection(Region other) {
+		MultiRegion region = null;
+		for (Region r : regions) {
+			Region intersect = other.getIntersection(r);
+			if (intersect == null) {
+				continue;
 			}
-		});
-		if (start[0] == null) {
-			return null;
+			if (region == null) {
+				region = new MultiRegion(intersect);
+				continue;
+			}
+			region.add(intersect);
 		}
-		return start[0];
+		return region;
 	}
 	
 	/**
@@ -456,17 +460,15 @@ public class MultiRegion extends Region {
 	 * @param autoCluster Whether to automatically cluster regions in clusters of 10 until there are less than 25 top-level regions
 	 */
 	public void recalculate(boolean autoCluster) {
-		decluster();
 		List<Region> regions = this.regions;
 		List<Region> newRegions = new ArrayList<>();
-		BlockSetRegion blocks = new BlockSetRegion();
+		MultiRegion[] blocks = {null};
 		newRegions.addAll(subtract);
 		Location center = start.clone().add(end).multiply(0.5).getBlock().getLocation();
 		Region r = new Region(center, center.clone().add(1, 1, 1));
-		expandToMax(r, blocks);
-		if (contains(center)) {
+		if (contains(center) && expandToMax(r, null)) {
 			newRegions.add(r);
-			r.stream().forEach(blocks::add);
+			blocks[0] = new MultiRegion(r);
 		}
 		boolean[] added = {true};
 		List<Region> toRemove = new ArrayList<>();
@@ -475,15 +477,20 @@ public class MultiRegion extends Region {
 			for (Region region : regions) {
 				region.stream().map(Block::getLocation)
 						.filter(l -> this.contains(l) && !contains(newRegions, l))
-						.min((a, b) -> (int) Math.signum(a.distanceSquared(center) - b.distanceSquared(center)))
+						.findAny()
 						.ifPresent(l -> {
-							added[0] = true;
 							Region reg = new Region(l, l.clone().add(1, 1, 1));
-							expandToMax(reg, blocks);
-							newRegions.add(reg);
-							reg.stream().forEach(blocks::add);
+							if (expandToMax(reg, blocks[0])) {
+								if (blocks[0] == null) {
+									blocks[0] = new MultiRegion(reg);
+								} else {
+									blocks[0].add(reg);
+								}
+								newRegions.add(reg);
+								added[0] = true;
+							}
 				});
-				if (region.stream().allMatch(blocks::contains)) {
+				if (blocks[0] != null && blocks[0].getNonIntersectingVolume(region) == region.getBlockVolume()) {
 					toRemove.add(region);
 				}
 			}
@@ -499,25 +506,65 @@ public class MultiRegion extends Region {
 		autoCluster();
 	}
 	
-	private void expandToMax(Region r, BlockSetRegion exclude) {
+	private boolean expandToMax(Region r, MultiRegion exclude) {
 		List<BlockFace> faces = new ArrayList<>(6);
 		List<BlockFace> toRemove = new ArrayList<>();
-		Arrays.stream(MultiRegion.faces).forEach(faces::add);
+		Collections.addAll(faces, MultiRegion.faces);
+		int step = 1;
+		boolean expanded = false;
 		while (faces.size() > 0) {
 			for (int i = 0; i < faces.size(); i++) {
 				BlockFace face = faces.get(i);
-				Region clone = r.clone();
-				clone.expand(face.getOppositeFace(), -(clone.measureBlocks(face) - 1));
-				clone.move(face.getDirection());
-				if (clone.stream().map(Block::getLocation).allMatch(l -> this.contains(l) && !exclude.contains(l))) {
-					r.expand(face, 1);
+				r.expand(face, step);
+				if (r.getBlockVolume() == getNonIntersectingVolume(r)
+						&& (exclude == null || exclude.getNonIntersectingVolume(r) == 0)) {
+					expanded = true;
+					continue;
+				}
+				r.expand(face, -step);
+				if (step > 1) {
+					step = Math.max(1, step / 2);
+					i--;
 					continue;
 				}
 				toRemove.add(face);
 			}
+			if (toRemove.size() == 0) {
+				step *= 2;
+			}
 			faces.removeAll(toRemove);
 			toRemove.clear();
 		}
+		if (r.getBlockVolume() == getNonIntersectingVolume(r)
+				&& (exclude == null || exclude.getNonIntersectingVolume(r) == 0)) {
+			expanded = true;
+		}
+		return expanded;
+	}
+	
+	private int getNonIntersectingVolume(Region r) {
+		MultiRegion intersection = getIntersection(r);
+		if (intersection == null) {
+			return 0;
+		}
+		int volume = intersection.getBlockVolume();
+		List<Region> intersections = intersection.getRegions();
+		int overlap = 0;
+		while (intersections.size() > 0) {
+			Region region = intersections.get(intersections.size() - 1);
+			for (int i = 0; i < intersections.size() - 1; i++) {
+				Region other = intersections.get(i);
+				Region tmp = region.getIntersection(other);
+				if (tmp != null) {
+					tmp = tmp.getIntersection(r);
+					if (tmp != null) {
+						overlap += tmp.getBlockVolume();
+					}
+				}
+			}
+			intersections.remove(intersections.size() - 1);
+		}
+		return volume - overlap;
 	}
 	
 	/**

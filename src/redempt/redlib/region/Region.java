@@ -326,6 +326,26 @@ public class Region {
 	}
 	
 	/**
+	 * Gets the cuboid intersection of this Region and another cuboid Region
+	 * @param o The Region to get the intersection with
+	 * @return The intersection Region, or null if there is no intersection
+	 */
+	public Region getIntersection(Region o) {
+		if (!overlaps(o)) {
+			return null;
+		}
+		double minX = Math.max(o.start.getX(), start.getX());
+		double minY = Math.max(o.start.getY(), start.getY());
+		double minZ = Math.max(o.start.getZ(), start.getZ());
+		
+		double maxX = Math.min(o.end.getX(), end.getX());
+		double maxY = Math.min(o.end.getY(), end.getY());
+		double maxZ = Math.min(o.end.getZ(), end.getZ());
+		
+		return new Region(new Location(getWorld(), minX, minY, minZ), new Location(getWorld(), maxX, maxY, maxZ));
+	}
+	
+	/**
 	 * Gets all entities contained in this Region in loaded chunks
 	 * @return The entities in this Region
 	 */
