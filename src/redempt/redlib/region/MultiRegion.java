@@ -2,7 +2,6 @@ package redempt.redlib.region;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -14,11 +13,14 @@ import java.util.stream.Stream;
 
 /**
  * Represents a collection of Regions forming any shape
+ *
  * @author Redempt
  */
 public class MultiRegion extends Region {
 	
 	private static BlockFace[] faces = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
+	private static Vector[] adjacent = {new Vector(.5, .5, .5), new Vector(.5, .5, -.5), new Vector(.5, -.5, .5), new Vector(-.5, .5, .5),
+										new Vector(-.5, -.5, .5), new Vector(-.5, .5, -.5), new Vector(.5, -.5, -.5), new Vector(-.5, -.5, -.5)};
 	
 	private List<Region> regions = new ArrayList<>();
 	private List<Region> subtract = new ArrayList<>();
@@ -26,6 +28,7 @@ public class MultiRegion extends Region {
 	
 	/**
 	 * Construct a MultiRegion using a list of Regions
+	 *
 	 * @param regions The list of Regions
 	 */
 	public MultiRegion(List<Region> regions) {
@@ -76,6 +79,7 @@ public class MultiRegion extends Region {
 	
 	/**
 	 * Construct a MultiRegion using a vararg of Regions
+	 *
 	 * @param regions The vararg of Regions
 	 */
 	public MultiRegion(Region... regions) {
@@ -84,6 +88,7 @@ public class MultiRegion extends Region {
 	
 	/**
 	 * Adds a Region to this MultiRegion
+	 *
 	 * @param region The Region to add
 	 */
 	public void add(Region region) {
@@ -106,6 +111,7 @@ public class MultiRegion extends Region {
 	 * Subtracts a Region from this MultiRegion. A subtracted Region overrides all positive Regions,
 	 * meaning adding a Region that overlaps a previously subtracted Region will not add the overlapping blocks.
 	 * Calling {@link MultiRegion#recalculate()} will coalesce into only added Regions.
+	 *
 	 * @param region The Region to subtract
 	 */
 	public void subtract(Region region) {
@@ -117,6 +123,7 @@ public class MultiRegion extends Region {
 	
 	/**
 	 * Checks whether this MultiRegion contains the given Location
+	 *
 	 * @param location The Location to check
 	 * @return Whether the Location is contained within this MultiRegion
 	 */
@@ -137,6 +144,7 @@ public class MultiRegion extends Region {
 	
 	/**
 	 * Gets all the cuboid Regions that form this MultiRegion
+	 *
 	 * @return The list of Regions that form this MultiRegion
 	 */
 	public List<Region> getRegions() {
@@ -146,7 +154,8 @@ public class MultiRegion extends Region {
 	/**
 	 * Sums the block volume of all the Regions that make up this MultiRegion.
 	 * Will be inaccurate if any of the Regions overlap. Call {@link MultiRegion#recalculate()} first.
- 	 * @return The volume of this MultiRegion
+	 *
+	 * @return The volume of this MultiRegion
 	 */
 	public int getBlockVolume() {
 		int total = 0;
@@ -162,6 +171,7 @@ public class MultiRegion extends Region {
 	/**
 	 * Sums the volume of all the Regions that make up this MultiRegion.
 	 * Will be inaccurate if any of the Regions overlap. Call {@link MultiRegion#recalculate()} first.
+	 *
 	 * @return The volume of this MultiRegion
 	 */
 	@Override
@@ -186,6 +196,7 @@ public class MultiRegion extends Region {
 	
 	/**
 	 * Clones this MultiRegion
+	 *
 	 * @return A clone of this MultiRegion
 	 */
 	@Override
@@ -202,8 +213,9 @@ public class MultiRegion extends Region {
 	 * given on the face of the direction. It is highly recommended to call {@link MultiRegion#recalculate()}
 	 * after calling this, especially if it is a retraction. This is a fairly expensive operation,
 	 * so use it sparingly.
+	 *
 	 * @param direction The direction to expand the region in
-	 * @param amount The amount to expand the region in the given direction
+	 * @param amount    The amount to expand the region in the given direction
 	 */
 	@Override
 	public void expand(BlockFace direction, int amount) {
@@ -232,6 +244,7 @@ public class MultiRegion extends Region {
 	/**
 	 * Expands the region, or retracts if negative. This makes 6 calls to {@link MultiRegion#expand(BlockFace, int)},
 	 * meaning it is very expensive. Avoid calling this method if possible.
+	 *
 	 * @param posX The amount to expand the region in the positive X direction
 	 * @param negX The amount to expand the region in the negative X direction
 	 * @param posY The amount to expand the region in the positive Y direction
@@ -250,6 +263,7 @@ public class MultiRegion extends Region {
 	
 	/**
 	 * Turns this MultiRegion into a cuboid Region using the extreme corners
+	 *
 	 * @return A cuboid region guaranteed to have equal or greater coverage compared to this MultiRegion
 	 */
 	public Region toCuboid() {
@@ -271,6 +285,7 @@ public class MultiRegion extends Region {
 	 * of {@link MultiRegion#contains(Location)} for MultiRegions which contain many Regions by allowing it to skip having
 	 * to check {@link Region#contains(Location)} on many nearby Regions. This method can be called multiple times, which
 	 * will further cluster the clusters. It is recommended to use {@link MultiRegion#autoCluster()} in most cases.
+	 *
 	 * @param per The number of Regions that should be in each cluster
 	 */
 	public void cluster(int per) {
@@ -368,6 +383,7 @@ public class MultiRegion extends Region {
 	
 	/**
 	 * Recursively gets the number of Regions in this MultiRegion
+	 *
 	 * @return The total number of cuboid Regions composing this MultiRegion
 	 */
 	public int getRegionCount() {
@@ -387,6 +403,7 @@ public class MultiRegion extends Region {
 	
 	/**
 	 * Check if this Region overlaps with another.
+	 *
 	 * @param o The Region to check against
 	 * @return Whether this Region overlaps with the given Region
 	 */
@@ -404,6 +421,7 @@ public class MultiRegion extends Region {
 	
 	/**
 	 * Gets a MultiRegion representing the overlap. This is somewhat expensive.
+	 *
 	 * @param other The Region to check for overlap with
 	 * @return The overlapping portions of the Regions
 	 */
@@ -425,6 +443,7 @@ public class MultiRegion extends Region {
 	
 	/**
 	 * Moves this MultiRegion using the given vector
+	 *
 	 * @param v The vector to be applied to both corners of the region
 	 */
 	@Override
@@ -450,6 +469,7 @@ public class MultiRegion extends Region {
 	 * This will coalesce the MultiRegion into only added Regions, but subtracted Regions will not be included
 	 * in any of the Regions. Calling this method is somewhat expensive, but will make all other operations
 	 * on this MultiRegion faster.
+	 *
 	 * @param autoCluster Whether to automatically cluster regions in clusters of 10 until there are less than 25 top-level regions
 	 */
 	public void recalculate(boolean autoCluster) {
@@ -475,11 +495,7 @@ public class MultiRegion extends Region {
 		while (added[0]) {
 			added[0] = false;
 			for (Region region : regions) {
-				if (blocks[0] != null && blocks[0].getNonIntersectingVolume(region) == region.getBlockVolume()) {
-					toRemove.add(region);
-					continue;
-				}
-				Location loc = findFreePointRecursive(region, newRegions, (int) Math.log(region.getBlockVolume()) * 2);
+				Location loc = findFreePoint(region, newRegions);
 				if (loc != null) {
 					Region reg = new Region(loc, loc.clone().add(1, 1, 1));
 					if (expandToMax(reg, blocks[0])) {
@@ -491,6 +507,7 @@ public class MultiRegion extends Region {
 						newRegions.add(reg);
 						added[0] = true;
 					}
+					continue;
 				}
 			}
 			regions.removeAll(toRemove);
@@ -505,33 +522,22 @@ public class MultiRegion extends Region {
 		autoCluster();
 	}
 	
-	private Location findFreePointRecursive(Region check, List<Region> exclude, int limit) {
-		Deque<Region> regions = new ArrayDeque<>();
-		regions.add(check);
-		int count = 0;
-		for (int i = 0; i < regions.size() && count < limit; i++) {
-			Region region = regions.getFirst();
+	private Location findFreePoint(Region check, List<Region> exclude) {
+		List<Region> intersects = exclude.stream().map(check::getIntersection).filter(Objects::nonNull).collect(Collectors.toList());
+		if (intersects.size() == 0) {
+			return check.getCenter().getBlock().getLocation();
+		}
+		for (Region region : intersects) {
 			for (Location corner : region.getCorners()) {
-				corner = corner.getBlock().getLocation();
-				if (contains(corner) && !contains(exclude, corner)) {
-					return corner;
+				for (Vector vec : adjacent) {
+					Location loc = corner.clone().add(vec).getBlock().getLocation();
+					if (check.contains(loc) && !contains(intersects, loc)) {
+						return loc;
+					}
 				}
 			}
-			Collections.addAll(regions, binarySplit(region));
-			regions.removeFirst();
-			count++;
 		}
 		return null;
-	}
-	
-	private Region[] binarySplit(Region r) {
-		Location[] corners = r.getCorners();
-		Region[] split = new Region[8];
-		Location center = r.getCenter();
-		for (int i = 0; i < corners.length; i++) {
-			split[i] = new Region(corners[i], center);
-		}
-		return split;
 	}
 	
 	private boolean expandToMax(Region r, MultiRegion exclude) {
@@ -598,6 +604,7 @@ public class MultiRegion extends Region {
 	/**
 	 * A Stream of all the blocks in all of the Regions within this MultiRegion. May iterate the same block multiple
 	 * times if any of the Regions overlap. Call {@link MultiRegion#recalculate()} first.
+	 *
 	 * @return A Stream of all the blocks in this MultiRegion
 	 */
 	public Stream<Block> stream() {
@@ -612,6 +619,7 @@ public class MultiRegion extends Region {
 	 * Converts this MultiRegion to a String which can be converted back to a MultiRegion using {@link MultiRegion#fromString(String)}
 	 * Please use this to persist MultiRegions, as most of the operations for manipulating a MultiRegion are far more
 	 * expensive than the same operations would be for a Region. If its shape is static, and it needs to be reused, save it.
+	 *
 	 * @return The String representation of this MultiRegion
 	 */
 	public String toString() {
@@ -626,6 +634,7 @@ public class MultiRegion extends Region {
 	
 	/**
 	 * Turns a String generated by {@link MultiRegion#toString()} back into a MultiRegion
+	 *
 	 * @param input The String representation of a MultiRegion
 	 * @return The MultiRegion
 	 */

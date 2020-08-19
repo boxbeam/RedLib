@@ -84,6 +84,12 @@ class ConfigMap<T> extends HashMap<String, T> {
 	}
 	
 	@Override
+	public void clear() {
+		super.clear();
+		section.getParent().set(section.getName(), null);
+	}
+	
+	@Override
 	public T put(String key, T value) {
 		T out = super.put(key, value);
 		fields.stream().filter(f -> f.getPath().equals("_section")).findFirst().ifPresent(f -> {

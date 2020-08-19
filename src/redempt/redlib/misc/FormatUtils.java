@@ -18,11 +18,16 @@ public class FormatUtils {
 	 */
 	public static String formatTimeOffset(long millis) {
 		millis /= 1000;
+		long days = millis / 86400;
+		millis %= 86400;
 		long hours = millis / 3600;
 		millis %= 3600;
 		long minutes = millis / 60;
 		millis %= 60;
 		StringBuilder output = new StringBuilder();
+		if (days > 0) {
+			output.append(days).append("d");
+		}
 		if (hours > 0) {
 			output.append(hours).append("h");
 		}
