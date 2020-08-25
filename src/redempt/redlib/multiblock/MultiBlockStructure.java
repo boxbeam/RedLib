@@ -392,6 +392,9 @@ public class MultiBlockStructure {
 	 * @throws ArrayIndexOutOfBoundsException if the relative coordinates do not exist within this structure
 	 */
 	public BlockState getData(Location loc, int relX, int relY, int relZ) {
+		if (relX >= dimX || relX < 0 || relY >= dimY || relY < 0 || relZ >= dimZ || relZ < 0) {
+			return null;
+		}
 		return this.getStateToSet(loc, data[relX][relY][relZ]);
 	}
 	

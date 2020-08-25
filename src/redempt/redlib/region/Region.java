@@ -15,6 +15,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import redempt.redlib.RedLib;
+import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.protection.ProtectedRegion;
 import redempt.redlib.protection.ProtectionPolicy.ProtectionType;
 
@@ -382,8 +383,10 @@ public class Region {
 	public Set<Chunk> getChunks() {
 		if (chunkCache == null) {
 			chunkCache = new HashSet<>();
-			for (int cx = start.getChunk().getX(); cx <= end.getChunk().getX(); cx++) {
-				for (int cz = start.getChunk().getZ(); cz <= end.getChunk().getZ(); cz++) {
+			int[] cstart = LocationUtils.getChunkCoordinates(start);
+			int[] cend = LocationUtils.getChunkCoordinates(end);
+			for (int cx = cstart[0]; cx <= cend[0]; cx++) {
+				for (int cz = cstart[1]; cz <= cend[1]; cz++) {
 					chunkCache.add(start.getWorld().getChunkAt(cx, cz));
 				}
 			}
@@ -401,8 +404,10 @@ public class Region {
 			chunkCache.stream().filter(Chunk::isLoaded).forEach(chunks::add);
 			return chunks;
 		}
-		for (int cx = start.getChunk().getX(); cx <= end.getChunk().getX(); cx++) {
-			for (int cz = start.getChunk().getZ(); cz <= end.getChunk().getZ(); cz++) {
+		int[] cstart = LocationUtils.getChunkCoordinates(start);
+		int[] cend = LocationUtils.getChunkCoordinates(end);
+		for (int cx = cstart[0]; cx <= cend[0]; cx++) {
+			for (int cz = cstart[1]; cz <= cend[1]; cz++) {
 				if (start.getWorld().isChunkLoaded(cx, cz)) {
 					chunks.add(start.getWorld().getChunkAt(cx, cz));
 				}

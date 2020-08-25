@@ -203,7 +203,9 @@ public class MultiRegion extends Region {
 	public MultiRegion clone() {
 		List<Region> clone = new ArrayList<>();
 		regions.stream().map(Region::clone).forEach(clone::add);
-		return new MultiRegion(clone);
+		MultiRegion multi = new MultiRegion(clone);
+		subtract.forEach(multi::subtract);
+		return multi;
 	}
 	
 	/**
@@ -509,6 +511,7 @@ public class MultiRegion extends Region {
 					}
 					continue;
 				}
+				toRemove.add(region);
 			}
 			regions.removeAll(toRemove);
 			toRemove.clear();

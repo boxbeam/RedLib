@@ -14,9 +14,11 @@ public class FormatUtils {
 	/**
 	 * Formats a time offset like 1h3m8s (1 hour, 3 minutes, 8 seconds)
 	 * @param millis The time offset, in milliseconds
+	 * @param truncate The number of units to truncate -
+	 *                 1 for seconds, 2 for seconds and minutes, 3 for seconds, minutes, and hours
 	 * @return The formatted string
 	 */
-	public static String formatTimeOffset(long millis) {
+	public static String formatTimeOffset(long millis, int truncate) {
 		millis /= 1000;
 		long days = millis / 86400;
 		millis %= 86400;
@@ -25,17 +27,28 @@ public class FormatUtils {
 		long minutes = millis / 60;
 		millis %= 60;
 		StringBuilder output = new StringBuilder();
-		if (days > 0) {
+		if (days > 0 || truncate == 3) {
 			output.append(days).append("d");
 		}
-		if (hours > 0) {
+		if (hours > 0 && (truncate < 3 || (days == 0))) {
 			output.append(hours).append("h");
 		}
-		if (minutes > 0) {
+		if (minutes > 0 && (truncate < 2 || (hours == 0))) {
 			output.append(minutes).append("m");
 		}
-		output.append(millis).append("s");
+		if (truncate < 1) {
+			output.append(millis).append("s");
+		}
 		return output.toString();
+	}
+	
+	/**
+	 * Formats a time offset like 1h3m8s (1 hour, 3 minutes, 8 seconds)
+	 * @param millis The time offset, in milliseconds
+	 * @return The formatted string
+	 */
+	public static String formatTimeOffset(long millis) {
+		return formatTimeOffset(millis, 0);
 	}
 	
 	/**

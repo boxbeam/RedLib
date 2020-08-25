@@ -1,4 +1,5 @@
 name: RedLib
 main: redempt.redlib.RedLib
 version: 2.0
+author: Redempt
 api-version: 1.13

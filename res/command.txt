@@ -22,16 +22,87 @@ structure,struct {
 		user player
 	}
 }
-itemhelper,itemhelp,ih {
+profiler,rprofiler {
 	permission redlib.dev
-	setname string:name*... {
-		help Sets the name of an item
-		hook setName
+	monitor {
+		start {
+			help Starts the tick monitor profiler
+			hook startmonitor
+		}
+		setminimum int:minimum {
+			help Sets the minimum milliseconds for a tick to take to be reported
+			hook setminimum
+		}
+		clear {
+			help Clears the tick monitor profiler reports
+			hook clear
+		}
+		reports {
+			help Shows reports for the longest ticks since the tick monitor profiler started
+			hook reports
+			user player
+		}
+		select int:num {
+			notab
+			hook selectreport
+		}
+	}
+	start {
+		help Starts or resets the RedLib passive profiler
+		hook start
+	}
+	stop {
+		help Stops the RedLib passive profiler
+		hook stop
+	}
+	summary {
+		help Creates and selects a summary from the manual RedLib profiler
+		hook summary
 		user player
 	}
-	addlore string:lore*... {
-		help Adds a line of lore to an item
-		hook addLore
+	verbose {
+		help Toggle verbose mode
+		hook verbose
+		user player
+	}
+	timeformat {
+		help Toggle time between percentages and milliseconds
+		hook timeformat
+		user player
+	}
+	root {
+		help Shows the root method from the selected summary
+		hook root
+		user player
+	}
+	select string:selector {
+		hook select
+		user player
+		notab
+	}
+	up int:count?(1) {
+		help Selects the parent method of the currently selected method
+		hook up
+		user player
+	}
+	collapse {
+		help Collapses all methods
+		hook collapse
+		user player
+	}
+	toggleexpand string:selector {
+		hook toggleexpand
+		user player
+		notab
+	}
+	search string:terms... {
+		help [-d depth] [-o over-percent] [-m over-milliseconds] term
+		hook search
+		user player
+	}
+	limit int:amount {
+		help Limits the number of children that can be shown under a single method
+		hook limit
 		user player
 	}
 }

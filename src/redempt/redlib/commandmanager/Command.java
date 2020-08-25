@@ -66,13 +66,14 @@ public class Command {
 	private Method methodHook;
 	protected String help;
 	private Object listener;
+	private boolean noTab = false;
 	protected boolean topLevel = false;
 	protected Command parent = null;
 	private boolean hideSub = false;
 	
 	protected Command() {}
 	
-	protected Command(String[] names, CommandArgument[] args, ContextProvider<?>[] providers, ContextProvider<?>[] asserters, String help, String permission, SenderType type, String hook, List<Command> children, boolean hideSub) {
+	protected Command(String[] names, CommandArgument[] args, ContextProvider<?>[] providers, ContextProvider<?>[] asserters, String help, String permission, SenderType type, String hook, List<Command> children, boolean hideSub, boolean noTab) {
 		this.names = names;
 		this.args = args;
 		this.contextProviders = providers;
@@ -83,6 +84,7 @@ public class Command {
 		this.help = help;
 		this.children = children;
 		this.hideSub = hideSub;
+		this.noTab = noTab;
 		for (Command command : children) {
 			command.parent = this;
 		}
@@ -418,6 +420,9 @@ public class Command {
 		List<String> completions = new ArrayList<>();
 		if (args.length > 0) {
 			for (Command child : children) {
+				if (child.noTab) {
+					continue;
+				}
 				if (child.getPermission() != null && !sender.hasPermission(child.getPermission())) {
 					continue;
 				}
@@ -431,6 +436,9 @@ public class Command {
 		}
 		if (args.length == 1) {
 			for (Command child : children) {
+				if (child.noTab) {
+					continue;
+				}
 				if (child.getPermission() != null && !sender.hasPermission(child.getPermission())) {
 					continue;
 				}

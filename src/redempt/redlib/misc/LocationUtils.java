@@ -224,4 +224,13 @@ public class LocationUtils {
 		});
 	}
 	
+	/**
+	 * Gets the chunk X and Z of a location
+	 * @param loc The location to get the chunk coordinates of
+	 * @return An array containing the chunk coordinates [x, z]
+	 */
+	public static int[] getChunkCoordinates(Location loc) {
+		return new int[] {loc.getBlockX() >> 4, loc.getBlockZ() >> 4};
+	}
+	
 }

@@ -96,6 +96,7 @@ public class CommandParser {
 		List<Command> commands = new ArrayList<>();
 		List<Command> children = new ArrayList<>();
 		boolean hideSub = false;
+		boolean noTab = false;
 		for (int pos = lineNumber; pos < lines.size(); pos++) {
 			String line = lines.get(pos).trim();
 			if (line.endsWith("{")) {
@@ -234,6 +235,9 @@ public class CommandParser {
 				if (line.equalsIgnoreCase("hidesub")) {
 					hideSub = true;
 				}
+				if (line.equalsIgnoreCase("notab")) {
+					noTab = true;
+				}
 				if (line.startsWith("hook ")) {
 					hook = line.replaceAll("^hook ", "");
 				}
@@ -244,7 +248,7 @@ public class CommandParser {
 					commands.add(new Command(names, args.toArray(new CommandArgument[args.size()]),
 							contextProviders.toArray(new ContextProvider<?>[contextProviders.size()]),
 							asserters.toArray(new ContextProvider<?>[asserters.size()]),
-							help, permission, type, hook, children, hideSub));
+							help, permission, type, hook, children, hideSub, noTab));
 					children = new ArrayList<>();
 					names = null;
 					args = new ArrayList<>();
@@ -255,6 +259,7 @@ public class CommandParser {
 					type = null;
 					hook = null;
 					hideSub = false;
+					noTab = false;
 					if (lineNumber != 0) {
 						return new CommandCollection(commands);
 					}

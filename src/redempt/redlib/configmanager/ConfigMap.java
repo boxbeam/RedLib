@@ -14,7 +14,7 @@ import java.util.List;
 
 class ConfigMap<T> extends HashMap<String, T> {
 	
-	private Class<T> clazz;
+	protected Class<T> clazz;
 	protected ConfigurationSection section;
 	private ConfigManager manager;
 	private List<ConfigField> fields = new ArrayList<>();
