@@ -1,9 +1,14 @@
 package redempt.redlib.blockdata;
 
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.block.Block;
+import redempt.redlib.json.JSONList;
+import redempt.redlib.json.JSONMap;
+import redempt.redlib.misc.LocationUtils;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents a Block with various data attached to it
@@ -11,9 +16,11 @@ import java.util.Map;
  */
 public class DataBlock {
 	
-	protected Map<String, Object> data = new HashMap<>();
+	protected JSONMap data = new JSONMap();
+	protected boolean exists = false;
 	private Block block;
 	private BlockDataManager manager;
+	private boolean modified;
 	
 	protected DataBlock(Block block, BlockDataManager manager) {
 		this.block = block;
@@ -27,8 +34,10 @@ public class DataBlock {
 	 * @param data The data to put
 	 */
 	public void set(String key, Object data) {
-		if (this.data.put(key, data) == null && this.data.size() == 1) {
-			manager.map.set(block.getLocation(), this);
+		modified = true;
+		this.data.put(key, data);
+		if (!exists) {
+			save();
 		}
 	}
 	
@@ -77,6 +86,14 @@ public class DataBlock {
 		return (double) this.data.get(key);
 	}
 	
+	public JSONMap getMap(String key) {
+		return this.data.getMap(key);
+	}
+	
+	public JSONList getList(String key) {
+		return this.data.getList(key);
+	}
+	
 	/**
 	 * Removes the object associated with a certain key.
 	 * If this object is the last one stored in this DataBlock,
@@ -85,13 +102,57 @@ public class DataBlock {
 	 */
 	public void remove(String key) {
 		this.data.remove(key);
-		if (this.data.size() == 0) {
-			manager.map.remove(block.getLocation(), this);
-		}
 	}
 	
 	/**
-	 * Removes this DataBlock from its BlockDataManager
+	 * @return All the data stored in this DataBlock
+	 */
+	public JSONMap getData() {
+		return data;
+	}
+	
+	protected void save() {
+		if (!modified) {
+			return;
+		}
+		modified = false;
+		if (exists) {
+			manager.sql.execute("UPDATE blocks SET data=? WHERE x=? AND y=? AND z=? AND world=?;",
+					data.toString(), block.getX(), block.getY(), block.getZ(), getWorld().getName());
+		} else {
+			
+			int[] pos = getChunkCoordinates();
+			manager.sql.execute("INSERT INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?);",
+					getWorld().getName(), pos[0], pos[1], block.getX(), block.getY(), block.getZ(), data.toString());
+			exists = true;
+		}
+	}
+	
+	
+	/**
+	 * @return Whether the chunk this DataBlock is in is loaded
+	 */
+	public boolean isLoaded() {
+		int[] pos = getChunkCoordinates();
+		return getWorld().isChunkLoaded(pos[0], pos[1]);
+	}
+	
+	/**
+	 * @return The chunk coordinates [x, z] of this DataBlock
+	 */
+	public int[] getChunkCoordinates() {
+		return LocationUtils.getChunkCoordinates(block.getLocation());
+	}
+	
+	/**
+	 * @return The World this DataBlock is in
+	 */
+	public World getWorld() {
+		return block.getWorld();
+	}
+	
+	/**
+	 * Removes this DataBlock and all the data associated with it
 	 */
 	public void remove() {
 		manager.remove(this);
@@ -113,6 +174,16 @@ public class DataBlock {
 	 */
 	public BlockDataManager getManager() {
 		return manager;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(block, manager);
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		return o.hashCode() == hashCode();
 	}
 	
 }

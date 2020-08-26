@@ -44,6 +44,12 @@ public class SampleSummary {
 	}
 	
 	protected SampleSummary(Collection<Sample> samples) {
+		if (samples.size() == 0) {
+			this.samples = null;
+			start = System.currentTimeMillis();
+			end = System.currentTimeMillis();
+			return;
+		}
 		this.samples.addAll(samples);
 		for (Sample sample : samples) {
 			StackTraceElement[] stack = sample.getStackTrace();

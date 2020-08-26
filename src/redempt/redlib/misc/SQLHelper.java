@@ -207,6 +207,42 @@ public class SQLHelper implements Closeable {
 	}
 	
 	/**
+	 * Sets the wrapped connection's auto-commit property
+	 * @param autoCommit The auto-commit property - whether it will commit with every command
+	 */
+	public void setAutoCommit(boolean autoCommit) {
+		try {
+			connection.setAutoCommit(autoCommit);
+		} catch (SQLException e) {
+			sneakyThrow(e);
+
+		}
+	}
+	
+	/**
+	 * @return The auto-commit property of the wrapped connection
+	 */
+	public boolean isAutoCommit() {
+		try {
+			return connection.getAutoCommit();
+		} catch (SQLException e) {
+			sneakyThrow(e);
+			return false;
+		}
+	}
+	
+	/**
+	 * Commits the transaction
+	 */
+	public void commit() {
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			sneakyThrow(e);
+		}
+	}
+	
+	/**
 	 * Prepares a statement, setting its fields to the elements of the vararg passed
 	 * @param query The SQL query to prepare
 	 * @param fields A vararg of the fields to set in the prepared statement

@@ -95,7 +95,7 @@ public class JSONParser {
 						Object value = null;
 						switch (type) {
 							case STRING:
-								value= json.substring(cursor + 1, lastChar);
+								value= substring(chars, cursor + 1, lastChar);
 								break;
 							case INT:
 								value = Integer.parseInt(json.substring(cursor, lastChar + 1));
@@ -153,6 +153,20 @@ public class JSONParser {
 			}
 		}
 		return root;
+	}
+	
+	private static String substring(char[] chars, int start, int end) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = start; i < end; i++) {
+			char c = chars[i];
+			if (c == '\\') {
+				builder.append(chars[i + 1]);
+				i++;
+				continue;
+			}
+			builder.append(c);
+		}
+		return builder.toString();
 	}
 	
 	private enum Type {

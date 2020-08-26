@@ -13,6 +13,7 @@ public class TickMonitorProfiler {
 	private static BurstProfiler burst;
 	private static List<SampleSummary> reports = new ArrayList<>(15);
 	private static long tickMinimum = 100;
+	private static Task task;
 	
 	public static void setTickMinimum(long tickMinimum) {
 		TickMonitorProfiler.tickMinimum = tickMinimum;
@@ -25,7 +26,7 @@ public class TickMonitorProfiler {
 		burst = new BurstProfiler(10000);
 		burst.start();
 		tick = 0;
-		Task.syncRepeating(RedLib.getInstance(), () -> {
+		task = Task.syncRepeating(RedLib.getInstance(), () -> {
 			if (times.size() >= 999) {
 				times.poll();
 			}
@@ -45,6 +46,14 @@ public class TickMonitorProfiler {
 			}
 			times.add(current);
 		}, 1, 1);
+	}
+	
+	public static void stop() {
+		if (task != null) {
+			task.cancel();
+		}
+		tick = -1;
+		burst.stop();
 	}
 	
 	public static void clear() {
