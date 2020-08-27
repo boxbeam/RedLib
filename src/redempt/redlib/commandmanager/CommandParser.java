@@ -1,22 +1,16 @@
 package redempt.redlib.commandmanager;
 
-import java.io.BufferedReader;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import redempt.redlib.commandmanager.Command.CommandArgumentType;
+import redempt.redlib.commandmanager.Command.SenderType;
+import redempt.redlib.commandmanager.exceptions.CommandParseException;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-import java.util.regex.Pattern;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import redempt.redlib.commandmanager.CommandArgument;
-import redempt.redlib.commandmanager.Command.CommandArgumentType;
-import redempt.redlib.commandmanager.Command.SenderType;
-import redempt.redlib.commandmanager.exceptions.CommandParseException;
 
 /**
  * Used to get ContextProviders and CommandArgumentTypes for a command file, then parse it

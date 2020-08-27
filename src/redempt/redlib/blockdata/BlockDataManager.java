@@ -48,11 +48,19 @@ public class BlockDataManager implements Listener {
 	}
 	
 	/**
-	 * Saves all data to the save file. Call this in your onDisable.
+	 * Saves all data to the save file.
 	 */
 	public void save() {
 		getAllLoaded().forEach(DataBlock::save);
 		sql.commit();
+	}
+	
+	/**
+	 * Saves all data to the save file, and closes the SQL connection. Call this in your onDisable.
+	 */
+	public void saveAndClose() {
+		save();
+		sql.close();
 	}
 	
 	/**
