@@ -2,29 +2,24 @@ package redempt.redlib.commandmanager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.event.server.PluginDisableEvent;
-import org.bukkit.event.server.TabCompleteEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.exceptions.CommandParseException;
 import redempt.redlib.commandmanager.exceptions.MissingHookException;
 import redempt.redlib.misc.EventListener;
-import redempt.redlib.region.MultiRegion;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static redempt.redlib.commandmanager.Messages.msg;
 
@@ -34,16 +29,16 @@ import static redempt.redlib.commandmanager.Messages.msg;
  */
 public class Command {
 	
-	private static List<CommandArgumentType<?>> types = new ArrayList<>();
+	private static List<ArgType<?>> types = new ArrayList<>();
 	protected List<Command> children = new ArrayList<>();
 	
 	static {
-		types.add(new CommandArgumentType<>("int", (Function<String, Integer>) Integer::parseInt));
-		types.add(new CommandArgumentType<>("double", Double::parseDouble));
-		types.add(new CommandArgumentType<>("float", Float::parseFloat));
-		types.add(new CommandArgumentType<>("long", (Function<String, Long>) Long::parseLong));
-		types.add(new CommandArgumentType<>("string", s -> s));
-		types.add(new CommandArgumentType<>("boolean", s -> {
+		types.add(new ArgType<>("int", (Function<String, Integer>) Integer::parseInt));
+		types.add(new ArgType<>("double", Double::parseDouble));
+		types.add(new ArgType<>("float", Float::parseFloat));
+		types.add(new ArgType<>("long", (Function<String, Long>) Long::parseLong));
+		types.add(new ArgType<>("string", s -> s));
+		types.add(new ArgType<>("boolean", s -> {
 			switch (s.toLowerCase()) {
 				case "true":
 					return true;
@@ -548,13 +543,13 @@ public class Command {
 		return true;
 	}
 	
-	protected static CommandArgumentType<?> getType(String name, CommandArgumentType<?>[] types) {
-		for (CommandArgumentType<?> type : Command.types) {
+	protected static ArgType<?> getType(String name, ArgType<?>[] types) {
+		for (ArgType<?> type : Command.types) {
 			if (type.getName().equals(name)) {
 				return type;
 			}
 		}
-		for (CommandArgumentType<?> type : types) {
+		for (ArgType<?> type : types) {
 			if (type.getName().equals(name)) {
 				return type;
 			}
@@ -598,176 +593,8 @@ public class Command {
 	 * @throws CommandParseException if the command file cannot be parsed
 	 * @deprecated Outdated. Use {@link CommandParser#parse()}
 	 */
-	public static CommandCollection fromStream(InputStream stream, CommandArgumentType<?>... types) {
+	public static CommandCollection fromStream(InputStream stream, ArgType<?>... types) {
 		return new CommandParser(stream).setArgTypes(types).parse();
-	}
-	
-	/**
-	 * A command argument type, which converts a String argument to another type
-	 * @author Redempt
-	 * @param <T> The type this CommandArgumentType converts to
-	 */
-	public static class CommandArgumentType<T> {
-		
-		/**
-		 * The CommandArgumentType for a Player
-		 */
-		public static CommandArgumentType<Player> playerType = new CommandArgumentType<Player>("player", s -> Bukkit.getPlayer(s))
-				.tabStream(c -> Bukkit.getOnlinePlayers().stream().map(Player::getName));
-		
-		/**
-		 * Creates a CommandArgumentType for an enum, which will accept all of the enum's values as arguments and offer all enum values as tab completions
-		 * @param <T> The enum type
-		 * @param name The name of the CommandArgumentType
-		 * @param clazz The enum class to make a CommandArgumentType from
-		 * @return A CommandArgumentType for the given enum
-		 */
-		public static <T extends Enum> CommandArgumentType<T> of(String name, Class<T> clazz) {
-			if (!clazz.isEnum()) {
-				throw new IllegalArgumentException("Class must be an enum type!");
-			}
-			try {
-				Method getValues = clazz.getDeclaredMethod("values");
-				Object[] values = (Object[]) getValues.invoke(null);
-				List<String> strings = Arrays.stream(values).map(Object::toString).collect(Collectors.toList());
-				return new CommandArgumentType<T>(name, s -> {
-						try {
-							return (T) Enum.valueOf(clazz, s);
-						} catch (Exception e) {
-							return null;
-						}
-					}).tab(c -> strings);
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
-		
-		/**
-		 * Creates a CommandArgumentType for a set of possible string inputs
-		 * @param name The name of the CommandArgumentType
-		 * @param values The list of possible inputs
-		 * @return A CommandArgumentType for the given inputs, which will offer tab completion and accept any of the supplied strings, or return null if the given argument does not match any of them
-		 */
-		public static CommandArgumentType<String> of(String name, String... values) {
-			List<String> list = Arrays.stream(values).collect(Collectors.toList());
-			return new CommandArgumentType<>(name, s -> list.contains(s) ? s : null)
-					.tab(c -> list);
-		}
-		
-		private Function<String, T> func = null;
-		private BiFunction<CommandSender, String, T> bifunc = null;
-		private String name;
-		private Function<CommandSender, List<String>> tab = null;
-		
-		/**
-		 * Create a CommandArgumentType from a name and converter
-		 * @param name The name of this command argument type, to be used in the command file
-		 * @param convert The {@link Function} to convert from a String to whatever type this converts to
-		 */
-		public CommandArgumentType(String name, Function<String, T> convert) {
-			if (name.contains(" ")) {
-				throw new IllegalArgumentException("Command argument type name cannot contain a space");
-			}
-			func = convert;
-			this.name = name;
-		}
-		
-		/**
-		 * Create a CommandArgumentType from a name and converter
-		 * @param name The name of this command argument type, to be used in the command file
-		 * @param convert The {@link BiFunction} to convert from a String to whatever type this converts to
-		 */
-		public CommandArgumentType(String name, BiFunction<CommandSender, String, T> convert) {
-			if (name.contains(" ")) {
-				throw new IllegalArgumentException("Command argument type name cannot contain a space");
-			}
-			bifunc = convert;
-			this.name = name;
-		}
-		
-		/**
-		 * Sets the tab completer for this type
-		 * @param tab The function returning a List of all completions for this sender
-		 * @return itself
-		 */
-		public CommandArgumentType<T> tab(Function<CommandSender, List<String>> tab) {
-			this.tab = tab;
-			return this;
-		}
-		
-		/**
-		 * Sets the tab completer for this type, can be used instead of tab
-		 * @param tab The function returning a Stream of all completions for this sender
-		 * @return itself
-		 */
-		public CommandArgumentType<T> tabStream(Function<CommandSender, Stream<String>> tab) {
-			this.tab = c -> tab.apply(c).collect(Collectors.toList());
-			return this;
-		}
-		
-		private List<String> tabComplete(CommandSender sender) {
-			if (tab == null) {
-				return new ArrayList<>();
-			}
-			List<String> values = tab.apply(sender);
-			if (values == null) {
-				return new ArrayList<>();
-			}
-			return values;
-		}
-		
-		/**
-		 * @return The name of this argument type
-		 */
-		public String getName() {
-			return name;
-		}
-		
-		/**
-		 * Converts an argument to another type
-		 * @param sender The sender of the command
-		 * @param argument The argument to be converted
-		 * @return The converted argument for use in a method hook
-		 */
-		public T convert(CommandSender sender, String argument) {
-			return func == null ? bifunc.apply(sender, argument) : func.apply(argument);
-		}
-		
-		/**
-		 * Creates a new CommandArgumentType based on this one which converts from this type to another
-		 * @param <K> The type of the resulting CommandArgumentType
-		 * @param name The name of the CommandArgumentType being created
-		 * @param func The function to convert from the type this CommandArgumentType returns to the type the new one will
-		 * @return The resulting CommandArgumentType
-		 */
-		public <K> CommandArgumentType<K> map(String name, Function<T, K> func) {
-			return new CommandArgumentType<>(name, (c, s) -> {
-				T obj = convert(c, s);
-				if (obj == null) {
-					return null;
-				}
-				return func.apply(obj);
-			});
-		}
-		
-		/**
-		 * Creates a new CommandArgumentType based on this one which converts from this type to another
-		 * @param <K> The type of the resulting CommandArgumentType
-		 * @param name The name of the CommandArgumentType being created
-		 * @param func The function to convert from the type this CommandArgumentType returns to the type the new one will
-		 * @return The resulting CommandArgumentType
-		 */
-		public <K> CommandArgumentType<K> map(String name, BiFunction<CommandSender, T, K> func) {
-			return new CommandArgumentType<>(name, (c, s) -> {
-				T obj = convert(c, s);
-				if (obj == null) {
-					return null;
-				}
-				return func.apply(c, obj);
-			});
-		}
-		
 	}
 	
 	public static enum SenderType {

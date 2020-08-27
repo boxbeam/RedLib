@@ -1,13 +1,12 @@
 package redempt.redlib.commandmanager;
 
 import org.bukkit.command.CommandSender;
-import redempt.redlib.commandmanager.Command.CommandArgumentType;
 
 import java.util.function.Function;
 
 class CommandArgument {
 	
-	private CommandArgumentType<?> type;
+	private ArgType<?> type;
 	private String name;
 	private boolean optional;
 	private boolean hideType;
@@ -15,13 +14,17 @@ class CommandArgument {
 	private Function<CommandSender, Object> defaultValue = null;
 	public int pos;
 	
-	public CommandArgument(CommandArgumentType<?> type, int pos, String name, boolean optional, boolean hideType, boolean consume) {
+	public CommandArgument(ArgType<?> type, int pos, String name, boolean optional, boolean hideType, boolean consume) {
 		this.name = name;
 		this.type = type;
 		this.pos = pos;
 		this.optional = optional;
 		this.hideType = hideType;
 		this.consume = consume;
+	}
+	
+	public String getName() {
+		return name;
 	}
 	
 	public void setDefaultValue(Function<CommandSender, Object> value) {
@@ -36,7 +39,7 @@ class CommandArgument {
 		return pos;
 	}
 	
-	public CommandArgumentType<?> getType() {
+	public ArgType<?> getType() {
 		return type;
 	}
 	

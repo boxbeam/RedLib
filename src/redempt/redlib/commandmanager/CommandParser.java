@@ -2,7 +2,6 @@ package redempt.redlib.commandmanager;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import redempt.redlib.commandmanager.Command.CommandArgumentType;
 import redempt.redlib.commandmanager.Command.SenderType;
 import redempt.redlib.commandmanager.exceptions.CommandParseException;
 
@@ -19,7 +18,7 @@ import java.util.function.Function;
  */
 public class CommandParser {
 	
-	private CommandArgumentType<?>[] argTypes = {};
+	private ArgType<?>[] argTypes = {};
 	private ContextProvider<?>[] contextProviders = {};
 	private InputStream stream;
 	
@@ -36,7 +35,7 @@ public class CommandParser {
 	 * @param types The CommandArgumentTypes to be used
 	 * @return This CommandParser
 	 */
-	public CommandParser setArgTypes(CommandArgumentType<?>... types) {
+	public CommandParser setArgTypes(ArgType<?>... types) {
 		if (Arrays.stream(types).anyMatch(t -> t == null)) {
 			throw new IllegalArgumentException("Command argument types cannot be null!");
 		}
@@ -104,7 +103,7 @@ public class CommandParser {
 						if (argSplit.length != 2) {
 							throw new CommandParseException("Invalid command argument syntax" + split[i] + ", line " + pos);
 						}
-						CommandArgumentType<?> argType = Command.getType(argSplit[0], argTypes);
+						ArgType<?> argType = Command.getType(argSplit[0], argTypes);
 						if (argType == null) {
 							throw new CommandParseException("Missing command argument type " + argSplit[0] + ", line " + pos);
 						}

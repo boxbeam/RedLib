@@ -4,7 +4,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import redempt.redlib.commandmanager.ArgType;
-import redempt.redlib.commandmanager.Command.CommandArgumentType;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -245,11 +244,11 @@ public class EnchantRegistry {
 	}
 	
 	/**
-	 * Gets the CommandArgumentType for CustomEnchants in this registry, with tab completion using IDs
+	 * Gets the ArgType for CustomEnchants in this registry, with tab completion using IDs
 	 * @param name The name to use for the argument type
 	 * @return A CommandArgumentType for CustomEnchants in this registry
 	 */
-	public CommandArgumentType<? extends CustomEnchant<?>> getEnchantArgType(String name) {
+	public ArgType<? extends CustomEnchant<?>> getEnchantArgType(String name) {
 		return new ArgType<>(name, this::getByName).tabStream(c -> enchants.keySet().stream());
 	}
 	
