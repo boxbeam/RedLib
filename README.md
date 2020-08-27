@@ -87,16 +87,16 @@ But this is still a bit clunky. Rather than converting the String argument to a 
 ```
 @Override
 public void onEnable() {
-	CommandArgumentType<Player> playerType = new CommandArgumentType<Player>("player", Bukkit::getPlayer)
+	ArgType<Player> playerType = new ArgType<Player>("player", Bukkit::getPlayer)
 	.tabStream(sender -> Bukkit.getOnlinePlayers().map(Player::getName));
 	new CommandParser(this.getResource("command.txt")).setArgTypes(playerType).register("smite", listener);
 }
 ```
-You can give the command manager a `CommandArgumentType`, which tells it how to convert it from a String argument from a command to whatever type it represents. In this case, `Bukkit::getPlayer` is a `Function<String, Player>` which will convert the `String` argument to a `Player` for any command hook methods. We then pass it to the method which loads the command info from the file. Optionally, you can add a tab provider to the `CommandArgumentType`, which is a lambda that takes the `CommandSender` tab completing and returns a list of possible completions. The ones which don't match the partial argument the sender has already typed are automatically removed by the command manager.
+You can give the command manager a `ArgType`, which tells it how to convert it from a String argument from a command to whatever type it represents. In this case, `Bukkit::getPlayer` is a `Function<String, Player>` which will convert the `String` argument to a `Player` for any command hook methods. We then pass it to the method which loads the command info from the file. Optionally, you can add a tab provider to the `ArgType`, which is a lambda that takes the `CommandSender` tab completing and returns a list of possible completions. The ones which don't match the partial argument the sender has already typed are automatically removed by the command manager.
 
 Default types you can use are: `int`, `double`, `string`, `float`, and `long`.
 
-We also specify a name for this `CommandArgumentType`, `"player"` which we can now use in the command file:
+We also specify a name for this `ArgType`, `"player"` which we can now use in the command file:
 
 ```
 smite player:target* {
@@ -106,7 +106,7 @@ smite player:target* {
 	hook smite
 }
 ```
-The `CommandArgumentType` for `Player` is not included by default, but you don't need to define the type yourself. Since it's so common, it can be found at `CommandArgumentType.playerType`.
+The `ArgType` for `Player` is not included by default, but you don't need to define the type yourself. Since it's so common, it can be found at `ArgType.playerType`.
 
 Note the `*` at the end of the argument. This isn't required, but it means that, in the help screen, the command will be shown as `smite <target>` instead of `smite <player:target>`. Anyways, now that we have specified `player` as the argument type and registered it in the command file, so we can now use it in the listener:
 
@@ -119,7 +119,7 @@ public void smite(Player sender, Player target) {
 ```
 Much nicer! If the sender provides an invalid player (if the Function we gave it to convert a String to a Player returns null), the sender will be shown the help screen.
 
-Now, what if you have a command that takes an arbitrary number of arguments? No problem! You can specify varargs in the command file, which consume all arguments following them and will be passed to the `Function<String, T>` of the respective `CommandArgumentType`. All you have to do is put `...` at the end of the argument. Obviously, they have to be the last argument in the command:
+Now, what if you have a command that takes an arbitrary number of arguments? No problem! You can specify varargs in the command file, which consume all arguments following them and will be passed to the `Function<String, T>` of the respective `ArgType`. All you have to do is put `...` at the end of the argument. Obviously, they have to be the last argument in the command:
 
 ```
 broadcast string:message*... {
@@ -168,7 +168,7 @@ givelava int:num?(1) {
 	user player
 }
 ```
-By putting a parenthetical expression at the end of the argument, you can tell the command manager to use a default value if the optional argument is not provided. Note that this is evaluated immediately, and the CommandArgumentType will be passed `null` in place of the CommandSender it usually takes. Since the argument now has a default value, it will never be `null`, so it's safe to use a primitive type like `int` again.
+By putting a parenthetical expression at the end of the argument, you can tell the command manager to use a default value if the optional argument is not provided. Note that this is evaluated immediately, and the ArgType will be passed `null` in place of the CommandSender it usually takes. Since the argument now has a default value, it will never be `null`, so it's safe to use a primitive type like `int` again.
 
 If you need a type that's not static, and depends on the sender, you can put `context` before the value.
 
