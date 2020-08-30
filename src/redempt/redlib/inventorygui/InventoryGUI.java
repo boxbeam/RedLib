@@ -8,6 +8,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -17,12 +18,26 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import redempt.redlib.RedLib;
+import redempt.redlib.itemutils.ItemBuilder;
 import redempt.redlib.itemutils.ItemUtils;
 
 /**
  * @author Redempt
  */
 public class InventoryGUI implements Listener {
+	
+	/**
+	 * A gray stained glass pane with no name. Good for filling empty slots in GUIs.
+	 */
+	public static final ItemStack FILLER;
+	
+	static {
+		if (RedLib.midVersion >= 13) {
+			FILLER = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setName(" ");
+		} else {
+			FILLER = new ItemBuilder(Material.valueOf("STAINED_GLASS_PANE")).setDurability(7).setName(" ");
+		}
+	}
 	
 	private final Inventory inventory;
 	private List<ItemButton> buttons = new ArrayList<>();

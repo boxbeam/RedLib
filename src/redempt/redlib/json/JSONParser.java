@@ -104,7 +104,7 @@ public class JSONParser {
 								value = Double.parseDouble(json.substring(cursor, lastChar + 1));
 								break;
 							case BOOLEAN:
-								value = chars[i] == 't';
+								value = chars[cursor] == 't';
 						}
 						currentParent.add(key, value);
 						key = null;

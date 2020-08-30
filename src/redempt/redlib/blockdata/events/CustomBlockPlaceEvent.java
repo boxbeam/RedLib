@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockEvent;
+import org.bukkit.inventory.ItemStack;
 import redempt.redlib.blockdata.CustomBlock;
 import redempt.redlib.blockdata.CustomBlockType;
 
@@ -22,6 +23,7 @@ public class CustomBlockPlaceEvent extends BlockEvent implements Cancellable {
 	private boolean cancelled = false;
 	private CustomBlockType<?> type;
 	private Player player;
+	private ItemStack item;
 	
 	/**
 	 * Constructs a new CustomBlockPlaceEvent
@@ -29,8 +31,9 @@ public class CustomBlockPlaceEvent extends BlockEvent implements Cancellable {
 	 * @param type The type of CustomBlock that is being placed
 	 * @param player The Player that placed the block
 	 */
-	public CustomBlockPlaceEvent(Block block, CustomBlockType<?> type, Player player) {
+	public CustomBlockPlaceEvent(Block block, ItemStack item, CustomBlockType<?> type, Player player) {
 		super(block);
+		this.item = item;
 		this.type = type;
 		this.player = player;
 	}
@@ -40,6 +43,13 @@ public class CustomBlockPlaceEvent extends BlockEvent implements Cancellable {
 	 */
 	public Player getPlayer() {
 		return player;
+	}
+	
+	/**
+	 * @return The item that was in the player's hand when this block was placed
+	 */
+	public ItemStack getItem() {
+		return item;
 	}
 	
 	/**

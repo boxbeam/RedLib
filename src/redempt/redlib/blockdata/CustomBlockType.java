@@ -118,7 +118,7 @@ public abstract class CustomBlockType<T extends CustomBlock> implements Listener
 	public final T initialize(Block block) {
 		DataBlock db = manager.getDataBlock(block);
 		db.set("custom-type", typeName);
-		return getCustom(db);
+		return get(db);
 	}
 	
 }

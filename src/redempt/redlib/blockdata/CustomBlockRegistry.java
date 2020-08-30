@@ -182,7 +182,7 @@ public class CustomBlockRegistry implements Listener {
 			return;
 		}
 		if (type.typeMatches(e.getBlock().getType()) && type.itemMatches(e.getItemInHand())) {
-			CustomBlockPlaceEvent place = new CustomBlockPlaceEvent(e.getBlock(), type, e.getPlayer());
+			CustomBlockPlaceEvent place = new CustomBlockPlaceEvent(e.getBlock(), e.getItemInHand(), type, e.getPlayer());
 			Bukkit.getPluginManager().callEvent(place);
 			if (place.isCancelled()) {
 				e.setCancelled(true);

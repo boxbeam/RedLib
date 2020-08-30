@@ -35,6 +35,10 @@ public class DataBlock {
 	 */
 	public void set(String key, Object data) {
 		modified = true;
+		if (data == null) {
+			remove(key);
+			return;
+		}
 		this.data.put(key, data);
 		if (!exists) {
 			save();
