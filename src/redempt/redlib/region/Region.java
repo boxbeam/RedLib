@@ -16,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import redempt.redlib.RedLib;
 import redempt.redlib.misc.LocationUtils;
+import redempt.redlib.multiblock.Rotator;
 import redempt.redlib.protection.ProtectedRegion;
 import redempt.redlib.protection.ProtectionPolicy.ProtectionType;
 
@@ -262,6 +263,15 @@ public class Region {
 	}
 	
 	/**
+	 * Set the world of this region, while keeping the coordinates the same
+	 * @param world The world to set
+	 */
+	public void setWorld(World world) {
+		start.setWorld(world);
+		end.setWorld(world);
+	}
+	
+	/**
 	 * @return Whether this Region is a non-cuboid variant
 	 */
 	public boolean isMulti() {
@@ -324,6 +334,36 @@ public class Region {
 		return (!(start.getX() > o.end.getX() || o.start.getX() > end.getX()
 				|| start.getY() > o.end.getY() || o.start.getY() > end.getY()
 				|| start.getZ() > o.end.getZ() || o.start.getZ() > end.getZ()));
+	}
+	
+	/**
+	 * Rotates this Region around a point
+	 * @param center The point to rotate this Region around
+	 * @param rotations The number of clockwise rotations to apply
+	 */
+	public void rotate(Location center, int rotations) {
+		Location start = getStart();
+		Location end = getEnd();
+		start.subtract(center);
+		end.subtract(center);
+		Rotator rotator = new Rotator(rotations, false);
+		rotator.setLocation(start.getX(), start.getZ());
+		start.setX(rotator.getRotatedX());
+		start.setZ(rotator.getRotatedZ());
+		rotator.setLocation(end.getX(), end.getZ());
+		end.setX(rotator.getRotatedX());
+		end.setZ(rotator.getRotatedZ());
+		start.add(center);
+		end.add(center);
+		setLocations(start, end);
+	}
+	
+	/**
+	 * Rotates this Region around its center
+	 * @param rotations The number of clockwise rotations to apply
+	 */
+	public void rotate(int rotations) {
+		rotate(getCenter(), rotations);
 	}
 	
 	/**

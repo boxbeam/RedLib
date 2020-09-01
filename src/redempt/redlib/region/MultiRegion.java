@@ -445,7 +445,6 @@ public class MultiRegion extends Region {
 	
 	/**
 	 * Moves this MultiRegion using the given vector
-	 *
 	 * @param v The vector to be applied to both corners of the region
 	 */
 	@Override
@@ -453,6 +452,29 @@ public class MultiRegion extends Region {
 		regions.forEach(r -> r.move(v));
 		start = start.add(v);
 		end = end.add(v);
+	}
+	
+	/**
+	 * Rotates this MultiRegion and all of its sub-regions around the given point
+	 * @param center The point to rotate this Region around
+	 * @param rotations The number of clockwise rotations to apply
+	 */
+	@Override
+	public void rotate(Location center, int rotations) {
+		for (Region region : regions) {
+			region.rotate(center, rotations);
+		}
+		super.rotate(center, rotations);
+	}
+	
+	/**
+	 * Sets the world of this MultiRegion and all of its sub-regions, while keeping the coordinates
+	 * the same
+	 * @param world The world to set
+	 */
+	@Override
+	public void setWorld(World world) {
+		regions.forEach(r -> r.setWorld(world));
 	}
 	
 	/**

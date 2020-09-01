@@ -151,4 +151,14 @@ public class StructureTool implements Listener {
 		});
 	}
 	
+	@CommandHook("build")
+	public void build(Player player, int rotation, boolean mirror) {
+		MultiBlockStructure structure = structures.get(player.getUniqueId());
+		if (structure == null) {
+			player.sendMessage(ChatColor.RED + "You do not have a debug structure, select one with the multi-block structure tool and use /struct create to create one!");
+			return;
+		}
+		structure.build(player.getLocation(), 0, 0, 0, rotation, mirror);
+	}
+	
 }

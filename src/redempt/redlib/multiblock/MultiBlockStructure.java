@@ -24,7 +24,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
-import org.bukkit.material.MaterialData;
 
 import redempt.redlib.RedLib;
 import redempt.redlib.region.Region;
@@ -307,9 +306,9 @@ public class MultiBlockStructure {
 			for (int y = 0; y < dimY; y++) {
 				for (int z = 0; z < dimZ; z++) {
 					rotator.setLocation(x, z);
-					Location l = loc.clone().add(rotator.getRotatedX(), y, rotator.getRotatedZ());
+					Location l = loc.clone().add(rotator.getRotatedBlockX(), y, rotator.getRotatedBlockZ());
 					rotator.setLocation(relX, relZ);
-					l.subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
+					l.subtract(rotator.getRotatedBlockX(), relY, rotator.getRotatedBlockZ());
 					callback.accept(l, rotator.rotate(data[x][y][z]));
 				}
 			}
@@ -330,9 +329,9 @@ public class MultiBlockStructure {
 		loc = loc.getBlock().getLocation();
 		Rotator rotator = new Rotator(rotation, mirror);
 		rotator.setLocation(relX, relZ);
-		Location start = loc.clone().subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
+		Location start = loc.clone().subtract(rotator.getRotatedBlockX(), relY, rotator.getRotatedBlockZ());
 		rotator.setLocation(dimX, dimZ);
-		Location end = start.clone().add(rotator.getRotatedX(), dimY, rotator.getRotatedZ());
+		Location end = start.clone().add(rotator.getRotatedBlockX(), dimY, rotator.getRotatedBlockZ());
 		return new Region(start, end);
 	}
 	
@@ -610,9 +609,9 @@ public class MultiBlockStructure {
 				for (; iter[1] < dimY; iter[1]++) {
 					for (; iter[2] < dimZ; iter[2]++) {
 						rotator.setLocation(iter[0], iter[2]);
-						Location l = location.clone().add(rotator.getRotatedX(), iter[1], rotator.getRotatedZ());
+						Location l = location.clone().add(rotator.getRotatedBlockX(), iter[1], rotator.getRotatedBlockZ());
 						rotator.setLocation(relX, relZ);
-						l.subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
+						l.subtract(rotator.getRotatedBlockX(), relY, rotator.getRotatedBlockZ());
 						BlockState state = getStateToSet(l, rotator.rotate(data[iter[0]][iter[1]][iter[2]]));
 						if (state != null) {
 							state.update(true, false);
@@ -781,7 +780,7 @@ public class MultiBlockStructure {
 		loc = loc.getBlock().getLocation();
 		Rotator rotator = new Rotator(rotation, mirror);
 		rotator.setLocation(relX, relZ);
-		loc.subtract(rotator.getRotatedX(), relY, rotator.getRotatedZ());
+		loc.subtract(rotator.getRotatedBlockX(), relY, rotator.getRotatedBlockZ());
 		return new Structure(this, loc, rotator);
 	}
 	
@@ -821,9 +820,9 @@ public class MultiBlockStructure {
 			for (int y = 0; y < dimY; y++) {
 				for (int z = 0; z < dimZ; z++) {
 					rotator.setLocation(x - xPos, z - zPos);
-					int xp = rotator.getRotatedX();
+					int xp = rotator.getRotatedBlockX();
 					int yp = y - yPos;
-					int zp = rotator.getRotatedZ();
+					int zp = rotator.getRotatedBlockZ();
 					Block block = loc.clone().add(xp, yp, zp).getBlock();
 					if (!compare(data[x][y][z], block, rotator)) {
 						return null;
@@ -832,7 +831,7 @@ public class MultiBlockStructure {
 			}
 		}
 		rotator.setLocation(xPos, zPos);
-		loc = loc.clone().subtract(rotator.getRotatedX(), yPos, rotator.getRotatedZ());
+		loc = loc.clone().subtract(rotator.getRotatedBlockX(), yPos, rotator.getRotatedBlockZ());
 		return new Structure(this, loc, rotator);
 	}
 	
@@ -921,187 +920,6 @@ public class MultiBlockStructure {
 			byte dataValue = Byte.parseByte(split[1]);
 			player.sendBlockChange(loc, type, dataValue);
 		}
-	}
-	
-	/**
-	 * Used to rotate blocks and block sections when building or testing for the presence of a MultiBlockStructure
-	 * @author Redempt
-	 *
-	 */
-	public static class Rotator {
-		
-		private static String[] rotations = {"x,z", "-z,x", "-x,-z", "z,-x"};
-		private static String[] blockDirections = {"north", "east", "south", "west"};
-		
-		private int rotation;
-		private boolean mirrored;
-		private int x = 0;
-		private int z = 0;
-		
-		/**
-		 * Constructs a new Rotator
-		 * @param rotation The number of 90-degree clockwise rotations this Rotator applies
-		 * @param mirrored Whether this Rotator should mirror over the X axis
-		 */
-		public Rotator(int rotation, boolean mirrored) {
-			while (rotation < 0) {
-				rotation += 4;
-			}
-			this.rotation = rotation % 4;
-			this.mirrored = mirrored;
-		}
-		
-		/**
-		 * Rotates block data. NOTE: Only works for 1.13+
-		 * @param data The block data to rotate
-		 * @return The rotated block data
-		 */
-		public String rotate(String data) {
-			rotate:
-			if (midVersion >= 13) {
-				if (data.contains("facing=")) {
-					int start = data.indexOf("facing=") + 7;
-					int end = data.indexOf(',', start);
-					end = end == -1 ? data.indexOf(']', start) : end;
-					String facing = data.substring(start, end);
-					int num = -1;
-					for (int i = 0; i < blockDirections.length; i++) {
-						if (facing.equals(blockDirections[i])) {
-							num = i;
-							break;
-						}
-					}
-					if (num == -1) {
-						return data;
-					}
-					if (mirrored && (num == 1 || num == 3)) {
-						num += 2;
-					}
-					num += rotation;
-					num %= 4;
-					facing = blockDirections[num];
-					data = data.substring(0, start) + facing + data.substring(end);
-				}
-				if (data.contains("axis=")) {
-					int start = data.indexOf("axis=") + 5;
-					int end = data.indexOf(',', start);
-					end = end == -1 ? data.indexOf(']', start) : end;
-					String axis = data.substring(start, end);
-					if (rotation % 2 != 0) {
-						if (axis.equals("x")) {
-							axis = "z";
-						} else if (axis.equals("z")) {
-							axis = "x";
-						}
-					}
-					data = data.substring(0, start) + axis + data.substring(end);
-				}
-				boolean[] directions = new boolean[blockDirections.length];
-				for (int i = 0; i < blockDirections.length; i++) {
-					int start = data.indexOf(blockDirections[i] + "=");
-					if (start == -1) {
-						break rotate;
-					}
-					start += blockDirections[i].length() + 1;
-					int end = data.indexOf(',', start);
-					end = end == -1 ? data.indexOf(']', start) : end;
-					directions[i] = data.substring(start, end).equals("true");
-				}
-				for (int i = 0; i < directions.length; i++) {
-					int dir = ((i - (rotation % 4)) + 4) % 4;
-					if (mirrored && (i == 0 || i == 2)) {
-						dir += 2;
-					}
-					dir %= 4;
-					int start = data.indexOf(blockDirections[i] + "=") + blockDirections[i].length() + 1;
-					int end = data.indexOf(',', start);
-					end = end == -1 ? data.indexOf(']', start) : end;
-					data = data.substring(0, start) + directions[dir] + data.substring(end);
-				}
-			}
-			return data;
-		}
-		
-		/**
-		 * Sets the relative coordinates this Rotator will rotate
-		 * @param x The relative X coordinate
-		 * @param z The relative Z coordinate
-		 */
-		public void setLocation(int x, int z) {
-			this.x = mirrored ? -x : x;
-			this.z = z;
-		}
-		
-		/**
-		 * Gets the rotated relative X
-		 * @return The rotated relative X
-		 */
-		public int getRotatedX() {
-			String rotationString = rotations[rotation];
-			String xString = rotationString.split(",")[0];
-			int val = 0;
-			switch (xString.charAt(xString.length() - 1)) {
-				case 'x':
-					val = x;
-					break;
-				case 'z':
-					val = z;
-					break;
-			}
-			return xString.startsWith("-") ? -val : val;
-		}
-		
-		/**
-		 * Gets the rotated relative Z
-		 * @return The rotated relative Z
-		 */
-		public int getRotatedZ() {
-			String rotationString = rotations[rotation];
-			String xString = rotationString.split(",")[1];
-			int val = 0;
-			switch (xString.charAt(xString.length() - 1)) {
-				case 'x':
-					val = x;
-					break;
-				case 'z':
-					val = z;
-					break;
-			}
-			return xString.startsWith("-") ? -val : val;
-		}
-		
-		/**
-		 * Gets a Rotator which will negate the operations of this Rotator
-		 * @return The inverse Rotator
-		 */
-		public Rotator getInverse() {
-			return new Rotator(-rotation, mirrored);
-		}
-		
-		/**
-		 * Gets a clone of this Rotator
-		 * @return The clone of this Rotator
-		 */
-		public Rotator clone() {
-			return new Rotator(rotation, mirrored);
-		}
-		
-		/**
-		 * Gets the rotation, in number of 90-degree clockwise rotations
-		 * @return The rotation
-		 */
-		public int getRotation() {
-			return rotation;
-		}
-		
-		/**
-		 * Gets whether this rotator mirrors over the X axis
-		 * @return Whether this rotator mirrors over the X axis
-		 */
-		public boolean isMirrored() {
-			return mirrored;
-		}
-		
 	}
 	
 }

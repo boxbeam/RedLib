@@ -1,5 +1,9 @@
 package redempt.redlib.misc;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -126,7 +130,11 @@ public class LocationUtils {
 		double x = Double.parseDouble(split[1]);
 		double y = Double.parseDouble(split[2]);
 		double z = Double.parseDouble(split[3]);
-		return new Location(world, x, y, z);
+		Location location = new Location(world, x, y, z);
+		if (world == null) {
+			waitForWorld(split[0], location::setWorld);
+		}
+		return location;
 	}
 	
 	/**
@@ -205,6 +213,20 @@ public class LocationUtils {
 		return fromString(string, " ");
 	}
 	
+	private static Map<String, List<Consumer<World>>> waiting = new HashMap<>();
+	private static boolean initialized = false;
+	
+	private static void initializeListener() {
+		if (initialized) {
+			return;
+		}
+		initialized = true;
+		new EventListener<>(RedLib.getInstance(), WorldLoadEvent.class, e -> {
+			List<Consumer<World>> list = waiting.remove(e.getWorld().getName());
+			list.forEach(c -> c.accept(e.getWorld()));
+		});
+	}
+	
 	/**
 	 * Waits for a world with the given name to load before calling the callback
 	 * @param worldname The name of the world
@@ -216,12 +238,10 @@ public class LocationUtils {
 			callback.accept(world);
 			return;
 		}
-		new EventListener<>(RedLib.getInstance(), WorldLoadEvent.class, (l, e) -> {
-			if (e.getWorld().getName().equals(worldname)) {
-				callback.accept(e.getWorld());
-				l.unregister();
-			}
-		});
+		waiting.putIfAbsent(worldname, new ArrayList<>());
+		List<Consumer<World>> list = waiting.get(worldname);
+		list.add(callback);
+		initializeListener();
 	}
 	
 	/**

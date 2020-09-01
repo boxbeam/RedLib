@@ -11,6 +11,11 @@ structure,struct {
 		hook create
 		user player
 	}
+	build int:rotation?(0) boolean:mirrored?(true) {
+		help Build the created structure at your location
+		hook build
+		user player
+	}
 	export string:filename*?(structure) {
 		help Exports the structure data for the selected points to a file
 		hook export

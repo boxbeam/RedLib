@@ -90,10 +90,20 @@ public class DataBlock {
 		return (double) this.data.get(key);
 	}
 	
+	/**
+	 * Gets a JSONMap mapped to a certain key
+	 * @param key The key
+	 * @return The JSONMap mapped to the key
+	 */
 	public JSONMap getMap(String key) {
 		return this.data.getMap(key);
 	}
 	
+	/**
+	 * Gets a JSONList mapped to a certain key
+	 * @param key The key
+	 * @return The JSONList mapped to the key
+	 */
 	public JSONList getList(String key) {
 		return this.data.getList(key);
 	}
@@ -106,6 +116,17 @@ public class DataBlock {
 	 */
 	public void remove(String key) {
 		this.data.remove(key);
+	}
+	
+	/**
+	 * Moves the data in this DataBlock to a new Block
+	 * @param block The Block to move the data to
+	 */
+	public void move(Block block) {
+		remove();
+		setBlock(block);
+		exists = false;
+		save();
 	}
 	
 	/**
@@ -124,14 +145,12 @@ public class DataBlock {
 			manager.sql.execute("UPDATE blocks SET data=? WHERE x=? AND y=? AND z=? AND world=?;",
 					data.toString(), block.getX(), block.getY(), block.getZ(), getWorld().getName());
 		} else {
-			
 			int[] pos = getChunkCoordinates();
 			manager.sql.execute("INSERT INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?);",
 					getWorld().getName(), pos[0], pos[1], block.getX(), block.getY(), block.getZ(), data.toString());
 			exists = true;
 		}
 	}
-	
 	
 	/**
 	 * @return Whether the chunk this DataBlock is in is loaded

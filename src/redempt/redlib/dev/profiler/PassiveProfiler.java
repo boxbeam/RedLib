@@ -35,6 +35,9 @@ public class PassiveProfiler extends Profiler {
 		scheduler = Executors.newSingleThreadScheduledExecutor();
 		scheduler.scheduleAtFixedRate(() -> {
 			new Thread(() -> {
+				if (server == null) {
+					return;
+				}
 				summary.add(server.getStackTrace());
 			}).start();
 		}, 1, 1, TimeUnit.MILLISECONDS);

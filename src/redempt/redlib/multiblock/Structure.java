@@ -1,17 +1,15 @@
 package redempt.redlib.multiblock;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.inventory.ItemStack;
-
-import redempt.redlib.multiblock.MultiBlockStructure.Rotator;
 import redempt.redlib.region.Region;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents an instance of a multi-block structure in the world
@@ -85,9 +83,9 @@ public class Structure {
 				for (int z = 0; z < dimensions[2]; z++) {
 					rotator.setLocation(x, z);
 					Block b = 
-						loc.getWorld().getBlockAt(rotator.getRotatedX() + loc.getBlockX(),
+						loc.getWorld().getBlockAt(rotator.getRotatedBlockX() + loc.getBlockX(),
 						y + loc.getBlockY(),
-						rotator.getRotatedZ() + loc.getBlockZ());
+						rotator.getRotatedBlockZ() + loc.getBlockZ());
 					blocks.add(new StructureBlock(b, this, x, y, z));
 				}
 			}
@@ -130,7 +128,7 @@ public class Structure {
 			throw new IndexOutOfBoundsException("Relative location outside bounds of structure: " + x + ", " + y + ", " + z);
 		}
 		rotator.setLocation(x, z);
-		return new StructureBlock(loc.getWorld().getBlockAt(rotator.getRotatedX() + loc.getBlockX(), y + loc.getBlockY(), rotator.getRotatedZ() + loc.getBlockZ()),
+		return new StructureBlock(loc.getWorld().getBlockAt(rotator.getRotatedBlockX() + loc.getBlockX(), y + loc.getBlockY(), rotator.getRotatedBlockZ() + loc.getBlockZ()),
 				this,
 				x, y, z);
 	}
@@ -149,9 +147,9 @@ public class Structure {
 		Rotator rotator = this.rotator.getInverse();
 		int[] dim = type.getDimensions();
 		rotator.setLocation(offset.getBlockX(), offset.getBlockZ());
-		int x = rotator.getRotatedX();
+		int x = rotator.getRotatedBlockX();
 		int y = offset.getBlockY();
-		int z = rotator.getRotatedZ();
+		int z = rotator.getRotatedBlockZ();
 		if (x < 0 || y < 0 || z < 0
 				|| x > dim[0] || y > dim[1] || z > dim[2]) {
 			return null;

@@ -49,6 +49,9 @@ public class BurstProfiler extends Profiler {
 		scheduler = Executors.newSingleThreadScheduledExecutor();
 		scheduler.scheduleAtFixedRate(() -> {
 			new Thread(() -> {
+				if (server == null) {
+					return;
+				}
 				Sample sample = new Sample(server.getStackTrace(), System.currentTimeMillis());
 				while (!samples.offer(sample)) {
 					samples.poll();
@@ -84,7 +87,7 @@ public class BurstProfiler extends Profiler {
 		long start = samples.element().getTime();
 		long diff = after - start;
 		List<Sample> list = new ArrayList<>();
-		samples.stream().skip(diff).forEach(list::add);
+		samples.stream().skip(Math.max(diff, 0)).forEach(list::add);
 		return new SampleSummary(list);
 	}
 
