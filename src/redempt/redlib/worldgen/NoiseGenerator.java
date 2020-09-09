@@ -19,7 +19,7 @@ public class NoiseGenerator {
 		long hash = 23;
 		for (long num : nums) {
 			if (num == 0) {
-				hash += 37;
+				hash += 143;
 				continue;
 			}
 			hash *= num;

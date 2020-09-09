@@ -457,7 +457,7 @@ public class ItemUtils {
 	 * @return A JSON string representing the given item
 	 */
 	public static String toString(ItemStack item) {
-		return toJSON(item, ItemStack.class).toString();
+		return item == null ? null : toJSON(item, ItemStack.class).toString();
 	}
 	
 	/**

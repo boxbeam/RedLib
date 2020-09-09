@@ -21,6 +21,10 @@ public class JSONList extends ArrayList<Object> implements JSONStorage {
 		return (boolean) get(key);
 	}
 	
+	public long getLong(int key) {
+		return (long) get(key);
+	}
+	
 	public double getDouble(int key) {
 		return (double) get(key);
 	}
@@ -53,6 +57,10 @@ public class JSONList extends ArrayList<Object> implements JSONStorage {
 		for (Object o : this) {
 			if (o instanceof CharSequence) {
 				builder.append('"').append(o.toString().replace("\\", "\\\\").replace("\"", "\\\"")).append("\", ");
+				continue;
+			}
+			if (o instanceof Long) {
+				builder.append(o.toString()).append("L, ");
 				continue;
 			}
 			builder.append(o.toString()).append(", ");

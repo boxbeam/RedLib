@@ -1,12 +1,12 @@
 package redempt.redlib.blockdata;
 
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import redempt.redlib.json.JSONList;
 import redempt.redlib.json.JSONMap;
 import redempt.redlib.misc.LocationUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -17,6 +17,7 @@ import java.util.Objects;
 public class DataBlock {
 	
 	protected JSONMap data = new JSONMap();
+	private Map<String, Object> transientProperties = new HashMap<>();
 	protected boolean exists = false;
 	private Block block;
 	private BlockDataManager manager;
@@ -25,6 +26,33 @@ public class DataBlock {
 	protected DataBlock(Block block, BlockDataManager manager) {
 		this.block = block;
 		this.manager = manager;
+	}
+	
+	/**
+	 * Gets a transient property associated with the given key
+	 * @param key The key
+	 * @return The transient property
+	 */
+	public Object getTransientProperty(String key) {
+		return transientProperties.get(key);
+	}
+	
+	/**
+	 * Removes a transient property by its key
+	 * @param key The key of the transient property
+	 */
+	public void removeTransientProperty(String key) {
+		transientProperties.remove(key);
+	}
+	
+	/**
+	 * Attaches a transient property to this DataBlock. Transient properties
+	 * are not saved and will be lost if the chunk is unloaded or the server is stopped
+	 * @param key The key of the transient property
+	 * @param o The value of the transient property
+	 */
+	public void setTransientProperty(String key, Object o) {
+		transientProperties.put(key, o);
 	}
 	
 	/**
@@ -60,7 +88,7 @@ public class DataBlock {
 	 * @return The int mapped to the key
 	 */
 	public int getInt(String key) {
-		return (int) this.data.get(key);
+		return this.data.getInt(key);
 	}
 	
 	/**
@@ -69,7 +97,7 @@ public class DataBlock {
 	 * @return The String mapped to the key
 	 */
 	public String getString(String key) {
-		return (String) this.data.get(key);
+		return this.data.getString(key);
 	}
 	
 	/**
@@ -78,7 +106,7 @@ public class DataBlock {
 	 * @return The boolean mapped to the key
 	 */
 	public boolean getBoolean(String key) {
-		return (boolean) this.data.get(key);
+		return this.data.getBoolean(key);
 	}
 	
 	/**
@@ -87,7 +115,16 @@ public class DataBlock {
 	 * @return The double mapped to the key
 	 */
 	public double getDouble(String key) {
-		return (double) this.data.get(key);
+		return this.data.getDouble(key);
+	}
+	
+	/**
+	 * Gets a double mapped to a certain key
+	 * @param key The key
+	 * @return The double mapped to the key
+	 */
+	public long getLong(String key) {
+		return this.data.getLong(key);
 	}
 	
 	/**
@@ -206,6 +243,9 @@ public class DataBlock {
 	
 	@Override
 	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
 		return o.hashCode() == hashCode();
 	}
 	

@@ -72,6 +72,11 @@ public class JSONParser {
 						type = Type.BOOLEAN;
 					}
 					break;
+				case 'L':
+					if (!quoted) {
+						type = Type.LONG;
+					}
+					break;
 				case ':':
 					if (quoted) {
 						break;
@@ -99,6 +104,9 @@ public class JSONParser {
 								break;
 							case INT:
 								value = Integer.parseInt(json.substring(cursor, lastChar + 1));
+								break;
+							case LONG:
+								value = Long.parseLong(json.substring(cursor, lastChar + 1));
 								break;
 							case DOUBLE:
 								value = Double.parseDouble(json.substring(cursor, lastChar + 1));
@@ -176,7 +184,8 @@ public class JSONParser {
 		STRING,
 		BOOLEAN,
 		DOUBLE,
-		INT;
+		INT,
+		LONG;
 		
 	}
 	

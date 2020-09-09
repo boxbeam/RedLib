@@ -23,6 +23,10 @@ public class JSONMap extends HashMap<String, Object> implements JSONStorage {
 		return (double) get(key);
 	}
 	
+	public long getLong(String key) {
+		return (long) get(key);
+	}
+	
 	public JSONList getList(String key) {
 		return (JSONList) get(key);
 	}
@@ -50,6 +54,10 @@ public class JSONMap extends HashMap<String, Object> implements JSONStorage {
 			Object o = entry.getValue();
 			if (o instanceof CharSequence) {
 				builder.append('"').append((o.toString()).replace("\\", "\\\\").replace("\"", "\\\"")).append("\", ");
+				continue;
+			}
+			if (o instanceof Long) {
+				builder.append(o.toString()).append("L, ");
 				continue;
 			}
 			builder.append(o.toString()).append(", ");
