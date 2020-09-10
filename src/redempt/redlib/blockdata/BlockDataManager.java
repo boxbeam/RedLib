@@ -32,6 +32,15 @@ import java.util.*;
  */
 public class BlockDataManager implements Listener {
 
+	private static List<BlockDataManager> managers = new ArrayList<>();
+	
+	/**
+	 * @return The list of all active BlockDataManagers
+	 */
+	public static List<BlockDataManager> getAllManagers() {
+		return managers;
+	}
+	
 	protected Map<World, Map<ChunkPosition, Set<DataBlock>>> blocks = new HashMap<>();
 	protected SQLHelper sql;
 	
@@ -45,6 +54,7 @@ public class BlockDataManager implements Listener {
 		sql = new SQLHelper(SQLHelper.openSQLite(saveFile));
 		sql.setAutoCommit(false);
 		sql.execute("CREATE TABLE IF NOT EXISTS blocks (world TEXT, cx INT, cz INT, x INT, y INT, z INT, data TEXT, PRIMARY KEY (world, x, y, z));");
+		managers.add(this);
 	}
 	
 	/**
@@ -61,6 +71,7 @@ public class BlockDataManager implements Listener {
 	public void saveAndClose() {
 		save();
 		sql.close();
+		managers.remove(this);
 	}
 	
 	/**
@@ -99,6 +110,17 @@ public class BlockDataManager implements Listener {
 		Set<DataBlock> set = map.get(cpos);
 		set.add(db);
 		return db;
+	}
+	
+	protected void register(DataBlock db) {
+		int[] pos = db.getChunkCoordinates();
+		if (!isChunkLoaded(db.getWorld(), pos[0], pos[1])) {
+			return;
+		}
+		Map<ChunkPosition, Set<DataBlock>> map = blocks.get(db.getWorld());
+		ChunkPosition cpos = new ChunkPosition(pos[0], pos[1]);
+		Set<DataBlock> set = map.get(cpos);
+		set.add(db);
 	}
 	
 	/**
@@ -253,7 +275,7 @@ public class BlockDataManager implements Listener {
 	 * @return Whether the DataBlocks in the chunk are loaded in this BlockDataManager
 	 */
 	public boolean isChunkLoaded(World world, int cx, int cz) {
-		return blocks.get(world) != null && blocks.get(world).get(new ChunkPosition(cx, cz)) != null;
+		return blocks.containsKey(world) && blocks.get(world).containsKey(new ChunkPosition(cx, cz));
 	}
 	
 	/**
@@ -381,10 +403,7 @@ public class BlockDataManager implements Listener {
 				e.setCancelled(true);
 				return;
 			}
-			remove(db);
-			db.setBlock(to.getBlock());
-			db.exists = false;
-			db.save();
+			db.move(to.getBlock());
 		});
 	}
 	
@@ -402,10 +421,7 @@ public class BlockDataManager implements Listener {
 				e.setCancelled(true);
 				return;
 			}
-			remove(db);
-			db.setBlock(to.getBlock());
-			db.exists = false;
-			db.save();
+			db.move(to.getBlock());
 		});
 	}
 	

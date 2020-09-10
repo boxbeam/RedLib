@@ -1,5 +1,7 @@
 package redempt.redlib.blockdata;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import redempt.redlib.json.JSONList;
@@ -161,8 +163,10 @@ public class DataBlock {
 	 */
 	public void move(Block block) {
 		remove();
-		setBlock(block);
+		this.block = block;
+		manager.register(this);
 		exists = false;
+		modified = true;
 		save();
 	}
 	
@@ -223,10 +227,6 @@ public class DataBlock {
 	 */
 	public Block getBlock() {
 		return block;
-	}
-	
-	protected void setBlock(Block block) {
-		this.block = block;
 	}
 	
 	/**
