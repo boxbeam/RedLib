@@ -1,9 +1,11 @@
 package redempt.redlib.misc;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import redempt.redlib.json.JSONList;
+import redempt.redlib.json.JSONMap;
+import redempt.redlib.json.JSONParser;
+
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * Uses a map of outcomes to weights to get random values
@@ -14,7 +16,8 @@ public class WeightedRandom<T> {
 	
 	private Map<T, Double> weights;
 	private double total;
-	private List<T> list = new ArrayList<>();
+	private List<Double> totals;
+	private List<T> items;
 	
 	/**
 	 * Create a new WeightedRandom from a map of outcomes to their weights
@@ -46,19 +49,38 @@ public class WeightedRandom<T> {
 	 * @deprecated Use {@link WeightedRandom#fromIntMap(Map)}
 	 */
 	public WeightedRandom(Map<T, Integer> weights) {
-		this.weights = new HashMap<>();
+		HashMap<T, Double> dmap = new HashMap<>();
 		weights.forEach((k, v) -> {
-			this.weights.put(k, (double) v);
-			total += v;
-			list.add(k);
+			dmap.put(k, (double) v);
 		});
+		initialize(dmap);
+	}
+	
+	/**
+	 * Create an empty WeightedRandom
+	 */
+	public WeightedRandom() {
+		weights = new HashMap<>();
+		totals = new ArrayList<>();
+		items = new ArrayList<>();
+		total = 0;
 	}
 	
 	private WeightedRandom(Map<T, Double> weights, boolean no) {
+		initialize(weights);
+	}
+	
+	private void initialize(Map<T, Double> weights) {
 		this.weights = weights;
+		total = 0;
+		totals = new ArrayList<>();
+		items = new ArrayList<>();
+		int[] pos = {0};
 		weights.forEach((k, v) -> {
 			total += v;
-			list.add(k);
+			totals.add(total);
+			items.add(k);
+			pos[0]++;
 		});
 	}
 	
@@ -67,17 +89,15 @@ public class WeightedRandom<T> {
 	 * @return A weighted random outcome, or null if there are no possible outcomes
 	 */
 	public T roll() {
-		if (list.size() == 0) {
+		if (totals.size() == 0) {
 			return null;
 		}
 		double random = Math.random() * (total);
-		int pos = 0;
-		double roll = 0;
-		while (random > (roll = weights.get(list.get(pos)))) {
-			random -= roll;
-			pos++;
+		int pos = Collections.binarySearch(totals, random);
+		if (pos < 0) {
+			pos = -(pos + 1);
 		}
-		return list.get(pos);
+		return items.get(pos);
 	}
 	
 	/**
@@ -87,7 +107,7 @@ public class WeightedRandom<T> {
 	public Map<T, Double> getPercentages() {
 		Map<T, Double> percentages = new HashMap<>();
 		weights.forEach((k, v) -> {
-			percentages.put(k, (((double) v) / (double) total) * 100d);
+			percentages.put(k, (v / total) * 100d);
 		});
 		return percentages;
 	}
@@ -101,19 +121,25 @@ public class WeightedRandom<T> {
 	}
 	
 	/**
-	 * Sets another weight in this WeightedRandom
-	 * @param outcome The outcome to set
-	 * @param weight The weight to set
+	 * Sets another weight in this WeightedRandom, replacing the weight of the outcome if it has already been added
+	 * @param outcome The weight to set
+	 * @param weight The outcome to set
 	 */
 	public void set(T outcome, int weight) {
 		set(outcome, (double) weight);
 	}
 	
+	/**
+	 * Sets another weight in this WeightedRandom, replacing the weight of the outcome if it has already been added
+	 * @param outcome The weight to set
+	 * @param weight The outcome to set
+	 */
 	public void set(T outcome, double weight) {
 		remove(outcome);
-		weights.put(outcome, weight);
-		list.add(outcome);
 		total += weight;
+		weights.put(outcome, weight);
+		totals.add(total);
+		items.add(outcome);
 	}
 	
 	/**
@@ -121,12 +147,16 @@ public class WeightedRandom<T> {
 	 * @param outcome The outcome to remove
 	 */
 	public void remove(T outcome) {
-		Double weight = weights.remove(outcome);
-		if (weight == null) {
+		Double value = weights.remove(outcome);
+		if (value == null) {
 			return;
 		}
-		total -= weight;
-		list.remove(outcome);
+		int index = items.indexOf(outcome);
+		items.remove(index);
+		totals.remove(index);
+		for (int i = index; i < totals.size(); i++) {
+			totals.set(i, totals.get(i) - value);
+		}
 	}
 	
 	/**
@@ -135,6 +165,41 @@ public class WeightedRandom<T> {
 	 */
 	public WeightedRandom<T> clone() {
 		return new WeightedRandom<T>(new HashMap<>(weights), false);
+	}
+	
+	/**
+	 * Converts this WeightedRandom to a String which can be deserialized later
+	 * @param converter A function to convert the outcomes of this WeightedRandom to strings which can be deserialized later
+	 * @return The string representing this WeightedRandom
+	 */
+	public String toString(Function<T, String> converter) {
+		JSONList list = new JSONList();
+		weights.forEach((k, v) -> {
+			JSONMap map = new JSONMap();
+			map.put("weight", v);
+			map.put("outcome", converter.apply(k));
+			list.add(map);
+		});
+		return list.toString();
+	}
+	
+	/**
+	 * Deserializes a string to create a WeightedRandom
+	 * @param str The string serialized using {@link WeightedRandom#toString(Function)}
+	 * @param converter A function to convert the serialized outcomes back to objects
+	 * @param <T> The type of the outcomes
+	 * @return The deserialized WeightedRandom
+	 */
+	public static <T> WeightedRandom<T> fromString(String str, Function<String, T> converter) {
+		JSONList list = JSONParser.parseList(str);
+		Map<T, Double> map = new HashMap<>();
+		for (int i = 0; i < list.size(); i++) {
+			JSONMap entry = list.getMap(i);
+			T outcome = converter.apply(entry.getString("outcome"));
+			double weight = entry.getDouble("weight");
+			map.put(outcome, weight);
+		}
+		return fromDoubleMap(map);
 	}
 	
 	/**
