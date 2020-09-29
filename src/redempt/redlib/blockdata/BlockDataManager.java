@@ -7,6 +7,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -72,6 +73,7 @@ public class BlockDataManager implements Listener {
 		save();
 		sql.close();
 		managers.remove(this);
+		HandlerList.unregisterAll(this);
 	}
 	
 	/**

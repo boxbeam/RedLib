@@ -137,6 +137,29 @@ public class SQLHelper implements Closeable {
 	
 	/**
 	 * Executes a SQL query as a prepared statement, setting its fields to the elements of the vararg passed,
+	 * returning the value in the first column of the first row in the results as a Long.
+	 * @param query The SQL query to execute
+	 * @param fields A vararg of the fields to set in the prepared statement
+	 * @return The String in the first column of the first row of the returned results, or null if none is present
+	 * @implNote This method exists because {@link ResultSet#getObject(int)} can return an Integer if the Long in the
+	 * column can be parsed into one.
+	 */
+	public Long querySingleResultLong(String query, Object... fields) {
+		try {
+			PreparedStatement statement = prepareStatement(query, fields);
+			ResultSet results = statement.executeQuery();
+			if (!results.next()) {
+				return null;
+			}
+			return results.getLong(1);
+		} catch (SQLException e) {
+			sneakyThrow(e);
+			return null;
+		}
+	}
+	
+	/**
+	 * Executes a SQL query as a prepared statement, setting its fields to the elements of the vararg passed,
 	 * returning a list of values in the first column of each row in the results
 	 * @param query The SQL query to execute
 	 * @param fields A vararg of the fields to set in the prepared statement
@@ -355,6 +378,22 @@ public class SQLHelper implements Closeable {
 		public String getString(int column) {
 			try {
 				return results.getString(column);
+			} catch (SQLException e) {
+				sneakyThrow(e);
+				return null;
+			}
+		}
+		
+		/**
+		 * Gets a Long in the given column in the current row
+		 * @param column The index of the column to get, starting at 1
+		 * @return The String in the column
+		 * @implNote This method exists because {@link ResultSet#getObject(int)} can return an Integer if the Long in the
+		 * column can be parsed into one.
+		 */
+		public Long getLong(int column) {
+			try {
+				return results.getLong(column);
 			} catch (SQLException e) {
 				sneakyThrow(e);
 				return null;
