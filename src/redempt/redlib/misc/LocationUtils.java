@@ -1,9 +1,6 @@
 package redempt.redlib.misc;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -13,8 +10,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.world.WorldLoadEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import redempt.redlib.RedLib;
@@ -251,6 +248,154 @@ public class LocationUtils {
 	 */
 	public static int[] getChunkCoordinates(Location loc) {
 		return new int[] {loc.getBlockX() >> 4, loc.getBlockZ() >> 4};
+	}
+	
+	/**
+	 * Finds the fastest path between a starting and ending location using A*, then removes unneeded steps for straight
+	 * @param start The starting block
+	 * @param end The ending block
+	 * @param max The max number of locations to be checked - use to limit runtime
+	 * @param filter A filter to determine which blocks are passable
+	 * @return A List of locations leading from the start to the end, or the closest block if the path could not
+	 * be completed
+	 */
+	public static List<Location> directPathfind(Block start, Block end, int max, Predicate<Block> filter) {
+		List<Location> path = new ArrayList<>(pathfind(start, end, max, filter));
+		for (int i = 0; i + 2 < path.size(); i += 2) {
+			Location first = path.get(i);
+			Location second = path.get(i + 2);
+			if (Path.getPath(first, second, 0.25).stream().map(Location::getBlock).allMatch(filter)) {
+				path.remove(i + 1);
+				i -= 2;
+			}
+		}
+		return path;
+	}
+	
+	/**
+	 * Finds the fastest path between a starting and ending location using A*, then removes unneeded steps for straight
+	 * @param start The starting block
+	 * @param end The ending block
+	 * @param max The max number of locations to be checked - use to limit runtime
+	 * @return A List of locations leading from the start to the end, or the closest block if the path could not
+	 * be completed
+	 */
+	public static List<Location> directPathfind(Block start, Block end, int max) {
+		return directPathfind(start, end, max, b -> !b.getType().isSolid());
+	}
+	
+	/**
+	 * Finds the fastest path between a starting and ending location using A*
+	 * @param start The starting block
+	 * @param end The ending block
+	 * @param max The max number of locations to be checked - use to limit runtime
+	 * @return A Deque of locations leading from the start to the end, or the closest block if the path could not
+	 * be completed
+	 */
+	public static Deque<Location> pathfind(Block start, Block end, int max) {
+		return pathfind(start, end, max, b -> !b.getType().isSolid());
+	}
+	
+	/**
+	 * Finds the fastest path between a starting and ending location using A*
+	 * @param start The starting block
+	 * @param end The ending block
+	 * @param max The max number of locations to be checked - use to limit runtime
+	 * @param filter A filter to determine which blocks are passable
+	 * @return A Deque of locations leading from the start to the end, or the closest block if the path could not
+	 * be completed
+	 */
+	public static Deque<Location> pathfind(Block start, Block end, int max, Predicate<Block> filter) {
+		if (!start.getWorld().equals(end.getWorld())) {
+			throw new IllegalArgumentException("Start and end must be in the same world");
+		}
+		Set<Block> nodes = new HashSet<>();
+		PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(n -> n.score));
+		Set<Block> exclude = new HashSet<>();
+		Node node = new Node(start, 0);
+		node.score = score(node, start, end);
+		nodes.add(node.block);
+		queue.add(node);
+		int iter = 0;
+		Node least = node;
+		int leastDist = distance(least.block, end);
+		while (iter < max) {
+			node = queue.poll();
+			if (node == null) {
+				return tracePath(least);
+			}
+			nodes.remove(node.block);
+			int dist = distance(node.block, end);
+			if (dist == 0 || (dist == 1 && !filter.test(end))) {
+				return tracePath(node);
+			} else {
+				if (dist < leastDist) {
+					leastDist = dist;
+					least = node;
+				}
+			}
+			exclude.add(node.block);
+			getAdjacent(node, start, end, n -> {
+				if (exclude.contains(n.block) || !filter.test(n.block)) {
+					exclude.add(n.block);
+					return;
+				}
+				if (nodes.add(n.block)) {
+					queue.add(n);
+				}
+			});
+			iter++;
+		}
+		return tracePath(least);
+	}
+	
+	private static Deque<Location> tracePath(Node node) {
+		Deque<Location> path = new ArrayDeque<>();
+		while (node != null) {
+			path.addFirst(node.block.getLocation().add(.5, .5, .5));
+			node = node.parent;
+		}
+		return path;
+	}
+	
+	private static void getAdjacent(Node block, Block start, Block end, Consumer<Node> lambda) {
+		lambda.accept(getRelative(block, start, end, 1, 0, 0));
+		lambda.accept(getRelative(block, start, end, -1, 0, 0));
+		lambda.accept(getRelative(block, start, end, 0, 1, 0));
+		lambda.accept(getRelative(block, start, end, 0, -1, 0));
+		lambda.accept(getRelative(block, start, end, 0, 0, 1));
+		lambda.accept(getRelative(block, start, end, 0, 0, -1));
+	}
+	
+	private static Node getRelative(Node block, Block start, Block end, int x, int y, int z) {
+		Block b = block.block.getRelative(x, y, z);
+		int score = score(block, start, end);
+		Node node = new Node(b, score);
+		node.parent = block;
+		return node;
+	}
+	
+	private static int score(Node node, Block start, Block end) {
+		return distance(node.block, start) + distance(node.block, end);
+	}
+	
+	private static int distance(Block first, Block second) {
+		return Math.abs(first.getX() - second.getX())
+				+ Math.abs(first.getY() - second.getY())
+				+ Math.abs(first.getZ() - second.getZ());
+	}
+	
+	private static class Node {
+		
+		public Block block;
+		public int score;
+		public Node parent;
+		
+		public Node(Block block, int score) {
+			this.block = block;
+			this.score = score;
+		}
+		
 	}
 	
 }
