@@ -376,7 +376,7 @@ public class LocationUtils {
 	}
 	
 	private static int score(Node node, Block start, Block end) {
-		return distance(node.block, start) + distance(node.block, end);
+		return distance(node.block, start) + distance(node.block, end) * 2;
 	}
 	
 	private static int distance(Block first, Block second) {
