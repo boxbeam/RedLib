@@ -325,6 +325,34 @@ public class ItemUtils {
 	}
 	
 	/**
+	 * Remove all matching items up to a maximum, returning the number that were removed
+	 * @param inv The inventory to count and remove items from
+	 * @param item The item to count and remove
+	 * @param max The maximum number of items to remove
+	 * @return How many items were removed
+	 */
+	public static int countAndRemove(Inventory inv, ItemStack item, int max) {
+		int count = count(inv, item);
+		count = Math.min(max, count);
+		remove(inv, item, count);
+		return count;
+	}
+	
+	/**
+	 * Remove all matching items up to a maximum, returning the number that were removed
+	 * @param inv The inventory to count and remove items from
+	 * @param type The item type to count and remove
+	 * @param max The maximum number of items to remove
+	 * @return How many items were removed
+	 */
+	public static int countAndRemove(Inventory inv, Material type, int max) {
+		int count = count(inv, type);
+		count = Math.min(max, count);
+		remove(inv, type, count);
+		return count;
+	}
+	
+	/**
 	 * Remove all matching items, returning the number that were removed
 	 * @param inv The inventory to count and remove items from
 	 * @param item The item to count and remove
