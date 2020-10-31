@@ -10,7 +10,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.exceptions.CommandParseException;
-import redempt.redlib.commandmanager.exceptions.MissingHookException;
+import redempt.redlib.commandmanager.exceptions.CommandHookException;
 import redempt.redlib.misc.EventListener;
 
 import java.io.InputStream;
@@ -25,6 +25,7 @@ import static redempt.redlib.commandmanager.Messages.msg;
 
 /**
  * Represents a command which can be registered
+ *
  * @author Redempt
  */
 public class Command {
@@ -48,10 +49,12 @@ public class Command {
 					return null;
 			}
 		}));
+		types.add(new ArgType<>("player", Bukkit::getPlayer).tabStream(c -> Bukkit.getOnlinePlayers().stream().map(Player::getName)));
 	}
 	
 	protected Plugin plugin;
 	private CommandArgument[] args;
+	private Flag[] flags;
 	private ContextProvider<?>[] contextProviders;
 	private ContextProvider<?>[] asserters;
 	protected String[] names;
@@ -66,11 +69,13 @@ public class Command {
 	protected Command parent = null;
 	private boolean hideSub = false;
 	
-	protected Command() {}
+	protected Command() {
+	}
 	
-	protected Command(String[] names, CommandArgument[] args, ContextProvider<?>[] providers, ContextProvider<?>[] asserters, String help, String permission, SenderType type, String hook, List<Command> children, boolean hideSub, boolean noTab) {
+	protected Command(String[] names, CommandArgument[] args, Flag[] flags, ContextProvider<?>[] providers, ContextProvider<?>[] asserters, String help, String permission, SenderType type, String hook, List<Command> children, boolean hideSub, boolean noTab) {
 		this.names = names;
 		this.args = args;
+		this.flags = flags;
 		this.contextProviders = providers;
 		this.asserters = asserters;
 		this.permission = permission;
@@ -87,6 +92,7 @@ public class Command {
 	
 	/**
 	 * Shows the help to a CommandSender
+	 *
 	 * @param sender The sender to show the help to
 	 */
 	public void showHelp(CommandSender sender) {
@@ -118,6 +124,7 @@ public class Command {
 	 */
 	public String getFullName() {
 		String name = getExpandedName() + " ";
+		name += String.join(" ", Arrays.stream(flags).map(Flag::toString).collect(Collectors.toList())) + " ";
 		name += String.join(" ", Arrays.stream(args).map(CommandArgument::toString).collect(Collectors.toList()));
 		return name;
 	}
@@ -134,10 +141,11 @@ public class Command {
 		return "/" + name;
 	}
 	
-	private static String[] parseArgs(String input) {
+	private static String[] splitArgs(String input) {
 		List<String> args = new ArrayList<>();
 		StringBuilder combine = new StringBuilder();
 		boolean quotes = false;
+		boolean argQuoted = false;
 		char[] chars = input.toCharArray();
 		for (int i = 0; i < chars.length; i++) {
 			char c = chars[i];
@@ -147,26 +155,73 @@ public class Command {
 				continue;
 			}
 			if (c == '"') {
+				argQuoted = true;
 				quotes = !quotes;
 				continue;
 			}
 			if (c == ' ' && !quotes) {
+				combine.append(argQuoted ? '1' : '0');
 				args.add(combine.toString());
 				combine = new StringBuilder();
+				argQuoted = false;
 				continue;
 			}
 			combine.append(c);
 		}
 		if (combine.length() > 0) {
+			combine.append(argQuoted ? '1' : '0');
 			args.add(combine.toString());
 		}
 		return args.toArray(new String[args.size()]);
 	}
 	
-	private Object[] processArgs(String[] sargs, CommandSender sender) {
+	private Object[] processArgs(String[] argArray, CommandSender sender) {
+		List<String> sargs = new ArrayList<>();
+		Collections.addAll(sargs, argArray);
+		Object[] output = new Object[args.length + flags.length + 1];
+		for (Flag flag : flags) {
+			if (flag.getType().getName().equals("boolean")) {
+				output[flag.getPosition() + 1] = false;
+				continue;
+			}
+			output[flag.getPosition() + 1] = flag.getDefaultValue(sender);
+		}
+		for (int i = 0; i < sargs.size(); i++) {
+			String arg = sargs.get(i);
+			boolean quoted = arg.charAt(arg.length() - 1) == '1';
+			arg = arg.substring(0, arg.length() - 1);
+			sargs.set(i, arg);
+			if (!arg.startsWith("-") || quoted) {
+				continue;
+			}
+			String farg = arg;
+			Flag flag = Arrays.stream(flags).filter(f -> f.getName().equals(farg)).findFirst().orElse(null);
+			if (flag == null) {
+				continue;
+			}
+			if (flag.getType().getName().equals("boolean")) {
+				output[flag.getPosition() + 1] = true;
+				sargs.remove(i);
+				i--;
+				continue;
+			}
+			if (i == sargs.size() - 1) {
+				return null;
+			}
+			String next = sargs.get(i + 1);
+			next = next.substring(0, next.length() - 1);
+			try {
+				output[flag.getPosition() + 1] = Objects.requireNonNull(flag.getType().convert(sender, next));
+			} catch (Exception e) {
+				return null;
+			}
+			sargs.remove(i);
+			sargs.remove(i);
+			i--;
+		}
 		List<CommandArgument> cmdArgs = Arrays.stream(args).collect(Collectors.toList());
-		if (cmdArgs.size() > sargs.length) {
-			int diff = cmdArgs.size() - sargs.length;
+		if (cmdArgs.size() > sargs.size()) {
+			int diff = cmdArgs.size() - sargs.size();
 			int optional = (int) cmdArgs.stream().filter(CommandArgument::isOptional).count();
 			CommandArgument[] cargs = args.clone();
 			for (int i = 0; i < cargs.length; i++) {
@@ -176,8 +231,8 @@ public class Command {
 			}
 			List<CommandArgument> used = new ArrayList<>();
 			if (optional >= diff) {
-				for (int i = 0; i < sargs.length && diff > 0; i++) {
-					String argString = sargs[i];
+				for (int i = 0; i < sargs.size() && diff > 0; i++) {
+					String argString = sargs.get(i);
 					List<CommandArgument> optionals = new ArrayList<>();
 					if (!cmdArgs.get(i).isOptional()) {
 						continue;
@@ -206,10 +261,10 @@ public class Command {
 							return true;
 						}
 					});
+					optionals.removeAll(used);
 					if (optionals.size() > 1 && !optionals.stream().allMatch(arg -> arg.getType().getName().equals("string"))) {
 						optionals.removeIf(arg -> arg.getType().getName().equals("string"));
 					}
-					optionals.removeAll(used);
 					if (optionals.size() == 0) {
 						continue;
 					}
@@ -221,19 +276,18 @@ public class Command {
 			}
 			cmdArgs = Arrays.stream(cargs).filter(arg -> arg != null).collect(Collectors.toList());
 		}
-		if (cmdArgs.size() != sargs.length && (args.length == 0 || !args[args.length - 1].consumes())) {
+		if (cmdArgs.size() != sargs.size() && (args.length == 0 || !args[args.length - 1].consumes())) {
 			return null;
 		}
-		Object[] output = new Object[args.length + 1];
 		output[0] = sender;
 		for (CommandArgument arg : cmdArgs) {
 			if (arg.consumes()) {
 				if (arg.pos != args.length - 1) {
-					throw new IllegalArgumentException("Consuming argument must be the last argument!");
+					throw new IllegalStateException("Consuming argument must be the last argument!");
 				}
 				StringBuilder builder = new StringBuilder();
-				for (int x = cmdArgs.size() - 1; x < sargs.length; x++) {
-					builder.append(sargs[x]).append(" ");
+				for (int x = cmdArgs.size() - 1; x < sargs.size(); x++) {
+					builder.append(sargs.get(x)).append(" ");
 				}
 				String combine = builder.toString();
 				try {
@@ -245,8 +299,9 @@ public class Command {
 				return output;
 			}
 			try {
-				output[arg.getPosition() + 1] = Objects.requireNonNull(arg.getType().convert(sender, sargs[cmdArgs.indexOf(arg)]));
+				output[arg.getPosition() + 1] = Objects.requireNonNull(arg.getType().convert(sender, sargs.get(cmdArgs.indexOf(arg))));
 			} catch (Exception e) {
+				e.printStackTrace();
 				return null;
 			}
 		}
@@ -265,10 +320,7 @@ public class Command {
 		}
 		Object[] output = new Object[contextProviders.length];
 		for (int i = 0; i < output.length; i++) {
-			Object obj = null;
-			if (sender instanceof Player) {
-				obj = contextProviders[i].provide((Player) sender);
-			}
+			Object obj = contextProviders[i].provide((Player) sender);
 			if (obj == null) {
 				String error = contextProviders[i].getErrorMessage();
 				if (error != null) {
@@ -305,7 +357,8 @@ public class Command {
 	
 	/**
 	 * Registers this command and its children
-	 * @param prefix The fallback prefix
+	 *
+	 * @param prefix    The fallback prefix
 	 * @param listeners The listener objects containing method hooks
 	 */
 	public void register(String prefix, Object... listeners) {
@@ -315,7 +368,7 @@ public class Command {
 			field.setAccessible(true);
 			SimpleCommandMap map = (SimpleCommandMap) field.get(Bukkit.getPluginManager());
 			org.bukkit.command.Command cmd = new org.bukkit.command.Command(names[0], help == null ? "None" : help, "", Arrays.stream(names).skip(1).collect(Collectors.toList())) {
-
+				
 				@Override
 				public boolean execute(CommandSender sender, String name, String[] args) {
 					Command.this.execute(sender, args);
@@ -349,65 +402,50 @@ public class Command {
 					}
 				}
 			});
-			loop:
-			for (Object listener : listeners) {
-				for (Method method : listener.getClass().getDeclaredMethods()) {
-					CommandHook cmdHook = method.getAnnotation(CommandHook.class);
-					if (cmdHook != null) {
-						if (cmdHook.value().equals(hook)) {
-							methodHook = method;
-							this.listener = listener;
-							Class<?>[] params = method.getParameterTypes();
-							int expectedLength = args.length + contextProviders.length + 1;
-							if (params.length != expectedLength) {
-								throw new IllegalStateException("Incorrect number of arguments for method hook! [" + method.getDeclaringClass().getName() + "." + method.getName() + "] "
-										+ "Argument count should be " + expectedLength + ", got " + params.length);
-							}
-							if (!CommandSender.class.isAssignableFrom(params[0])) {
-								throw new IllegalStateException("The first argument must be CommandSender or one of its subclasses! [" + method.getDeclaringClass().getName() + "." + method.getName() + "]");
-							}
-							break loop;
-						}
-					}
-				}
-			}
+			registerHook(createHookMap(listeners));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		for (Command child : children) {
-			child.registerHook(listeners);
-		}
 	}
 	
-	protected void registerHook(Object... listeners) {
-		loop:
+	protected Map<String, MethodHook> createHookMap(Object... listeners) {
+		Map<String, MethodHook> hooks = new HashMap<>();
 		for (Object listener : listeners) {
 			for (Method method : listener.getClass().getDeclaredMethods()) {
-				if (method.isAnnotationPresent(CommandHook.class)) {
-					CommandHook cmdHook = method.getAnnotation(CommandHook.class);
-					if (cmdHook.value().equals(hook)) {
-						methodHook = method;
-						plugin = JavaPlugin.getProvidingPlugin(method.getDeclaringClass());
-						Class<?>[] params = method.getParameterTypes();
-						int expectedLength = args.length + contextProviders.length + 1;
-						if (params.length != expectedLength) {
-							throw new IllegalStateException("Incorrect number of arguments for method hook! [" + method.getDeclaringClass().getName() + "." + method.getName() + "] "
-									+ "Argument count should be " + expectedLength + ", got " + params.length);
-						}
-						this.listener = listener;
-						if (!CommandSender.class.isAssignableFrom(params[0])) {
-							throw new IllegalStateException("The first argument must be CommandSender or one of its subclasses! [" + method.getDeclaringClass().getName() + "." + method.getName() + "]");
-						}
-						break loop;
-					}
+				CommandHook cmdHook = method.getAnnotation(CommandHook.class);
+				if (cmdHook == null) {
+					continue;
+				}
+				if (hooks.put(cmdHook.value(), new MethodHook(method, listener)) != null) {
+					throw new CommandHookException("Duplicate method hook for name '" + cmdHook.value() + "'");
 				}
 			}
 		}
-		if (hook != null && methodHook == null) {
-			throw new MissingHookException("Command with hook name " + hook + " has no method hook");
-		}
+		return hooks;
+	}
+	
+	protected void registerHook(Map<String, MethodHook> hooks) {
 		for (Command child : children) {
-			child.registerHook(listeners);
+			child.registerHook(hooks);
+		}
+		if (hook == null) {
+			return;
+		}
+		MethodHook mh = hooks.get(hook);
+		if (hook != null && mh == null) {
+			throw new CommandHookException("Command with hook name " + hook + " has no method hook");
+		}
+		methodHook = mh.getMethod();
+		plugin = JavaPlugin.getProvidingPlugin(methodHook.getDeclaringClass());
+		Class<?>[] params = methodHook.getParameterTypes();
+		int expectedLength = args.length + contextProviders.length + flags.length + 1;
+		if (params.length != expectedLength) {
+			throw new IllegalStateException("Incorrect number of arguments for method hook! [" + methodHook.getDeclaringClass().getName() + "." + methodHook.getName() + "] "
+					+ "Argument count should be " + expectedLength + ", got " + params.length);
+		}
+		this.listener = mh.getListener();
+		if (!CommandSender.class.isAssignableFrom(params[0])) {
+			throw new IllegalStateException("The first argument must be CommandSender or one of its subclasses! [" + methodHook.getDeclaringClass().getName() + "." + methodHook.getName() + "]");
 		}
 	}
 	
@@ -442,12 +480,43 @@ public class Command {
 				}
 			}
 		}
-		if (args.length - 1 < this.args.length && args.length > 0) {
-			String partial = args[args.length - 1].replaceAll("(^\")|(\"$)", "");
-			CommandArgument arg = this.args[args.length - 1];
+		int flagArgs = 1;
+		Set<Flag> used = new HashSet<>();
+		Flag flag = null;
+		for (int i = 0; i < args.length; i++) {
+			String arg = args[i];
+			if (i == args.length - 1) {
+				if (arg.startsWith("-")) {
+					Arrays.stream(flags).filter(f -> !used.contains(f) && f.getName().startsWith(arg))
+							.map(Flag::getName).forEach(completions::add);
+				}
+				if (flag != null && !flag.getType().getName().equals("boolean")) {
+					flag.getType().tabComplete(sender)
+							.stream().filter(s -> s.toLowerCase().startsWith(arg.toLowerCase()))
+							.map(s -> s.contains(" ") ? '"' + s + '"' : s)
+							.forEach(completions::add);
+				}
+			}
+			if (arg.startsWith("-")) {
+				flag = Arrays.stream(flags).filter(f -> f.getName().equals(arg)).findFirst().orElse(null);
+				if (flag != null) {
+					used.add(flag);
+					flagArgs++;
+					continue;
+				}
+			}
+			if (flag != null && !flag.getType().getName().equals("boolean")) {
+				flagArgs++;
+			}
+			flag = null;
+		}
+//		flagArgs = 1;
+		if (args.length - flagArgs < this.args.length && args.length - flagArgs >= 0) {
+			String partial = args[args.length - 1].replaceAll("(^\")|(\"$)", "").toLowerCase();
+			CommandArgument arg = this.args[args.length - flagArgs];
 			List<String> argCompletions = arg.getType().tabComplete(sender);
 			for (String completion : argCompletions) {
-				if (completion.toLowerCase().startsWith(partial.toLowerCase()) && !partial.equals(completion)) {
+				if (completion.toLowerCase().startsWith(partial) && !partial.equals(completion)) {
 					if (completion.contains(" ")) {
 						completion = '"' + completion + '"';
 					}
@@ -485,7 +554,7 @@ public class Command {
 					}
 					break;
 			}
-			Object[] objArgs = processArgs(parseArgs(String.join(" ", args)), sender);
+			Object[] objArgs = processArgs(splitArgs(String.join(" ", args)), sender);
 			if (objArgs != null) {
 				if (asserters.length > 0 && !assertAll(sender)) {
 					return true;
@@ -508,6 +577,9 @@ public class Command {
 					sender.sendMessage(ChatColor.RED + "An error was encountered in running this command. Please notify an admin.");
 					return true;
 				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+					for (Object obj : objArgs) {
+					}
 					if (topLevel) {
 						showHelp(sender);
 						return true;
@@ -587,8 +659,9 @@ public class Command {
 	
 	/**
 	 * Loads commands from a command file in stream form. Use {@link org.bukkit.plugin.java.JavaPlugin#getResource} for this
+	 *
 	 * @param stream The InputStream to load commands from
-	 * @param types Custom argument types
+	 * @param types  Custom argument types
 	 * @return The commands loaded from the stream
 	 * @throws CommandParseException if the command file cannot be parsed
 	 * @deprecated Outdated. Use {@link CommandParser#parse()}
@@ -602,6 +675,26 @@ public class Command {
 		CONSOLE,
 		PLAYER,
 		EVERYONE;
+		
+	}
+	
+	protected static class MethodHook {
+		
+		private Method method;
+		private Object listener;
+		
+		public MethodHook(Method method, Object listener) {
+			this.method = method;
+			this.listener = listener;
+		}
+		
+		public Method getMethod() {
+			return method;
+		}
+		
+		public Object getListener() {
+			return listener;
+		}
 		
 	}
 	

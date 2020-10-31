@@ -151,46 +151,14 @@ public class ProfilerCommands {
 	}
 	
 	@CommandHook("search")
-	public void search(Player player, String terms) {
+	public void search(Player player, int depth, double overPercent, int overMillis, String term) {
 		if (summary == null) {
 			player.sendMessage(ChatColor.RED + "No selection.");
 			return;
 		}
-		String flag = null;
-		String[] split = terms.split(" ");
-		String contains = null;
-		Predicate<SampleMethod> filter = m -> true;
-		for (String term : split) {
-			if (term.startsWith("-")) {
-				flag = term;
-				continue;
-			}
-			if (flag == null) {
-				contains = term;
-				continue;
-			}
-			switch (flag) {
-				case "-o":
-				case "--over-percent":
-					filter = filter.and(m -> m.getPrevalence() >= Double.parseDouble(term));
-					break;
-				case "-d":
-				case "--depth":
-					filter = filter.and(m -> m.getDepth() >= Integer.parseInt(term));
-					break;
-				case "-m":
-				case "--over-milliseconds":
-					filter = filter.and(m -> m.getCount() >= Integer.parseInt(term));
-					break;
-			}
-			flag = null;
-		}
-		if (contains != null) {
-			String c = contains;
-			filter = filter.and(m -> m.getName().contains(c));
-		}
 		showChildren.clear();
-		List<SampleMethod> results = search(selected, filter);
+		List<SampleMethod> results = search(selected, m -> m.getDepth() >= depth
+				&& m.getPrevalence() >= overPercent && m.getCount() >= overMillis && m.getName().contains(term));
 		player.sendMessage(ChatColor.YELLOW + "Search results (" + results.size() + ")");
 		for (SampleMethod method : results) {
 			player.spigot().sendMessage(toMessage(method)[1]);

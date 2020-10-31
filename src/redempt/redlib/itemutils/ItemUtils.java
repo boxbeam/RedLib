@@ -1,8 +1,5 @@
 package redempt.redlib.itemutils;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -18,14 +15,11 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.util.io.BukkitObjectOutputStream;
 import redempt.redlib.json.JSONList;
 import redempt.redlib.json.JSONMap;
 import redempt.redlib.json.JSONParser;
 import redempt.redlib.nms.NMSHelper;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -418,47 +412,35 @@ public class ItemUtils {
 	}
 	
 	/**
-	 * Compares the type, name, and lore of two items
+	 * Compares the traits of two items
 	 * @param first The first ItemStack
 	 * @param second The second ItemStack
-	 * @return Whether the two items are identical in terms of type, name, and lore. Returns true if both items are null, and false if only one is null.
+	 * @param traits The ItemTraits to compare
+	 * @return Whether the two items are identical in terms of the traits provided. Returns true if both items are null, and false if only one is null.
 	 */
-	public static boolean compare(ItemStack first, ItemStack second) {
+	public static boolean compare(ItemStack first, ItemStack second, ItemTrait... traits) {
 		if (first == second) {
 			return true;
 		}
 		if (first == null || second == null) {
 			return false;
 		}
-		if (first.getType() != second.getType()) {
-			return false;
-		}
-		ItemMeta firstMeta = first.getItemMeta();
-		ItemMeta secondMeta = second.getItemMeta();
-		if (firstMeta.hasDisplayName() != secondMeta.hasDisplayName()) {
-			return false;
-		}
-		if (firstMeta.hasDisplayName()) {
-			if (!firstMeta.getDisplayName().equals(secondMeta.getDisplayName())) {
+		for (ItemTrait trait : traits) {
+			if (!trait.compare(first, second)) {
 				return false;
-			}
-		}
-		if (firstMeta.hasLore() != secondMeta.hasLore()) {
-			return false;
-		}
-		if (firstMeta.hasLore()) {
-			List<String> firstLore = firstMeta.getLore();
-			List<String> secondLore = secondMeta.getLore();
-			if (firstLore.size() != secondLore.size()) {
-				return false;
-			}
-			for (int i = 0; i < firstLore.size(); i++) {
-				if (!firstLore.get(i).equals(secondLore.get(i))) {
-					return false;
-				}
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Compares the type, name, and lore of two items
+	 * @param first The first ItemStack
+	 * @param second The second ItemStack
+	 * @return Whether the two items are identical in terms of type, name, and lore. Returns true if both items are null, and false if only one is null.
+	 */
+	public static boolean compare(ItemStack first, ItemStack second) {
+		return compare(first, second, ItemTrait.TYPE, ItemTrait.NAME, ItemTrait.LORE);
 	}
 	
 	/**

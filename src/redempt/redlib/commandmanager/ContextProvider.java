@@ -34,6 +34,7 @@ public class ContextProvider<T> {
 	/**
 	 * Use "self" in the command file. Returns the player that ran the command.
 	 * Useful when you need an optional argument of type player to have a default value of the sender
+	 * @deprecated Now included by default, there is no need to add it yourself
 	 */
 	public static ContextProvider<Player> self = new ContextProvider<>("self", p -> p);
 	

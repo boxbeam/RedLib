@@ -100,8 +100,8 @@ profiler,rprofiler {
 		user player
 		notab
 	}
-	search string:terms... {
-		help [-d depth] [-o over-percent] [-m over-milliseconds] term
+	search int:--depth(0) double:--over-percent(0) int:--over-milliseconds(0) string:term {
+		help Searches the profiler with the given conditions
 		hook search
 		user player
 	}

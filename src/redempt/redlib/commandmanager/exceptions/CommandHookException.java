@@ -3,9 +3,9 @@ package redempt.redlib.commandmanager.exceptions;
 /**
  * Thrown when a command with a hook name specified does not find a method hook
  */
-public class MissingHookException extends IllegalStateException {
+public class CommandHookException extends IllegalStateException {
 	
-	public MissingHookException(String s) {
+	public CommandHookException(String s) {
 		super(s);
 	}
 	

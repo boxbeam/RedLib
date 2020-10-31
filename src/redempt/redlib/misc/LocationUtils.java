@@ -1,5 +1,6 @@
 package redempt.redlib.misc;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -11,10 +12,12 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.util.Vector;
 
 import redempt.redlib.RedLib;
+import redempt.redlib.commandmanager.Messages;
 
 public class LocationUtils {
 	
@@ -100,6 +103,50 @@ public class LocationUtils {
 	 */
 	public static Location getNearestSafeLocation(Location loc, int maxDistance) {
 		return getNearestSafeLocation(loc, maxDistance, l -> true);
+	}
+	
+	private static DecimalFormat timeFormat = new DecimalFormat("0.#");
+	
+	/**
+	 * Initiates a delayed teleport for a player which will be cancelled if the player moves. The messages
+	 * relevant to this will be sent automatically.
+	 * @param player The player to teleport
+	 * @param loc The location to teleport the player to after the delay
+	 * @param ticks The delay for the teleport, in ticks
+	 * @param result A lambda to handle the result, given true if the teleport succeeded, false otherwise
+	 */
+	public static void delayedTeleport(Player player, Location loc, int ticks, Consumer<Boolean> result) {
+		double seconds = ticks / 20;
+		player.sendMessage(Messages.msg("teleportDelay").replace("%seconds%", timeFormat.format(seconds)));
+		Location start = player.getLocation();
+		Task[] task = {null};
+		EventListener<?> listener = new EventListener<>(RedLib.getInstance(), PlayerMoveEvent.class, (l, e) -> {
+			if (!e.getPlayer().equals(player)) {
+				return;
+			}
+			if (start.distanceSquared(e.getTo()) > 0.125) {
+				player.sendMessage(Messages.msg("teleportCancelled"));
+				task[0].cancel();
+				l.unregister();
+				result.accept(false);
+			}
+		});
+		task[0] = Task.syncDelayed(RedLib.getInstance(), () -> {
+			player.teleport(loc);
+			listener.unregister();
+			result.accept(true);
+		}, ticks);
+	}
+	
+	/**
+	 * Initiates a delayed teleport for a player which will be cancelled if the player moves. The messages
+	 * relevant to this will be sent automatically.
+	 * @param player The player to teleport
+	 * @param loc The location to teleport the player to after the delay
+	 * @param ticks The delay for the teleport, in ticks
+	 */
+	public static void delayedTeleport(Player player, Location loc, int ticks) {
+		delayedTeleport(player, loc, ticks, b -> {});
 	}
 	
 	/**

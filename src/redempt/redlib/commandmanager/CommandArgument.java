@@ -35,6 +35,10 @@ class CommandArgument {
 		return defaultValue == null ? null : defaultValue.apply(sender);
 	}
 	
+	public Function<CommandSender, Object> getDefaultValue() {
+		return defaultValue;
+	}
+	
 	public int getPosition() {
 		return pos;
 	}

@@ -1,14 +1,14 @@
 package redempt.redlib.commandmanager;
 
+import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * Represents a collection of commands which can be mass-registered. Can contain any amount of commands, including 0
@@ -149,8 +149,9 @@ public class CommandCollection {
 		@Override
 		public void register(String prefix, Object... listeners) {
 			super.register(prefix, listeners);
+			Map<String, MethodHook> hooks = createHookMap(listeners);
 			for (Command command : children) {
-				command.registerHook(listeners);
+				command.registerHook(hooks);
 			}
 		}
 		

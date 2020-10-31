@@ -23,6 +23,7 @@ public class ArgType<T> {
 	
 	/**
 	 * The ArgType for a Player
+	 * @deprecated Now included by default, there is no need to add it yourself
 	 */
 	public static ArgType<Player> playerType = new ArgType<Player>("player", s -> Bukkit.getPlayer(s))
 			.tabStream(c -> Bukkit.getOnlinePlayers().stream().map(Player::getName));
