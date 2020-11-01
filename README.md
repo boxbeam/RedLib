@@ -18,4 +18,4 @@ You may also need to add the jar to your classpath. After that, you should be go
 
 # Usage
 
-For info on how to use RedLib, please see the (wiki)[https://github.com/Redempt/RedLib/wiki].
+For info on how to use RedLib, please see the [wiki](https://github.com/Redempt/RedLib/wiki).
