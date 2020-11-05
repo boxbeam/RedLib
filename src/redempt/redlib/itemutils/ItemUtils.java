@@ -22,6 +22,7 @@ import redempt.redlib.nms.NMSHelper;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.BiPredicate;
 
 /**
  * A utility class to easily modify items
@@ -228,16 +229,27 @@ public class ItemUtils {
 	 * Counts the number of the given item in the given inventory
 	 * @param inv The inventory to count the items in
 	 * @param item The item to count
+	 * @param comparison A filter to compare items for counting
 	 * @return The number of items found
 	 */
-	public static int count(Inventory inv, ItemStack item) {
+	public static int count(Inventory inv, ItemStack item, BiPredicate<ItemStack, ItemStack> comparison) {
 		int count = 0;
 		for (ItemStack i : inv) {
-			if (item.isSimilar(i)) {
+			if (comparison.test(item, i)) {
 				count += i.getAmount();
 			}
 		}
 		return count;
+	}
+	
+	/**
+	 * Counts the number of the given item in the given inventory
+	 * @param inv The inventory to count the items in
+	 * @param item The item to count
+	 * @return The number of items found
+	 */
+	public static int count(Inventory inv, ItemStack item) {
+		return count(inv, item, ItemStack::isSimilar);
 	}
 	
 	/**
@@ -247,14 +259,38 @@ public class ItemUtils {
 	 * @return The number of items found
 	 */
 	public static int count(Inventory inv, Material type) {
-		type = new ItemStack(type).getType();
-		int count = 0;
-		for (ItemStack i : inv) {
-			if (i != null && i.getType() == type) {
-				count += i.getAmount();
+		return count(inv, new ItemStack(type), (a, b) -> compare(a, b, ItemTrait.TYPE));
+	}
+	
+	/**
+	 * Removes the specified amount of the given item from the given inventory
+	 * @param inv The inventory to remove the items from
+	 * @param item The item to be removed
+	 * @param amount The amount of items to remove
+	 * @param comparison A filter to compare items for removal
+	 * @return Whether the amount specified could be removed. False if it removed less than specified.
+	 */
+	public static boolean remove(Inventory inv, ItemStack item, int amount, BiPredicate<ItemStack, ItemStack> comparison) {
+		ItemStack[] contents = inv.getContents();
+		for (int i = 0; i < contents.length && amount > 0; i++) {
+			if (!comparison.test(item, contents[i])) {
+				continue;
 			}
+			if (amount >= contents[i].getAmount()) {
+				amount -= contents[i].getAmount();
+				contents[i] = null;
+				if (amount == 0) {
+					inv.setContents(contents);
+					return true;
+				}
+				continue;
+			}
+			contents[i].setAmount(contents[i].getAmount() - amount);
+			inv.setContents(contents);
+			return true;
 		}
-		return count;
+		inv.setContents(contents);
+		return false;
 	}
 	
 	/**
@@ -265,26 +301,7 @@ public class ItemUtils {
 	 * @return Whether the amount specified could be removed. False if it removed less than specified.
 	 */
 	public static boolean remove(Inventory inv, ItemStack item, int amount) {
-		ItemStack[] contents = inv.getContents();
-		for (int i = 0; i < contents.length && amount > 0; i++) {
-			if (!item.isSimilar(contents[i])) {
-				continue;
-			}
-			if (amount >= contents[i].getAmount()) {
-				amount -= contents[i].getAmount();
-				contents[i] = null;
-				if (amount == 0) {
-					inv.setContents(contents);
-					return true;
-				}
-				continue;
-			}
-			contents[i].setAmount(contents[i].getAmount() - amount);
-			inv.setContents(contents);
-			return true;
-		}
-		inv.setContents(contents);
-		return false;
+		return remove(inv, item, amount, ItemStack::isSimilar);
 	}
 	
 	/**
@@ -295,27 +312,22 @@ public class ItemUtils {
 	 * @return Whether the amount specified could be removed. False if it removed less than specified.
 	 */
 	public static boolean remove(Inventory inv, Material type, int amount) {
-		type = new ItemStack(type).getType();
-		ItemStack[] contents = inv.getContents();
-		for (int i = 0; i < contents.length && amount > 0; i++) {
-			if (contents[i] == null || contents[i].getType() != type) {
-				continue;
-			}
-			if (amount >= contents[i].getAmount()) {
-				amount -= contents[i].getAmount();
-				contents[i] = null;
-				if (amount == 0) {
-					inv.setContents(contents);
-					return true;
-				}
-				continue;
-			}
-			contents[i].setAmount(contents[i].getAmount() - amount);
-			inv.setContents(contents);
-			return true;
-		}
-		inv.setContents(contents);
-		return false;
+		return remove(inv, new ItemStack(type), amount, (a, b) -> compare(a, b, ItemTrait.TYPE));
+	}
+	
+	/**
+	 * Remove all matching items up to a maximum, returning the number that were removed
+	 * @param inv The inventory to count and remove items from
+	 * @param item The item to count and remove
+	 * @param max The maximum number of items to remove
+	 * @param comparison A filter to compare items for counting and removal
+	 * @return How many items were removed
+	 */
+	public static int countAndRemove(Inventory inv, ItemStack item, int max, BiPredicate<ItemStack, ItemStack> comparison) {
+		int count = count(inv, item, comparison);
+		count = Math.min(max, count);
+		remove(inv, item, count, comparison);
+		return count;
 	}
 	
 	/**
@@ -326,10 +338,7 @@ public class ItemUtils {
 	 * @return How many items were removed
 	 */
 	public static int countAndRemove(Inventory inv, ItemStack item, int max) {
-		int count = count(inv, item);
-		count = Math.min(max, count);
-		remove(inv, item, count);
-		return count;
+		return countAndRemove(inv, item, max, ItemStack::isSimilar);
 	}
 	
 	/**
@@ -340,10 +349,7 @@ public class ItemUtils {
 	 * @return How many items were removed
 	 */
 	public static int countAndRemove(Inventory inv, Material type, int max) {
-		int count = count(inv, type);
-		count = Math.min(max, count);
-		remove(inv, type, count);
-		return count;
+		return countAndRemove(inv, new ItemStack(type), max, (a, b) -> compare(a, b, ItemTrait.TYPE));
 	}
 	
 	/**
@@ -353,9 +359,7 @@ public class ItemUtils {
 	 * @return How many items were removed
 	 */
 	public static int countAndRemove(Inventory inv, ItemStack item) {
-		int count = count(inv, item);
-		remove(inv, item, count);
-		return count;
+		return countAndRemove(inv, item, Integer.MAX_VALUE, ItemStack::isSimilar);
 	}
 	
 	/**
@@ -365,9 +369,7 @@ public class ItemUtils {
 	 * @return How many items were removed
 	 */
 	public static int countAndRemove(Inventory inv, Material type) {
-		int count = count(inv, type);
-		remove(inv, type, count);
-		return count;
+		return countAndRemove(inv, new ItemStack(type), Integer.MAX_VALUE, (a, b) -> ItemUtils.compare(a, b, ItemTrait.TYPE));
 	}
 	
 	/**

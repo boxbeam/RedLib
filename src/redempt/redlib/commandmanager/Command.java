@@ -301,7 +301,6 @@ public class Command {
 			try {
 				output[arg.getPosition() + 1] = Objects.requireNonNull(arg.getType().convert(sender, sargs.get(cmdArgs.indexOf(arg))));
 			} catch (Exception e) {
-				e.printStackTrace();
 				return null;
 			}
 		}
@@ -577,9 +576,6 @@ public class Command {
 					sender.sendMessage(ChatColor.RED + "An error was encountered in running this command. Please notify an admin.");
 					return true;
 				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-					for (Object obj : objArgs) {
-					}
 					if (topLevel) {
 						showHelp(sender);
 						return true;
