@@ -124,7 +124,7 @@ public class Command {
 	 */
 	public String getFullName() {
 		String name = getExpandedName() + " ";
-		name += String.join(" ", Arrays.stream(flags).map(Flag::toString).collect(Collectors.toList())) + " ";
+		name += flags.length > 0 ? String.join(" ", Arrays.stream(flags).map(Flag::toString).collect(Collectors.toList())) + " " : "";
 		name += String.join(" ", Arrays.stream(args).map(CommandArgument::toString).collect(Collectors.toList()));
 		return name;
 	}
