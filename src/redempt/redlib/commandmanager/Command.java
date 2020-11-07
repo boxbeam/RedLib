@@ -195,7 +195,7 @@ public class Command {
 				continue;
 			}
 			String farg = arg;
-			Flag flag = Arrays.stream(flags).filter(f -> f.getName().equals(farg)).findFirst().orElse(null);
+			Flag flag = Arrays.stream(flags).filter(f -> f.nameMatches(farg)).findFirst().orElse(null);
 			if (flag == null) {
 				continue;
 			}
@@ -487,7 +487,7 @@ public class Command {
 			if (i == args.length - 1) {
 				if (arg.startsWith("-")) {
 					Arrays.stream(flags).filter(f -> !used.contains(f) && f.getName().startsWith(arg))
-							.map(Flag::getName).forEach(completions::add);
+							.map(Flag::getNames).forEach(s -> Collections.addAll(completions, s));
 				}
 				if (flag != null && !flag.getType().getName().equals("boolean")) {
 					flag.getType().tabComplete(sender)

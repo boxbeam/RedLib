@@ -2,18 +2,21 @@ package redempt.redlib.commandmanager;
 
 import org.bukkit.command.CommandSender;
 
+import java.util.Arrays;
 import java.util.function.Function;
 
 class Flag {
 
 	private ArgType<?> type;
 	private String name;
+	private String[] names;
 	private int pos;
 	private Function<CommandSender, Object> defaultValue = null;
 	
 	public Flag(ArgType<?> type, String name, int pos, Function<CommandSender, Object> defaultValue) {
 		this.type = type;
 		this.name = name;
+		this.names = name.split(",");
 		this.pos = pos;
 		this.defaultValue = defaultValue;
 	}
@@ -30,8 +33,16 @@ class Flag {
 		return type;
 	}
 	
+	public boolean nameMatches(String name) {
+		return Arrays.stream(names).anyMatch(name::equals);
+	}
+	
 	public String getName() {
 		return name;
+	}
+	
+	public String[] getNames() {
+		return names;
 	}
 	
 	@Override
