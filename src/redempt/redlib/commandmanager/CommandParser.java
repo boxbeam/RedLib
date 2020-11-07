@@ -112,6 +112,11 @@ public class CommandParser {
 								throw new CommandParseException("Flags cannot be vararg, line " + pos);
 							}
 							Flag flag = new Flag(arg.getType(), arg.getName(), arg.getPosition(), arg.getDefaultValue());
+							for (String name : flag.getNames()) {
+								if (!name.startsWith("-")) {
+									throw new CommandParseException("All flag names and aliases must start with a dash, line " + pos);
+								}
+							}
 							flags.add(flag);
 							continue;
 						}
