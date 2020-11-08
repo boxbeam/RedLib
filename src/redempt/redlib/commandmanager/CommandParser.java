@@ -108,8 +108,8 @@ public class CommandParser {
 							if (arg.isOptional()) {
 								throw new CommandParseException("Flags cannot be marked as optional, they are optional by definition, line " + pos);
 							}
-							if (arg.consumes()) {
-								throw new CommandParseException("Flags cannot be vararg, line " + pos);
+							if (arg.consumes() || arg.isVararg()) {
+								throw new CommandParseException("Flags cannot be consuming or vararg, line " + pos);
 							}
 							Flag flag = new Flag(arg.getType(), arg.getName(), arg.getPosition(), arg.getDefaultValue());
 							for (String name : flag.getNames()) {
@@ -121,6 +121,12 @@ public class CommandParser {
 							continue;
 						}
 						args.add(arg);
+					}
+					for (int i = 0; i + 1 < args.size(); i++) {
+						CommandArgument arg = args.get(i);
+						if (arg.isVararg() || arg.consumes()) {
+							throw new CommandParseException("Vararg and consuming arguments must the final argument in the arg list, line " + pos);
+						}
 					}
 				} else if (depth == 2) {
 					children.addAll(fromLines(lines, pos).getCommands());
@@ -226,6 +232,19 @@ public class CommandParser {
 		if (argSplit.length != 2) {
 			throw new CommandParseException("Invalid command argument syntax" + arg + ", line " + pos);
 		}
+		boolean consumes = false;
+		boolean vararg = false;
+		if (argSplit[0].endsWith("...")) {
+			consumes = true;
+			argSplit[0] = argSplit[0].substring(0, argSplit[0].length() - 3);
+		}
+		if (argSplit[0].endsWith("[]")) {
+			vararg = true;
+			argSplit[0] = argSplit[0].substring(0, argSplit[0].length() - 2);
+			if (consumes) {
+				throw new CommandParseException("Argument cannot be both consuming and vararg, line " + pos);
+			}
+		}
 		ArgType<?> argType = Command.getType(argSplit[0], argTypes);
 		if (argType == null) {
 			throw new CommandParseException("Missing command argument type " + argSplit[0] + ", line " + pos);
@@ -233,12 +252,7 @@ public class CommandParser {
 		String name = argSplit[1];
 		boolean hideType = false;
 		boolean optional = false;
-		boolean consumes = false;
 		Function<CommandSender, Object> defaultValue = c -> null;
-		if (name.endsWith("...")) {
-			consumes = true;
-			name = name.substring(0, name.length() - 3);
-		}
 		int startIndex = -1;
 		if ((startIndex = name.indexOf('(')) != -1) {
 			int pdepth = 0;
@@ -290,7 +304,7 @@ public class CommandParser {
 		if (name.equals(argType.getName())) {
 			hideType = true;
 		}
-		CommandArgument carg = new CommandArgument(argType, argPos - 1, name, optional, hideType, consumes);
+		CommandArgument carg = new CommandArgument(argType, argPos - 1, name, optional, hideType, consumes, vararg);
 		if (carg.isOptional() || name.startsWith("-")) {
 			carg.setDefaultValue(defaultValue);
 		}

@@ -14,6 +14,7 @@ import redempt.redlib.commandmanager.exceptions.CommandHookException;
 import redempt.redlib.misc.EventListener;
 
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -179,6 +180,7 @@ public class Command {
 		List<String> sargs = new ArrayList<>();
 		Collections.addAll(sargs, argArray);
 		Object[] output = new Object[args.length + flags.length + 1];
+		//Flag checks
 		for (Flag flag : flags) {
 			if (flag.getType().getName().equals("boolean")) {
 				output[flag.getPosition() + 1] = false;
@@ -186,6 +188,7 @@ public class Command {
 			}
 			output[flag.getPosition() + 1] = flag.getDefaultValue(sender);
 		}
+		//Flag argument handling
 		for (int i = 0; i < sargs.size(); i++) {
 			String arg = sargs.get(i);
 			boolean quoted = arg.charAt(arg.length() - 1) == '1';
@@ -219,6 +222,7 @@ public class Command {
 			sargs.remove(i);
 			i--;
 		}
+		//Remove unused optional args
 		List<CommandArgument> cmdArgs = Arrays.stream(args).collect(Collectors.toList());
 		if (cmdArgs.size() > sargs.size()) {
 			int diff = cmdArgs.size() - sargs.size();
@@ -276,15 +280,14 @@ public class Command {
 			}
 			cmdArgs = Arrays.stream(cargs).filter(arg -> arg != null).collect(Collectors.toList());
 		}
-		if (cmdArgs.size() != sargs.size() && (args.length == 0 || !args[args.length - 1].consumes())) {
+		if (cmdArgs.size() != sargs.size() &&
+				(args.length == 0 || (!args[args.length - 1].consumes() && !args[args.length - 1].isVararg()))) {
 			return null;
 		}
 		output[0] = sender;
+		//Process remaining arguments
 		for (CommandArgument arg : cmdArgs) {
 			if (arg.consumes()) {
-				if (arg.pos != args.length - 1) {
-					throw new IllegalStateException("Consuming argument must be the last argument!");
-				}
 				StringBuilder builder = new StringBuilder();
 				for (int x = cmdArgs.size() - 1; x < sargs.size(); x++) {
 					builder.append(sargs.get(x)).append(" ");
@@ -296,6 +299,28 @@ public class Command {
 				} catch (Exception e) {
 					return null;
 				}
+				return output;
+			}
+			if (arg.isVararg()) {
+				Class<?> clazz = methodHook.getParameterTypes()[arg.getPosition() + 1];
+				if (!clazz.isArray()) {
+					throw new IllegalStateException("Expected type parameter #" + (arg.getPosition() + 2) + " for method hook " + methodHook.getName() + " to be an array");
+				}
+				Class<?> arrType = clazz.getComponentType();
+				Object arr = Array.newInstance(arrType, sargs.size() - cmdArgs.size() + 1);
+				if (Array.getLength(arr) == 0 && !arg.isOptional()) {
+					return null;
+				}
+				int pos = 0;
+				for (int x = cmdArgs.size() - 1; x < sargs.size(); x++) {
+					try {
+						Array.set(arr, pos, arg.getType().convert(sender, sargs.get(x)));
+						pos++;
+					} catch (Exception e) {
+						return null;
+					}
+				}
+				output[arg.getPosition() + 1] = arr;
 				return output;
 			}
 			try {
@@ -450,6 +475,7 @@ public class Command {
 	
 	protected List<String> tab(CommandSender sender, String[] args) {
 		List<String> completions = new ArrayList<>();
+		//Handle child command completions
 		if (args.length > 0) {
 			for (Command child : children) {
 				if (child.noTab) {
@@ -466,6 +492,7 @@ public class Command {
 				}
 			}
 		}
+		//Add subcommands of this command as completions
 		if (args.length == 1) {
 			for (Command child : children) {
 				if (child.noTab) {
@@ -479,6 +506,7 @@ public class Command {
 				}
 			}
 		}
+		//Handle flag completions and account for already-used flags
 		int flagArgs = 1;
 		Set<Flag> used = new HashSet<>();
 		Flag flag = null;
@@ -509,7 +537,7 @@ public class Command {
 			}
 			flag = null;
 		}
-//		flagArgs = 1;
+		//Remaining completions for command arguments
 		if (args.length - flagArgs < this.args.length && args.length - flagArgs >= 0) {
 			String partial = args[args.length - 1].replaceAll("(^\")|(\"$)", "").toLowerCase();
 			CommandArgument arg = this.args[args.length - flagArgs];
@@ -522,6 +550,10 @@ public class Command {
 					completions.add(completion);
 				}
 			}
+		} else if (this.args.length > 0 && this.args[this.args.length - 1].isVararg() && args.length > 0) {
+			String partial = args[args.length - 1].replaceAll("(^\")|(\"$)", "").toLowerCase();
+			this.args[this.args.length - 1].getType().tabComplete(sender).stream()
+					.filter(s -> s.toLowerCase().startsWith(partial) && !s.equals(partial)).forEach(completions::add);
 		}
 		return completions;
 	}
