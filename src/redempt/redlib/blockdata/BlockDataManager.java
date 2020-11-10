@@ -21,6 +21,7 @@ import redempt.redlib.json.JSONMap;
 import redempt.redlib.json.JSONParser;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.misc.SQLHelper;
+import redempt.redlib.misc.Task;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -44,6 +45,7 @@ public class BlockDataManager implements Listener {
 	
 	protected Map<World, Map<ChunkPosition, Set<DataBlock>>> blocks = new HashMap<>();
 	protected SQLHelper sql;
+	private Task saveTask;
 	
 	/**
 	 * Create a BlockDataManager instance with a save file location, to be saved to and loaded from. This constructor
@@ -56,6 +58,21 @@ public class BlockDataManager implements Listener {
 		sql.setAutoCommit(false);
 		sql.execute("CREATE TABLE IF NOT EXISTS blocks (world TEXT, cx INT, cz INT, x INT, y INT, z INT, data TEXT, PRIMARY KEY (world, x, y, z));");
 		managers.add(this);
+		setAutoSave(true);
+	}
+	
+	/**
+	 * Sets whether this BlockDataManager will automatically save every 5 minutes. Defaults to true.
+	 * @param autoSave Whether to save automatically every 5 minutes
+	 */
+	public void setAutoSave(boolean autoSave) {
+		if (saveTask != null) {
+			saveTask.cancel();
+			saveTask = null;
+		}
+		if (autoSave) {
+			saveTask = Task.syncRepeating(RedLib.getInstance(), this::save, 5 * 60 * 20, 5 * 60 * 20);
+		}
 	}
 	
 	/**
@@ -70,6 +87,7 @@ public class BlockDataManager implements Listener {
 	 * Saves all data to the save file, and closes the SQL connection. Call this in your onDisable.
 	 */
 	public void saveAndClose() {
+		setAutoSave(false);
 		save();
 		sql.close();
 		managers.remove(this);
