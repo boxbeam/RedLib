@@ -3,7 +3,11 @@ RedLib is a Spigot plugin development library, designed to make your life easier
 
 # Installation for Development
 
-To build the RedLib jar, it is recommended to use Jitpack with Gradle or Maven if possible. If you don't want to do that, you can build the jar yourself manually. For Windows, use Git Bash. For Linux or OSX, just ensure you have Git installed. Navigate to the directory where you want to clone the repository, and run:
+RedLib is a standalone plugin, so you will need to install it on any servers that have plugins which depend on it, and specify it as a dependency in your plugin.yml like this:
+
+`depend: [RedLib]`
+
+To get the jar, either download it from the releases tab either here on [GitHub](https://github.com/Redempt/RedLib/releases) or on [Spigot](https://www.spigotmc.org/resources/redlib.78713/), or [build it locally](https://github.com/Redempt/RedLib#build-locally).
 
 ## With Jitpack:
 
@@ -44,15 +48,15 @@ Replace `Tag` with a release tag for RedLib. Example: `4.3.5-1`.
 
 ## Build locally:
 
+For Windows, use Git Bash. For Linux or OSX, just ensure you have Git installed.Navigate to the directory where you want to clone the repository, and run:
+
 ```
 git clone https://github.com/Redempt/RedLib
 cd RedLib
 ./gradlew jar
 ```
 
-After running these commands, the jar will be at `build/libs/RedLib.jar`. RedLib is a standalone plugin, so you will need to install it on any servers that have plugins which depend on it, and specify it as a dependency in your plugin.yml like this:
-
-`depend: [RedLib]`
+After running these commands, the jar will be at `build/libs/RedLib.jar`.
 You may also need to add the jar to your classpath. After that, you should be good to go!
 
 # Usage
