@@ -2,7 +2,6 @@ package redempt.redlib;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.commandmanager.ArgType;
 import redempt.redlib.commandmanager.CommandParser;
@@ -14,7 +13,6 @@ import redempt.redlib.dev.profiler.Profiler;
 import redempt.redlib.dev.profiler.ProfilerCommands;
 import redempt.redlib.dev.profiler.TickMonitorProfiler;
 import redempt.redlib.enchants.events.PlayerChangedArmorEvent;
-import redempt.redlib.nms.PacketListener;
 import redempt.redlib.protection.ProtectionPolicy;
 import redempt.redlib.region.RegionEnterExitListener;
 
@@ -63,7 +61,6 @@ public class RedLib extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
-		PacketListener.disable();
 		Profiler.stopAll();
 	}
 	
