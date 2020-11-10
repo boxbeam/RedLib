@@ -50,7 +50,7 @@ public class Command {
 					return null;
 			}
 		}));
-		types.add(new ArgType<>("player", Bukkit::getPlayer).tabStream(c -> Bukkit.getOnlinePlayers().stream().map(Player::getName)));
+		types.add(new ArgType<Player>("player", (Function<String, Player>) Bukkit::getPlayer).tabStream(c -> Bukkit.getOnlinePlayers().stream().map(Player::getName)));
 	}
 	
 	protected Plugin plugin;
