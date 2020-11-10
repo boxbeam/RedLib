@@ -26,7 +26,7 @@ dependencies {
 }
 ```
 
-Replace `Tag` with a release tag for RedLib. Example: `4.3.5-1`.
+Replace `Tag` with a release tag for RedLib. Example: `4.3.6`.
 
 Maven:
 
@@ -44,7 +44,7 @@ Maven:
 	<version>Tag</version>
 </dependency>
 ```
-Replace `Tag` with a release tag for RedLib. Example: `4.3.5-1`.
+Replace `Tag` with a release tag for RedLib. Example: `4.3.6`.
 
 ## Build locally:
 
