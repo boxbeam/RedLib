@@ -1,8 +1,12 @@
-package redempt.redlib.misc;
+package redempt.redlib.sql;
+
+import redempt.redlib.RedLib;
+import redempt.redlib.misc.Task;
 
 import java.io.Closeable;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -65,6 +69,8 @@ public class SQLHelper implements Closeable {
 	}
 	
 	private Connection connection;
+	private List<SQLCache> caches = new ArrayList<>();
+	private Task commitTask = null;
 	
 	/**
 	 * Constructs a SQLHelper from a Connection. Get the Connection using one of the static SQLHelper open methods.
@@ -72,6 +78,101 @@ public class SQLHelper implements Closeable {
 	 */
 	public SQLHelper(Connection connection) {
 		this.connection = connection;
+	}
+	
+	/**
+	 * Creates and adds cache for a certain column
+	 * @param tableName The name of the table to create the cache for
+	 * @param columnName The name of the column to create the cache for
+	 * @param primaryKeyNames The primary keys used to access and mutate the column
+	 * @return The cache
+	 */
+	public SQLCache createCache(String tableName, String columnName, String... primaryKeyNames) {
+		SQLCache cache = new SQLCache(this, tableName, columnName, primaryKeyNames);
+		caches.add(cache);
+		return cache;
+	}
+	
+	/**
+	 * Finds matching caches by a pattern and flushes a specific entry from them.
+	 * @param pattern The pattern used for {@link SQLHelper#getMatchingCaches(String)}
+	 * @param primaryKeys The primary keys used to access the entry
+	 */
+	public void flushMatchingCaches(String pattern, Object... primaryKeys) {
+		getMatchingCaches(pattern).forEach(c -> c.flush(primaryKeys));
+	}
+	
+	/**
+	 * Finds matching caches by a pattern and removes a specific entry from them. Useful for saving targeted
+	 * cached rows when a column in a certain table is changed
+	 * @param pattern The pattern used for {@link SQLHelper#getMatchingCaches(String)}
+	 * @param primaryKeys The primary keys used to access the entry
+	 */
+	public void removeFromMatchingCaches(String pattern, Object... primaryKeys) {
+		getMatchingCaches(pattern).forEach(c -> c.remove(primaryKeys));
+	}
+	
+	/**
+	 * Finds matching caches by a pattern and flushes, then removes a specific entry from them.
+	 * @param pattern The pattern used for {@link SQLHelper#getMatchingCaches(String)}
+	 * @param primaryKeys The primary keys used to access the entry
+	 */
+	public void flushAndRemoveFromMatchingCaches(String pattern, Object... primaryKeys) {
+		List<SQLCache> caches = getMatchingCaches(pattern);
+		caches.forEach(c -> c.flush(primaryKeys));
+		caches.forEach(c -> c.remove(primaryKeys));
+	}
+	
+	/**
+	 * Gets the caches matching a pattern
+	 * @param pattern The pattern to match. Should be formatted as "tableName.primaryKeyColumnName". Use * to indicate all for either tableName or columnName.
+	 *                Use | to indicate or. Primary key column name matches any primary key with the given column name. Useful if you are updating
+	 *                a value in a table and want to flush/remove targeted values from the cache.
+	 *                Example: *.name|team
+	 * @return The list of matching caches
+	 */
+	public List<SQLCache> getMatchingCaches(String pattern) {
+		List<SQLCache> list = new ArrayList<>();
+		String[] split = pattern.split("\\.");
+		if (split.length != 2) {
+			throw new IllegalArgumentException("Pattern to match caches must match tableName.columnName (use * to match all of either)");
+		}
+		String[] tableName = split[0].split("\\|");
+		String[] columnName = split[1].split("\\|");
+		for (SQLCache cache : caches) {
+			if (!(tableName[0].equals("*") || Arrays.stream(tableName).anyMatch(s -> s.equals(cache.getTableName())))) {
+				continue;
+			}
+			if (!(columnName[0].equals("*") || cache.keyNamesMatch(columnName))) {
+				continue;
+			}
+			list.add(cache);
+		}
+		list.forEach(c -> {
+			System.out.println(c.getTableName() + ": " + c.getColumnName());
+		});
+		return list;
+	}
+	
+	/**
+	 * @return The list of caches for this SQLHelper
+	 */
+	public List<SQLCache> getCaches() {
+		return caches;
+	}
+	
+	/**
+	 * Calls {@link SQLCache#flush()} on all caches owned by this SQLHelper
+	 */
+	public void flushAllCaches() {
+		caches.forEach(SQLCache::flush);
+	}
+	
+	/**
+	 * Calls {@link SQLCache#clear()} on all caches owned by this SQLHelper
+	 */
+	public void clearAllCaches() {
+		caches.forEach(SQLCache::clear);
 	}
 	
 	/**
@@ -230,11 +331,13 @@ public class SQLHelper implements Closeable {
 	}
 	
 	/**
-	 * Sets the wrapped connection's auto-commit property
+	 * Sets the wrapped connection's auto-commit property. Calling this method will automatically disable
+	 * the task started by {@link SQLHelper#setCommitInterval(int)}.
 	 * @param autoCommit The auto-commit property - whether it will commit with every command
 	 */
 	public void setAutoCommit(boolean autoCommit) {
 		try {
+			setCommitInterval(-1);
 			connection.setAutoCommit(autoCommit);
 		} catch (SQLException e) {
 			sneakyThrow(e);
@@ -255,10 +358,28 @@ public class SQLHelper implements Closeable {
 	}
 	
 	/**
-	 * Commits the transaction
+	 * Starts a task to call commit() on this SQLHelper every n ticks. Pass -1 to disable.
+	 * Automatically sets autoCommit to false.
+	 * @param ticks The number of ticks between commits, or -1 to disable
+	 */
+	public void setCommitInterval(int ticks) {
+		if (commitTask != null) {
+			commitTask.cancel();
+			commitTask = null;
+		}
+		if (ticks == -1) {
+			return;
+		}
+		setAutoCommit(false);
+		commitTask = Task.syncRepeating(RedLib.getInstance(), this::commit, ticks, ticks);
+	}
+	
+	/**
+	 * Flushes all caches and commits the transaction
 	 */
 	public void commit() {
 		try {
+			flushAllCaches();
 			connection.commit();
 		} catch (SQLException e) {
 			sneakyThrow(e);
@@ -292,6 +413,7 @@ public class SQLHelper implements Closeable {
 	@Override
 	public void close() {
 		try {
+			setCommitInterval(-1);
 			connection.close();
 		} catch (SQLException e) {
 			sneakyThrow(e);

@@ -11,7 +11,6 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import redempt.redlib.RedLib;
 import redempt.redlib.blockdata.events.DataBlockDestroyEvent;
@@ -20,7 +19,7 @@ import redempt.redlib.blockdata.events.DataBlockMoveEvent;
 import redempt.redlib.json.JSONMap;
 import redempt.redlib.json.JSONParser;
 import redempt.redlib.misc.LocationUtils;
-import redempt.redlib.misc.SQLHelper;
+import redempt.redlib.sql.SQLHelper;
 import redempt.redlib.misc.Task;
 
 import java.nio.file.Path;
@@ -45,7 +44,6 @@ public class BlockDataManager implements Listener {
 	
 	protected Map<World, Map<ChunkPosition, Set<DataBlock>>> blocks = new HashMap<>();
 	protected SQLHelper sql;
-	private Task saveTask;
 	
 	/**
 	 * Create a BlockDataManager instance with a save file location, to be saved to and loaded from. This constructor
@@ -66,13 +64,7 @@ public class BlockDataManager implements Listener {
 	 * @param autoSave Whether to save automatically every 5 minutes
 	 */
 	public void setAutoSave(boolean autoSave) {
-		if (saveTask != null) {
-			saveTask.cancel();
-			saveTask = null;
-		}
-		if (autoSave) {
-			saveTask = Task.syncRepeating(RedLib.getInstance(), this::save, 5 * 60 * 20, 5 * 60 * 20);
-		}
+		sql.setCommitInterval(autoSave ? 20 * 60 * 5 : -1);
 	}
 	
 	/**

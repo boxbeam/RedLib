@@ -25,11 +25,17 @@ public enum ItemTrait {
 	 * For comparing the display name of two items
 	 */
 	NAME((a, b) -> {
-		if (!a.getItemMeta().hasDisplayName() && !b.getItemMeta().hasDisplayName()) {
+		if (a.hasItemMeta() != b.hasItemMeta()) {
+			return false;
+		}
+		if (!a.hasItemMeta()) {
 			return true;
 		}
-		if (!a.getItemMeta().hasDisplayName() || !b.getItemMeta().hasDisplayName()) {
+		if (a.getItemMeta().hasDisplayName() != b.getItemMeta().hasDisplayName()) {
 			return false;
+		}
+		if (!a.getItemMeta().hasDisplayName()) {
+			return true;
 		}
 		return a.getItemMeta().getDisplayName().equals(b.getItemMeta().getDisplayName());
 	}),
@@ -37,11 +43,17 @@ public enum ItemTrait {
 	 * For comparing the lore of two items
 	 */
 	LORE((a, b) -> {
-		if (!a.getItemMeta().hasLore() && !b.getItemMeta().hasLore()) {
+		if (a.hasItemMeta() != b.hasItemMeta()) {
+			return false;
+		}
+		if (!a.hasItemMeta()) {
 			return true;
 		}
-		if (!a.getItemMeta().hasLore() || !b.getItemMeta().hasLore()) {
+		if (a.getItemMeta().hasLore() != b.getItemMeta().hasLore()) {
 			return false;
+		}
+		if (!a.getItemMeta().hasLore()) {
+			return true;
 		}
 		List<String> lore1 = a.getItemMeta().getLore();
 		List<String> lore2 = b.getItemMeta().getLore();
