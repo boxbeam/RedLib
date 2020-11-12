@@ -196,14 +196,11 @@ public class SQLCache {
 		SQLCacheEntry entry = new SQLCacheEntry(primaryKeys);
 		Object val = cache.get(entry);
 		if (val == null) {
-			System.out.println(primaryKeys[0]);
-			System.out.println("Null");
 			return;
 		}
 		Object[] objs = new Object[entry.getParams().length + 1];
 		objs[0] = val;
 		for (int i = 0; i < entry.getParams().length; i++) {
-			System.out.println(entry.getParams()[i]);
 			objs[i + 1] = entry.getParams()[i];
 		}
 		sql.execute(updateQuery, objs);

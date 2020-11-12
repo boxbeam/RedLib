@@ -148,9 +148,6 @@ public class SQLHelper implements Closeable {
 			}
 			list.add(cache);
 		}
-		list.forEach(c -> {
-			System.out.println(c.getTableName() + ": " + c.getColumnName());
-		});
 		return list;
 	}
 	
