@@ -87,7 +87,7 @@ public class Task {
 	 * @param run The task to run
 	 * @return The Task that has been scheduled
 	 */
-	public Task asyncDelayed(Plugin plugin, Runnable run) {
+	public static Task asyncDelayed(Plugin plugin, Runnable run) {
 		return asyncDelayed(plugin, t -> run.run(), 0);
 	}
 	
@@ -97,7 +97,7 @@ public class Task {
 	 * @param run The task to run
 	 * @return The Task that has been scheduled
 	 */
-	public Task asyncDelayed(Plugin plugin, Consumer<Task> run) {
+	public static Task asyncDelayed(Plugin plugin, Consumer<Task> run) {
 		return asyncDelayed(plugin, run, 0);
 	}
 	
@@ -108,7 +108,7 @@ public class Task {
 	 * @param delay The delay in ticks to wait before running the task
 	 * @return The Task that has been scheduled
 	 */
-	public Task asyncDelayed(Plugin plugin, Runnable run, long delay) {
+	public static Task asyncDelayed(Plugin plugin, Runnable run, long delay) {
 		return asyncDelayed(plugin, t -> run.run(), delay);
 	}
 	
@@ -119,7 +119,7 @@ public class Task {
 	 * @param delay The delay in ticks to wait before running the task
 	 * @return The Task that has been scheduled
 	 */
-	public Task asyncDelayed(Plugin plugin, Consumer<Task> run, long delay) {
+	public static Task asyncDelayed(Plugin plugin, Consumer<Task> run, long delay) {
 		Task[] task = {null};
 		task[0] = new Task(Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, () -> run.accept(task[0]), delay), TaskType.ASYNC_DELAYED, plugin);
 		return task[0];
@@ -133,7 +133,7 @@ public class Task {
 	 * @param period The number of ticks between executions of the task
 	 * @return The Task that has been scheduled
 	 */
-	public Task asyncRepeating(Plugin plugin, Consumer<Task> run, long delay, long period) {
+	public static Task asyncRepeating(Plugin plugin, Consumer<Task> run, long delay, long period) {
 		Task[] task = {null};
 		task[0] = new Task(Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, () -> run.accept(task[0]), delay, period), TaskType.ASYNC_REPEATING, plugin);
 		return task[0];
@@ -147,7 +147,7 @@ public class Task {
 	 * @param period The number of ticks between executions of the task
 	 * @return The Task that has been scheduled
 	 */
-	public Task asyncRepeating(Plugin plugin, Runnable run, long delay, long period) {
+	public static Task asyncRepeating(Plugin plugin, Runnable run, long delay, long period) {
 		return asyncRepeating(plugin, t -> run.run(), delay, period);
 	}
 	

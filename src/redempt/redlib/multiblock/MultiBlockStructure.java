@@ -382,7 +382,7 @@ public class MultiBlockStructure {
 	}
 	
 	/**
-	 * 
+	 * Gets the data of this structure at a given relative location, set with a BlockState at the given location
 	 * @param relX The relative X of the block within this multi-block structure
 	 * @param relY The relative Y of the block within this multi-block structure
 	 * @param relZ The relative Z of the block within this multi-block structure
@@ -398,7 +398,7 @@ public class MultiBlockStructure {
 	}
 	
 	/**
-	 *
+	 * Gets the data of this structure at a given relative location
 	 * @param relX The relative X of the block within this multi-block structure
 	 * @param relY The relative Y of the block within this multi-block structure
 	 * @param relZ The relative Z of the block within this multi-block structure
@@ -408,6 +408,27 @@ public class MultiBlockStructure {
 	 */
 	public BlockState getData(int relX, int relY, int relZ) {
 		return getData(new Location(Bukkit.getWorlds().get(0), 0, 0, 0), relX, relY, relZ);
+	}
+	
+	/**
+	 * Gets the type of the data at a given relative location
+	 * @param relX The relative X of the block within this multi-block structure
+	 * @param relY The relative Y of the block within this multi-block structure
+	 * @param relZ The relative Z of the block within this multi-block structure
+	 * @return The type of the block at the given relative location
+	 * @throws ArrayIndexOutOfBoundsException if the relative coordinates do not exist within this structure
+	 */
+	public Material getType(int relX, int relY, int relZ) {
+		String data = this.data[relX][relY][relZ];
+		if (midVersion >= 13) {
+			int pos = data.indexOf('[');
+			pos = pos == -1 ? data.length() : pos;
+			return Material.valueOf(data.substring(0, pos).toUpperCase());
+		} else {
+			int pos = data.indexOf(':');
+			pos = pos == -1 ? data.length() : pos;
+			return Material.valueOf(data.substring(0, pos).toUpperCase());
+		}
 	}
 	
 	/**

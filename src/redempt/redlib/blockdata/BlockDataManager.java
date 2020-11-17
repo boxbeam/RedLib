@@ -53,8 +53,8 @@ public class BlockDataManager implements Listener {
 	public BlockDataManager(Path saveFile) {
 		Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
 		sql = new SQLHelper(SQLHelper.openSQLite(saveFile));
-		sql.setAutoCommit(false);
 		sql.execute("CREATE TABLE IF NOT EXISTS blocks (world TEXT, cx INT, cz INT, x INT, y INT, z INT, data TEXT, PRIMARY KEY (world, x, y, z));");
+		sql.execute("PRAGMA synchronous = OFF;");
 		managers.add(this);
 		setAutoSave(true);
 	}

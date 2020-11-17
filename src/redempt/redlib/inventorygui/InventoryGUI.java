@@ -341,6 +341,10 @@ public class InventoryGUI implements Listener {
 		if (!inventory.equals(e.getView().getTopInventory())) {
 			return;
 		}
+		if (e.getAction() == InventoryAction.COLLECT_TO_CURSOR && !e.getClickedInventory().equals(inventory)) {
+			e.setCancelled(true);
+			return;
+		}
 		if (!inventory.equals(e.getClickedInventory()) && e.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
 			if (openSlots.size() > 0) {
 				List<Integer> slots = new ArrayList<>();
