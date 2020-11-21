@@ -13,6 +13,7 @@ import redempt.redlib.dev.profiler.Profiler;
 import redempt.redlib.dev.profiler.ProfilerCommands;
 import redempt.redlib.dev.profiler.TickMonitorProfiler;
 import redempt.redlib.enchants.events.PlayerChangedArmorEvent;
+import redempt.redlib.enchants.events.PlayerChangedHeldItemEvent;
 import redempt.redlib.protection.ProtectionPolicy;
 import redempt.redlib.region.RegionEnterExitListener;
 
@@ -55,6 +56,7 @@ public class RedLib extends JavaPlugin {
 			}
 		}
 		PlayerChangedArmorEvent.register();
+		PlayerChangedHeldItemEvent.register();
 		RegionEnterExitListener.register();
 		ProtectionPolicy.registerProtections();
 	}

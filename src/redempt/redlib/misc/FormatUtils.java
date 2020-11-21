@@ -77,4 +77,36 @@ public class FormatUtils {
 		return truncateDouble(money);
 	}
 	
+	/**
+	 * Converts a string to Title Case, where the first character and every character after a space is capitalized. Preserves spaces.
+	 * @param string The string to convert to Title Case
+	 * @return The Title Case string
+	 */
+	public static String toTitleCase(String string) {
+		StringBuilder str = new StringBuilder();
+		boolean space = false;
+		for (int i = 0; i < string.length(); i++) {
+			char c = string.charAt(i);
+			str.append(space || i == 0 ? Character.toUpperCase(c) : Character.toLowerCase(c));
+			space = c == ' ';
+		}
+		return str.toString();
+	}
+	
+	/**
+	 * Converts a string to camelCase, where every character after a space is capitalized. Removes spaces.
+	 * @param string The string to convert to camelCase
+	 * @return The camelCase string
+	 */
+	public static String toCamelCase(String string) {
+		StringBuilder str = new StringBuilder();
+		boolean space = false;
+		for (int i = 0; i < string.length(); i++) {
+			char c = string.charAt(i);
+			str.append(c == ' ' ? "" : (space ? Character.toUpperCase(c) : Character.toLowerCase(c)));
+			space = c == ' ';
+		}
+		return str.toString();
+	}
+	
 }

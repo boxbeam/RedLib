@@ -8,7 +8,10 @@ import redempt.redlib.commandmanager.ArgType;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.jar.JarEntry;
@@ -16,6 +19,7 @@ import java.util.jar.JarFile;
 
 /**
  * A registry for custom enchantments owned by a single plugin
+ *
  * @author Redempt
  */
 public class EnchantRegistry {
@@ -24,6 +28,7 @@ public class EnchantRegistry {
 	
 	/**
 	 * Gets the EnchantRegistry owned by the given plugin
+	 *
 	 * @param plugin The plugin owning the requested EnchantRegistry
 	 * @return The EnchantRegistry owned by the plugin
 	 */
@@ -38,6 +43,7 @@ public class EnchantRegistry {
 	
 	/**
 	 * Gets a CustomEnchant by its name or ID
+	 *
 	 * @param name The name or ID of the enchantment
 	 * @return The CustomEnchant
 	 */
@@ -63,8 +69,9 @@ public class EnchantRegistry {
 	
 	/**
 	 * Instantiates a new EnchantRegistry
+	 *
 	 * @param plugin The plugin that owns this EnchantRegistry
-	 * @param namer A function which will generate a display name for any given CustomEnchant
+	 * @param namer  A function which will generate a display name for any given CustomEnchant
 	 */
 	public EnchantRegistry(Plugin plugin, Function<CustomEnchant<?>, String> namer) {
 		this.plugin = plugin;
@@ -74,6 +81,7 @@ public class EnchantRegistry {
 	
 	/**
 	 * Instantiates a new EnchantRegistry
+	 *
 	 * @param plugin The plugin that owns this EnchantResgistry
 	 * @param prefix The prefix to be prepended to the name of any given CustomEnchant to create the display name
 	 */
@@ -83,6 +91,7 @@ public class EnchantRegistry {
 	
 	/**
 	 * Instantiates a new EnchantRegistry with a namer that prepends the gray chat color
+	 *
 	 * @param plugin The plugin that owns this EnchantRegistry
 	 */
 	public EnchantRegistry(Plugin plugin) {
@@ -91,9 +100,13 @@ public class EnchantRegistry {
 	
 	/**
 	 * Registers a CustomEnchant in this EnchantRegistry
+	 *
 	 * @param ench The CustomEnchant to register
 	 */
 	public void register(CustomEnchant<?> ench) {
+		if (enchants.containsKey(ench.getId())) {
+			throw new IllegalArgumentException("Duplicate enchant ID/name "  + ench.getId() + "/" + ench.getName());
+		}
 		ench.register(this);
 		enchants.put(ench.getId(), ench);
 		byDisplayName.put(ench.getDisplayName(), ench);
@@ -117,6 +130,7 @@ public class EnchantRegistry {
 	/**
 	 * Peeks inside a plugin's jar and registers all the classes which extend CustomEnchant inside it.
 	 * Note: Custom enchantment classes MUST have a constructor with no arguments to be loaded by this method
+	 *
 	 * @param plugin The plugin to load all CustomEnchants from
 	 */
 	public void registerAll(Plugin plugin) {
@@ -134,7 +148,12 @@ public class EnchantRegistry {
 					continue;
 				}
 				name = name.substring(0, name.length() - 6).replace("/", ".");
-				Class<?> clazz = Class.forName(name, true, loader);
+				Class<?> clazz;
+				try {
+					clazz = Class.forName(name, true, loader);
+				} catch (ClassNotFoundException ex) {
+					continue;
+				}
 				if (!CustomEnchant.class.isAssignableFrom(clazz) || Modifier.isAbstract(clazz.getModifiers()) || clazz.isInterface()) {
 					continue;
 				}
@@ -153,6 +172,7 @@ public class EnchantRegistry {
 	
 	/**
 	 * Gets all the CustomEnchants on an item
+	 *
 	 * @param item The item to get the CustomEnchants from
 	 * @return A map of each CustomEnchant on this item to its level
 	 */
@@ -172,7 +192,8 @@ public class EnchantRegistry {
 	
 	/**
 	 * Combines two maps of CustomEnchants to their levels, in the same way that normal enchantments would be combined at an anvil
-	 * @param first The first map of CustomEnchants to levels
+	 *
+	 * @param first  The first map of CustomEnchants to levels
 	 * @param second The second map of CustomEnchants to levels - Incompatible enchants will be removed from this map
 	 * @return A map of the combined CustomEnchants to their levels
 	 */
@@ -199,8 +220,9 @@ public class EnchantRegistry {
 	
 	/**
 	 * Applies all the enchantments in a map of CustomEnchants to their levels to an item
+	 *
 	 * @param enchants The map of CustomEnchants to their levels
-	 * @param item The item to apply the enchants to
+	 * @param item     The item to apply the enchants to
 	 * @return The enchanted item
 	 */
 	public ItemStack applyAll(Map<CustomEnchant<?>, Integer> enchants, ItemStack item) {
@@ -212,30 +234,36 @@ public class EnchantRegistry {
 	
 	/**
 	 * Gets a CustomEnchant and its level from a line of lore
+	 *
 	 * @param line The line of lore
 	 * @return The EnchantInfo containing the enchantment type and level, or null if there was no CustomEnchant on the given line of lore
 	 */
 	public EnchantInfo fromLoreLine(String line) {
 		int lastSpace = getLastSpace(line);
-		if (lastSpace == -1) {
-			CustomEnchant<?> ench = byDisplayName.get(line);
-			if (ench != null && ench.getMaxLevel() == 1) {
-				return new EnchantInfo(ench, 1);
+		check:
+		{
+			if (lastSpace == -1) {
+				break check;
 			}
-			return null;
+			String name = line.substring(0, lastSpace);
+			String level = line.substring(lastSpace + 1);
+			CustomEnchant<?> ench = byDisplayName.get(name);
+			if (ench == null) {
+				break check;
+			}
+			int lvl = CustomEnchant.fromRomanNumerals(level);
+			return new EnchantInfo(ench, lvl);
 		}
-		String name = line.substring(0, lastSpace);
-		String level = line.substring(lastSpace + 1, line.length());
-		CustomEnchant<?> ench = byDisplayName.get(name);
-		if (ench == null) {
-			return null;
+		CustomEnchant<?> ench = byDisplayName.get(line);
+		if (ench != null && ench.getMaxLevel() == 1) {
+			return new EnchantInfo(ench, 1);
 		}
-		int lvl = CustomEnchant.fromRomanNumerals(level);
-		return new EnchantInfo(ench, lvl);
+		return null;
 	}
 	
 	/**
 	 * Gets the display name of a CustomEnchant
+	 *
 	 * @param enchant The Enchant to get the display name of
 	 * @return The display name
 	 */
@@ -245,6 +273,7 @@ public class EnchantRegistry {
 	
 	/**
 	 * Gets the ArgType for CustomEnchants in this registry, with tab completion using IDs
+	 *
 	 * @param name The name to use for the argument type
 	 * @return A CommandArgumentType for CustomEnchants in this registry
 	 */

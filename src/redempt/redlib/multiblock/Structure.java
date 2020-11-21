@@ -196,6 +196,13 @@ public class Structure {
 		}
 		
 		/**
+		 * @return The Material that the MultiBlockStructure would set at this location if it were built here
+		 */
+		public Material getStructureType() {
+			return structure.getType().getType(relX, relY, relZ);
+		}
+		
+		/**
 		 * Gets the relative X of this block
 		 * @return The relative X of this block
 		 */
