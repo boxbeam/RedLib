@@ -15,6 +15,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import redempt.redlib.RedLib;
@@ -331,9 +332,13 @@ public class InventoryGUI implements Listener {
 	
 	@EventHandler
 	public void onDrag(InventoryDragEvent e) {
-		if (e.getRawSlots().stream().anyMatch(s -> e.getView().getInventory(s).equals(inventory) && !openSlots.contains(s))) {
+		if (e.getRawSlots().stream().anyMatch(s -> getInventory(e.getView(), s).equals(inventory) && !openSlots.contains(s))) {
 			e.setCancelled(true);
 		}
+	}
+	
+	private Inventory getInventory(InventoryView view, int rawSlot) {
+		return rawSlot < view.getTopInventory().getSize() ? view.getTopInventory() : view.getBottomInventory();
 	}
 	
 	@EventHandler

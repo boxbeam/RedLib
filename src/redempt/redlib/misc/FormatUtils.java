@@ -78,6 +78,35 @@ public class FormatUtils {
 	}
 	
 	/**
+	 * Formats a large number with commas, like 12345 as 12,345
+	 * @param num
+	 * @return
+	 */
+	public static String formatLargeInteger(long num) {
+		StringBuilder out = new StringBuilder();
+		boolean negative = num < 0;
+		num = Math.abs(num);
+		int iter = 0;
+		while (num > 0) {
+			out.append(num % 10);
+			num /= 10;
+			iter++;
+			if (iter == 3) {
+				iter = 0;
+				out.append(',');
+			}
+		}
+		if (negative) {
+			out.append('-');
+		}
+		out.reverse();
+		if (out.charAt(0) == ',') {
+			out.deleteCharAt(0);
+		}
+		return out.toString();
+	}
+	
+	/**
 	 * Converts a string to Title Case, where the first character and every character after a space is capitalized. Preserves spaces.
 	 * @param string The string to convert to Title Case
 	 * @return The Title Case string

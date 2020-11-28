@@ -97,6 +97,7 @@ public class WeightedRandom<T> {
 		if (pos < 0) {
 			pos = -(pos + 1);
 		}
+		pos = Math.min(pos, items.size() - 1);
 		return items.get(pos);
 	}
 	

@@ -36,6 +36,13 @@ public class NMSClass {
 	}
 	
 	/**
+	 * @return The wrapped superclass
+	 */
+	public NMSClass getSuperclass() {
+		return new NMSClass(clazz.getSuperclass());
+	}
+	
+	/**
 	 * Calls a constructor of this class with the given arguments
 	 * @param args The arguments to pass to the constructor
 	 * @return An NMSObject wrapping the returned value

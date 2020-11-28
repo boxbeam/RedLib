@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -20,6 +21,11 @@ import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.Messages;
 
 public class LocationUtils {
+	
+	/**
+	 * An array of all the block faces which face in a single direction (positive X, negative X, etc.)
+	 */
+	public static final BlockFace[] PRIMARY_BLOCK_FACES = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
 	
 	/**
 	 * Checks if a given block type is a hazard - whether it would damage the player if they were on top of it
@@ -227,6 +233,15 @@ public class LocationUtils {
 				l.unregister();
 			}
 		});
+	}
+	
+	/**
+	 * Returns the Location at the center of a Block - shorthand
+	 * @param block The Block to get the center of
+	 * @return The center of the Block
+	 */
+	public static Location center(Block block) {
+		return block.getLocation().add(.5, .5, .5);
 	}
 	
 	/**

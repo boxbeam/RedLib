@@ -2,6 +2,7 @@ package redempt.redlib;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.commandmanager.ArgType;
 import redempt.redlib.commandmanager.CommandParser;
@@ -66,10 +67,28 @@ public class RedLib extends JavaPlugin {
 		Profiler.stopAll();
 	}
 	
+	/**
+	 * @return The server version String (ex: 1.16.4)
+	 */
 	public static String getServerVersion() {
 		String version = Bukkit.getVersion();
 		String[] split = version.split(" ");
 		return split[split.length - 1].trim().replace(")", "");
+	}
+	
+	/**
+	 * Gets the plugin that called the calling method of this method
+	 * @return The plugin which called the method
+	 */
+	public static Plugin getCallingPlugin() {
+		Exception ex = new Exception();
+		try {
+			Class<?> clazz = Class.forName(ex.getStackTrace()[2].getClassName());
+			return JavaPlugin.getProvidingPlugin(clazz);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 }

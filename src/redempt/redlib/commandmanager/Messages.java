@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import redempt.redlib.RedLib;
 
 /**
  * Represents a list of messages loaded from a file with defaults
@@ -88,19 +89,12 @@ public class Messages {
 	 * @throws IllegalStateException if your plugin has not loaded any messages
 	 */
 	public static String msg(String message) {
-		Exception ex = new Exception();
-		try {
-			Class<?> clazz = Class.forName(ex.getStackTrace()[1].getClassName());
-			Plugin plugin = JavaPlugin.getProvidingPlugin(clazz);
-			Messages msgs = all.get(plugin);
-			if (msgs == null) {
-				throw new IllegalStateException("Your plugin has not loaded any messages, or this method is being called from the wrong plugin");
-			}
-			return msgs.get(message);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			return null;
+		Plugin plugin = RedLib.getCallingPlugin();
+		Messages msgs = all.get(plugin);
+		if (msgs == null) {
+			throw new IllegalStateException("Your plugin has not loaded any messages, or this method is being called from the wrong plugin");
 		}
+		return msgs.get(message);
 	}
 	
 	private static Map<String, String> parse(Stream<String> input) {

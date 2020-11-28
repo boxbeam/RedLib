@@ -12,6 +12,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
+import redempt.redlib.RedLib;
 
 /**
  * A compact way to define a Listener using a lambda
@@ -23,6 +24,16 @@ public class EventListener<T extends Event> implements Listener {
 	
 	private BiConsumer<EventListener<T>, T> handler;
 	private Class<T> eventClass;
+	
+	/**
+	 * Creates and registers a Listener for the given event
+	 * @param eventClass The class of the event being listened for
+	 * @param priority The EventPriority for this listener
+	 * @param handler The callback to receive the event and this EventListener
+	 */
+	public EventListener(Class<T> eventClass, EventPriority priority, BiConsumer<EventListener<T>, T> handler) {
+		this(RedLib.getCallingPlugin(), eventClass, priority, handler);
+	}
 	
 	/**
 	 * Creates and registers a Listener for the given event
@@ -39,6 +50,16 @@ public class EventListener<T extends Event> implements Listener {
 	
 	/**
 	 * Creates and registers a Listener for the given event
+	 * @param eventClass The class of the event being listened for
+	 * @param priority The EventPriority for this listener
+	 * @param handler The callback to receive the event
+	 */
+	public EventListener(Class<T> eventClass, EventPriority priority, Consumer<T> handler) {
+		this(RedLib.getCallingPlugin(), eventClass, priority, handler);
+	}
+	
+	/**
+	 * Creates and registers a Listener for the given event
 	 * @param plugin The plugin registering the listener
 	 * @param eventClass The class of the event being listened for
 	 * @param priority The EventPriority for this listener
@@ -50,12 +71,30 @@ public class EventListener<T extends Event> implements Listener {
 	
 	/**
 	 * Creates and registers a Listener for the given event
+	 * @param eventClass The class of the event being listened for
+	 * @param handler The callback to receive the event and this EventListener
+	 */
+	public EventListener(Class<T> eventClass, BiConsumer<EventListener<T>, T> handler) {
+		this(RedLib.getCallingPlugin(), eventClass, handler);
+	}
+	
+	/**
+	 * Creates and registers a Listener for the given event
 	 * @param plugin The plugin registering the listener
 	 * @param eventClass The class of the event being listened for
 	 * @param handler The callback to receive the event and this EventListener
 	 */
 	public EventListener(Plugin plugin, Class<T> eventClass, BiConsumer<EventListener<T>, T> handler) {
 		this(plugin, eventClass, EventPriority.NORMAL, handler);
+	}
+	
+	/**
+	 * Creates and registers a Listener for the given event
+	 * @param eventClass The class of the event being listened for
+	 * @param handler The callback to receive the event
+	 */
+	public EventListener(Class<T> eventClass, Consumer<T> handler) {
+		this(RedLib.getCallingPlugin(), eventClass, handler);
 	}
 	
 	/**
