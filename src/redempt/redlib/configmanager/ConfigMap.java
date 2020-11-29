@@ -77,7 +77,7 @@ class ConfigMap<T> extends HashMap<String, T> {
 	
 	@Override
 	public T remove(Object key) {
-		if (key instanceof String) {
+		if (section != null && key instanceof String) {
 			section.set((String) key, null);
 		}
 		return super.remove(key);

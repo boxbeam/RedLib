@@ -294,13 +294,7 @@ public class Region {
 	 * @return The {@link ProtectedRegion}
 	 */
 	public ProtectedRegion protect(ProtectionType... types) {
-		try {
-			Plugin plugin = JavaPlugin.getProvidingPlugin(Class.forName(new Exception().getStackTrace()[1].getClassName()));
-			return new ProtectedRegion(plugin, new Region(this.getStart(), this.getEnd()), types);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return new ProtectedRegion(RedLib.getCallingPlugin(), new Region(this.getStart(), this.getEnd()), types);
 	}
 	
 	/**

@@ -84,7 +84,8 @@ public class RedLib extends JavaPlugin {
 		Exception ex = new Exception();
 		try {
 			Class<?> clazz = Class.forName(ex.getStackTrace()[2].getClassName());
-			return JavaPlugin.getProvidingPlugin(clazz);
+			Plugin plugin = JavaPlugin.getProvidingPlugin(clazz);
+			return plugin.isEnabled() ? plugin : Bukkit.getPluginManager().getPlugin(plugin.getName());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			return null;

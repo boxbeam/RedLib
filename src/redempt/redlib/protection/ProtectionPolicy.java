@@ -11,6 +11,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -34,6 +35,8 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.world.PortalCreateEvent;
+import org.bukkit.event.world.PortalCreateEvent.CreateReason;
 import org.bukkit.inventory.InventoryHolder;
 
 import org.bukkit.plugin.Plugin;
@@ -113,6 +116,12 @@ public class ProtectionPolicy implements Listener {
 			}
 			return e.getEntity().getLocation().getBlock();
 		});
+		ProtectionListener.protectMultiBlock(PortalCreateEvent.class, ProtectionType.PORTAL_PAIRING, e -> null, (e, b) -> e.setCancelled(true), e -> {
+			if (e.getReason() != CreateReason.NETHER_PAIR) {
+				return null;
+			}
+			return e.getBlocks().stream().map(BlockState::getBlock).collect(Collectors.toList());
+		});
 	}
 	
 	/**
@@ -171,11 +180,7 @@ public class ProtectionPolicy implements Listener {
 	 * @param protections The types of actions to protect against
 	 */
 	public ProtectionPolicy(Region bounds, Predicate<Block> protectionCheck, ProtectionType... protections) {
-		try {
-			plugin = JavaPlugin.getProvidingPlugin(Class.forName(new Exception().getStackTrace()[1].getClassName()));
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+		plugin = RedLib.getCallingPlugin();
 		this.bounds = bounds;
 		Arrays.stream(protections).forEach(this.protections::add);
 		this.protectionCheck = protectionCheck;
@@ -386,6 +391,10 @@ public class ProtectionPolicy implements Listener {
 		 */
 		FIRE,
 		/**
+		 * Portals being created from another dimension
+		 */
+		PORTAL_PAIRING,
+		/**
 		 * Does nothing by default, but other plugins can register their events to be protected against by this type.
 		 */
 		MISCELLANEOUS;
@@ -401,7 +410,7 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * All protection types relating to actions usually taken by players which indirectly affect blocks - Pistons, redstone, explosions, and falling blocks
 		 */
-		public static final ProtectionType[] INDIRECT_PLAYERS = {PISTONS, REDSTONE, ENTITY_EXPLOSION, BLOCK_EXPLOSION, FALLING_BLOCK, FIRE};
+		public static final ProtectionType[] INDIRECT_PLAYERS = {PISTONS, REDSTONE, ENTITY_EXPLOSION, BLOCK_EXPLOSION, FALLING_BLOCK, FIRE, PORTAL_PAIRING};
 		/**
 		 * All protection types relating to natural processes not caused by players
 		 */

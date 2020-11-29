@@ -74,7 +74,7 @@ public class Rotator {
 				}
 				data = data.substring(0, start) + axis + data.substring(end);
 			}
-			boolean[] directions = new boolean[BLOCK_DIRECTIONS.length];
+			String[] directions = new String[BLOCK_DIRECTIONS.length];
 			for (int i = 0; i < BLOCK_DIRECTIONS.length; i++) {
 				int start = data.indexOf(BLOCK_DIRECTIONS[i] + "=");
 				if (start == -1) {
@@ -83,7 +83,7 @@ public class Rotator {
 				start += BLOCK_DIRECTIONS[i].length() + 1;
 				int end = data.indexOf(',', start);
 				end = end == -1 ? data.indexOf(']', start) : end;
-				directions[i] = data.substring(start, end).equals("true");
+				directions[i] = data.substring(start, end);
 			}
 			for (int i = 0; i < directions.length; i++) {
 				int dir = ((i - (rotation % 4)) + 4) % 4;

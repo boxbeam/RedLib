@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static redempt.redlib.commandmanager.Messages.msg;
 
@@ -49,7 +50,7 @@ public class Command {
 				default:
 					return null;
 			}
-		}));
+		}).tabStream(c -> Stream.of("true", "false")));
 		types.add(new ArgType<Player>("player", (Function<String, Player>) Bukkit::getPlayer).tabStream(c -> Bukkit.getOnlinePlayers().stream().map(Player::getName)));
 	}
 	
