@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
+import redempt.redlib.misc.LocationUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,9 +19,8 @@ import java.util.stream.Stream;
  */
 public class MultiRegion extends Region {
 	
-	private static BlockFace[] faces = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
-	private static Vector[] adjacent = {new Vector(.5, .5, .5), new Vector(.5, .5, -.5), new Vector(.5, -.5, .5), new Vector(-.5, .5, .5),
-										new Vector(-.5, -.5, .5), new Vector(-.5, .5, -.5), new Vector(.5, -.5, -.5), new Vector(-.5, -.5, -.5)};
+	private static Vector[] adjacent = {new Vector(.1, .1, .1), new Vector(.1, .1, -.1), new Vector(.1, -.1, .1), new Vector(-.1, .1, .1),
+										new Vector(-.1, -.1, .1), new Vector(-.1, .1, -.1), new Vector(.1, -.1, -.1), new Vector(-.1, -.1, -.1)};
 	
 	private List<Region> regions = new ArrayList<>();
 	private List<Region> subtract = new ArrayList<>();
@@ -220,7 +220,7 @@ public class MultiRegion extends Region {
 	 * @param amount    The amount to expand the region in the given direction
 	 */
 	@Override
-	public void expand(BlockFace direction, int amount) {
+	public void expand(BlockFace direction, double amount) {
 		if (amount == 0) {
 			return;
 		}
@@ -244,8 +244,8 @@ public class MultiRegion extends Region {
 	}
 	
 	/**
-	 * Expands the region, or retracts if negative. This makes 6 calls to {@link MultiRegion#expand(BlockFace, int)},
-	 * meaning it is very expensive. Avoid calling this method if possible.
+	 * Expands the region, or retracts if negative. This makes 6 calls to {@link MultiRegion#expand(BlockFace, double)},
+	 * meaning it is expensive. Avoid calling this method if possible.
 	 *
 	 * @param posX The amount to expand the region in the positive X direction
 	 * @param negX The amount to expand the region in the negative X direction
@@ -254,7 +254,7 @@ public class MultiRegion extends Region {
 	 * @param posZ The amount to expand the region in the positive Z direction
 	 * @param negZ The amount to expand the region in the negative Z direction
 	 */
-	public void expand(int posX, int negX, int posY, int negY, int posZ, int negZ) {
+	public void expand(double posX, double negX, double posY, double negY, double posZ, double negZ) {
 		expand(BlockFace.EAST, posX);
 		expand(BlockFace.WEST, negX);
 		expand(BlockFace.SOUTH, posZ);
@@ -497,6 +497,7 @@ public class MultiRegion extends Region {
 	 * @param autoCluster Whether to automatically cluster regions in clusters of 10 until there are less than 25 top-level regions
 	 */
 	public void recalculate(boolean autoCluster) {
+		RegionSummary summary = new RegionSummary(regions);
 		List<Region> regions = this.regions;
 		List<Region> newRegions = new ArrayList<>();
 		MultiRegion[] blocks = {null};
@@ -509,8 +510,8 @@ public class MultiRegion extends Region {
 		});
 		newRegions.addAll(subtract);
 		Location center = start.clone().add(end).multiply(0.5).getBlock().getLocation();
-		Region r = new Region(center, center.clone().add(1, 1, 1));
-		if (contains(center) && expandToMax(r, null)) {
+		Region r = new Region(center, center);
+		if (contains(center) && expandToMax(r, null, summary)) {
 			newRegions.add(r);
 			blocks[0] = new MultiRegion(r);
 		}
@@ -521,8 +522,8 @@ public class MultiRegion extends Region {
 			for (Region region : regions) {
 				Location loc = findFreePoint(region, newRegions);
 				if (loc != null) {
-					Region reg = new Region(loc, loc.clone().add(1, 1, 1));
-					if (expandToMax(reg, blocks[0])) {
+					Region reg = new Region(loc, loc);
+					if (expandToMax(reg, blocks[0], summary)) {
 						if (blocks[0] == null) {
 							blocks[0] = new MultiRegion(reg);
 						} else {
@@ -565,48 +566,38 @@ public class MultiRegion extends Region {
 		return null;
 	}
 	
-	private boolean expandToMax(Region r, MultiRegion exclude) {
+	private boolean expandToMax(Region r, MultiRegion exclude, RegionSummary summary) {
 		List<BlockFace> faces = new ArrayList<>(6);
-		List<BlockFace> toRemove = new ArrayList<>();
-		Collections.addAll(faces, MultiRegion.faces);
-		int step = 1;
+		Collections.addAll(faces, LocationUtils.PRIMARY_BLOCK_FACES);
 		boolean expanded = false;
 		while (faces.size() > 0) {
 			for (int i = 0; i < faces.size(); i++) {
 				BlockFace face = faces.get(i);
-				r.expand(face, step);
-				if (r.getBlockVolume() == getNonIntersectingVolume(r)
+				double step = summary.getCurrentStep(r, face);
+				double next = summary.getNextStep(face, step);
+				if (step == next) {
+					faces.remove(i);
+					continue;
+				}
+				r.expand(face, Math.abs(next - step));
+				if (r.getVolume() == getNonIntersectingVolume(r)
 						&& (exclude == null || exclude.getNonIntersectingVolume(r) == 0)) {
 					expanded = true;
 					continue;
 				}
-				r.expand(face, -step);
-				if (step > 1) {
-					step = Math.max(1, step / 2);
-					i--;
-					continue;
-				}
-				toRemove.add(face);
+				r.expand(face, -Math.abs(next - step));
+				faces.remove(i);
 			}
-			if (toRemove.size() == 0) {
-				step *= 2;
-			}
-			faces.removeAll(toRemove);
-			toRemove.clear();
 		}
-		if (r.getBlockVolume() == getNonIntersectingVolume(r)
-				&& (exclude == null || exclude.getNonIntersectingVolume(r) == 0)) {
-			expanded = true;
-		}
-		return expanded;
+		return r.getVolume() > 0 && expanded;
 	}
 	
-	private int getNonIntersectingVolume(Region r) {
+	private double getNonIntersectingVolume(Region r) {
 		MultiRegion intersection = getIntersection(r);
 		if (intersection == null) {
 			return 0;
 		}
-		int volume = intersection.getBlockVolume();
+		double volume = intersection.getVolume();
 		List<Region> intersections = intersection.getRegions();
 		int overlap = 0;
 		while (intersections.size() > 0) {
@@ -617,7 +608,7 @@ public class MultiRegion extends Region {
 				if (tmp != null) {
 					tmp = tmp.getIntersection(r);
 					if (tmp != null) {
-						overlap += tmp.getBlockVolume();
+						overlap += tmp.getVolume();
 					}
 				}
 			}

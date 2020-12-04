@@ -31,6 +31,16 @@ import java.util.stream.Stream;
  */
 public class Region {
 	
+	/**
+	 * Gets a Region covering a cubic radius centered around a Location
+	 * @param loc The center
+	 * @param radius The block radius
+	 * @return A Region covering the specified radius
+	 */
+	public static Region cubeRadius(Location loc, int radius) {
+		return new Region(loc.clone().subtract(radius, radius, radius), loc.clone().add(radius + 1, radius + 1, radius + 1));
+	}
+	
 	protected Location start;
 	protected Location end;
 	private Set<Chunk> chunkCache = null;
@@ -212,12 +222,37 @@ public class Region {
 	
 	/**
 	 * Expands the region in all directions, or retracts if negative. If this is a MultiRegion,
-	 * makes 6 calls to {@link MultiRegion#expand(BlockFace, int)}, meaning it is very expensive.
+	 * makes 6 calls to {@link MultiRegion#expand(BlockFace, double)}, meaning it is very expensive.
+	 * Check if this is a MultiRegion before expanding.
+	 * @param amount The amount to expand the region by
+	 */
+	public void expand(double amount) {
+		expand(amount, amount, amount, amount, amount, amount);
+	}
+	
+	/**
+	 * Expands the region in all directions, or retracts if negative. If this is a MultiRegion,
+	 * makes 6 calls to {@link MultiRegion#expand(BlockFace, double)}, meaning it is very expensive.
 	 * Check if this is a MultiRegion before expanding.
 	 * @param amount The amount to expand the region by
 	 */
 	public void expand(int amount) {
-		expand(amount, amount, amount, amount, amount, amount);
+		expand((double) amount);
+	}
+	
+	/**
+	 * Expands the region, or retracts where negative values are passed
+	 * @param posX The amount to expand the region in the positive X direction
+	 * @param negX The amount to expand the region in the negative X direction
+	 * @param posY The amount to expand the region in the positive Y direction
+	 * @param negY The amount to expand the region in the negative Y direction
+	 * @param posZ The amount to expand the region in the positive Z direction
+	 * @param negZ The amount to expand the region in the negative Z direction
+	 */
+	public void expand(double posX, double negX, double posY, double negY, double posZ, double negZ) {
+		start = start.subtract(negX, negY, negZ);
+		end = end.add(posX, posY, posZ);
+		setLocations(start, end);
 	}
 	
 	/**
@@ -230,9 +265,7 @@ public class Region {
 	 * @param negZ The amount to expand the region in the negative Z direction
 	 */
 	public void expand(int posX, int negX, int posY, int negY, int posZ, int negZ) {
-		start = start.subtract(negX, negY, negZ);
-		end = end.add(posX, posY, posZ);
-		setLocations(start, end);
+		expand(posX, negX, posY, negY, posZ, (double) negZ);
 	}
 	
 	/**
@@ -240,7 +273,7 @@ public class Region {
 	 * @param direction The direction to expand the region in
 	 * @param amount The amount to expand the region in the given direction
 	 */
-	public void expand(BlockFace direction, int amount) {
+	public void expand(BlockFace direction, double amount) {
 		Vector vec = direction.getDirection();
 		if (vec.getX() + vec.getY() + vec.getZ() > 0) {
 			vec = vec.multiply(amount);
@@ -250,6 +283,15 @@ public class Region {
 			start = start.add(vec);
 		}
 		setLocations(start, end);
+	}
+	
+	/**
+	 * Expand the region in a given direction, or retracts if negative.
+	 * @param direction The direction to expand the region in
+	 * @param amount The amount to expand the region in the given direction
+	 */
+	public void expand(BlockFace direction, int amount) {
+		expand(direction, (double) amount);
 	}
 	
 	/**
