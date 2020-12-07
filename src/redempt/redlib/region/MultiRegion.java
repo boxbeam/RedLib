@@ -475,6 +475,8 @@ public class MultiRegion extends Region {
 	@Override
 	public void setWorld(World world) {
 		regions.forEach(r -> r.setWorld(world));
+		start.setWorld(world);
+		end.setWorld(world);
 	}
 	
 	/**
@@ -497,7 +499,7 @@ public class MultiRegion extends Region {
 	 * @param autoCluster Whether to automatically cluster regions in clusters of 10 until there are less than 25 top-level regions
 	 */
 	public void recalculate(boolean autoCluster) {
-		RegionSummary summary = new RegionSummary(regions);
+		MultiRegionMeta summary = new MultiRegionMeta(regions);
 		List<Region> regions = this.regions;
 		List<Region> newRegions = new ArrayList<>();
 		MultiRegion[] blocks = {null};
@@ -566,7 +568,7 @@ public class MultiRegion extends Region {
 		return null;
 	}
 	
-	private boolean expandToMax(Region r, MultiRegion exclude, RegionSummary summary) {
+	private boolean expandToMax(Region r, MultiRegion exclude, MultiRegionMeta summary) {
 		List<BlockFace> faces = new ArrayList<>(6);
 		Collections.addAll(faces, LocationUtils.PRIMARY_BLOCK_FACES);
 		boolean expanded = false;
@@ -580,7 +582,7 @@ public class MultiRegion extends Region {
 					continue;
 				}
 				r.expand(face, Math.abs(next - step));
-				if (r.getVolume() == getNonIntersectingVolume(r)
+				if (compare(r.getVolume(), getNonIntersectingVolume(r))
 						&& (exclude == null || exclude.getNonIntersectingVolume(r) == 0)) {
 					expanded = true;
 					continue;
@@ -590,6 +592,10 @@ public class MultiRegion extends Region {
 			}
 		}
 		return r.getVolume() > 0 && expanded;
+	}
+	
+	private boolean compare(double first, double second) {
+		return Math.abs(first - second) < 0.00001;
 	}
 	
 	private double getNonIntersectingVolume(Region r) {

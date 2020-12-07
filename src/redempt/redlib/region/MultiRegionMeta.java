@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
-class RegionSummary {
+class MultiRegionMeta {
 	
 	private List<TreeSet<Double>> points = new ArrayList<>();
 	
-	public RegionSummary(List<Region> regions) {
+	public MultiRegionMeta(List<Region> regions) {
 		for (int i = 0; i < 6; i++) {
 			TreeSet<Double> direction = new TreeSet<>();
 			for (Region region : regions) {

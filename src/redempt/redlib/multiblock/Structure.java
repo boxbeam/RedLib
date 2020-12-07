@@ -61,14 +61,7 @@ public class Structure {
 	 * @return The list of blocks in this Structure of that type
 	 */
 	public List<StructureBlock> getByType(Material type) {
-		ItemStack item = new ItemStack(type);
-		// Don't ask my why this is what's needed. I don't get it either.
-		// It seems as if this enum isn't actually consistent. Passing
-		// Material.DIAMOND_BLOCK from another plugin resulted in a Material whose toString() yielded
-		// "_BLOCK", which makes no sense. This fixes it somehow. I believe this has to do
-		// with the cross-compatibility for 1.8 and 1.13+.
-		Material realType = item.getType();
-		return getBlocks().stream().filter(s -> s.getBlock().getType() == realType).collect(Collectors.toList());
+		return getBlocks().stream().filter(s -> s.getBlock().getType() == type).collect(Collectors.toList());
 	}
 	
 	/**

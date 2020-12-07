@@ -260,12 +260,13 @@ public class MultiBlockStructure {
 		return builder.toString() + ";";
 	}
 	
-	private String[][][] data;
+	protected String[][][] data;
+	private StructureFinder finder;
 	private String dataString;
 	private String name;
-	private int dimX;
-	private int dimY;
-	private int dimZ;
+	protected int dimX;
+	protected int dimY;
+	protected int dimZ;
 	private boolean strictMode = true;
 	private boolean ignoreAir = false;
 	
@@ -281,6 +282,7 @@ public class MultiBlockStructure {
 		dimY = Integer.parseInt(dimSplit[1]);
 		dimZ = Integer.parseInt(dimSplit[2]);
 		data = parse(info, dimX, dimY, dimZ);
+		finder = new StructureFinder(this, data, dimX, dimY, dimZ, strictMode, ignoreAir);
 	}
 	
 	private static String[][][] parse(String info, int dimX, int dimY, int dimZ) {
@@ -737,34 +739,7 @@ public class MultiBlockStructure {
 	 * @return The structure at this block, or null if it does not exist
 	 */
 	public Structure getAt(Location loc) {
-		Block block = loc.getBlock();
-		for (int rot = 0; rot < 4; rot++) {
-			Rotator rotator = new Rotator(rot, false);
-			for (int x = 0; x < dimX; x++) {
-				for (int y = 0; y < dimY; y++) {
-					for (int z = 0; z < dimZ; z++) {
-						Structure s;
-						if (compare(data[x][y][z], block, rotator) && (s = test(loc, x, y, z, rotator)) != null) {
-							return s;
-						}
-					}
-				}
-			}
-		}
-		for (int rot = 0; rot < 4; rot++) {
-			Rotator rotator = new Rotator(rot, true);
-			for (int x = 0; x < dimX; x++) {
-				for (int y = 0; y < dimY; y++) {
-					for (int z = 0; z < dimZ; z++) {
-						Structure s;
-						if (compare(data[x][y][z], block, rotator) && (s = test(loc, x, y, z, rotator)) != null) {
-							return s;
-						}
-					}
-				}
-			}
-		}
-		return null;
+		return finder.getAt(loc.getBlock());
 	}
 	
 	/**
@@ -856,7 +831,7 @@ public class MultiBlockStructure {
 		return new Structure(this, loc, rotator);
 	}
 	
-	private boolean compare(String data, Block block, Rotator rotator) {
+	protected boolean compare(String data, Block block, Rotator rotator) {
 		if (midVersion >= 13) {
 			data = rotator.rotate(data);
 			data = data.startsWith("minecraft:") ? data : "minecraft:" + data;

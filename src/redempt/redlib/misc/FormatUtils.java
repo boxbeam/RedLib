@@ -83,6 +83,9 @@ public class FormatUtils {
 	 * @return
 	 */
 	public static String formatLargeInteger(long num) {
+		if (num == 0) {
+			return "0";
+		}
 		StringBuilder out = new StringBuilder();
 		boolean negative = num < 0;
 		num = Math.abs(num);

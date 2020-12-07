@@ -11,8 +11,8 @@ public class Rotator {
 	
 	private static final String[] BLOCK_DIRECTIONS = {"north", "east", "south", "west"};
 	
-	private final int rotation;
-	private final boolean mirrored;
+	private int rotation;
+	private boolean mirrored;
 	private double x = 0;
 	private double z = 0;
 	
@@ -180,6 +180,22 @@ public class Rotator {
 	 */
 	public int getRotation() {
 		return rotation;
+	}
+	
+	/**
+	 * Sets the rotation
+	 * @param rotation The rotation to set
+	 */
+	public void setRotation(int rotation) {
+		this.rotation = rotation;
+	}
+	
+	/**
+	 * Sets whether this rotator mirrors over the X axis
+	 * @param mirrored Whether this rotator mirrors over the X axis
+	 */
+	public void setMirrored(boolean mirrored) {
+		this.mirrored = mirrored;
 	}
 	
 	/**
