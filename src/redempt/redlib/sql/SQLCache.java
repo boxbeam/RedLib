@@ -61,6 +61,11 @@ public class SQLCache {
 	}
 	
 	protected boolean keyNamesMatch(String[] matches) {
+		for (String match : matches) {
+			if (match.equals(columnName)) {
+				return true;
+			}
+		}
 		for (String key : primaryKeyNames) {
 			for (String match : matches) {
 				if (key.equals(match)) {

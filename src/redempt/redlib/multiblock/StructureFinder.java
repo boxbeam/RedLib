@@ -1,9 +1,7 @@
 package redempt.redlib.multiblock;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.material.MaterialData;
 
 import java.util.*;
 
@@ -12,15 +10,11 @@ import static redempt.redlib.RedLib.midVersion;
 class StructureFinder {
 	
 	private MultiBlockStructure type;
-	private boolean ignoreAir;
-	private boolean strictMode;
 	private Map<Material, List<int[]>> materialMap = new HashMap<>();
 	private List<Material> materials = new ArrayList<>();
 	
-	public StructureFinder(MultiBlockStructure type, String[][][] data, int dimX, int dimY, int dimZ, boolean strictMode, boolean ignoreAir) {
+	public StructureFinder(MultiBlockStructure type) {
 		this.type = type;
-		this.ignoreAir = ignoreAir;
-		this.strictMode = strictMode;
 	}
 	
 	private Material getType(int x, int y, int z) {
@@ -58,7 +52,7 @@ class StructureFinder {
 		}
 		List<int[]> locations = materialMap.get(block.getType());
 		if (locations == null) {
-			if (!ignoreAir) {
+			if (!type.ignoreAir) {
 				return null;
 			}
 			locations = materialMap.get(Material.AIR);
@@ -94,7 +88,7 @@ class StructureFinder {
 				for (int z = 0; z < maxZ; z++) {
 					rotator.setLocation(x, z);
 					Block b = block.getRelative(-rotator.getRotatedBlockX(), -y, -rotator.getRotatedBlockZ());
-					if (!ignoreAir && !materialMap.containsKey(b.getType())) {
+					if (!type.ignoreAir && !materialMap.containsKey(b.getType())) {
 						if (foundY) {
 							maxZ = z;
 						}
@@ -126,7 +120,7 @@ class StructureFinder {
 				}
 			}
 		}
-		return new Structure(type, block.getLocation(), rotator.clone());
+		return new Structure(type, block.getLocation(), rotator.getInverse());
 	}
 	
 }

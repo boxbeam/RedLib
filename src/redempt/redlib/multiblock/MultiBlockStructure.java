@@ -6,12 +6,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -218,7 +214,7 @@ public class MultiBlockStructure {
 				replace.add(entry.getKey());
 			}
 		}
-		replace.sort((a, b) -> a.length() - b.length());
+		replace.sort(Comparator.comparingInt(String::length));
 		StringBuilder prepend = new StringBuilder();
 		for (int i = 0; i < replace.size(); i++) {
 			String str = replace.get(i);
@@ -267,8 +263,8 @@ public class MultiBlockStructure {
 	protected int dimX;
 	protected int dimY;
 	protected int dimZ;
-	private boolean strictMode = true;
-	private boolean ignoreAir = false;
+	protected boolean strictMode = true;
+	protected boolean ignoreAir = false;
 	
 	private MultiBlockStructure(String info, String name, boolean strictMode, boolean ignoreAir) {
 		info = expand(info);
@@ -282,7 +278,7 @@ public class MultiBlockStructure {
 		dimY = Integer.parseInt(dimSplit[1]);
 		dimZ = Integer.parseInt(dimSplit[2]);
 		data = parse(info, dimX, dimY, dimZ);
-		finder = new StructureFinder(this, data, dimX, dimY, dimZ, strictMode, ignoreAir);
+		finder = new StructureFinder(this);
 	}
 	
 	private static String[][][] parse(String info, int dimX, int dimY, int dimZ) {
