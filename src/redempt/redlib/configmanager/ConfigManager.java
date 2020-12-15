@@ -2,17 +2,17 @@ package redempt.redlib.configmanager;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+import redempt.redlib.configmanager.annotations.ConfigValue;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
 /**
- * Loads config values into variables annotated with {@link ConfigHook}
+ * Loads config values into variables annotated with {@link ConfigValue}
  */
 public class ConfigManager {
 	
@@ -60,9 +60,8 @@ public class ConfigManager {
 	
 	private YamlConfiguration config;
 	private File file = null;
-	private Object data = null;
+	private Map<Object, List<ConfigField>> data = new HashMap<>();
 	private boolean registered = false;
-	private List<ConfigField> fields = new ArrayList<>();
 	protected Map<Class<?>, TypeConverter<?>> converters = new HashMap<>();
 	
 	/**
@@ -124,38 +123,24 @@ public class ConfigManager {
 	}
 	
 	/**
-	 * Register all the hooks for annotated fields in the the given object
+	 * Register all the hooks for annotated fields in the the given objects. Pass classes instead if static
+	 * fields are used.
 	 * @param data The object to be registered
 	 * @return This ConfigManager
 	 */
-	public ConfigManager register(Object data) {
-		for (Field field : data.getClass().getDeclaredFields()) {
-			ConfigHook hook = field.getAnnotation(ConfigHook.class);
-			if (hook == null) {
-				continue;
+	public ConfigManager register(Object... data) {
+		for (Object obj : data) {
+			List<ConfigField> fields = new ArrayList<>();
+			for (Field field : (obj instanceof Class ? ((Class) obj).getDeclaredFields() : obj.getClass().getDeclaredFields())) {
+				ConfigValue hook = field.getAnnotation(ConfigValue.class);
+				if (hook == null) {
+					continue;
+				}
+				fields.add(new ConfigField(field, hook.value(), hook.priority(), this));
 			}
-			fields.add(new ConfigField(field, hook.value(), hook.priority(), this));
+			this.data.put(obj, fields);
+			fields.sort(Comparator.comparingInt(f -> f.priority));
 		}
-		fields.sort(Comparator.comparingInt(f -> f.priority));
-		this.data = data;
-		registered = true;
-		return this;
-	}
-	
-	/**
-	 * Registers all the hooks for static annotated fields in the given class
-	 * @param clazz The class to be registered
-	 * @return This ConfigManager
-	 */
-	public ConfigManager register(Class clazz) {
-		for (Field field : clazz.getDeclaredFields()) {
-			ConfigHook hook = field.getAnnotation(ConfigHook.class);
-			if (hook == null) {
-				continue;
-			}
-			fields.add(new ConfigField(field, hook.value(), hook.priority(), this));
-		}
-		fields.sort(Comparator.comparingInt(f -> f.priority));
 		registered = true;
 		return this;
 	}
@@ -176,7 +161,9 @@ public class ConfigManager {
 		if (!registered) {
 			throw new IllegalStateException("Config manager is not registered");
 		}
-		fields.forEach(f -> f.saveIfAbsent(data, config));
+		data.forEach((k, v) -> {
+			v.forEach(f -> f.saveIfAbsent(k, config));
+		});
 		try {
 			config.save(file);
 		} catch (IOException e) {
@@ -195,7 +182,9 @@ public class ConfigManager {
 			throw new IllegalStateException("Config manager is not registered");
 		}
 		config = YamlConfiguration.loadConfiguration(file);
-		fields.forEach(f -> f.load(data, config));
+		data.forEach((k, v) -> {
+			v.forEach(f -> f.load(k, config));
+		});
 		return this;
 	}
 	
@@ -208,7 +197,9 @@ public class ConfigManager {
 		if (!registered) {
 			throw new IllegalStateException("Config manager is not registered");
 		}
-		fields.forEach(f -> f.save(data, config));
+		data.forEach((k, v) -> {
+			v.forEach(f -> f.save(k, config));
+		});
 		try {
 			config.save(file);
 		} catch (IOException e) {

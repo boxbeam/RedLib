@@ -7,7 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.commandmanager.ArgType;
 import redempt.redlib.commandmanager.CommandParser;
 import redempt.redlib.commandmanager.Messages;
-import redempt.redlib.configmanager.ConfigHook;
+import redempt.redlib.configmanager.annotations.ConfigValue;
 import redempt.redlib.configmanager.ConfigManager;
 import redempt.redlib.dev.StructureTool;
 import redempt.redlib.dev.profiler.Profiler;
@@ -23,13 +23,13 @@ import redempt.redlib.region.RegionEnterExitListener;
  */
 public class RedLib extends JavaPlugin {
 	
-	@ConfigHook("devMode")
+	@ConfigValue("devMode")
 	public static boolean devMode = false;
-	@ConfigHook("autoStartPassiveProfiler")
+	@ConfigValue("autoStartPassiveProfiler")
 	private static boolean autoStartPassiveProfiler = false;
-	@ConfigHook("autoStartTickMonitorProfiler")
+	@ConfigValue("autoStartTickMonitorProfiler")
 	private static boolean autoStartTickMonitorProfiler = false;
-	@ConfigHook("tickMonitorProfilerMinTickLength")
+	@ConfigValue("tickMonitorProfilerMinTickLength")
 	private static int tickMonitorProfilerMinTickLength = 100;
 	public static int midVersion = Integer.parseInt(getServerVersion().split("\\.")[1]);
 	
