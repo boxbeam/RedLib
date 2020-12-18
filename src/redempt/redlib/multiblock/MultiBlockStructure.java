@@ -265,6 +265,7 @@ public class MultiBlockStructure {
 	protected int dimZ;
 	protected boolean strictMode = true;
 	protected boolean ignoreAir = false;
+	protected EnumSet<Material> strictModeExclude = EnumSet.noneOf(Material.class);
 	
 	private MultiBlockStructure(String info, String name, boolean strictMode, boolean ignoreAir) {
 		info = expand(info);
@@ -311,6 +312,21 @@ public class MultiBlockStructure {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Add a list of Materials to be excluded from strict data checks rather than disabling strict mode for all blocks
+	 * @param materials The materials to exclude from strict mode checks
+	 */
+	public void addStrictModeExclusions(Material... materials) {
+		Collections.addAll(strictModeExclude, materials);
+	}
+	
+	/**
+	 * @return A set of Materials to be excluded from strict data checks rather than disabling strict mode for all blocks
+	 */
+	public Set<Material> getStrictModeExclusions() {
+		return strictModeExclude;
 	}
 	
 	/**
@@ -828,6 +844,7 @@ public class MultiBlockStructure {
 	}
 	
 	protected boolean compare(String data, Block block, Rotator rotator) {
+		Material material = block.getType();
 		if (midVersion >= 13) {
 			data = rotator.rotate(data);
 			data = data.startsWith("minecraft:") ? data : "minecraft:" + data;
@@ -838,7 +855,7 @@ public class MultiBlockStructure {
 			String type = data.substring(0, data.indexOf('[') == -1 ? data.length() : data.indexOf('['));
 			String otherBlockData = block.getBlockData().getAsString();
 			String otherType = otherBlockData.substring(0, otherBlockData.indexOf('[') == -1 ? otherBlockData.length() : otherBlockData.indexOf('['));
-			if (!strictMode) {
+			if (!strictMode || strictModeExclude.contains(material)) {
 				return type.equals(otherType);
 			}
 			return block.getBlockData().matches(bdata);
@@ -847,10 +864,10 @@ public class MultiBlockStructure {
 			if (ignoreAir && split[0].equals("AIR")) {
 				return true;
 			}
-			if (!strictMode) {
-				return block.getType() == Material.valueOf(split[0]);
+			if (!strictMode || strictModeExclude.contains(material)) {
+				return material == Material.valueOf(split[0]);
 			}
-			return block.getType() == Material.valueOf(split[0]) && block.getData() == Byte.parseByte(split[1]);
+			return material == Material.valueOf(split[0]) && block.getData() == Byte.parseByte(split[1]);
 		}
 	}
 	
