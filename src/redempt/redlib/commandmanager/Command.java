@@ -177,7 +177,7 @@ public class Command {
 		return args.toArray(new String[args.size()]);
 	}
 	
-	private Object[] processArgs(String[] argArray, CommandSender sender) {
+	private Result<Object[]> processArgs(String[] argArray, CommandSender sender) {
 		List<String> sargs = new ArrayList<>();
 		Collections.addAll(sargs, argArray);
 		Object[] output = new Object[args.length + flags.length + 1];
@@ -210,14 +210,14 @@ public class Command {
 				continue;
 			}
 			if (i == sargs.size() - 1) {
-				return null;
+				return new Result<>(this, null, Messages.msg("needFlagValue").replace("%flag%", flag.getName()));
 			}
 			String next = sargs.get(i + 1);
 			next = next.substring(0, next.length() - 1);
 			try {
 				output[flag.getPosition() + 1] = Objects.requireNonNull(flag.getType().convert(sender, next));
 			} catch (Exception e) {
-				return null;
+				return new Result<>(this, null, Messages.msg("invalidArgument").replace("%arg%", flag.getName()).replace("%value%", next));
 			}
 			sargs.remove(i);
 			sargs.remove(i);
@@ -283,7 +283,10 @@ public class Command {
 		}
 		if (cmdArgs.size() != sargs.size() &&
 				(args.length == 0 || (!args[args.length - 1].consumes() && !args[args.length - 1].isVararg()))) {
-			return null;
+			int minArgCount = args.length - (int) Arrays.stream(args).filter(CommandArgument::isOptional).count();
+			String argCount = minArgCount == args.length ? args.length + "" : minArgCount + "-" + args.length;
+			return new Result<>(this, null, Messages.msg("wrongArgumentCount")
+					.replace("%args%", argCount).replace("%count%", sargs.size() + ""));
 		}
 		output[0] = sender;
 		//Process remaining arguments
@@ -298,9 +301,9 @@ public class Command {
 					combine = combine.substring(0, combine.length() - 1);
 					output[arg.getPosition() + 1] = arg.getType().convert(sender, combine);
 				} catch (Exception e) {
-					return null;
+					return new Result<>(this, null, Messages.msg("invalidArgument").replace("%arg%", arg.getName()).replace("%value%", combine));
 				}
-				return output;
+				return new Result<>(this, output, null);
 			}
 			if (arg.isVararg()) {
 				Class<?> clazz = methodHook.getParameterTypes()[arg.getPosition() + 1];
@@ -310,7 +313,7 @@ public class Command {
 				Class<?> arrType = clazz.getComponentType();
 				Object arr = Array.newInstance(arrType, sargs.size() - cmdArgs.size() + 1);
 				if (Array.getLength(arr) == 0 && !arg.isOptional()) {
-					return null;
+					return new Result<>(this, null, Messages.msg("needArgument").replace("%arg%", arg.getName()));
 				}
 				int pos = 0;
 				for (int x = cmdArgs.size() - 1; x < sargs.size(); x++) {
@@ -318,16 +321,16 @@ public class Command {
 						Array.set(arr, pos, arg.getType().convert(sender, sargs.get(x)));
 						pos++;
 					} catch (Exception e) {
-						return null;
+						return new Result<>(this, null, Messages.msg("invalidArgument").replace("%arg%", arg.getName()).replace("%value%", sargs.get(x)));
 					}
 				}
 				output[arg.getPosition() + 1] = arr;
-				return output;
+				return new Result<>(this, output, null);
 			}
 			try {
 				output[arg.getPosition() + 1] = Objects.requireNonNull(arg.getType().convert(sender, sargs.get(cmdArgs.indexOf(arg))));
 			} catch (Exception e) {
-				return null;
+				return new Result<>(this, null, Messages.msg("invalidArgument").replace("%arg%", arg.getName()).replace("%value%", sargs.get(cmdArgs.indexOf(arg))));
 			}
 		}
 		for (CommandArgument arg : args) {
@@ -335,7 +338,7 @@ public class Command {
 				output[arg.getPosition() + 1] = arg.getDefaultValue(sender);
 			}
 		}
-		return output;
+		return new Result<>(this, output, null);
 	}
 	
 	private Object[] getContext(CommandSender sender) {
@@ -559,14 +562,14 @@ public class Command {
 		return completions;
 	}
 	
-	protected boolean execute(CommandSender sender, String[] args) {
+	protected Result<Boolean> execute(CommandSender sender, String[] args) {
 		if (permission != null && !sender.hasPermission(permission)) {
 			sender.sendMessage(msg("noPermission").replace("%permission%", permission));
-			return true;
+			return new Result<>(this, true, null);
 		}
 		if (args.length > 0 && args[0].equalsIgnoreCase("help")) {
 			showHelp(sender);
-			return true;
+			return new Result<>(this, true, null);
 		}
 		if (methodHook != null) {
 			type = type == null ? SenderType.EVERYONE : type;
@@ -576,20 +579,21 @@ public class Command {
 				case CONSOLE:
 					if (sender instanceof Player) {
 						sender.sendMessage(Messages.msg("consoleOnly"));
-						return true;
+						return new Result<>(this, true, null);
 					}
 					break;
 				case PLAYER:
 					if (!(sender instanceof Player)) {
 						sender.sendMessage(Messages.msg("playerOnly"));
-						return true;
+						return new Result<>(this, true, null);
 					}
 					break;
 			}
-			Object[] objArgs = processArgs(splitArgs(String.join(" ", args)), sender);
+			Result<Object[]> result = processArgs(splitArgs(String.join(" ", args)), sender);
+			Object[] objArgs = result.getValue();
 			if (objArgs != null) {
 				if (asserters.length > 0 && !assertAll(sender)) {
-					return true;
+					return new Result<>(this, true, null);
 				}
 				int size = objArgs.length + contextProviders.length;
 				Object[] arr = new Object[size];
@@ -597,51 +601,68 @@ public class Command {
 				if (contextProviders.length > 0) {
 					Object[] context = getContext(sender);
 					if (context == null) {
-						return true;
+						return new Result<>(this, true, null);
 					}
 					System.arraycopy(context, 0, arr, objArgs.length, context.length);
 				}
 				try {
 					methodHook.invoke(listener, arr);
-					return true;
+					return new Result<>(this, true, null);
 				} catch (IllegalAccessException | InvocationTargetException e) {
 					e.printStackTrace();
 					sender.sendMessage(ChatColor.RED + "An error was encountered in running this command. Please notify an admin.");
-					return true;
+					return new Result<>(this, true, null);
 				} catch (IllegalArgumentException e) {
 					if (topLevel) {
 						showHelp(sender);
-						return true;
+						return new Result<>(this, true, null);
 					}
 				}
 			}
+			return new Result<>(this, false, result.getMessage());
 		}
 		if (args.length == 0) {
 			if (topLevel) {
 				showHelp(sender);
-				return true;
+				return new Result<>(this, true, null);
 			}
-			return false;
+			return new Result<>(this, false, null);
 		}
 		String[] truncArgs = Arrays.copyOfRange(args, 1, args.length);
+		List<Result<Boolean>> results = new ArrayList<>();
 		for (Command command : children) {
 			for (String alias : command.getAliases()) {
 				if (alias.equals(args[0])) {
-					if (command.execute(sender, truncArgs)) {
-						return true;
+					Result<Boolean> result = command.execute(sender, truncArgs);
+					if (result.getValue()) {
+						return new Result<>(this, true, null);
+					} else {
+						results.add(result);
 					}
 				}
 			}
 		}
-		if (parent != null) {
-			for (Command command : parent.children) {
-				if (!command.equals(this) && command.getName().equals(this.getName())) {
-					return false;
-				}
-			}
+		Result<Boolean> deepest = results.stream().max(Comparator.comparingInt(r -> r.getCommand().getDepth())).orElse(
+				new Result<>(this, false, Messages.msg("invalidSubcommand").replace("%value%", args[0]))
+		);
+		if (!topLevel) {
+			return deepest;
 		}
-		showHelp(sender);
-		return true;
+		if (deepest.getMessage() != null) {
+			sender.sendMessage(deepest.getMessage());
+		}
+		deepest.getCommand().showHelp(sender);
+		return null;
+	}
+	
+	private int getDepth() {
+		int depth = 0;
+		Command c = this;
+		while (c.parent != null) {
+			c = c.parent;
+			depth++;
+		}
+		return depth;
 	}
 	
 	protected static ArgType<?> getType(String name, ArgType<?>[] types) {

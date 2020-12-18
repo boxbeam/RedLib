@@ -10,3 +10,8 @@ playerOnly: &cThis command can only be executed as a player!
 consoleOnly: &cThis command can only be executed as console!
 teleportDelay: &aPlease stand still for %seconds% seconds to teleport...
 teleportCancelled: &cTeleport cancelled!
+invalidArgument: &cInvalid argument for %arg%: %value%
+needArgument: &cMust supply at least one argument for %arg%
+needFlagValue: &cMust supply value for flag %flag%
+wrongArgumentCount: &cIncorrect number of arguments. Expected %args% argument(s), got %count%
+invalidSubcommand: &cInvalid subcommand: %value%

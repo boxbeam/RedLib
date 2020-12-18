@@ -113,7 +113,6 @@ public class CommandCollection {
 	
 	private static class MergedBaseCommand extends Command {
 		
-		
 		public MergedBaseCommand(List<Command> commands) {
 			this.children = commands;
 			this.help = commands.get(0).help;
@@ -125,13 +124,17 @@ public class CommandCollection {
 		}
 		
 		@Override
-		public boolean execute(CommandSender sender, String[] args) {
-			if (children.stream().anyMatch(c -> c.execute(sender, args))) {
-				return true;
+		public Result<Boolean> execute(CommandSender sender, String[] args) {
+			List<Result<Boolean>> results = new ArrayList<>();
+			for (Command cmd : children) {
+				results.add(cmd.execute(sender, args));
+			}
+			if (results.stream().anyMatch(Result::getValue)) {
+				return null;
 			}
 			sender.sendMessage(Messages.msg("helpTitle").replace("%cmdname%", children.get(0).getName()));
 			sender.sendMessage(getHelpRecursive(sender, 0));
-			return true;
+			return null;
 		}
 		
 		@Override
