@@ -3,15 +3,14 @@ package redempt.redlib.enchants;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.ArgType;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.jar.JarEntry;
@@ -134,39 +133,15 @@ public class EnchantRegistry {
 	 * @param plugin The plugin to load all CustomEnchants from
 	 */
 	public void registerAll(Plugin plugin) {
-		try {
-			ClassLoader loader = plugin.getClass().getClassLoader();
-			JarFile file = new JarFile(new File(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()));
-			Enumeration<JarEntry> entries = file.entries();
-			while (entries.hasMoreElements()) {
-				JarEntry entry = entries.nextElement();
-				if (entry.isDirectory()) {
-					continue;
-				}
-				String name = entry.getName();
-				if (!name.endsWith(".class")) {
-					continue;
-				}
-				name = name.substring(0, name.length() - 6).replace("/", ".");
-				Class<?> clazz;
-				try {
-					clazz = Class.forName(name, true, loader);
-				} catch (ClassNotFoundException ex) {
-					continue;
-				}
-				if (!CustomEnchant.class.isAssignableFrom(clazz) || Modifier.isAbstract(clazz.getModifiers()) || clazz.isInterface()) {
-					continue;
-				}
-				try {
-					Constructor<?> constructor = clazz.getConstructor();
-					CustomEnchant<?> ench = (CustomEnchant<?>) constructor.newInstance();
-					register(ench);
-				} catch (NoSuchMethodException e) {
-					throw new IllegalStateException("Class " + clazz.getName() + " does not have a default constructor and could not be loaded");
-				}
+		List<Class<? extends CustomEnchant>> list = RedLib.getExtendingClasses(plugin, CustomEnchant.class);
+		for (Class<?> clazz : list) {
+			try {
+				Constructor<?> constructor = clazz.getConstructor();
+				CustomEnchant<?> ench = (CustomEnchant<?>) constructor.newInstance();
+				register(ench);
+			} catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+				throw new IllegalStateException("Class " + clazz.getName() + " does not have a default constructor or could not be loaded", e);
 			}
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
 		}
 	}
 	

@@ -141,11 +141,11 @@ public class MultiBlockStructure {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 			String line;
-			String combine = "";
+			StringBuilder combine = new StringBuilder();
 			while ((line = reader.readLine()) != null) {
-				combine += line;
+				combine.append(line);
 			}
-			return create(combine, name, strictMode, ignoreAir);
+			return create(combine.toString(), name, strictMode, ignoreAir);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
