@@ -619,7 +619,6 @@ public class Command {
 					}
 				}
 			}
-			return new Result<>(this, false, result.getMessage());
 		}
 		if (args.length == 0) {
 			if (topLevel) {
