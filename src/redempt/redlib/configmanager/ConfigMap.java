@@ -4,73 +4,110 @@ import org.bukkit.configuration.ConfigurationSection;
 import redempt.redlib.configmanager.annotations.ConfigMappable;
 import redempt.redlib.configmanager.exceptions.ConfigMapException;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
-class ConfigMap<T> extends HashMap<String, T> implements ConfigStorage {
+class ConfigMap<K, V> extends LinkedHashMap<K, V> implements ConfigStorage {
 	
-	protected Class<T> clazz;
+	protected Class<V> valueClass;
+	private Class<K> keyClass;
 	protected ConfigurationSection section;
 	private ConfigManager manager;
-	private ConfigObjectMapper<T> mapper;
+	private ConfigObjectMapper<V> mapper;
+	private TypeConverter<K> converter;
 	
-	public ConfigMap(Class<T> clazz) {
-		this.clazz = clazz;
+	public ConfigMap(Class<K> keyClass, Class<V> valueClass) {
+		this.valueClass = valueClass;
+		this.keyClass = keyClass;
 	}
 	
 	public void init(ConfigManager manager) {
 		if (this.manager != null) {
 			return;
 		}
-		if (clazz.isAnnotationPresent(ConfigMappable.class)) {
-			mapper = new ConfigObjectMapper<>(clazz, manager);
+		if (valueClass.isAnnotationPresent(ConfigMappable.class)) {
+			mapper = new ConfigObjectMapper<>(valueClass, manager);
 		}
 		this.manager = manager;
 	}
 	
 	public void load(ConfigurationSection section) {
+		clear();
 		this.section = section;
-		if (clazz.isAnnotationPresent(ConfigMappable.class)) {
+		if (valueClass.isAnnotationPresent(ConfigMappable.class)) {
 			section.getKeys(false).forEach(k -> {
-				put(k, mapper.load(section.getConfigurationSection(k)));
+				put(getObjKey(k), mapper.load(section.getConfigurationSection(k)));
 			});
 			return;
 		}
-		TypeConverter<T> converter = (TypeConverter<T>) manager.converters.get(clazz);
+		TypeConverter<V> converter = (TypeConverter<V>) manager.converters.get(valueClass);
 		if (converter == null) {
-			throw new ConfigMapException("No converter for class " + clazz.getName());
+			section.getKeys(false).forEach(k -> {
+				put(getObjKey(k), (V) section.get(k));
+			});
+			return;
 		}
 		section.getKeys(false).forEach(k -> {
-			put(k, converter.load(section.getString(k)));
+			put(getObjKey(k), converter.load(section.getString(k)));
 		});
 	}
 	
 	public void save(ConfigurationSection section) {
 		this.section = section;
-		if (clazz.isAnnotationPresent(ConfigMappable.class)) {
+		if (valueClass.isAnnotationPresent(ConfigMappable.class)) {
 			forEach((k, v) -> {
-				ConfigurationSection sect = section.createSection(k);
+				ConfigurationSection sect = section.createSection(getStringKey(k));
 				mapper.save(sect, v);
 			});
 			return;
 		}
-		TypeConverter<T> converter = (TypeConverter<T>) manager.converters.get(clazz);
+		TypeConverter<V> converter = (TypeConverter<V>) manager.converters.get(valueClass);
 		if (converter == null) {
-			throw new ConfigMapException("No converter for class " + clazz.getName());
+			forEach((k, v) -> {
+				section.set(getStringKey(k), v);
+			});
+			return;
 		}
 		forEach((k, v) -> {
-			section.set(k, converter.save(v));
+			section.set(getStringKey(k), converter.save(v));
 		});
 	}
 	
 	@Override
-	public T put(String key, T value) {
-		T out = super.put(key, value);
+	public V put(K key, V value) {
+		V out = super.put(key, value);
 		if (section != null && mapper != null) {
-			ConfigurationSection section = this.section.getConfigurationSection(key);
-			section = section == null ? this.section.createSection(key) : section;
+			String skey = getStringKey(key);
+			ConfigurationSection section = this.section.getConfigurationSection(skey);
+			section = section == null ? this.section.createSection(skey) : section;
 			mapper.setPathField(value, section);
 		}
 		return out;
+	}
+	
+	private String getStringKey(K key) {
+		if (keyClass.equals(String.class)) {
+			return (String) key;
+		}
+		if (converter == null) {
+			converter = (TypeConverter<K>) manager.converters.get(keyClass);
+			if (converter == null) {
+				throw new ConfigMapException("No converter for class " + keyClass.getName());
+			}
+		}
+		return converter.save(key);
+	}
+	
+	private K getObjKey(String key) {
+		if (keyClass.equals(String.class)) {
+			return (K) key;
+		}
+		if (converter == null) {
+			converter = (TypeConverter<K>) manager.converters.get(keyClass);
+			if (converter == null) {
+				throw new ConfigMapException("No converter for class " + keyClass.getName());
+			}
+		}
+		return converter.load(key);
 	}
 	
 }

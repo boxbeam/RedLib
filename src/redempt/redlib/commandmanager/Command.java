@@ -318,7 +318,7 @@ public class Command {
 				int pos = 0;
 				for (int x = cmdArgs.size() - 1; x < sargs.size(); x++) {
 					try {
-						Array.set(arr, pos, arg.getType().convert(sender, sargs.get(x)));
+						Array.set(arr, pos, Objects.requireNonNull(arg.getType().convert(sender, sargs.get(x))));
 						pos++;
 					} catch (Exception e) {
 						return new Result<>(this, null, Messages.msg("invalidArgument").replace("%arg%", arg.getName()).replace("%value%", sargs.get(x)));
@@ -547,6 +547,9 @@ public class Command {
 			CommandArgument arg = this.args[args.length - flagArgs];
 			List<String> argCompletions = arg.getType().tabComplete(sender);
 			for (String completion : argCompletions) {
+				if (completion == null) {
+					continue;
+				}
 				if (completion.toLowerCase().startsWith(partial) && !partial.equals(completion)) {
 					if (completion.contains(" ")) {
 						completion = '"' + completion + '"';
@@ -571,6 +574,7 @@ public class Command {
 			showHelp(sender);
 			return new Result<>(this, true, null);
 		}
+		List<Result<Boolean>> results = new ArrayList<>();
 		if (methodHook != null) {
 			type = type == null ? SenderType.EVERYONE : type;
 			switch (type) {
@@ -619,16 +623,16 @@ public class Command {
 					}
 				}
 			}
+			results.add(new Result<>(this, false, result.getMessage()));
 		}
 		if (args.length == 0) {
 			if (topLevel) {
 				showHelp(sender);
 				return new Result<>(this, true, null);
 			}
-			return new Result<>(this, false, null);
+			return new Result<>(this, false, results.stream().findFirst().map(Result::getMessage).orElse(null));
 		}
 		String[] truncArgs = Arrays.copyOfRange(args, 1, args.length);
-		List<Result<Boolean>> results = new ArrayList<>();
 		for (Command command : children) {
 			for (String alias : command.getAliases()) {
 				if (alias.equals(args[0])) {

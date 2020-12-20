@@ -30,15 +30,30 @@ public class ConfigManager {
 	}
 	
 	/**
-	 * Creates a ConfigMap from a given type. A ConfigMap extends HashMap. The class is not accessible, so
+	 * Creates a ConfigMap from a given type. A ConfigMap extends LinkedHashMap. The class is not accessible, so
 	 * store it in a HashMap variable. This method must be used to set the initial value for a variable
 	 * which loads in a section from config.
-	 * @param clazz The class of the type that will be mapped
-	 * @param <T> The type
+	 * @param clazz The class of the value type
+	 * @param <T> The value type
 	 * @return An empty map of the given type, which will be populated when {@link ConfigManager#load()} is called
  	 */
-	public static <T> ConfigMap<T> map(Class<T> clazz) {
-		return new ConfigMap<T>(clazz);
+	public static <T> ConfigMap<String, T> map(Class<T> clazz) {
+		return new ConfigMap<>(String.class, clazz);
+	}
+	
+	/**
+	 * Creates a ConfigMap from a given type. A ConfigMap extends LinkedHashMap. The class is not accessible, so
+	 * store it in a HashMap variable. This method must be used to set the initial value for a variable
+	 * which loads in a section from config. The key class may only be a type which has converter from string to
+	 * another type. For obvious reasons, it cannot be a config-mappable object.
+	 * @param keyClass The class of the key type
+	 * @param <K> The key type
+	 * @param valueClass The class of the value type
+	 * @param <V> The value type
+	 * @return An empty map of the given type, which will be populated when {@link ConfigManager#load()} is called
+	 */
+	public static <K, V> ConfigMap<K, V> map(Class<K> keyClass, Class<V> valueClass) {
+		return new ConfigMap<>(keyClass, valueClass);
 	}
 	
 	/**

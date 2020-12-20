@@ -52,6 +52,7 @@ class ConfigList<T> extends ArrayList<T> implements ConfigStorage {
 	
 	@Override
 	public void load(ConfigurationSection section) {
+		clear();
 		if (clazz.isAnnotationPresent(ConfigMappable.class)) {
 			section.getKeys(false).forEach(k -> {
 				add(mapper.load(section.getConfigurationSection(k)));
