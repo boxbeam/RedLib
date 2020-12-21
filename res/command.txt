@@ -111,3 +111,8 @@ profiler,rprofiler {
 		user player
 	}
 }
+commandchain,cchain commandchain...:commandchain {
+	help Runs several commands in a row separated by ;
+	hook commandchain
+	permission redlib.commandchain
+}

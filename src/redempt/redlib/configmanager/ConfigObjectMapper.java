@@ -2,8 +2,8 @@ package redempt.redlib.configmanager;
 
 import org.bukkit.configuration.ConfigurationSection;
 import redempt.redlib.configmanager.annotations.ConfigPath;
-import redempt.redlib.configmanager.annotations.ConfigValue;
 import redempt.redlib.configmanager.annotations.ConfigPostInit;
+import redempt.redlib.configmanager.annotations.ConfigValue;
 import redempt.redlib.configmanager.exceptions.ConfigMapException;
 
 import java.lang.reflect.Constructor;
@@ -86,11 +86,7 @@ class ConfigObjectMapper<T> {
 			return;
 		}
 		try {
-			if (pathFieldString) {
-				pathField.set(inst, section.getName());
-			} else {
-				pathField.set(inst, section);
-			}
+			pathField.set(inst, pathFieldString ? section.getName() : section);
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}

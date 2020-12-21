@@ -9,6 +9,7 @@ import redempt.redlib.commandmanager.CommandParser;
 import redempt.redlib.commandmanager.Messages;
 import redempt.redlib.configmanager.ConfigManager;
 import redempt.redlib.configmanager.annotations.ConfigValue;
+import redempt.redlib.dev.ChainCommand;
 import redempt.redlib.dev.StructureTool;
 import redempt.redlib.dev.profiler.Profiler;
 import redempt.redlib.dev.profiler.ProfilerCommands;
@@ -52,12 +53,13 @@ public class RedLib extends JavaPlugin {
 		Messages.load(this);
 		new ConfigManager(this).register(this).saveDefaults().load();
 		if (devMode) {
+			ChainCommand chain = new ChainCommand();
 			new CommandParser(this.getResource("command.txt"))
-					.setArgTypes(ArgType.of("material", Material.class))
+					.setArgTypes(ArgType.of("material", Material.class), chain.getArgType())
 					.parse()
 					.register("redlib",
 					new ProfilerCommands(),
-					StructureTool.enable());
+					StructureTool.enable(), chain);
 			if (autoStartPassiveProfiler) {
 				ProfilerCommands.getProfiler().start();
 			}

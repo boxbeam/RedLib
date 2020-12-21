@@ -79,10 +79,9 @@ public class ArgType<T> {
 		return new ArgType<>(name, map::get).tabStream(c -> map.keySet().stream());
 	}
 	
-	private Function<String, T> func = null;
-	private BiFunction<CommandSender, String, T> bifunc = null;
+	private BiFunction<CommandSender, String, T> convert;
+	private BiFunction<CommandSender, String[], List<String>> tab = null;
 	private String name;
-	private Function<CommandSender, List<String>> tab = null;
 	
 	/**
 	 * Create a ArgType from a name and converter
@@ -93,7 +92,7 @@ public class ArgType<T> {
 		if (name.contains(" ")) {
 			throw new IllegalArgumentException("Command argument type name cannot contain a space");
 		}
-		func = convert;
+		this.convert = (c, s) -> convert.apply(s);
 		this.name = name;
 	}
 	
@@ -106,7 +105,7 @@ public class ArgType<T> {
 		if (name.contains(" ")) {
 			throw new IllegalArgumentException("Command argument type name cannot contain a space");
 		}
-		bifunc = convert;
+		this.convert = convert;
 		this.name = name;
 	}
 	
@@ -116,6 +115,16 @@ public class ArgType<T> {
 	 * @return itself
 	 */
 	public ArgType<T> tab(Function<CommandSender, List<String>> tab) {
+		this.tab = (c, s) -> tab.apply(c);
+		return this;
+	}
+	
+	/**
+	 * Sets the tab completer for this type
+	 * @param tab The function returning a List of all completions for this sender
+	 * @return itself
+	 */
+	public ArgType<T> tab(BiFunction<CommandSender, String[], List<String>> tab) {
 		this.tab = tab;
 		return this;
 	}
@@ -126,15 +135,25 @@ public class ArgType<T> {
 	 * @return itself
 	 */
 	public ArgType<T> tabStream(Function<CommandSender, Stream<String>> tab) {
-		this.tab = c -> tab.apply(c).collect(Collectors.toList());
+		this.tab = (c, s) -> tab.apply(c).collect(Collectors.toList());
 		return this;
 	}
 	
-	protected List<String> tabComplete(CommandSender sender) {
+	/**
+	 * Sets the tab completer for this type, can be used instead of tab
+	 * @param tab The function returning a Stream of all completions for this sender
+	 * @return itself
+	 */
+	public ArgType<T> tabStream(BiFunction<CommandSender, String[], Stream<String>> tab) {
+		this.tab = (c, s) -> tab.apply(c, s).collect(Collectors.toList());
+		return this;
+	}
+	
+	protected List<String> tabComplete(CommandSender sender, String[] args) {
 		if (tab == null) {
 			return new ArrayList<>();
 		}
-		List<String> values = tab.apply(sender);
+		List<String> values = tab.apply(sender, args);
 		if (values == null) {
 			return new ArrayList<>();
 		}
@@ -155,7 +174,7 @@ public class ArgType<T> {
 	 * @return The converted argument for use in a method hook
 	 */
 	public T convert(CommandSender sender, String argument) {
-		return func == null ? bifunc.apply(sender, argument) : func.apply(argument);
+		return convert.apply(sender, argument);
 	}
 	
 	/**

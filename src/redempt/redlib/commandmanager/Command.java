@@ -143,8 +143,9 @@ public class Command {
 		return "/" + name;
 	}
 	
-	private static String[] splitArgs(String input) {
+	private static Result<String[], Boolean[]> splitArgs(String input) {
 		List<String> args = new ArrayList<>();
+		List<Boolean> quoted = new ArrayList<>();
 		StringBuilder combine = new StringBuilder();
 		boolean quotes = false;
 		boolean argQuoted = false;
@@ -162,8 +163,8 @@ public class Command {
 				continue;
 			}
 			if (c == ' ' && !quotes) {
-				combine.append(argQuoted ? '1' : '0');
 				args.add(combine.toString());
+				quoted.add(argQuoted);
 				combine = new StringBuilder();
 				argQuoted = false;
 				continue;
@@ -171,13 +172,13 @@ public class Command {
 			combine.append(c);
 		}
 		if (combine.length() > 0) {
-			combine.append(argQuoted ? '1' : '0');
 			args.add(combine.toString());
+			quoted.add(argQuoted);
 		}
-		return args.toArray(new String[args.size()]);
+		return new Result<>(null, args.toArray(new String[args.size()]), quoted.toArray(new Boolean[quoted.size()]));
 	}
 	
-	private Result<Object[]> processArgs(String[] argArray, CommandSender sender) {
+	private Result<Object[], String> processArgs(String[] argArray, Boolean[] quoted, CommandSender sender) {
 		List<String> sargs = new ArrayList<>();
 		Collections.addAll(sargs, argArray);
 		Object[] output = new Object[args.length + flags.length + 1];
@@ -192,10 +193,8 @@ public class Command {
 		//Flag argument handling
 		for (int i = 0; i < sargs.size(); i++) {
 			String arg = sargs.get(i);
-			boolean quoted = arg.charAt(arg.length() - 1) == '1';
-			arg = arg.substring(0, arg.length() - 1);
 			sargs.set(i, arg);
-			if (!arg.startsWith("-") || quoted) {
+			if (!arg.startsWith("-") || quoted[i]) {
 				continue;
 			}
 			String farg = arg;
@@ -522,7 +521,7 @@ public class Command {
 							.map(Flag::getNames).forEach(s -> Collections.addAll(completions, s));
 				}
 				if (flag != null && !flag.getType().getName().equals("boolean")) {
-					flag.getType().tabComplete(sender)
+					flag.getType().tabComplete(sender, args)
 							.stream().filter(s -> s.toLowerCase().startsWith(arg.toLowerCase()))
 							.map(s -> s.contains(" ") ? '"' + s + '"' : s)
 							.forEach(completions::add);
@@ -545,7 +544,7 @@ public class Command {
 		if (args.length - flagArgs < this.args.length && args.length - flagArgs >= 0) {
 			String partial = args[args.length - 1].replaceAll("(^\")|(\"$)", "").toLowerCase();
 			CommandArgument arg = this.args[args.length - flagArgs];
-			List<String> argCompletions = arg.getType().tabComplete(sender);
+			List<String> argCompletions = arg.getType().tabComplete(sender, args);
 			for (String completion : argCompletions) {
 				if (completion == null) {
 					continue;
@@ -557,15 +556,15 @@ public class Command {
 					completions.add(completion);
 				}
 			}
-		} else if (this.args.length > 0 && this.args[this.args.length - 1].isVararg() && args.length > 0) {
+		} else if (this.args.length > 0 && (this.args[this.args.length - 1].isVararg() || this.args[this.args.length - 1].consumes()) && args.length > 0) {
 			String partial = args[args.length - 1].replaceAll("(^\")|(\"$)", "").toLowerCase();
-			this.args[this.args.length - 1].getType().tabComplete(sender).stream()
+			this.args[this.args.length - 1].getType().tabComplete(sender, args).stream()
 					.filter(s -> s.toLowerCase().startsWith(partial) && !s.equals(partial)).forEach(completions::add);
 		}
 		return completions;
 	}
 	
-	protected Result<Boolean> execute(CommandSender sender, String[] args) {
+	protected Result<Boolean, String> execute(CommandSender sender, String[] args) {
 		if (permission != null && !sender.hasPermission(permission)) {
 			sender.sendMessage(msg("noPermission").replace("%permission%", permission));
 			return new Result<>(this, true, null);
@@ -574,7 +573,7 @@ public class Command {
 			showHelp(sender);
 			return new Result<>(this, true, null);
 		}
-		List<Result<Boolean>> results = new ArrayList<>();
+		List<Result<Boolean, String>> results = new ArrayList<>();
 		if (methodHook != null) {
 			type = type == null ? SenderType.EVERYONE : type;
 			switch (type) {
@@ -593,7 +592,8 @@ public class Command {
 					}
 					break;
 			}
-			Result<Object[]> result = processArgs(splitArgs(String.join(" ", args)), sender);
+			Result<String[], Boolean[]> split = splitArgs(String.join(" ", args));
+			Result<Object[], String> result = processArgs(split.getValue(), split.getMessage(), sender);
 			Object[] objArgs = result.getValue();
 			if (objArgs != null) {
 				if (asserters.length > 0 && !assertAll(sender)) {
@@ -636,7 +636,7 @@ public class Command {
 		for (Command command : children) {
 			for (String alias : command.getAliases()) {
 				if (alias.equals(args[0])) {
-					Result<Boolean> result = command.execute(sender, truncArgs);
+					Result<Boolean, String> result = command.execute(sender, truncArgs);
 					if (result.getValue()) {
 						return new Result<>(this, true, null);
 					} else {
@@ -645,7 +645,7 @@ public class Command {
 				}
 			}
 		}
-		Result<Boolean> deepest = results.stream().max(Comparator.comparingInt(r -> r.getCommand().getDepth())).orElse(
+		Result<Boolean, String> deepest = results.stream().max(Comparator.comparingInt(r -> r.getCommand().getDepth())).orElse(
 				new Result<>(this, false, Messages.msg("invalidSubcommand").replace("%value%", args[0]))
 		);
 		if (!topLevel) {

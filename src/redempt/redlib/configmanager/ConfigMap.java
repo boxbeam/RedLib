@@ -35,19 +35,19 @@ class ConfigMap<K, V> extends LinkedHashMap<K, V> implements ConfigStorage {
 		this.section = section;
 		if (valueClass.isAnnotationPresent(ConfigMappable.class)) {
 			section.getKeys(false).forEach(k -> {
-				put(getObjKey(k), mapper.load(section.getConfigurationSection(k)));
+				super.put(getObjKey(k), mapper.load(section.getConfigurationSection(k)));
 			});
 			return;
 		}
 		TypeConverter<V> converter = (TypeConverter<V>) manager.converters.get(valueClass);
 		if (converter == null) {
 			section.getKeys(false).forEach(k -> {
-				put(getObjKey(k), (V) section.get(k));
+				super.put(getObjKey(k), (V) section.get(k));
 			});
 			return;
 		}
 		section.getKeys(false).forEach(k -> {
-			put(getObjKey(k), converter.load(section.getString(k)));
+			super.put(getObjKey(k), converter.load(section.getString(k)));
 		});
 	}
 	

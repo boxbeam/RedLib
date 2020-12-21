@@ -1,12 +1,12 @@
 package redempt.redlib.commandmanager;
 
-class Result<T> {
+class Result<T, V> {
 	
 	private T value;
-	private String message;
+	private V message;
 	private Command cmd;
 	
-	public Result(Command cmd, T value, String message) {
+	public Result(Command cmd, T value, V message) {
 		this.value = value;
 		this.message = message;
 		this.cmd = cmd;
@@ -20,7 +20,7 @@ class Result<T> {
 		return value;
 	}
 	
-	public String getMessage() {
+	public V getMessage() {
 		return message;
 	}
 	
