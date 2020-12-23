@@ -8,15 +8,17 @@ import redempt.redlib.enchants.trigger.EnchantTrigger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * Represents a custom enchantment created by another plugin
- * @param <T> The event type this CustomEnchant handles
  * @author Redempt
  */
-public abstract class CustomEnchant<T extends Event> {
+public abstract class CustomEnchant {
 	
 	/**
 	 * Converts a number to roman numerals, between 1 and 10
@@ -83,56 +85,61 @@ public abstract class CustomEnchant<T extends Event> {
 	}
 	
 	private EnchantRegistry registry;
-	private EnchantTrigger<T> trigger;
+	private Map<EnchantTrigger<?>, EnchantListener<?>> triggers = new HashMap<>();
 	private int maxLevel;
 	private String name;
+	private EnumSet<Material> applicable;
 	
 	/**
 	 * Constructs a new CustomEnchant
 	 * @param name The name of this CustomEnchant
 	 * @param maxLevel The max level of this CustomEnchant
-	 * @param trigger The EventTrigger to pass events to this CustomEnchant
 	 */
-	public CustomEnchant(String name, int maxLevel, EnchantTrigger<T> trigger) {
+	public CustomEnchant(String name, int maxLevel) {
 		if (this.name != null) {
 			throw new IllegalStateException("This enchantment has already been instantiated, get it through the EnchantRegistry!");
 		}
 		this.name = name;
 		this.maxLevel = maxLevel;
-		this.trigger = trigger;
 	}
 	
 	protected void register(EnchantRegistry registry) {
 		this.registry = registry;
-		trigger.register(this);
 	}
 	
 	/**
-	 * Activates this CustomEnchant by passing it an event
-	 * @param e The event which activated this CustomEnchant
-	 * @param level The level of this CustomEnchant on the related item
+	 * Registers an EnchantTrigger with a listener
+	 * @param trigger The EnchantTrigger to register
+	 * @param activate The callback for when this trigger is activated
+	 * @param deactivate The callback for when this trigger is deactivated
+	 * @param <T> The event type
 	 */
-	public abstract void activate(T e, int level);
+	protected <T extends Event> void addTrigger(EnchantTrigger<T> trigger, BiConsumer<T, Integer> activate, BiConsumer<T, Integer> deactivate) {
+		triggers.put(trigger, new EnchantListener<>(activate, deactivate));
+	}
 	
 	/**
-	 * Deactivates this CustomEnchant by passing it an event
-	 * @param e The event which deactivated this CustomEnchant
-	 * @param level The level of this CustomEnchant on the related item
+	 * Registers an EnchantTrigger with a listener
+	 * @param trigger The EnchantTrigger to register
+	 * @param activate The callback for when this trigger is activated
+	 * @param <T> The event type
 	 */
-	public void deactivate(T e, int level) {}
+	protected <T extends Event> void addTrigger(EnchantTrigger<T> trigger, BiConsumer<T, Integer> activate) {
+		triggers.put(trigger, new EnchantListener<>(activate, (e, l) -> {}));
+	}
 	
 	/**
 	 * @return An array of all other CustomEnchants that are incompatible with this one
 	 */
-	public CustomEnchant<?>[] getIncompatible() {
-		return new CustomEnchant<?>[]{};
+	public CustomEnchant[] getIncompatible() {
+		return new CustomEnchant[]{};
 	}
 	
 	/**
 	 * @return The EventTrigger for this CustomEnchant
 	 */
-	public final EnchantTrigger<T> getTrigger() {
-		return trigger;
+	public final Map<EnchantTrigger<?>, EnchantListener<?>> getTriggers() {
+		return triggers;
 	}
 	
 	/**
@@ -140,8 +147,8 @@ public abstract class CustomEnchant<T extends Event> {
 	 * @param type The type to check
 	 * @return Whether this CustomEnchant applies to the given type
 	 */
-	public boolean appliesTo(Material type) {
-		return getTrigger().defaultAppliesTo(type);
+	protected boolean appliesTo(Material type) {
+		return triggers.keySet().stream().anyMatch(t -> t.defaultAppliesTo(type));
 	}
 	
 	/**
@@ -278,11 +285,11 @@ public abstract class CustomEnchant<T extends Event> {
 	 * @return False if this CustomEnchantment cannot be applied to the item's type, or one of the CustomEnchants already on the item is incompatible with this one, true otherwise
 	 */
 	public final boolean canApply(ItemStack item) {
-		if (!appliesTo(item.getType())) {
+		if (!canApply(item.getType())) {
 			return false;
 		}
-		Map<CustomEnchant<?>, Integer> enchants = registry.getEnchants(item);
-		for (CustomEnchant<?> ench : getIncompatible()) {
+		Map<CustomEnchant, Integer> enchants = registry.getEnchants(item);
+		for (CustomEnchant ench : getIncompatible()) {
 			if (enchants.containsKey(ench)) {
 				return false;
 			}
@@ -291,11 +298,24 @@ public abstract class CustomEnchant<T extends Event> {
 	}
 	
 	/**
+	 * Checks whether this CustomEnchant applies to the given type
+	 * @param type The type
+	 * @return Whether this CustomEnchant applies to the type
+	 */
+	public final boolean canApply(Material type) {
+		if (applicable == null) {
+			applicable = EnumSet.noneOf(Material.class);
+			Arrays.stream(Material.values()).filter(this::appliesTo).forEach(applicable::add);
+		}
+		return applicable.contains(type);
+	}
+	
+	/**
 	 * Checks if this CustomEnchant is compatible with another CustomEnchant
 	 * @param ench The CustomEnchant to check compatibility with
 	 * @return Whether this CustomEnchant is compatible with the given enchant
 	 */
-	public boolean isCompatible(CustomEnchant<?> ench) {
+	public boolean isCompatible(CustomEnchant ench) {
 		return Arrays.stream(getIncompatible()).noneMatch(e -> e.equals(ench));
 	}
 	

@@ -6,7 +6,7 @@ package redempt.redlib.enchants;
  */
 public class EnchantInfo {
 	
-	private CustomEnchant<?> ench;
+	private CustomEnchant ench;
 	private int level;
 	
 	/**
@@ -14,7 +14,7 @@ public class EnchantInfo {
 	 * @param ench The CustomEnchant
 	 * @param level The level
 	 */
-	public EnchantInfo(CustomEnchant<?> ench, int level) {
+	public EnchantInfo(CustomEnchant ench, int level) {
 		this.ench = ench;
 		this.level = level;
 	}
@@ -29,7 +29,7 @@ public class EnchantInfo {
 	/**
 	 * @return The CustomEnchant stored in this EnchantInfo
 	 */
-	public CustomEnchant<?> getEnchant() {
+	public CustomEnchant getEnchant() {
 		return ench;
 	}
 	

@@ -47,7 +47,7 @@ public abstract class CustomItem {
 	 */
 	protected CustomItem(String name) {
 		this.name = name;
-		item = item();
+		item = getDefaultItem();
 	}
 	
 	/**
@@ -57,7 +57,10 @@ public abstract class CustomItem {
 		return false;
 	}
 	
-	protected abstract ItemStack item();
+	/**
+	 * @return The default item for this CustomItem
+	 */
+	public abstract ItemStack getDefaultItem();
 	
 	/**
 	 * @return The name of this custom item
@@ -69,7 +72,7 @@ public abstract class CustomItem {
 	/**
 	 * @return The item
 	 */
-	public final ItemStack getItem() {
+	public ItemStack getItem() {
 		if (cloneOnGet()) {
 			return item.clone();
 		}

@@ -1,24 +1,26 @@
 package redempt.redlib.enchants;
 
 import org.bukkit.ChatColor;
+import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.ArgType;
+import redempt.redlib.enchants.trigger.EnchantTrigger;
+import redempt.redlib.misc.EventListener;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 /**
  * A registry for custom enchantments owned by a single plugin
- *
  * @author Redempt
  */
 public class EnchantRegistry {
@@ -35,10 +37,12 @@ public class EnchantRegistry {
 		return registries.get(plugin);
 	}
 	
-	private Map<String, CustomEnchant<?>> enchants = new HashMap<>();
-	private Map<String, CustomEnchant<?>> byDisplayName = new HashMap<>();
+	private Map<String, CustomEnchant> enchants = new HashMap<>();
+	private Map<String, CustomEnchant> byDisplayName = new HashMap<>();
+	private Map<EnchantTrigger<?>, List<CustomEnchant>> triggers = new HashMap<>();
+	private List<EventListener<?>> listeners = new ArrayList<>();
 	private Plugin plugin;
-	private Function<CustomEnchant<?>, String> namer;
+	private Function<CustomEnchant, String> namer;
 	
 	/**
 	 * Gets a CustomEnchant by its name or ID
@@ -46,14 +50,14 @@ public class EnchantRegistry {
 	 * @param name The name or ID of the enchantment
 	 * @return The CustomEnchant
 	 */
-	public CustomEnchant<?> getByName(String name) {
+	public CustomEnchant getByName(String name) {
 		return enchants.get(name.toLowerCase().replace(" ", "_"));
 	}
 	
 	/**
 	 * @return A collection of all the CustomEnchants in this EnchantRegistry
 	 */
-	public Collection<CustomEnchant<?>> getEnchants() {
+	public Collection<CustomEnchant> getEnchants() {
 		return enchants.values();
 	}
 	
@@ -72,7 +76,7 @@ public class EnchantRegistry {
 	 * @param plugin The plugin that owns this EnchantRegistry
 	 * @param namer  A function which will generate a display name for any given CustomEnchant
 	 */
-	public EnchantRegistry(Plugin plugin, Function<CustomEnchant<?>, String> namer) {
+	public EnchantRegistry(Plugin plugin, Function<CustomEnchant, String> namer) {
 		this.plugin = plugin;
 		this.namer = namer;
 		registries.put(plugin, this);
@@ -102,13 +106,53 @@ public class EnchantRegistry {
 	 *
 	 * @param ench The CustomEnchant to register
 	 */
-	public void register(CustomEnchant<?> ench) {
+	public void register(CustomEnchant ench) {
 		if (enchants.containsKey(ench.getId())) {
 			throw new IllegalArgumentException("Duplicate enchant ID/name "  + ench.getId() + "/" + ench.getName());
 		}
 		ench.register(this);
 		enchants.put(ench.getId(), ench);
 		byDisplayName.put(ench.getDisplayName(), ench);
+		ench.getTriggers().keySet().forEach(trigger -> {
+			List<CustomEnchant> enchs;
+			if (triggers.containsKey(trigger)) {
+				enchs = triggers.get(trigger);
+			} else {
+				enchs = new ArrayList<>();
+				register(trigger);
+				triggers.put(trigger, enchs);
+			}
+			enchs.add(ench);
+			triggers.put(trigger, enchs);
+		});
+	}
+	
+	private <T extends Event> void register(EnchantTrigger<T> trigger) {
+		trigger.init();
+		trigger.getEvents().forEach((c, it) -> listeners.add(new EventListener<>(plugin, c, trigger.getPriority(), e -> {
+			EventItems items = it.apply(e);
+			if (items == null) {
+				return;
+			}
+			for (CustomEnchant ench : triggers.get(trigger)) {
+				for (int i = 0; i < items.getAfter().length; i++) {
+					int beforeLevel = ench.getLevel(items.getBefore()[i]);
+					int afterLevel = ench.getLevel(items.getAfter()[i]);
+					if (beforeLevel == 0 && afterLevel > 0) {
+						ench.getTriggers().get(trigger).activate(e, afterLevel);
+						continue;
+					}
+					if (beforeLevel > 0 && afterLevel == 0) {
+						ench.getTriggers().get(trigger).deactivate(e, beforeLevel);
+						continue;
+					}
+					if (beforeLevel != afterLevel) {
+						ench.getTriggers().get(trigger).deactivate(e, beforeLevel);
+						ench.getTriggers().get(trigger).activate(e, afterLevel);
+					}
+				}
+			}
+		})));
 	}
 	
 	/**
@@ -137,7 +181,7 @@ public class EnchantRegistry {
 		for (Class<?> clazz : list) {
 			try {
 				Constructor<?> constructor = clazz.getConstructor();
-				CustomEnchant<?> ench = (CustomEnchant<?>) constructor.newInstance();
+				CustomEnchant ench = (CustomEnchant) constructor.newInstance();
 				register(ench);
 			} catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 				throw new IllegalStateException("Class " + clazz.getName() + " does not have a default constructor or could not be loaded", e);
@@ -151,8 +195,8 @@ public class EnchantRegistry {
 	 * @param item The item to get the CustomEnchants from
 	 * @return A map of each CustomEnchant on this item to its level
 	 */
-	public Map<CustomEnchant<?>, Integer> getEnchants(ItemStack item) {
-		Map<CustomEnchant<?>, Integer> map = new HashMap<>();
+	public Map<CustomEnchant, Integer> getEnchants(ItemStack item) {
+		Map<CustomEnchant, Integer> map = new HashMap<>();
 		if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {
 			return map;
 		}
@@ -172,9 +216,9 @@ public class EnchantRegistry {
 	 * @param second The second map of CustomEnchants to levels - Incompatible enchants will be removed from this map
 	 * @return A map of the combined CustomEnchants to their levels
 	 */
-	public Map<CustomEnchant<?>, Integer> combine(Map<CustomEnchant<?>, Integer> first, Map<CustomEnchant<?>, Integer> second) {
-		Map<CustomEnchant<?>, Integer> ffirst = new HashMap<>(first);
-		Map<CustomEnchant<?>, Integer> fsecond = new HashMap<>(second);
+	public Map<CustomEnchant, Integer> combine(Map<CustomEnchant, Integer> first, Map<CustomEnchant, Integer> second) {
+		Map<CustomEnchant, Integer> ffirst = new HashMap<>(first);
+		Map<CustomEnchant, Integer> fsecond = new HashMap<>(second);
 		fsecond.keySet().removeIf(e -> ffirst.keySet().stream().anyMatch(e2 -> !e2.isCompatible(e)));
 		fsecond.forEach((ench, level) -> {
 			if (!ffirst.containsKey(ench)) {
@@ -200,8 +244,8 @@ public class EnchantRegistry {
 	 * @param item     The item to apply the enchants to
 	 * @return The enchanted item
 	 */
-	public ItemStack applyAll(Map<CustomEnchant<?>, Integer> enchants, ItemStack item) {
-		for (Entry<CustomEnchant<?>, Integer> entry : enchants.entrySet()) {
+	public ItemStack applyAll(Map<CustomEnchant, Integer> enchants, ItemStack item) {
+		for (Entry<CustomEnchant, Integer> entry : enchants.entrySet()) {
 			item = entry.getKey().apply(item, entry.getValue());
 		}
 		return item;
@@ -222,14 +266,14 @@ public class EnchantRegistry {
 			}
 			String name = line.substring(0, lastSpace);
 			String level = line.substring(lastSpace + 1);
-			CustomEnchant<?> ench = byDisplayName.get(name);
+			CustomEnchant ench = byDisplayName.get(name);
 			if (ench == null) {
 				break check;
 			}
 			int lvl = CustomEnchant.fromRomanNumerals(level);
 			return new EnchantInfo(ench, lvl);
 		}
-		CustomEnchant<?> ench = byDisplayName.get(line);
+		CustomEnchant ench = byDisplayName.get(line);
 		if (ench != null && ench.getMaxLevel() == 1) {
 			return new EnchantInfo(ench, 1);
 		}
@@ -242,7 +286,7 @@ public class EnchantRegistry {
 	 * @param enchant The Enchant to get the display name of
 	 * @return The display name
 	 */
-	public String getDisplayName(CustomEnchant<?> enchant) {
+	public String getDisplayName(CustomEnchant enchant) {
 		return namer.apply(enchant);
 	}
 	
@@ -252,7 +296,7 @@ public class EnchantRegistry {
 	 * @param name The name to use for the argument type
 	 * @return A CommandArgumentType for CustomEnchants in this registry
 	 */
-	public ArgType<? extends CustomEnchant<?>> getEnchantArgType(String name) {
+	public ArgType<? extends CustomEnchant> getEnchantArgType(String name) {
 		return new ArgType<>(name, this::getByName).tabStream(c -> enchants.keySet().stream());
 	}
 	

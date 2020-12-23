@@ -191,7 +191,7 @@ public class ArgType<T> {
 				return null;
 			}
 			return func.apply(obj);
-		});
+		}).tab(tab);
 	}
 	
 	/**
@@ -208,7 +208,7 @@ public class ArgType<T> {
 				return null;
 			}
 			return func.apply(c, obj);
-		});
+		}).tab(tab);
 	}
 	
 }

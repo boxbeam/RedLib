@@ -4,25 +4,23 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.inventory.ItemStack;
-import redempt.redlib.enchants.CustomEnchant;
-import redempt.redlib.misc.EventListener;
+import redempt.redlib.enchants.EventItems;
 
-class AttackEntityTrigger implements EnchantTrigger<EntityDamageByEntityEvent> {
+class AttackEntityTrigger extends EnchantTrigger<EntityDamageByEntityEvent> {
 	
 	@Override
-	public void register(CustomEnchant<EntityDamageByEntityEvent> ench) {
-		new EventListener<>(ench.getRegistry().getPlugin(), EntityDamageByEntityEvent.class, EventPriority.MONITOR, (e) -> {
+	protected void register() {
+		addListener(EntityDamageByEntityEvent.class, e -> {
 			if (!(e.getDamager() instanceof Player)) {
-				return;
+				return null;
 			}
-			Player player = (Player) e.getDamager();
-			int level = ench.getLevel(player.getItemInHand());
-			if (level == 0 || !ench.appliesTo(player.getItemInHand().getType())) {
-				return;
-			}
-			ench.activate(e, level);
+			return new EventItems(e, ((Player) e.getDamager()).getItemInHand());
 		});
+	}
+	
+	@Override
+	public EventPriority getPriority() {
+		return EventPriority.MONITOR;
 	}
 	
 	@Override
