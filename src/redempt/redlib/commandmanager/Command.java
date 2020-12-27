@@ -74,7 +74,9 @@ public class Command {
 	protected Command() {
 	}
 	
-	protected Command(String[] names, CommandArgument[] args, Flag[] flags, ContextProvider<?>[] providers, ContextProvider<?>[] asserters, String help, String permission, SenderType type, String hook, List<Command> children, boolean hideSub, boolean noTab) {
+	protected Command(String[] names, CommandArgument[] args, Flag[] flags, ContextProvider<?>[] providers,
+	                  ContextProvider<?>[] asserters, String help, String permission, SenderType type, String hook,
+	                  List<Command> children, boolean hideSub, boolean noTab) {
 		this.names = names;
 		this.args = args;
 		this.flags = flags;

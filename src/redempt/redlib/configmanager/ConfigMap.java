@@ -14,68 +14,41 @@ class ConfigMap<K, V> extends LinkedHashMap<K, V> implements ConfigStorage {
 	private ConfigManager manager;
 	private ConfigObjectMapper<V> mapper;
 	private TypeConverter<K> converter;
+	private ConversionType type;
 	
-	public ConfigMap(Class<K> keyClass, Class<V> valueClass) {
+	public ConfigMap(Class<K> keyClass, Class<V> valueClass, ConversionType type) {
 		this.valueClass = valueClass;
 		this.keyClass = keyClass;
+		this.type = type;
 	}
 	
 	public void init(ConfigManager manager) {
 		if (this.manager != null) {
 			return;
 		}
-		if (valueClass.isAnnotationPresent(ConfigMappable.class)) {
-			mapper = new ConfigObjectMapper<>(valueClass, manager);
-		}
+		mapper = new ConfigObjectMapper<V>(valueClass, type, manager);
 		this.manager = manager;
 	}
 	
 	public void load(ConfigurationSection section) {
 		clear();
 		this.section = section;
-		if (valueClass.isAnnotationPresent(ConfigMappable.class)) {
-			section.getKeys(false).forEach(k -> {
-				super.put(getObjKey(k), mapper.load(section.getConfigurationSection(k)));
-			});
-			return;
-		}
-		TypeConverter<V> converter = (TypeConverter<V>) manager.converters.get(valueClass);
-		if (converter == null) {
-			section.getKeys(false).forEach(k -> {
-				super.put(getObjKey(k), (V) section.get(k));
-			});
-			return;
-		}
 		section.getKeys(false).forEach(k -> {
-			super.put(getObjKey(k), converter.load(section.getString(k)));
+			super.put(getObjKey(k), mapper.load(section, k));
 		});
 	}
 	
 	public void save(ConfigurationSection section) {
 		this.section = section;
-		if (valueClass.isAnnotationPresent(ConfigMappable.class)) {
-			forEach((k, v) -> {
-				ConfigurationSection sect = section.createSection(getStringKey(k));
-				mapper.save(sect, v);
-			});
-			return;
-		}
-		TypeConverter<V> converter = (TypeConverter<V>) manager.converters.get(valueClass);
-		if (converter == null) {
-			forEach((k, v) -> {
-				section.set(getStringKey(k), v);
-			});
-			return;
-		}
 		forEach((k, v) -> {
-			section.set(getStringKey(k), converter.save(v));
+			mapper.save(section, getStringKey(k), v);
 		});
 	}
 	
 	@Override
 	public V put(K key, V value) {
 		V out = super.put(key, value);
-		if (section != null && mapper != null) {
+		if (section != null) {
 			String skey = getStringKey(key);
 			ConfigurationSection section = this.section.getConfigurationSection(skey);
 			section = section == null ? this.section.createSection(skey) : section;

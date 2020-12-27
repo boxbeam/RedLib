@@ -12,9 +12,11 @@ class ConfigList<T> extends ArrayList<T> implements ConfigStorage {
 	private ConfigObjectMapper<T> mapper;
 	private ConfigurationSection section;
 	private ConfigManager manager;
+	private ConversionType type;
 	
-	public ConfigList(Class<T> clazz) {
+	public ConfigList(Class<T> clazz, ConversionType type) {
 		this.clazz = clazz;
+		this.type = type;
 	}
 	
 	@Override
@@ -22,9 +24,7 @@ class ConfigList<T> extends ArrayList<T> implements ConfigStorage {
 		if (this.manager != null) {
 			return;
 		}
-		if (clazz.isAnnotationPresent(ConfigMappable.class)) {
-			mapper = new ConfigObjectMapper<>(clazz, manager);
-		}
+		mapper = new ConfigObjectMapper<>(clazz, type, manager);
 		this.manager = manager;
 		
 	}
@@ -32,20 +32,8 @@ class ConfigList<T> extends ArrayList<T> implements ConfigStorage {
 	@Override
 	public void save(ConfigurationSection section) {
 		int[] count = {0};
-		if (clazz.isAnnotationPresent(ConfigMappable.class)) {
-			forEach(i -> {
-				ConfigurationSection sect = section.createSection(count[0] + "");
-				count[0]++;
-				mapper.save(sect, i);
-			});
-			return;
-		}
-		TypeConverter<T> converter = (TypeConverter<T>) manager.converters.get(clazz);
-		if (converter == null) {
-			throw new ConfigMapException("No converter for class " + clazz.getName());
-		}
 		forEach(i -> {
-			section.set(count[0] + "", converter.save(i));
+			mapper.save(section, count[0] + "", i);
 			count[0]++;
 		});
 	}
@@ -53,18 +41,8 @@ class ConfigList<T> extends ArrayList<T> implements ConfigStorage {
 	@Override
 	public void load(ConfigurationSection section) {
 		clear();
-		if (clazz.isAnnotationPresent(ConfigMappable.class)) {
-			section.getKeys(false).forEach(k -> {
-				add(mapper.load(section.getConfigurationSection(k)));
-			});
-			return;
-		}
-		TypeConverter<T> converter = (TypeConverter<T>) manager.converters.get(clazz);
-		if (converter == null) {
-			throw new ConfigMapException("No converter for class " + clazz.getName());
-		}
 		section.getKeys(false).forEach(k -> {
-			add(converter.load(section.getString(k)));
+			add(mapper.load(section, k));
 		});
 	}
 	

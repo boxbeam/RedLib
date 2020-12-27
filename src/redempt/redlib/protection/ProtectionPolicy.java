@@ -2,6 +2,8 @@ package redempt.redlib.protection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -150,7 +152,7 @@ public class ProtectionPolicy implements Listener {
 	}
 	
 	private List<BypassPolicy> bypassPolicies = new ArrayList<>();
-	private Set<ProtectionType> protections = new HashSet<>();
+	private Set<ProtectionType> protections = EnumSet.noneOf(ProtectionType.class);
 	private Map<ProtectionType, String> messages = new HashMap<>();
 	private Predicate<Block> protectionCheck;
 	private Region bounds;
@@ -210,7 +212,23 @@ public class ProtectionPolicy implements Listener {
 	 */
 	public void setProtectionTypes(ProtectionType... protections) {
 		this.protections.clear();
-		Arrays.stream(protections).forEach(this.protections::add);
+		addProtectionTypes(protections);
+	}
+	
+	/**
+	 * Adds ProtectionTypes to this ProtectionPolicy
+	 * @param protections The ProtectionTypes to add
+	 */
+	public void addProtectionTypes(ProtectionType... protections) {
+		Collections.addAll(this.protections, protections);
+	}
+	
+	/**
+	 * Removes ProtectionTypes from this ProtectionPolicy
+	 * @param protections The ProtectionTypes to remove
+	 */
+	public void removeProtectionTypes(ProtectionType... protections) {
+		Arrays.stream(protections).forEach(this.protections::remove);
 	}
 	
 	/**

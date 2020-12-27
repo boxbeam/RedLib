@@ -23,9 +23,7 @@ public class ConfigManager {
 	 */
 	public static List<String> stringList(String... strings) {
 		List<String> list = new ArrayList<>();
-		for (String string : strings) {
-			list.add(string);
-		}
+		Collections.addAll(list, strings);
 		return list;
 	}
 	
@@ -38,7 +36,20 @@ public class ConfigManager {
 	 * @return An empty map of the given type, which will be populated when {@link ConfigManager#load()} is called
  	 */
 	public static <T> ConfigMap<String, T> map(Class<T> clazz) {
-		return new ConfigMap<>(String.class, clazz);
+		return map(clazz, ConversionType.AUTO);
+	}
+	
+	/**
+	 * Creates a ConfigMap from a given type. A ConfigMap extends LinkedHashMap. The class is not accessible, so
+	 * store it in a HashMap variable. This method must be used to set the initial value for a variable
+	 * which loads in a section from config.
+	 * @param clazz The class of the value type
+	 * @param type The method which will be used to convert the stored type
+	 * @param <T> The value type
+	 * @return An empty map of the given type, which will be populated when {@link ConfigManager#load()} is called
+	 */
+	public static <T> ConfigMap<String, T> map(Class<T> clazz, ConversionType type) {
+		return new ConfigMap<>(String.class, clazz, type);
 	}
 	
 	/**
@@ -53,7 +64,23 @@ public class ConfigManager {
 	 * @return An empty map of the given type, which will be populated when {@link ConfigManager#load()} is called
 	 */
 	public static <K, V> ConfigMap<K, V> map(Class<K> keyClass, Class<V> valueClass) {
-		return new ConfigMap<>(keyClass, valueClass);
+		return map(keyClass, valueClass, ConversionType.AUTO);
+	}
+	
+	/**
+	 * Creates a ConfigMap from a given type. A ConfigMap extends LinkedHashMap. The class is not accessible, so
+	 * store it in a HashMap variable. This method must be used to set the initial value for a variable
+	 * which loads in a section from config. The key class may only be a type which has converter from string to
+	 * another type. For obvious reasons, it cannot be a config-mappable object.
+	 * @param keyClass The class of the key type
+	 * @param <K> The key type
+	 * @param valueClass The class of the value type
+	 * @param <V> The value type
+	 * @param type The method which will be used to convert the value type
+	 * @return An empty map of the given type, which will be populated when {@link ConfigManager#load()} is called
+	 */
+	public static <K, V> ConfigMap<K, V> map(Class<K> keyClass, Class<V> valueClass, ConversionType type) {
+		return new ConfigMap<>(keyClass, valueClass, type);
 	}
 	
 	/**
@@ -66,10 +93,22 @@ public class ConfigManager {
 	 * @return A list of the given type which has been populated with the given elements
 	 */
 	public static <T> ConfigList<T> list(Class<T> clazz, T... elements) {
-		ConfigList<T> list = new ConfigList<T>(clazz);
-		for (T elem : elements) {
-			list.add(elem);
-		}
+		return list(clazz, ConversionType.AUTO, elements);
+	}
+	
+	/**
+	 * Creates a ConfigList from a given type with initial elements. A ConfigList extends ArrayList. The class
+	 * is not accessible, so store it in an ArrayList variable. This method must be used to set the initial
+	 * value for a variable which loads a list from config using type converters.
+	 * @param clazz The class of the type of the list
+	 * @param elements The elements to initialize the list with
+	 * @param <T> The type
+	 * @param type The method which will be used to convert the stored type
+	 * @return A list of the given type which has been populated with the given elements
+	 */
+	public static <T> ConfigList<T> list(Class<T> clazz, ConversionType type, T... elements) {
+		ConfigList<T> list = new ConfigList<T>(clazz, type);
+		Collections.addAll(list, elements);
 		return list;
 	}
 	
