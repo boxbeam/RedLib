@@ -3,9 +3,12 @@ package redempt.redlib.multiblock;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
-import java.util.*;
-
-import static redempt.redlib.RedLib.midVersion;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 class StructureFinder {
 	
@@ -17,18 +20,11 @@ class StructureFinder {
 		this.type = type;
 	}
 	
-	private Material getType(int x, int y, int z) {
-		String data = type.data[x][y][z];
-		int ind = data.indexOf(midVersion >= 13 ? '[' : ':');
-		ind = ind == -1 ? data.length() : ind;
-		return Material.valueOf(data.substring(0, ind).toUpperCase());
-	}
-	
 	private void initializeMap() {
 		for (int x = 0; x < type.dimX; x++) {
 			for (int y = 0; y < type.dimY; y++) {
 				for (int z = 0; z < type.dimZ; z++) {
-					Material type = getType(x, y, z);
+					Material type = this.type.data[x][y][z].getType();
 					List<int[]> list = materialMap.get(type);
 					if (list == null) {
 						list = new ArrayList<>();
@@ -112,7 +108,7 @@ class StructureFinder {
 		for (Material mat : materials) {
 			List<int[]> instances = materialMap.get(mat);
 			for (int[] pos : instances) {
-				String data = type.data[pos[0]][pos[1]][pos[2]];
+				StructureData data = type.data[pos[0]][pos[1]][pos[2]];
 				rotator.setLocation(pos[0], pos[2]);
 				Block b = block.getRelative(rotator.getRotatedBlockX(), pos[1], rotator.getRotatedBlockZ());
 				if (!type.compare(data, b, rotator)) {
@@ -120,7 +116,7 @@ class StructureFinder {
 				}
 			}
 		}
-		return new Structure(type, block.getLocation(), rotator.getInverse());
+		return new Structure(type, block.getLocation(), rotator);
 	}
 	
 }

@@ -222,8 +222,9 @@ public class Region {
 	 * Check if this is a MultiRegion before expanding.
 	 * @param amount The amount to expand the region by
 	 */
-	public void expand(double amount) {
+	public Region expand(double amount) {
 		expand(amount, amount, amount, amount, amount, amount);
+		return this;
 	}
 	
 	/**
@@ -232,8 +233,9 @@ public class Region {
 	 * Check if this is a MultiRegion before expanding.
 	 * @param amount The amount to expand the region by
 	 */
-	public void expand(int amount) {
+	public Region expand(int amount) {
 		expand((double) amount);
+		return this;
 	}
 	
 	/**
@@ -245,10 +247,11 @@ public class Region {
 	 * @param posZ The amount to expand the region in the positive Z direction
 	 * @param negZ The amount to expand the region in the negative Z direction
 	 */
-	public void expand(double posX, double negX, double posY, double negY, double posZ, double negZ) {
+	public Region expand(double posX, double negX, double posY, double negY, double posZ, double negZ) {
 		start = start.subtract(negX, negY, negZ);
 		end = end.add(posX, posY, posZ);
 		setLocations(start, end);
+		return this;
 	}
 	
 	/**
@@ -260,8 +263,9 @@ public class Region {
 	 * @param posZ The amount to expand the region in the positive Z direction
 	 * @param negZ The amount to expand the region in the negative Z direction
 	 */
-	public void expand(int posX, int negX, int posY, int negY, int posZ, int negZ) {
+	public Region expand(int posX, int negX, int posY, int negY, int posZ, int negZ) {
 		expand(posX, negX, posY, negY, posZ, (double) negZ);
+		return this;
 	}
 	
 	/**
@@ -269,7 +273,7 @@ public class Region {
 	 * @param direction The direction to expand the region in
 	 * @param amount The amount to expand the region in the given direction
 	 */
-	public void expand(BlockFace direction, double amount) {
+	public Region expand(BlockFace direction, double amount) {
 		Vector vec = direction.getDirection();
 		if (vec.getX() + vec.getY() + vec.getZ() > 0) {
 			vec = vec.multiply(amount);
@@ -279,6 +283,7 @@ public class Region {
 			start = start.add(vec);
 		}
 		setLocations(start, end);
+		return this;
 	}
 	
 	/**
@@ -286,34 +291,30 @@ public class Region {
 	 * @param direction The direction to expand the region in
 	 * @param amount The amount to expand the region in the given direction
 	 */
-	public void expand(BlockFace direction, int amount) {
+	public Region expand(BlockFace direction, int amount) {
 		expand(direction, (double) amount);
+		return this;
 	}
 	
 	/**
 	 * Move the region
 	 * @param v The vector to be applied to both corners of the region
 	 */
-	public void move(Vector v) {
+	public Region move(Vector v) {
 		start = start.add(v);
 		end = end.add(v);
 		chunkCache = null;
+		return this;
 	}
 	
 	/**
 	 * Set the world of this region, while keeping the coordinates the same
 	 * @param world The world to set
 	 */
-	public void setWorld(World world) {
+	public Region setWorld(World world) {
 		start.setWorld(world);
 		end.setWorld(world);
-	}
-	
-	/**
-	 * @return Whether this Region is a non-cuboid variant
-	 */
-	public boolean isMulti() {
-		return false;
+		return this;
 	}
 	
 	/**
@@ -322,8 +323,16 @@ public class Region {
 	 * @param y How much to move the region on the Y axis
 	 * @param z How much to move the region on the Z axis
 	 */
-	public void move(int x, int y, int z) {
+	public Region move(int x, int y, int z) {
 		move(new Vector(x, y, z));
+		return this;
+	}
+	
+	/**
+	 * @return Whether this Region is a non-cuboid variant
+	 */
+	public boolean isMulti() {
+		return false;
 	}
 	
 	/**
@@ -373,7 +382,7 @@ public class Region {
 	 * @param center The point to rotate this Region around
 	 * @param rotations The number of clockwise rotations to apply
 	 */
-	public void rotate(Location center, int rotations) {
+	public Region rotate(Location center, int rotations) {
 		Location start = getStart();
 		Location end = getEnd();
 		start.subtract(center);
@@ -388,14 +397,16 @@ public class Region {
 		start.add(center);
 		end.add(center);
 		setLocations(start, end);
+		return this;
 	}
 	
 	/**
 	 * Rotates this Region around its center
 	 * @param rotations The number of clockwise rotations to apply
 	 */
-	public void rotate(int rotations) {
+	public Region rotate(int rotations) {
 		rotate(getCenter(), rotations);
+		return this;
 	}
 	
 	/**

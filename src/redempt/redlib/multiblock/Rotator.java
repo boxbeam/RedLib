@@ -1,6 +1,16 @@
 package redempt.redlib.multiblock;
 
-import static redempt.redlib.RedLib.midVersion;
+import org.bukkit.Axis;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.MultipleFacing;
+import org.bukkit.block.data.Orientable;
+import org.bukkit.block.data.type.Wall;
+import org.bukkit.block.data.type.Wall.Height;
+import redempt.redlib.RedLib;
+
+import static redempt.redlib.RedLib.MID_VERSION;
 
 /**
  * Used to rotate blocks and block sections when building or testing for the presence of a MultiBlockStructure
@@ -10,6 +20,7 @@ import static redempt.redlib.RedLib.midVersion;
 public class Rotator {
 	
 	private static final String[] BLOCK_DIRECTIONS = {"north", "east", "south", "west"};
+	private static final BlockFace[] BLOCK_FACES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
 	
 	private int rotation;
 	private boolean mirrored;
@@ -34,70 +45,73 @@ public class Rotator {
 	 * @param data The block data to rotate
 	 * @return The rotated block data
 	 */
-	public String rotate(String data) {
-		rotate:
-		if (midVersion >= 13) {
-			if (data.contains("facing=")) {
-				int start = data.indexOf("facing=") + 7;
-				int end = data.indexOf(',', start);
-				end = end == -1 ? data.indexOf(']', start) : end;
-				String facing = data.substring(start, end);
-				int num = -1;
-				for (int i = 0; i < BLOCK_DIRECTIONS.length; i++) {
-					if (facing.equals(BLOCK_DIRECTIONS[i])) {
-						num = i;
-						break;
-					}
-				}
-				if (num == -1) {
-					return data;
-				}
-				if (mirrored && (num == 1 || num == 3)) {
-					num += 2;
-				}
-				num += rotation;
-				num %= 4;
-				facing = BLOCK_DIRECTIONS[num];
-				data = data.substring(0, start) + facing + data.substring(end);
+	public BlockData rotate(BlockData data) {
+		data = data.clone();
+		directional:
+		if (data instanceof Directional) {
+			Directional d = (Directional) data;
+			int ind = indexOf(BLOCK_DIRECTIONS, d.getFacing());
+			if (ind == -1) {
+				break directional;
 			}
-			if (data.contains("axis=")) {
-				int start = data.indexOf("axis=") + 5;
-				int end = data.indexOf(',', start);
-				end = end == -1 ? data.indexOf(']', start) : end;
-				String axis = data.substring(start, end);
-				if (rotation % 2 != 0) {
-					if (axis.equals("x")) {
-						axis = "z";
-					} else if (axis.equals("z")) {
-						axis = "x";
-					}
-				}
-				data = data.substring(0, start) + axis + data.substring(end);
+			if (mirrored && (ind == 1 || ind == 3)) {
+				ind = ind + 2;
 			}
-			String[] directions = new String[BLOCK_DIRECTIONS.length];
-			for (int i = 0; i < BLOCK_DIRECTIONS.length; i++) {
-				int start = data.indexOf(BLOCK_DIRECTIONS[i] + "=");
-				if (start == -1) {
-					break rotate;
-				}
-				start += BLOCK_DIRECTIONS[i].length() + 1;
-				int end = data.indexOf(',', start);
-				end = end == -1 ? data.indexOf(']', start) : end;
-				directions[i] = data.substring(start, end);
+			ind = (ind + rotation) % 4;
+			d.setFacing(BLOCK_FACES[ind]);
+		}
+		if (data instanceof MultipleFacing) {
+			MultipleFacing d = (MultipleFacing) data;
+			Boolean[] directions = new Boolean[4];
+			for (int i = 0; i < 4; i++) {
+				directions[i] = d.hasFace(BLOCK_FACES[i]);
 			}
-			for (int i = 0; i < directions.length; i++) {
-				int dir = ((i - (rotation % 4)) + 4) % 4;
-				if (mirrored && (i == 0 || i == 2)) {
-					dir += 2;
-				}
-				dir %= 4;
-				int start = data.indexOf(BLOCK_DIRECTIONS[i] + "=") + BLOCK_DIRECTIONS[i].length() + 1;
-				int end = data.indexOf(',', start);
-				end = end == -1 ? data.indexOf(']', start) : end;
-				data = data.substring(0, start) + directions[dir] + data.substring(end);
+			rotate(directions);
+			for (int i = 0; i < 4; i++) {
+				d.setFace(BLOCK_FACES[i], directions[i]);
+			}
+		}
+		if (data instanceof Orientable) {
+			Orientable d = (Orientable) data;
+			if (rotation % 2 != 0 && d.getAxis() != Axis.Y) {
+				d.setAxis(d.getAxis() == Axis.X ? Axis.Z : Axis.X);
+			}
+		}
+		if (RedLib.MID_VERSION >= 16 && data instanceof Wall) {
+			Wall d = (Wall) data;
+			Height[] heights = new Height[4];
+			for (int i = 0; i < 4; i++) {
+				heights[i] = d.getHeight(BLOCK_FACES[i]);
+			}
+			rotate(heights);
+			for (int i = 0; i < 4; i++) {
+				d.setHeight(BLOCK_FACES[i], heights[i]);
 			}
 		}
 		return data;
+	}
+	
+	private <T> int indexOf(T[] arr, T key) {
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i].equals(key)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	private <T> void rotate(T[] arr) {
+		Object[] rot = new Object[4];
+		for (int i = 0; i < 4; i++) {
+			rot[i] = arr[i];
+		}
+		for (int i = 0; i < 4; i++) {
+			int dir = (i + rotation) % 4;
+			if (mirrored && (i == 0 || i == 2)) {
+				dir = (dir + 2) % 4;
+			}
+			arr[i] = (T) rot[dir];
+		}
 	}
 	
 	/**

@@ -1,6 +1,14 @@
 package redempt.redlib.multiblock;
 
-import static redempt.redlib.RedLib.midVersion;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Player;
+import redempt.redlib.RedLib;
+import redempt.redlib.region.Region;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,17 +20,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.Player;
-
-import redempt.redlib.RedLib;
-import redempt.redlib.region.Region;
 
 /**
  * A utility class intended to create interactive multi-block structures.
@@ -61,7 +58,7 @@ public class MultiBlockStructure {
 			for (int y = minY; y <= maxY; y++) {
 				for (int z = minZ; z <= maxZ; z++) {
 					Block block = start.getWorld().getBlockAt(x, y, z);
-					if (midVersion >= 13) {
+					if (RedLib.MID_VERSION >= 13) {
 						if (block.getType() == skip) {
 							builder.append("air;");
 							continue;
@@ -227,36 +224,16 @@ public class MultiBlockStructure {
 		return combine;
 	}
 	
-	private static String expand(String data) {
-		String[] replace = null;
-		if (data.startsWith("(")) {
-			String list = data.substring(1, data.indexOf(')'));
-			replace = list.split(";");
-			data = data.substring(data.indexOf(')') + 1);
-		}
-		StringBuilder builder = new StringBuilder();
-		for (String str : data.split(";")) {
-			String[] split = str.split("\\*");
-			String val = "";
-			try {
-				int index = Integer.parseInt(split[0]);
-				val = replace[index];
-			} catch (NumberFormatException e) {
-				val = split[0];
+	private static int findFromEnd(String str, char c) {
+		for (int i = str.length() - 1; i >= 0; i--) {
+			if (str.charAt(i) == c) {
+				return i;
 			}
-			if (split.length > 1) {
-				int times = Integer.parseInt(split[1]);
-				for (int i = 0; i < times; i++) {
-					builder.append(val).append(';');
-				}
-				continue;
-			}
-			builder.append(val).append(';');
 		}
-		return builder.toString() + ";";
+		return -1;
 	}
 	
-	protected String[][][] data;
+	protected StructureData[][][] data;
 	private StructureFinder finder;
 	private String dataString;
 	private String name;
@@ -268,37 +245,86 @@ public class MultiBlockStructure {
 	protected EnumSet<Material> strictModeExclude = EnumSet.noneOf(Material.class);
 	
 	private MultiBlockStructure(String info, String name, boolean strictMode, boolean ignoreAir) {
-		info = expand(info);
 		this.dataString = info;
 		this.name = name;
 		this.strictMode = strictMode;
 		this.ignoreAir = ignoreAir;
-		String[] split = info.split(";");
-		String[] dimSplit = split[0].split("x");
-		dimX = Integer.parseInt(dimSplit[0]);
-		dimY = Integer.parseInt(dimSplit[1]);
-		dimZ = Integer.parseInt(dimSplit[2]);
-		data = parse(info, dimX, dimY, dimZ);
+		parse(info);
 		finder = new StructureFinder(this);
 	}
 	
-	private static String[][][] parse(String info, int dimX, int dimY, int dimZ) {
-		String[] split = info.split(";");
-		String[][][] data = new String[dimX][dimY][dimZ];
-		
-		int pos = 1;
-		for (int x = 0; x < dimX; x++) {
-			for (int y = 0; y < dimY; y++) {
-				for (int z = 0; z < dimZ; z++) {
-					data[x][y][z] = split[pos];
-					pos++;
-				}
+	private void split(String s, char c, Consumer<String> callback) {
+		int last = 0;
+		for (int i = 0; i < s.length(); i++) {
+			if (s.charAt(i) == c) {
+				callback.accept(s.substring(last, i));
+				last = i + 1;
 			}
 		}
-		return data;
+		if (last != s.length()) {
+			callback.accept(s.substring(last));
+		}
 	}
 	
-	private void forEachData(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror, BiConsumer<Location, String> callback) {
+	private void expand(String data, Consumer<StructureData> consumer) {
+		StructureData[][] replace = {null};
+		if (data.startsWith("(")) {
+			String list = data.substring(1, data.indexOf(')'));
+			replace[0] = Arrays.stream(list.split(";")).map(StructureData::new).toArray(StructureData[]::new);
+			data = data.substring(data.indexOf(')') + 1);
+		}
+		boolean[] first = {true};
+		split(data, ';', str -> {
+			if (first[0]) {
+				first[0] = false;
+				int ind = findFromEnd(str, ')');
+				String[] split = str.substring(ind + 1).split("x");
+				dimX = Integer.parseInt(split[0]);
+				dimY = Integer.parseInt(split[1]);
+				dimZ = Integer.parseInt(split[2]);
+				this.data = new StructureData[dimX][dimY][dimZ];
+				return;
+			}
+			if (str.length() == 0) {
+				return;
+			}
+			int ind = findFromEnd(str, '*');
+			StructureData val;
+			char c = str.charAt(0);
+			String type = ind == -1 ? str : str.substring(0, ind);
+			if (c >= '0' && c <= '9') {
+				val = replace[0][Integer.parseInt(type)];
+			} else {
+				val = new StructureData(type);
+			}
+			if (ind != -1) {
+				int times = Integer.parseInt(str.substring(ind + 1));
+				for (int i = 0; i < times; i++) {
+					consumer.accept(val);
+				}
+				return;
+			}
+			consumer.accept(val);
+		});
+	}
+	
+	private void parse(String info) {
+		int[] iter = {0, 0, 0};
+		expand(info, s -> {
+			data[iter[0]][iter[1]][iter[2]] = s;
+			iter[2]++;
+			if (iter[2] >= dimZ) {
+				iter[2] = 0;
+				iter[1]++;
+				if (iter[1] >= dimY) {
+					iter[1] = 0;
+					iter[0]++;
+				}
+			}
+		});
+	}
+	
+	private void forEachData(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror, BiConsumer<Location, StructureData> callback) {
 		loc = loc.getBlock().getLocation();
 		Rotator rotator = new Rotator(rotation, mirror);
 		for (int x = 0; x < dimX; x++) {
@@ -308,7 +334,7 @@ public class MultiBlockStructure {
 					Location l = loc.clone().add(rotator.getRotatedBlockX(), y, rotator.getRotatedBlockZ());
 					rotator.setLocation(relX, relZ);
 					l.subtract(rotator.getRotatedBlockX(), relY, rotator.getRotatedBlockZ());
-					callback.accept(l, rotator.rotate(data[x][y][z]));
+					callback.accept(l, data[x][y][z].getRotated(rotator));
 				}
 			}
 		}
@@ -391,7 +417,7 @@ public class MultiBlockStructure {
 	 */
 	public void forEachBlock(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror, Consumer<BlockState> callback) {
 		forEachData(loc, relX, relY, relZ, rotation, mirror, (l, s) -> {
-			callback.accept(getStateToSet(l, s));
+			callback.accept(s.getState(l.getBlock()));
 		});
 	}
 	
@@ -408,7 +434,7 @@ public class MultiBlockStructure {
 		if (relX >= dimX || relX < 0 || relY >= dimY || relY < 0 || relZ >= dimZ || relZ < 0) {
 			return null;
 		}
-		return this.getStateToSet(loc, data[relX][relY][relZ]);
+		return data[relX][relY][relZ].getState(loc.getBlock());
 	}
 	
 	/**
@@ -425,24 +451,27 @@ public class MultiBlockStructure {
 	}
 	
 	/**
-	 * Gets the type of the data at a given relative location
+	 * Gets the StructureData at a certain relative position
 	 * @param relX The relative X of the block within this multi-block structure
 	 * @param relY The relative Y of the block within this multi-block structure
 	 * @param relZ The relative Z of the block within this multi-block structure
-	 * @return The type of the block at the given relative location
-	 * @throws ArrayIndexOutOfBoundsException if the relative coordinates do not exist within this structure
+	 * @return StructureData for the given relative position
+	 * @throws ArrayIndexOutOfBoundsException if the relative coordinates are out of bounds
+	 */
+	public StructureData getStructureData(int relX, int relY, int relZ) {
+		return data[relX][relY][relZ];
+	}
+	
+	/**
+	 * Gets the Material at a certain relative position
+	 * @param relX The relative X of the block within this multi-block structure
+	 * @param relY The relative Y of the block within this multi-block structure
+	 * @param relZ The relative Z of the block within this multi-block structure
+	 * @return Material for the given relative position
+	 * @throws ArrayIndexOutOfBoundsException if the relative coordinates are out of bounds
 	 */
 	public Material getType(int relX, int relY, int relZ) {
-		String data = this.data[relX][relY][relZ];
-		if (midVersion >= 13) {
-			int pos = data.indexOf('[');
-			pos = pos == -1 ? data.length() : pos;
-			return Material.valueOf(data.substring(0, pos).toUpperCase());
-		} else {
-			int pos = data.indexOf(':');
-			pos = pos == -1 ? data.length() : pos;
-			return Material.valueOf(data.substring(0, pos).toUpperCase());
-		}
+		return getStructureData(relX, relY, relZ).getType();
 	}
 	
 	/**
@@ -541,7 +570,7 @@ public class MultiBlockStructure {
 	 */
 	public void visualize(Player player, Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
 		forEachData(loc, relX, relY, relZ, rotation, mirror, (l, d) -> {
-			sendBlock(player, l, d);
+			d.sendBlock(player, l);
 		});
 	}
 	
@@ -569,10 +598,10 @@ public class MultiBlockStructure {
 	 */
 	public Structure build(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
 		forEachData(loc, relX, relY, relZ, rotation, mirror, (l, d) -> {
-			BlockState state = getStateToSet(l, d);
-			if (state != null) {
-				state.update(true, false);
+			if (ignoreAir && d.isAir()) {
+				return;
 			}
+			d.setBlock(l.getBlock());
 		});
 		return assumeAt(loc, relX, relY, relZ, rotation, mirror);
 	}
@@ -647,9 +676,9 @@ public class MultiBlockStructure {
 						Location l = location.clone().add(rotator.getRotatedBlockX(), iter[1], rotator.getRotatedBlockZ());
 						rotator.setLocation(relX, relZ);
 						l.subtract(rotator.getRotatedBlockX(), relY, rotator.getRotatedBlockZ());
-						BlockState state = getStateToSet(l, rotator.rotate(data[iter[0]][iter[1]][iter[2]]));
-						if (state != null) {
-							state.update(true, false);
+						StructureData sdata = data[iter[0]][iter[1]][iter[2]].getRotated(rotator);
+						if (!(ignoreAir && sdata.isAir())) {
+							sdata.setBlock(l.getBlock());
 							pos++;
 						}
 						if (pos >= blocksPerTick) {
@@ -768,6 +797,7 @@ public class MultiBlockStructure {
 	public Structure getAt(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
 		Structure s;
 		Rotator rotator = new Rotator(rotation, mirror);
+		data[relX][relY][relZ].getRotated(rotator).compare(loc.getBlock(), strictMode, ignoreAir);
 		if (compare(data[relX][relY][relZ], loc.getBlock(), rotator) && (s = test(loc, relX, relY, relZ, rotator)) != null) {
 			return s;
 		}
@@ -843,32 +873,8 @@ public class MultiBlockStructure {
 		return new Structure(this, loc, rotator);
 	}
 	
-	protected boolean compare(String data, Block block, Rotator rotator) {
-		Material material = block.getType();
-		if (midVersion >= 13) {
-			data = rotator.rotate(data);
-			data = data.startsWith("minecraft:") ? data : "minecraft:" + data;
-			if (ignoreAir && Bukkit.createBlockData(data).getMaterial() == Material.AIR) {
-				return true;
-			}
-			BlockData bdata = Bukkit.createBlockData(data);
-			String type = data.substring(0, data.indexOf('[') == -1 ? data.length() : data.indexOf('['));
-			String otherBlockData = block.getBlockData().getAsString();
-			String otherType = otherBlockData.substring(0, otherBlockData.indexOf('[') == -1 ? otherBlockData.length() : otherBlockData.indexOf('['));
-			if (!strictMode || strictModeExclude.contains(material)) {
-				return type.equals(otherType);
-			}
-			return block.getBlockData().matches(bdata);
-		} else {
-			String[] split = data.split(":");
-			if (ignoreAir && split[0].equals("AIR")) {
-				return true;
-			}
-			if (!strictMode || strictModeExclude.contains(material)) {
-				return material == Material.valueOf(split[0]);
-			}
-			return material == Material.valueOf(split[0]) && block.getData() == Byte.parseByte(split[1]);
-		}
+	protected boolean compare(StructureData data, Block block, Rotator rotator) {
+		return data.getRotated(rotator).compare(block, strictMode && strictModeExclude.contains(data.getType()), ignoreAir);
 	}
 	
 	@Override
@@ -888,47 +894,6 @@ public class MultiBlockStructure {
 	@Override
 	public String toString() {
 		return dataString;
-	}
-	
-	private BlockState getStateToSet(Location loc, String data) {
-		if (midVersion >= 13) {
-			BlockData blockData = Bukkit.createBlockData(data);
-			if (ignoreAir && blockData.getMaterial() == Material.AIR) {
-				return null;
-			}
-			BlockState state = loc.getBlock().getState();
-			state.setBlockData(blockData);
-			return state;
-		} else {
-			String[] split = data.split(":");
-			Material type = Material.valueOf(split[0]);
-			if (ignoreAir && type == Material.AIR) {
-				return null;
-			}
-			byte dataValue = Byte.parseByte(split[1]);
-			BlockState state = loc.getBlock().getState();
-			state.setType(type);
-			state.setRawData(dataValue);
-			return state;
-		}
-	}
-	
-	private void sendBlock(Player player, Location loc, String data) {
-		if (midVersion >= 13) {
-			BlockData blockData = Bukkit.createBlockData(data);
-			if (ignoreAir && blockData.getMaterial() == Material.AIR) {
-				return;
-			}
-			player.sendBlockChange(loc, blockData);
-		} else {
-			String[] split = data.split(":");
-			Material type = Material.valueOf(split[0]);
-			if (ignoreAir && type == Material.AIR) {
-				return;
-			}
-			byte dataValue = Byte.parseByte(split[1]);
-			player.sendBlockChange(loc, type, dataValue);
-		}
 	}
 	
 }

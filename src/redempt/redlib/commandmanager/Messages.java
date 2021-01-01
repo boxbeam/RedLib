@@ -1,5 +1,9 @@
 package redempt.redlib.commandmanager;
 
+import org.bukkit.ChatColor;
+import org.bukkit.plugin.Plugin;
+import redempt.redlib.RedLib;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,16 +11,12 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.bukkit.ChatColor;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
-import redempt.redlib.RedLib;
 
 /**
  * Represents a list of messages loaded from a file with defaults
@@ -37,15 +37,14 @@ public class Messages {
 	public static Messages load(Plugin plugin, InputStream defaults, String filename) {
 		java.nio.file.Path path = plugin.getDataFolder().toPath().resolve(filename);
 		try {
-			Map<String, String> messages = Files.exists(path) ? parse(Files.lines(path)) : new HashMap<>();
+			Map<String, String> messages = Files.exists(path) ? parse(Files.readAllLines(path)) : new LinkedHashMap<>();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(defaults));
-			Map<String, String> defaultMap = parse(Stream.generate(() -> {
-				try {
-					return reader.readLine();
-				} catch (IOException e) {
-					return null;
-				}
-			}));
+			List<String> lines = new ArrayList<>();
+			String line;
+			while ((line = reader.readLine()) != null) {
+				lines.add(line);
+			}
+			Map<String, String> defaultMap = parse(lines);
 			boolean[] missing = {false};
 			defaultMap.forEach((k, v) -> {
 				if (!messages.containsKey(k)) {
@@ -97,16 +96,15 @@ public class Messages {
 		return msgs.get(message);
 	}
 	
-	private static Map<String, String> parse(Stream<String> input) {
-		Map<String, String> map = new HashMap<>();
-		input.allMatch(s -> {
+	private static Map<String, String> parse(List<String> input) {
+		Map<String, String> map = new LinkedHashMap<>();
+		for (String s : input) {
 			if (s == null) {
-				return false;
+				break;
 			}
 			int index = s.indexOf(':');
 			map.put(s.substring(0, index), s.substring(index + 1).trim());
-			return true;
-		});
+		}
 		return map;
 	}
 	

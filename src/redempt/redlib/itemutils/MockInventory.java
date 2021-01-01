@@ -156,6 +156,10 @@ class MockInventory implements Inventory {
 		return -1;
 	}
 	
+	public boolean isEmpty() {
+		return firstEmpty() == -1;
+	}
+	
 	@Override
 	public void remove(Material material) throws IllegalArgumentException {
 		for (int i = 0; i < items.length; i++) {

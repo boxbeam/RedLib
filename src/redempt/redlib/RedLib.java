@@ -42,7 +42,10 @@ public class RedLib extends JavaPlugin {
 	private static boolean autoStartTickMonitorProfiler = false;
 	@ConfigValue("tickMonitorProfilerMinTickLength")
 	private static int tickMonitorProfilerMinTickLength = 100;
-	public static int midVersion = Integer.parseInt(getServerVersion().split("\\.")[1]);
+	/**
+	 * The middle number of the server version - for example, if the server version is 1.15.2, this will be 15
+	 */
+	public static final int MID_VERSION = Integer.parseInt(getServerVersion().split("\\.")[1]);
 	
 	public static RedLib getInstance() {
 		return RedLib.getPlugin(RedLib.class);

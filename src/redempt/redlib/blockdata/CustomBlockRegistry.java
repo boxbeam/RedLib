@@ -205,7 +205,7 @@ public class CustomBlockRegistry implements Listener {
 			CustomBlockType<T> type = (CustomBlockType<T>) cb.getType();
 			DataBlock db = e.getDataBlock();
 			ItemStack item = type.getItem(type.get(db));
-			if (RedLib.midVersion >= 12) {
+			if (RedLib.MID_VERSION >= 12) {
 				BlockBreakEvent parent = (BlockBreakEvent) e.getParent();
 				if (!parent.isDropItems()) {
 					return;

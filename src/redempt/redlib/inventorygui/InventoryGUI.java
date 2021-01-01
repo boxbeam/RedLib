@@ -20,7 +20,6 @@ import org.bukkit.inventory.ItemStack;
 
 import redempt.redlib.RedLib;
 import redempt.redlib.itemutils.ItemBuilder;
-import redempt.redlib.itemutils.ItemUtils;
 
 /**
  * @author Redempt
@@ -33,7 +32,7 @@ public class InventoryGUI implements Listener {
 	public static final ItemStack FILLER;
 	
 	static {
-		if (RedLib.midVersion >= 13) {
+		if (RedLib.MID_VERSION >= 13) {
 			FILLER = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setName(" ");
 		} else {
 			FILLER = new ItemBuilder(Material.valueOf("STAINED_GLASS_PANE")).setDurability(7).setName(" ");

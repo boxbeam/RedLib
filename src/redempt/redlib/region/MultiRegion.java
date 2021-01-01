@@ -220,16 +220,16 @@ public class MultiRegion extends Region {
 	 * @param amount    The amount to expand the region in the given direction
 	 */
 	@Override
-	public void expand(BlockFace direction, double amount) {
+	public MultiRegion expand(BlockFace direction, double amount) {
 		if (amount == 0) {
-			return;
+			return this;
 		}
 		if (amount < 0) {
 			Region r = new Region(start, end);
 			r.expand(direction.getOppositeFace(), -r.measureBlocks(direction));
 			r.expand(direction.getOppositeFace(), Math.abs(amount));
 			subtract.add(r);
-			return;
+			return this;
 		}
 		Region r = new Region(start, end);
 		r.expand(direction.getOppositeFace(), -(r.measureBlocks(direction) - 1));
@@ -241,6 +241,7 @@ public class MultiRegion extends Region {
 			add(clone);
 		}
 		fixCorners(null);
+		return this;
 	}
 	
 	/**
@@ -254,13 +255,14 @@ public class MultiRegion extends Region {
 	 * @param posZ The amount to expand the region in the positive Z direction
 	 * @param negZ The amount to expand the region in the negative Z direction
 	 */
-	public void expand(double posX, double negX, double posY, double negY, double posZ, double negZ) {
+	public MultiRegion expand(double posX, double negX, double posY, double negY, double posZ, double negZ) {
 		expand(BlockFace.EAST, posX);
 		expand(BlockFace.WEST, negX);
 		expand(BlockFace.SOUTH, posZ);
 		expand(BlockFace.NORTH, negZ);
 		expand(BlockFace.UP, posY);
 		expand(BlockFace.DOWN, negY);
+		return this;
 	}
 	
 	/**
@@ -448,10 +450,11 @@ public class MultiRegion extends Region {
 	 * @param v The vector to be applied to both corners of the region
 	 */
 	@Override
-	public void move(Vector v) {
+	public MultiRegion move(Vector v) {
 		regions.forEach(r -> r.move(v));
 		start = start.add(v);
 		end = end.add(v);
+		return this;
 	}
 	
 	/**
@@ -460,11 +463,12 @@ public class MultiRegion extends Region {
 	 * @param rotations The number of clockwise rotations to apply
 	 */
 	@Override
-	public void rotate(Location center, int rotations) {
+	public MultiRegion rotate(Location center, int rotations) {
 		for (Region region : regions) {
 			region.rotate(center, rotations);
 		}
 		super.rotate(center, rotations);
+		return this;
 	}
 	
 	/**
@@ -473,10 +477,11 @@ public class MultiRegion extends Region {
 	 * @param world The world to set
 	 */
 	@Override
-	public void setWorld(World world) {
+	public MultiRegion setWorld(World world) {
 		regions.forEach(r -> r.setWorld(world));
 		start.setWorld(world);
 		end.setWorld(world);
+		return this;
 	}
 	
 	/**

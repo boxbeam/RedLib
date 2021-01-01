@@ -1,5 +1,6 @@
 package redempt.redlib.multiblock;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -75,7 +76,7 @@ public class Structure {
 			for (int y = 0; y < dimensions[1]; y++) {
 				for (int z = 0; z < dimensions[2]; z++) {
 					rotator.setLocation(x, z);
-					Block b = 
+					Block b =
 						loc.getWorld().getBlockAt(rotator.getRotatedBlockX() + loc.getBlockX(),
 						y + loc.getBlockY(),
 						rotator.getRotatedBlockZ() + loc.getBlockZ());
@@ -101,9 +102,7 @@ public class Structure {
 	public Region getRegion() {
 		int[] dim = this.getType().getDimensions();
 		Location loc = this.getRelative(dim[0] - 1, dim[1] - 1, dim[2] - 1).getBlock().getLocation();
-		Region region = new Region(this.loc, loc);
-		region.expand(1, 0, 1, 0, 1, 0);
-		return region;
+		return new Region(this.loc, loc).expand(1, 0, 1, 0, 1, 0);
 	}
 	
 	/**
