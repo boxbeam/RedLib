@@ -1,13 +1,12 @@
 package redempt.redlib.configmanager;
 
 import org.bukkit.configuration.ConfigurationSection;
-import redempt.redlib.configmanager.annotations.ConfigMappable;
-import redempt.redlib.configmanager.exceptions.ConfigMapException;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 
-class ConfigList<T> extends ArrayList<T> implements ConfigStorage {
+class ConfigSet<T> extends HashSet<T> implements ConfigStorage {
 	
 	protected Class<T> clazz;
 	private ConfigObjectMapper<T> mapper;
@@ -15,7 +14,7 @@ class ConfigList<T> extends ArrayList<T> implements ConfigStorage {
 	private ConfigManager manager;
 	private ConversionType type;
 	
-	public ConfigList(Class<T> clazz, ConversionType type) {
+	public ConfigSet(Class<T> clazz, ConversionType type) {
 		this.clazz = clazz;
 		this.type = type;
 	}

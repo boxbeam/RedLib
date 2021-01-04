@@ -86,7 +86,7 @@ public class ConfigManager {
 	/**
 	 * Creates a ConfigList from a given type with initial elements. A ConfigList extends ArrayList. The class
 	 * is not accessible, so store it in an ArrayList variable. This method must be used to set the initial
-	 * value for a variable which loads a list from config using type converters.
+	 * value for a variable which loads a list from config using type converters or mapped objects.
 	 * @param clazz The class of the type of the list
 	 * @param elements The elements to initialize the list with
 	 * @param <T> The type
@@ -99,7 +99,7 @@ public class ConfigManager {
 	/**
 	 * Creates a ConfigList from a given type with initial elements. A ConfigList extends ArrayList. The class
 	 * is not accessible, so store it in an ArrayList variable. This method must be used to set the initial
-	 * value for a variable which loads a list from config using type converters.
+	 * value for a variable which loads a list from config using type converters or mapped objects.
 	 * @param clazz The class of the type of the list
 	 * @param elements The elements to initialize the list with
 	 * @param <T> The type
@@ -110,6 +110,35 @@ public class ConfigManager {
 		ConfigList<T> list = new ConfigList<T>(clazz, type);
 		Collections.addAll(list, elements);
 		return list;
+	}
+	
+	/**
+	 * Creates a ConfigSet from a given type with initial elements. A ConfigSet extends HashSet. The class
+	 * is not accessible, so store it in a HashSet variable. This method must be used to set the initial
+	 * value for a variable which loads a set from config using type converters or mapped objects.
+	 * @param clazz The class of the type of the list
+	 * @param elements The elements to initialize the list with
+	 * @param <T> The type
+	 * @return A list of the given type which has been populated with the given elements
+	 */
+	public static <T> ConfigSet<T> set(Class<T> clazz, T... elements) {
+		return set(clazz, ConversionType.AUTO, elements);
+	}
+	
+	/**
+	 * Creates a ConfigSet from a given type with initial elements. A ConfigSet extends HashSet. The class
+	 * is not accessible, so store it in a HashSet variable. This method must be used to set the initial
+	 * value for a variable which loads a set from config using type converters or mapped objects.
+	 * @param clazz The class of the type of the list
+	 * @param elements The elements to initialize the list with
+	 * @param <T> The type
+	 * @param type The method which will be used to convert the stored type
+	 * @return A list of the given type which has been populated with the given elements
+	 */
+	public static <T> ConfigSet<T> set(Class<T> clazz, ConversionType type, T... elements) {
+		ConfigSet<T> set = new ConfigSet<T>(clazz, type);
+		Collections.addAll(set, elements);
+		return set;
 	}
 	
 	private YamlConfiguration config;
