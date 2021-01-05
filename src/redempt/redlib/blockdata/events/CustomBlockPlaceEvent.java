@@ -28,6 +28,7 @@ public class CustomBlockPlaceEvent extends BlockEvent implements Cancellable {
 	/**
 	 * Constructs a new CustomBlockPlaceEvent
 	 * @param block The block that was placed
+	 * @param item The item used to break the block
 	 * @param type The type of CustomBlock that is being placed
 	 * @param player The Player that placed the block
 	 */

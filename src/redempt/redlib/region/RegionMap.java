@@ -134,7 +134,7 @@ public class RegionMap<T> {
 	 * @param location The location to check centered on
 	 * @param radius The radius to check
 	 * @return A set of all objects mapped near the given location
-	 * @implNote The radius is not exact, no distance checks are made. Make sure you do your own distance checks
+	 * Note: The radius is not exact, no distance checks are made. Make sure you do your own distance checks
 	 * if needed.
 	 */
 	public Set<T> getNearby(Location location, int radius) {

@@ -297,7 +297,7 @@ public class Task {
 	}
 	
 	/**
-	 * @return @return Whether this Task is currently running, same as {@link org.bukkit.scheduler.BukkitScheduler#isCurrentlyRunning(int)}
+	 * @return Whether this Task is currently running, same as {@link org.bukkit.scheduler.BukkitScheduler#isCurrentlyRunning(int)}
 	 */
 	public boolean isCurrentlyRunning() {
 		return Bukkit.getScheduler().isCurrentlyRunning(task);

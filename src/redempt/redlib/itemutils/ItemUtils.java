@@ -197,6 +197,8 @@ public class ItemUtils {
 	 * @param key The key to add the data under
 	 * @param type The type of the data
 	 * @param data The data to store
+	 * @param <T> The primary object type
+	 * @param <Z> The retrieved object type
 	 * @return The modified item
 	 */
 	public static <T, Z> ItemStack addPersistentTag(ItemStack item, NamespacedKey key, PersistentDataType<T, Z> type, Z data) {

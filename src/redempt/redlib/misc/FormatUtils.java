@@ -79,8 +79,8 @@ public class FormatUtils {
 	
 	/**
 	 * Formats a large number with commas, like 12345 as 12,345
-	 * @param num
-	 * @return
+	 * @param num The number to format
+	 * @return The formatted String representing the number
 	 */
 	public static String formatLargeInteger(long num) {
 		if (num == 0) {

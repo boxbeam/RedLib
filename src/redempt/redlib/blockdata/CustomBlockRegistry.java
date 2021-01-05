@@ -139,6 +139,7 @@ public class CustomBlockRegistry implements Listener {
 	/**
 	 * Gets a CustomBlock instance with the correct CustomBlockType
 	 * @param block The Block to check
+	 * @param <T> The type of the CustomBlock
 	 * @return The CustomBlock, or null if it was not a custom block
 	 */
 	public <T extends CustomBlock> T getCustomBlock(Block block) {

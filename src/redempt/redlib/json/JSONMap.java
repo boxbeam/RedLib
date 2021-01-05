@@ -40,8 +40,7 @@ public class JSONMap extends HashMap<String, Object> implements JSONStorage {
 	}
 	
 	/**
-	 * A JSON string representing this JSONMap
-	 * @return
+	 * @return A JSON string representing this JSONMap
 	 */
 	@Override
 	public String toString() {

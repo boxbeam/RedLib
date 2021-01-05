@@ -38,7 +38,7 @@ public class NMSHelper {
 	
 	/**
 	 * Unwraps an array of arguments, replacing NMSObjects with their wrapped values
-	 * @param args
+	 * @param args The arguments to unwrap
 	 */
 	public static void unwrapArgs(Object... args) {
 		for (int i = 0; i < args.length; i++) {
@@ -138,7 +138,7 @@ public class NMSHelper {
 	}
 	
 	/**
-	 * Gets an NMS class (a class whose package is {@link net.minecraft.server} followed by the version package)
+	 * Gets an NMS class (a class whose package is net.minecraft.server followed by the version package)
 	 * by name.
 	 * @param name The name of the class
 	 * @return The NMSClass wrapping the resulting class

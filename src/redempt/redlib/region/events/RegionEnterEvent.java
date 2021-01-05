@@ -35,6 +35,7 @@ public class RegionEnterEvent extends Event implements Cancellable {
 	 * @param player The player who entered the region
 	 * @param region The region that was entered
 	 * @param cause What caused the player to enter the region
+	 * @param parent The event which caused this RegionEnterEvent to fire
 	 */
 	public RegionEnterEvent(Player player, Region region, EnterCause cause, Cancellable parent) {
 		this.region = region;

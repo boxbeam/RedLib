@@ -216,7 +216,7 @@ public class SQLHelper implements Closeable {
 	 * @param query The SQL query to execute
 	 * @param fields A vararg of the fields to set in the prepared statement
 	 * @return The String in the first column of the first row of the returned results, or null if none is present
-	 * @implNote This method exists because {@link ResultSet#getObject(int)} can return an Integer if the String in the
+	 * Note: This method exists because {@link ResultSet#getObject(int)} can return an Integer if the String in the
 	 * column can be parsed into one.
 	 */
 	public String querySingleResultString(String query, Object... fields) {
@@ -239,7 +239,7 @@ public class SQLHelper implements Closeable {
 	 * @param query The SQL query to execute
 	 * @param fields A vararg of the fields to set in the prepared statement
 	 * @return The String in the first column of the first row of the returned results, or null if none is present
-	 * @implNote This method exists because {@link ResultSet#getObject(int)} can return an Integer if the Long in the
+	 * Note: This method exists because {@link ResultSet#getObject(int)} can return an Integer if the Long in the
 	 * column can be parsed into one.
 	 */
 	public Long querySingleResultLong(String query, Object... fields) {
@@ -285,7 +285,7 @@ public class SQLHelper implements Closeable {
 	 * @param query The SQL query to execute
 	 * @param fields A vararg of the fields to set in the prepared statement
 	 * @return A String list of the value in the first column of each row returned by the query
-	 * @implNote This method exists because {@link ResultSet#getObject(int)} can return an Integer if the String in the
+	 * Note: This method exists because {@link ResultSet#getObject(int)} can return an Integer if the String in the
 	 * column can be parsed into one.
 	 */
 	public List<String> queryResultStringList(String query, Object... fields) {
@@ -491,7 +491,7 @@ public class SQLHelper implements Closeable {
 		 * Gets a String in the given column in the current row
 		 * @param column The index of the column to get, starting at 1
 		 * @return The String in the column
-		 * @implNote This method exists because {@link ResultSet#getObject(int)} can return an Integer if the String in the
+		 * Note: This method exists because {@link ResultSet#getObject(int)} can return an Integer if the String in the
 		 * column can be parsed into one.
 		 */
 		public String getString(int column) {
@@ -507,7 +507,7 @@ public class SQLHelper implements Closeable {
 		 * Gets a Long in the given column in the current row
 		 * @param column The index of the column to get, starting at 1
 		 * @return The String in the column
-		 * @implNote This method exists because {@link ResultSet#getObject(int)} can return an Integer if the Long in the
+		 * Note: This method exists because {@link ResultSet#getObject(int)} can return an Integer if the Long in the
 		 * column can be parsed into one.
 		 */
 		public Long getLong(int column) {

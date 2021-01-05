@@ -64,6 +64,7 @@ public abstract class EnchantTrigger<T extends Event> {
 	 * Registers a listener for this EventTrigger to get the items and event for the specified event
 	 * @param eventClass The class of the event
 	 * @param func The function to get the EventItems from the event
+	 * @param <T> The event type
 	 */
 	protected <T extends Event> void addListener(Class<T> eventClass, Function<T, EventItems> func) {
 		events.put(eventClass, (Function<Event, EventItems>) func);
@@ -71,7 +72,7 @@ public abstract class EnchantTrigger<T extends Event> {
 	
 	/**
 	 * Gets the event listeners registered by this EnchantTrigger
-	 * @return
+	 * @return The map of events to their functions which will retrieve relevant items
 	 */
 	public Map<Class<? extends Event>, Function<Event, EventItems>> getEvents() {
 		return events;

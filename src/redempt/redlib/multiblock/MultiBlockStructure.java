@@ -423,6 +423,7 @@ public class MultiBlockStructure {
 	
 	/**
 	 * Gets the data of this structure at a given relative location, set with a BlockState at the given location
+	 * @param loc The location to use for the BlockState
 	 * @param relX The relative X of the block within this multi-block structure
 	 * @param relY The relative Y of the block within this multi-block structure
 	 * @param relZ The relative Z of the block within this multi-block structure

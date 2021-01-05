@@ -149,6 +149,8 @@ public class ItemBuilder extends ItemStack {
 	 * @param key The key to add the data under
 	 * @param type The type of the data
 	 * @param data The data to store
+	 * @param <T> The primary object type
+	 * @param <Z> The retrieved object type
 	 * @return The ItemBuilder with the persistent data added
 	 */
 	public <T, Z> ItemBuilder addPersistentTag(NamespacedKey key, PersistentDataType<T, Z> type, Z data) {

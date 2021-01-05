@@ -221,6 +221,7 @@ public class Region {
 	 * makes 6 calls to {@link MultiRegion#expand(BlockFace, double)}, meaning it is very expensive.
 	 * Check if this is a MultiRegion before expanding.
 	 * @param amount The amount to expand the region by
+	 * @return Itself
 	 */
 	public Region expand(double amount) {
 		expand(amount, amount, amount, amount, amount, amount);
@@ -232,6 +233,7 @@ public class Region {
 	 * makes 6 calls to {@link MultiRegion#expand(BlockFace, double)}, meaning it is very expensive.
 	 * Check if this is a MultiRegion before expanding.
 	 * @param amount The amount to expand the region by
+	 * @return Itself
 	 */
 	public Region expand(int amount) {
 		expand((double) amount);
@@ -246,6 +248,7 @@ public class Region {
 	 * @param negY The amount to expand the region in the negative Y direction
 	 * @param posZ The amount to expand the region in the positive Z direction
 	 * @param negZ The amount to expand the region in the negative Z direction
+	 * @return Itself
 	 */
 	public Region expand(double posX, double negX, double posY, double negY, double posZ, double negZ) {
 		start = start.subtract(negX, negY, negZ);
@@ -262,6 +265,7 @@ public class Region {
 	 * @param negY The amount to expand the region in the negative Y direction
 	 * @param posZ The amount to expand the region in the positive Z direction
 	 * @param negZ The amount to expand the region in the negative Z direction
+	 * @return Itself
 	 */
 	public Region expand(int posX, int negX, int posY, int negY, int posZ, int negZ) {
 		expand(posX, negX, posY, negY, posZ, (double) negZ);
@@ -272,6 +276,7 @@ public class Region {
 	 * Expand the region in a given direction, or retracts if negative.
 	 * @param direction The direction to expand the region in
 	 * @param amount The amount to expand the region in the given direction
+	 * @return Itself
 	 */
 	public Region expand(BlockFace direction, double amount) {
 		Vector vec = direction.getDirection();
@@ -290,6 +295,7 @@ public class Region {
 	 * Expand the region in a given direction, or retracts if negative.
 	 * @param direction The direction to expand the region in
 	 * @param amount The amount to expand the region in the given direction
+	 * @return Itself
 	 */
 	public Region expand(BlockFace direction, int amount) {
 		expand(direction, (double) amount);
@@ -299,6 +305,7 @@ public class Region {
 	/**
 	 * Move the region
 	 * @param v The vector to be applied to both corners of the region
+	 * @return Itself
 	 */
 	public Region move(Vector v) {
 		start = start.add(v);
@@ -310,6 +317,7 @@ public class Region {
 	/**
 	 * Set the world of this region, while keeping the coordinates the same
 	 * @param world The world to set
+	 * @return Itself
 	 */
 	public Region setWorld(World world) {
 		start.setWorld(world);
@@ -322,6 +330,7 @@ public class Region {
 	 * @param x How much to move the region on the X axis
 	 * @param y How much to move the region on the Y axis
 	 * @param z How much to move the region on the Z axis
+	 * @return Itself
 	 */
 	public Region move(int x, int y, int z) {
 		move(new Vector(x, y, z));
@@ -381,6 +390,7 @@ public class Region {
 	 * Rotates this Region around a point
 	 * @param center The point to rotate this Region around
 	 * @param rotations The number of clockwise rotations to apply
+	 * @return Itself
 	 */
 	public Region rotate(Location center, int rotations) {
 		Location start = getStart();
@@ -403,6 +413,7 @@ public class Region {
 	/**
 	 * Rotates this Region around its center
 	 * @param rotations The number of clockwise rotations to apply
+	 * @return Itself
 	 */
 	public Region rotate(int rotations) {
 		rotate(getCenter(), rotations);

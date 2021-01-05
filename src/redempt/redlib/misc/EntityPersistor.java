@@ -87,7 +87,7 @@ public class EntityPersistor<T extends Entity> {
 	/**
 	 * Gets the Entity held in this EntityPersistor. If the reference is invalid, the EntityPersistor will attempt
 	 * to refresh it.
-	 * @return
+	 * @return The wrapped Entity
 	 */
 	public T get() {
 		refresh:

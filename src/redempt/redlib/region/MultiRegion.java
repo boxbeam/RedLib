@@ -448,6 +448,7 @@ public class MultiRegion extends Region {
 	/**
 	 * Moves this MultiRegion using the given vector
 	 * @param v The vector to be applied to both corners of the region
+	 * @return Itself
 	 */
 	@Override
 	public MultiRegion move(Vector v) {
@@ -461,6 +462,7 @@ public class MultiRegion extends Region {
 	 * Rotates this MultiRegion and all of its sub-regions around the given point
 	 * @param center The point to rotate this Region around
 	 * @param rotations The number of clockwise rotations to apply
+	 * @return Itself
 	 */
 	@Override
 	public MultiRegion rotate(Location center, int rotations) {
@@ -475,6 +477,7 @@ public class MultiRegion extends Region {
 	 * Sets the world of this MultiRegion and all of its sub-regions, while keeping the coordinates
 	 * the same
 	 * @param world The world to set
+	 * @return Itself
 	 */
 	@Override
 	public MultiRegion setWorld(World world) {

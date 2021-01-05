@@ -22,7 +22,7 @@ public class BurstProfiler extends Profiler {
 	/**
 	 * Create a new BurstProfiler with an initial size, being the number of milliseconds
 	 * it will be able to record
-	 * @param size
+	 * @param size The size of the sample queue to create, 1ms = 1 element
 	 */
 	public BurstProfiler(int size) {
 		this.size = size;
