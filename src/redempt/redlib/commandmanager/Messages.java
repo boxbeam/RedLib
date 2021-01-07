@@ -63,6 +63,15 @@ public class Messages {
 	}
 	
 	/**
+	 * Gets the Messages which have been loaded for a specific plugin, if they exist
+	 * @param plugin The plugin to get the Messages for
+	 * @return The Messages object, or null
+	 */
+	public static Messages getLoaded(Plugin plugin) {
+		return all.get(plugin);
+	}
+	
+	/**
 	 * Loads messages from a file, messages.txt, and writes missing defaults
 	 * @param plugin The plugin loading the messages
 	 * @param defaults The InputStream for default messages. Use {@link Plugin#getResource(String)} for this.

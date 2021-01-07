@@ -21,13 +21,24 @@ public class CommandParser {
 	private ArgType<?>[] argTypes = {};
 	private ContextProvider<?>[] contextProviders = {ContextProvider.self};
 	private InputStream stream;
+	private Messages messages;
 	
 	/**
 	 * Constructs a CommandParser to parse input from the given stream. Use {@link org.bukkit.plugin.java.JavaPlugin#getResource} for this
 	 * @param stream The stream to read the command info from
 	 */
 	public CommandParser(InputStream stream) {
+		this(stream, null);
+	}
+	
+	/**
+	 * Constructs a CommandParser to parse input from the given stream. Use {@link org.bukkit.plugin.java.JavaPlugin#getResource} for this
+	 * @param stream The stream to read the command info from
+	 * @param messages The messages to be used to supply help messages with the helpmsg tag
+	 */
+	public CommandParser(InputStream stream, Messages messages) {
 		this.stream = stream;
+		this.messages = messages;
 	}
 	
 	/**
@@ -142,6 +153,12 @@ public class CommandParser {
 							} else {
 								help += "\n" + tag[1];
 							}
+							break;
+						case "helpmsg":
+							if (messages == null) {
+								throw new IllegalStateException("No Messages supplied, cannot use helpmsg tag, line " + pos);
+							}
+							help = messages.get(tag[1]).replace("\\n", "\n");
 							break;
 						case "permission":
 							permission = tag[1];
