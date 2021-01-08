@@ -359,11 +359,10 @@ public class SpheroidRegion extends Region {
 	public Set<Block> getSurface() {
 		if (surface == null) {
 			surface = new HashSet<>();
-			double incPitch = 45 / yRad;
-			double incYaw = 45 / Math.max(zRad, xRad);
+			double inc = 45 / Math.max(zRad, Math.max(xRad, yRad));
 			Location loc = getCenter();
-			for (double pitch = 0; pitch < 360; pitch += incPitch) {
-				for (double yaw = 0; yaw < 360; yaw += incYaw) {
+			for (double pitch = 0; pitch < 360; pitch += inc) {
+				for (double yaw = 0; yaw < 360; yaw += inc) {
 					loc.setPitch((float) pitch);
 					loc.setYaw((float) yaw);
 					Block block = getSurfacePoint(loc.getDirection()).getBlock();
