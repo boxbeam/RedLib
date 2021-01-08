@@ -725,6 +725,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Players opening containers</div>
 </dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/region/Region.html#contains(org.bukkit.block.Block)">contains(Block)</a></span> - Method in class redempt.redlib.region.<a href="redempt/redlib/region/Region.html" title="class in redempt.redlib.region">Region</a></dt>
+<dd>
+<div class="block">Checks whether a Block is contained by this Region</div>
+</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/region/CuboidRegion.html#contains(org.bukkit.Location)">contains(Location)</a></span> - Method in class redempt.redlib.region.<a href="redempt/redlib/region/CuboidRegion.html" title="class in redempt.redlib.region">CuboidRegion</a></dt>
 <dd>
 <div class="block">Check whether a location is inside this Region</div>
@@ -738,7 +742,9 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <div class="block">Determines if this Region contains a Location</div>
 </dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/region/SpheroidRegion.html#contains(org.bukkit.Location)">contains(Location)</a></span> - Method in class redempt.redlib.region.<a href="redempt/redlib/region/SpheroidRegion.html" title="class in redempt.redlib.region">SpheroidRegion</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Checks if this SpheroidRegion contains a given point</div>
+</dd>
 <dt><a href="redempt/redlib/commandmanager/ContextProvider.html" title="class in redempt.redlib.commandmanager"><span class="typeNameLink">ContextProvider</span></a>&lt;<a href="redempt/redlib/commandmanager/ContextProvider.html" title="type parameter in ContextProvider">T</a>&gt; - Class in <a href="redempt/redlib/commandmanager/package-summary.html">redempt.redlib.commandmanager</a></dt>
 <dd>
 <div class="block">Used to provide context arguments to command method hooks</div>
@@ -2310,6 +2316,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/nms/NMSClass.html#getWrappedClass()">getWrappedClass()</a></span> - Method in class redempt.redlib.nms.<a href="redempt/redlib/nms/NMSClass.html" title="class in redempt.redlib.nms">NMSClass</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/region/SpheroidRegion.html#getXRadius()">getXRadius()</a></span> - Method in class redempt.redlib.region.<a href="redempt/redlib/region/SpheroidRegion.html" title="class in redempt.redlib.region">SpheroidRegion</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/region/SpheroidRegion.html#getYRadius()">getYRadius()</a></span> - Method in class redempt.redlib.region.<a href="redempt/redlib/region/SpheroidRegion.html" title="class in redempt.redlib.region">SpheroidRegion</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/region/SpheroidRegion.html#getZRadius()">getZRadius()</a></span> - Method in class redempt.redlib.region.<a href="redempt/redlib/region/SpheroidRegion.html" title="class in redempt.redlib.region">SpheroidRegion</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/itemutils/ItemUtils.html#give(org.bukkit.entity.Player,org.bukkit.inventory.ItemStack...)">give(Player, ItemStack...)</a></span> - Static method in class redempt.redlib.itemutils.<a href="redempt/redlib/itemutils/ItemUtils.html" title="class in redempt.redlib.itemutils">ItemUtils</a></dt>
 <dd>
 <div class="block">Give the player the specified items, dropping them on the ground if there is not enough room</div>
@@ -3827,6 +3839,18 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Sets the world of this SpheroidRegion</div>
 </dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/region/SpheroidRegion.html#setXRadius(double)">setXRadius(double)</a></span> - Method in class redempt.redlib.region.<a href="redempt/redlib/region/SpheroidRegion.html" title="class in redempt.redlib.region">SpheroidRegion</a></dt>
+<dd>
+<div class="block">Sets the radius of the spheroid on the X axis</div>
+</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/region/SpheroidRegion.html#setYRadius(double)">setYRadius(double)</a></span> - Method in class redempt.redlib.region.<a href="redempt/redlib/region/SpheroidRegion.html" title="class in redempt.redlib.region">SpheroidRegion</a></dt>
+<dd>
+<div class="block">Sets the radius of the spheroid on the Y axis</div>
+</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/region/SpheroidRegion.html#setZRadius(double)">setZRadius(double)</a></span> - Method in class redempt.redlib.region.<a href="redempt/redlib/region/SpheroidRegion.html" title="class in redempt.redlib.region">SpheroidRegion</a></dt>
+<dd>
+<div class="block">Sets the radius of the spheroid on the Z axis</div>
+</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/enchants/trigger/EnchantTrigger.html#SHOOT_ARROW">SHOOT_ARROW</a></span> - Static variable in class redempt.redlib.enchants.trigger.<a href="redempt/redlib/enchants/trigger/EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a></dt>
 <dd>
 <div class="block">Calls activate with a ProjectileLaunchEvent when a player shoots a projectile with an item that has a CustomEnchant with this trigger</div>
@@ -4105,6 +4129,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <div class="block">Converts a string to camelCase, where every character after a space is capitalized.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/region/Region.html#toCuboid()">toCuboid()</a></span> - Method in class redempt.redlib.region.<a href="redempt/redlib/region/Region.html" title="class in redempt.redlib.region">Region</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/region/SpheroidRegion.html#toCuboid()">toCuboid()</a></span> - Method in class redempt.redlib.region.<a href="redempt/redlib/region/SpheroidRegion.html" title="class in redempt.redlib.region">SpheroidRegion</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/dev/profiler/ProfilerCommands.html#toggleExpand(org.bukkit.entity.Player,java.lang.String)">toggleExpand(Player, String)</a></span> - Method in class redempt.redlib.dev.profiler.<a href="redempt/redlib/dev/profiler/ProfilerCommands.html" title="class in redempt.redlib.dev.profiler">ProfilerCommands</a></dt>
 <dd>&nbsp;</dd>

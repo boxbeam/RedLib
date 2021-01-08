@@ -24,7 +24,7 @@ public class ProtectedRegion {
 	 */
 	public ProtectedRegion(Plugin plugin, Region region, ProtectionType... types) {
 		this.region = region;
-		this.policy = new ProtectionPolicy(plugin, region.toCuboid(), b -> region.contains(b.getLocation()), types);
+		this.policy = new ProtectionPolicy(plugin, region.toCuboid(), region::contains, types);
 	}
 	
 	/**

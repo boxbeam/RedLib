@@ -1,5 +1,6 @@
 package redempt.redlib.region;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -22,6 +23,8 @@ public class SpheroidRegion extends Region {
 	private double yRad;
 	private double zRad;
 	private Location center;
+	private CuboidRegion cuboid;
+	private Set<Block> surface;
 	
 	/**
 	 * Creates a SpheroidRegion from two corners, using their midpoint as the center and their distance in each direction
@@ -95,6 +98,7 @@ public class SpheroidRegion extends Region {
 		yRad += posY + negY;
 		zRad += posZ + negZ;
 		move(posX - negX, posY - negY, posZ - negZ);
+		clearCached();
 		return this;
 	}
 	
@@ -106,6 +110,25 @@ public class SpheroidRegion extends Region {
 	 */
 	@Override
 	public SpheroidRegion expand(BlockFace face, double amount) {
+		clearCached();
+		switch (face) {
+			case UP:
+			case DOWN:
+				yRad += amount / 2;
+				break;
+			case EAST:
+			case WEST:
+				xRad += amount / 2;
+				break;
+			case NORTH:
+			case SOUTH:
+				zRad += amount / 2;
+				break;
+			default:
+				throw new IllegalArgumentException("Face must be UP, DOWN, NORTH, SOUTH, EAST, or WEST");
+		}
+		move(face.getDirection().multiply(amount / 2));
+		clearCached();
 		return this;
 	}
 	
@@ -118,6 +141,7 @@ public class SpheroidRegion extends Region {
 		xRad += amount;
 		yRad += amount;
 		zRad += amount;
+		clearCached();
 		return this;
 	}
 	
@@ -129,6 +153,7 @@ public class SpheroidRegion extends Region {
 	@Override
 	public SpheroidRegion move(Vector vec) {
 		center.add(vec);
+		clearCached();
 		return this;
 	}
 	
@@ -150,6 +175,16 @@ public class SpheroidRegion extends Region {
 				Math.pow((loc.getZ() - center.getZ()) / zRad, 2);
 	}
 	
+	private void clearCached() {
+		clearCached();
+		surface = null;
+	}
+	
+	/**
+	 * Checks if this SpheroidRegion contains a given point
+	 * @param loc The location to check
+	 * @return Whether this SpheroidRegion contains the given Location
+	 */
 	public boolean contains(Location loc) {
 		return center.getWorld().equals(loc.getWorld()) &&
 				distanceSquared(loc) <= 1;
@@ -187,6 +222,7 @@ public class SpheroidRegion extends Region {
 			xRad = zRad;
 			zRad = tmp;
 		}
+		clearCached();
 		return this;
 	}
 	
@@ -198,6 +234,7 @@ public class SpheroidRegion extends Region {
 	@Override
 	public SpheroidRegion setWorld(World world) {
 		center.setWorld(world);
+		clearCached();
 		return this;
 	}
 	
@@ -207,6 +244,68 @@ public class SpheroidRegion extends Region {
 	@Override
 	public Stream<Block> stream() {
 		return toCuboid().stream().filter(b -> contains(b.getLocation().add(.5, .5, .5)));
+	}
+	
+	/**
+	 * @return A cuboid representation of this SpheroidRegion using the extreme corners
+	 */
+	@Override
+	public CuboidRegion toCuboid() {
+		if (cuboid == null) {
+			cuboid = super.toCuboid();
+		}
+		return cuboid;
+	}
+	
+	/**
+	 * @return The radius of the spheroid on the X axis
+	 */
+	public double getXRadius() {
+		return xRad;
+	}
+	
+	/**
+	 * @return The radius of the spheroid on the Y axis
+	 */
+	public double getYRadius() {
+		return yRad;
+	}
+	
+	/**
+	 * @return The radius of the spheroid on the Z axis
+	 */
+	public double getZRadius() {
+		return zRad;
+	}
+	
+	/**
+	 * Sets the radius of the spheroid on the X axis
+	 * @param xRad The radius on the X axis
+	 * @return Itself
+	 */
+	public SpheroidRegion setXRadius(double xRad) {
+		this.xRad = xRad;
+		return this;
+	}
+	
+	/**
+	 * Sets the radius of the spheroid on the Y axis
+	 * @param yRad The radius on the Y axis
+	 * @return Itself
+	 */
+	public SpheroidRegion setYRadius(double yRad) {
+		this.yRad = yRad;
+		return this;
+	}
+	
+	/**
+	 * Sets the radius of the spheroid on the Z axis
+	 * @param zRad The radius on the Z axis
+	 * @return Itself
+	 */
+	public SpheroidRegion setZRadius(double zRad) {
+		this.zRad = zRad;
+		return this;
 	}
 	
 	/**
@@ -258,19 +357,21 @@ public class SpheroidRegion extends Region {
 	 * @return A Set containing all of the blocks on the surface of this SpheroidRegion
 	 */
 	public Set<Block> getSurface() {
-		Set<Block> surface = new HashSet<>();
-		double incPitch = 45 / yRad;
-		double incYaw = 45 / Math.max(zRad, xRad);
-		Location loc = getCenter();
-		for (double pitch = 0; pitch < 360; pitch += incPitch) {
-			for (double yaw = 0; yaw < 360; yaw += incYaw) {
-				loc.setPitch((float) pitch);
-				loc.setYaw((float) yaw);
-				Block block = getSurfacePoint(loc.getDirection()).getBlock();
-				if (surfaceContains(block)) {
-					surface.add(block);
+		if (surface == null) {
+			surface = new HashSet<>();
+			double incPitch = 45 / yRad;
+			double incYaw = 45 / Math.max(zRad, xRad);
+			Location loc = getCenter();
+			for (double pitch = 0; pitch < 360; pitch += incPitch) {
+				for (double yaw = 0; yaw < 360; yaw += incYaw) {
+					loc.setPitch((float) pitch);
+					loc.setYaw((float) yaw);
+					Block block = getSurfacePoint(loc.getDirection()).getBlock();
+					if (toCuboid().contains(block)) {
+						surface.add(block);
+					}
 				}
-			}
+			}	
 		}
 		return surface;
 	}
@@ -281,13 +382,7 @@ public class SpheroidRegion extends Region {
 	 * @return Whether the block is on the surface of this SpheroidRegion
 	 */
 	public boolean surfaceContains(Block block) {
-		Vector v = LocationUtils.center(block).subtract(center).toVector();
-		v.setX(v.getX() / xRad);
-		v.setY(v.getY() / yRad);
-		v.setZ(v.getZ() / zRad);
-		Location l = getSurfacePoint(v);
-		CuboidRegion region = new CuboidRegion(block.getLocation(), block.getLocation().add(1, 1, 1)).expand(0.06);
-		return region.contains(l);
+		return getSurface().contains(block);
 	}
 	
 	/**

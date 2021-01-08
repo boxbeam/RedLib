@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":6,"i1":6,"i2":10,"i3":10,"i4":6,"i5":6,"i6":10,"i7":10,"i8":6,"i9":10,"i10":10,"i11":10,"i12":10,"i13":6,"i14":10,"i15":10,"i16":10,"i17":10,"i18":6,"i19":6,"i20":10,"i21":10,"i22":10,"i23":6,"i24":6,"i25":10,"i26":10,"i27":6,"i28":6,"i29":6,"i30":10};
+var data = {"i0":6,"i1":10,"i2":6,"i3":10,"i4":10,"i5":6,"i6":6,"i7":10,"i8":10,"i9":6,"i10":10,"i11":10,"i12":10,"i13":10,"i14":6,"i15":10,"i16":10,"i17":10,"i18":10,"i19":6,"i20":6,"i21":10,"i22":10,"i23":10,"i24":6,"i25":6,"i26":10,"i27":10,"i28":6,"i29":6,"i30":6,"i31":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -190,27 +190,34 @@ implements java.lang.Cloneable</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#contains(org.bukkit.block.Block)">contains</a></span>&#8203;(org.bukkit.block.Block&nbsp;block)</code></th>
+<td class="colLast">
+<div class="block">Checks whether a Block is contained by this Region</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#contains(org.bukkit.Location)">contains</a></span>&#8203;(org.bukkit.Location&nbsp;loc)</code></th>
 <td class="colLast">
 <div class="block">Determines if this Region contains a Location</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#disableEvents()">disableEvents</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Disable RegionEnterEvent and RegionExitEvent for this region</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#enableEvents()">enableEvents</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Enable RegionEnterEvent and RegionExitEvent for this region</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>abstract <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#expand(double,double,double,double,double,double)">expand</a></span>&#8203;(double&nbsp;posX,
       double&nbsp;negX,
@@ -222,7 +229,7 @@ implements java.lang.Cloneable</pre>
 <div class="block">Expands this Region by a specified amount in each direction</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>abstract <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#expand(org.bukkit.block.BlockFace,double)">expand</a></span>&#8203;(org.bukkit.block.BlockFace&nbsp;face,
       double&nbsp;amount)</code></th>
@@ -230,122 +237,122 @@ implements java.lang.Cloneable</pre>
 <div class="block">Expands this Region in a specific direction</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#forEachBlock(java.util.function.Consumer)">forEachBlock</a></span>&#8203;(java.util.function.Consumer&lt;org.bukkit.block.Block&gt;&nbsp;forEach)</code></th>
 <td class="colLast">
 <div class="block">Streams every Block in this Region, running your lambda on it</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>int[]</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getBlockDimensions()">getBlockDimensions</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Get the dimensions of this Region [x, y, z] in blocks</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>abstract int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getBlockVolume()">getBlockVolume</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>org.bukkit.Location</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCenter()">getCenter</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;org.bukkit.Chunk&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getChunks()">getChunks</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>org.bukkit.Location[]</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCorners()">getCorners</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>double[]</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDimensions()">getDimensions</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Get the dimensions of this Region [x, y, z]</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>abstract org.bukkit.Location</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getEnd()">getEnd</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;org.bukkit.entity.Entity&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getEntities()">getEntities</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Gets all entities contained in this Region in loaded chunks</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>java.util.List&lt;org.bukkit.entity.Entity&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getEntities(boolean)">getEntities</a></span>&#8203;(boolean&nbsp;load)</code></th>
 <td class="colLast">
 <div class="block">Gets all entities contained in this Region</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;org.bukkit.Chunk&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLoadedChunks()">getLoadedChunks</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>java.util.List&lt;org.bukkit.entity.Player&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPlayers()">getPlayers</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Gets all players contained in this Region</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>abstract org.bukkit.Location</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getStart()">getStart</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>abstract double</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getVolume()">getVolume</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>org.bukkit.World</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getWorld()">getWorld</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>double</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#measure(org.bukkit.block.BlockFace)">measure</a></span>&#8203;(org.bukkit.block.BlockFace&nbsp;direction)</code></th>
 <td class="colLast">
 <div class="block">Gets the length of this Region along a given axis</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#measureBlocks(org.bukkit.block.BlockFace)">measureBlocks</a></span>&#8203;(org.bukkit.block.BlockFace&nbsp;direction)</code></th>
 <td class="colLast">
 <div class="block">Gets the block length of this Region along a given axis</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>abstract <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#move(double,double,double)">move</a></span>&#8203;(double&nbsp;x,
     double&nbsp;y,
     double&nbsp;z)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>abstract <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#move(org.bukkit.util.Vector)">move</a></span>&#8203;(org.bukkit.util.Vector&nbsp;vec)</code></th>
 <td class="colLast">
 <div class="block">Moves this Region</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code><a href="../protection/ProtectedRegion.html" title="class in redempt.redlib.protection">ProtectedRegion</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#protect(org.bukkit.plugin.Plugin,redempt.redlib.protection.ProtectionPolicy.ProtectionType...)">protect</a></span>&#8203;(org.bukkit.plugin.Plugin&nbsp;plugin,
        <a href="../protection/ProtectionPolicy.ProtectionType.html" title="enum in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a>...&nbsp;types)</code></th>
@@ -353,14 +360,14 @@ implements java.lang.Cloneable</pre>
 <div class="block">Protects this Region</div>
 </td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code><a href="../protection/ProtectedRegion.html" title="class in redempt.redlib.protection">ProtectedRegion</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#protect(redempt.redlib.protection.ProtectionPolicy.ProtectionType...)">protect</a></span>&#8203;(<a href="../protection/ProtectionPolicy.ProtectionType.html" title="enum in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a>...&nbsp;types)</code></th>
 <td class="colLast">
 <div class="block">Protects this Region</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code>abstract <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rotate(org.bukkit.Location,int)">rotate</a></span>&#8203;(org.bukkit.Location&nbsp;center,
       int&nbsp;rotations)</code></th>
@@ -368,21 +375,21 @@ implements java.lang.Cloneable</pre>
 <div class="block">Rotates this Region around a central point</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i29" class="rowColor">
 <td class="colFirst"><code>abstract <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setWorld(org.bukkit.World)">setWorld</a></span>&#8203;(org.bukkit.World&nbsp;world)</code></th>
 <td class="colLast">
 <div class="block">Sets the World of this Region</div>
 </td>
 </tr>
-<tr id="i29" class="rowColor">
+<tr id="i30" class="altColor">
 <td class="colFirst"><code>abstract java.util.stream.Stream&lt;org.bukkit.block.Block&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#stream()">stream</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Streams all Blocks inside this Region</div>
 </td>
 </tr>
-<tr id="i30" class="altColor">
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code><a href="CuboidRegion.html" title="class in redempt.redlib.region">CuboidRegion</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toCuboid()">toCuboid</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
@@ -642,6 +649,22 @@ implements java.lang.Cloneable</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>All the Chunks this Region overlaps</dd>
+</dl>
+</li>
+</ul>
+<a id="contains(org.bukkit.block.Block)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>contains</h4>
+<pre class="methodSignature">public&nbsp;boolean&nbsp;contains&#8203;(org.bukkit.block.Block&nbsp;block)</pre>
+<div class="block">Checks whether a Block is contained by this Region</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>block</code> - The Block</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Whether the Block is contained by this Region</dd>
 </dl>
 </li>
 </ul>

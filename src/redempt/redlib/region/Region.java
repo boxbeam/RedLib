@@ -125,6 +125,15 @@ public abstract class Region implements Cloneable {
 	}
 	
 	/**
+	 * Checks whether a Block is contained by this Region
+	 * @param block The Block
+	 * @return Whether the Block is contained by this Region
+	 */
+	public boolean contains(Block block) {
+		return contains(block.getLocation());
+	}
+	
+	/**
 	 * @return All the loaded Chunks this Region overlaps
 	 */
 	public Set<Chunk> getLoadedChunks() {
