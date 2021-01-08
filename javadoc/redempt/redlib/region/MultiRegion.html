@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":9,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10};
+var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":9,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -88,8 +88,8 @@ loadScripts(document, 'script');</script>
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
-<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
@@ -135,9 +135,14 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <div class="description">
 <ul class="blockList">
 <li class="blockList">
+<dl>
+<dt>All Implemented Interfaces:</dt>
+<dd><code>java.lang.Cloneable</code>, <code><a href="Overlappable.html" title="interface in redempt.redlib.region">Overlappable</a></code></dd>
+</dl>
 <hr>
 <pre>public class <span class="typeNameLabel">MultiRegion</span>
-extends <a href="Region.html" title="class in redempt.redlib.region">Region</a></pre>
+extends <a href="Region.html" title="class in redempt.redlib.region">Region</a>
+implements <a href="Overlappable.html" title="interface in redempt.redlib.region">Overlappable</a></pre>
 <div class="block">Represents a collection of Regions forming any shape</div>
 </li>
 </ul>
@@ -145,40 +150,6 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
-<!-- ======== NESTED CLASS SUMMARY ======== -->
-<section role="region">
-<ul class="blockList">
-<li class="blockList"><a id="nested.class.summary">
-<!--   -->
-</a>
-<h3>Nested Class Summary</h3>
-<ul class="blockList">
-<li class="blockList"><a id="nested.classes.inherited.from.class.redempt.redlib.region.Region">
-<!--   -->
-</a>
-<h3>Nested classes/interfaces inherited from class&nbsp;redempt.redlib.region.<a href="Region.html" title="class in redempt.redlib.region">Region</a></h3>
-<code><a href="Region.RegionState.html" title="class in redempt.redlib.region">Region.RegionState</a></code></li>
-</ul>
-</li>
-</ul>
-</section>
-<!-- =========== FIELD SUMMARY =========== -->
-<section role="region">
-<ul class="blockList">
-<li class="blockList"><a id="field.summary">
-<!--   -->
-</a>
-<h3>Field Summary</h3>
-<ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.redempt.redlib.region.Region">
-<!--   -->
-</a>
-<h3>Fields inherited from class&nbsp;redempt.redlib.region.<a href="Region.html" title="class in redempt.redlib.region">Region</a></h3>
-<code><a href="Region.html#end">end</a>, <a href="Region.html#start">start</a></code></li>
-</ul>
-</li>
-</ul>
-</section>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <section role="region">
 <ul class="blockList">
@@ -299,72 +270,84 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 </td>
 </tr>
 <tr id="i10" class="altColor">
+<td class="colFirst"><code>org.bukkit.Location</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getEnd()">getEnd</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code><a href="MultiRegion.html" title="class in redempt.redlib.region">MultiRegion</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getIntersection(redempt.redlib.region.Region)">getIntersection</a></span>&#8203;(<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;other)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getIntersection(redempt.redlib.region.Overlappable)">getIntersection</a></span>&#8203;(<a href="Overlappable.html" title="interface in redempt.redlib.region">Overlappable</a>&nbsp;other)</code></th>
 <td class="colLast">
 <div class="block">Gets a MultiRegion representing the overlap.</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getRegionCount()">getRegionCount</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Recursively gets the number of Regions in this MultiRegion</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getRegions()">getRegions</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Gets all the cuboid Regions that form this MultiRegion</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
+<td class="colFirst"><code>org.bukkit.Location</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getStart()">getStart</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>double</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getVolume()">getVolume</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Sums the volume of all the Regions that make up this MultiRegion.</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isClustered()">isClustered</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i15" class="rowColor">
-<td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isMulti()">isMulti</a></span>()</code></th>
+<tr id="i17" class="rowColor">
+<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#move(double,double,double)">move</a></span>&#8203;(double&nbsp;x,
+    double&nbsp;y,
+    double&nbsp;z)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code><a href="MultiRegion.html" title="class in redempt.redlib.region">MultiRegion</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#move(org.bukkit.util.Vector)">move</a></span>&#8203;(org.bukkit.util.Vector&nbsp;v)</code></th>
 <td class="colLast">
 <div class="block">Moves this MultiRegion using the given vector</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#overlaps(redempt.redlib.region.Region)">overlaps</a></span>&#8203;(<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;o)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#overlaps(redempt.redlib.region.Overlappable)">overlaps</a></span>&#8203;(<a href="Overlappable.html" title="interface in redempt.redlib.region">Overlappable</a>&nbsp;overlap)</code></th>
 <td class="colLast">
 <div class="block">Check if this Region overlaps with another.</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#recalculate()">recalculate</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Recalculates this region to ensure it is using close to the least possible number of sub-regions with no overlaps.</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#recalculate(boolean)">recalculate</a></span>&#8203;(boolean&nbsp;autoCluster)</code></th>
 <td class="colLast">
 <div class="block">Recalculates this region to ensure it is using close to the least possible number of sub-regions with no overlaps.</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code><a href="MultiRegion.html" title="class in redempt.redlib.region">MultiRegion</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rotate(org.bukkit.Location,int)">rotate</a></span>&#8203;(org.bukkit.Location&nbsp;center,
       int&nbsp;rotations)</code></th>
@@ -372,7 +355,13 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <div class="block">Rotates this MultiRegion and all of its sub-regions around the given point</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i23" class="rowColor">
+<td class="colFirst"><code>protected void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setLocations(org.bukkit.Location,org.bukkit.Location)">setLocations</a></span>&#8203;(org.bukkit.Location&nbsp;start,
+            org.bukkit.Location&nbsp;end)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i24" class="altColor">
 <td class="colFirst"><code><a href="MultiRegion.html" title="class in redempt.redlib.region">MultiRegion</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setWorld(org.bukkit.World)">setWorld</a></span>&#8203;(org.bukkit.World&nbsp;world)</code></th>
 <td class="colLast">
@@ -380,28 +369,21 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
  the same</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>java.util.stream.Stream&lt;org.bukkit.block.Block&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#stream()">stream</a></span>()</code></th>
 <td class="colLast">
 <div class="block">A Stream of all the blocks in all of the Regions within this MultiRegion.</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#subtract(redempt.redlib.region.Region)">subtract</a></span>&#8203;(<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;region)</code></th>
 <td class="colLast">
 <div class="block">Subtracts a Region from this MultiRegion.</div>
 </td>
 </tr>
-<tr id="i24" class="altColor">
-<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toCuboid()">toCuboid</a></span>()</code></th>
-<td class="colLast">
-<div class="block">Turns this MultiRegion into a cuboid Region using the extreme corners</div>
-</td>
-</tr>
-<tr id="i25" class="rowColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString()">toString</a></span>()</code></th>
 <td class="colLast">
@@ -416,7 +398,7 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;redempt.redlib.region.<a href="Region.html" title="class in redempt.redlib.region">Region</a></h3>
-<code><a href="Region.html#cubeRadius(org.bukkit.Location,int)">cubeRadius</a>, <a href="Region.html#disableEvents()">disableEvents</a>, <a href="Region.html#enableEvents()">enableEvents</a>, <a href="Region.html#expand(double)">expand</a>, <a href="Region.html#expand(int)">expand</a>, <a href="Region.html#expand(int,int,int,int,int,int)">expand</a>, <a href="Region.html#expand(org.bukkit.block.BlockFace,int)">expand</a>, <a href="Region.html#forEachBlock(java.util.function.Consumer)">forEachBlock</a>, <a href="Region.html#getBlockDimensions()">getBlockDimensions</a>, <a href="Region.html#getCenter()">getCenter</a>, <a href="Region.html#getChunks()">getChunks</a>, <a href="Region.html#getCorners()">getCorners</a>, <a href="Region.html#getDimensions()">getDimensions</a>, <a href="Region.html#getEnd()">getEnd</a>, <a href="Region.html#getEntities()">getEntities</a>, <a href="Region.html#getEntities(boolean)">getEntities</a>, <a href="Region.html#getLoadedChunks()">getLoadedChunks</a>, <a href="Region.html#getPlayers()">getPlayers</a>, <a href="Region.html#getStart()">getStart</a>, <a href="Region.html#getState()">getState</a>, <a href="Region.html#getWorld()">getWorld</a>, <a href="Region.html#measure(org.bukkit.block.BlockFace)">measure</a>, <a href="Region.html#measureBlocks(org.bukkit.block.BlockFace)">measureBlocks</a>, <a href="Region.html#move(int,int,int)">move</a>, <a href="Region.html#protect(redempt.redlib.protection.ProtectionPolicy.ProtectionType...)">protect</a>, <a href="Region.html#rotate(int)">rotate</a>, <a href="Region.html#setLocations(org.bukkit.Location,org.bukkit.Location)">setLocations</a></code></li>
+<code><a href="Region.html#disableEvents()">disableEvents</a>, <a href="Region.html#enableEvents()">enableEvents</a>, <a href="Region.html#forEachBlock(java.util.function.Consumer)">forEachBlock</a>, <a href="Region.html#getBlockDimensions()">getBlockDimensions</a>, <a href="Region.html#getCenter()">getCenter</a>, <a href="Region.html#getChunks()">getChunks</a>, <a href="Region.html#getCorners()">getCorners</a>, <a href="Region.html#getDimensions()">getDimensions</a>, <a href="Region.html#getEntities()">getEntities</a>, <a href="Region.html#getEntities(boolean)">getEntities</a>, <a href="Region.html#getLoadedChunks()">getLoadedChunks</a>, <a href="Region.html#getPlayers()">getPlayers</a>, <a href="Region.html#getWorld()">getWorld</a>, <a href="Region.html#measure(org.bukkit.block.BlockFace)">measure</a>, <a href="Region.html#measureBlocks(org.bukkit.block.BlockFace)">measureBlocks</a>, <a href="Region.html#protect(org.bukkit.plugin.Plugin,redempt.redlib.protection.ProtectionPolicy.ProtectionType...)">protect</a>, <a href="Region.html#protect(redempt.redlib.protection.ProtectionPolicy.ProtectionType...)">protect</a>, <a href="Region.html#toCuboid()">toCuboid</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -479,6 +461,46 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a id="setLocations(org.bukkit.Location,org.bukkit.Location)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setLocations</h4>
+<pre class="methodSignature">protected&nbsp;void&nbsp;setLocations&#8203;(org.bukkit.Location&nbsp;start,
+                            org.bukkit.Location&nbsp;end)</pre>
+</li>
+</ul>
+<a id="getStart()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getStart</h4>
+<pre class="methodSignature">public&nbsp;org.bukkit.Location&nbsp;getStart()</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="Region.html#getStart()">getStart</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The least extreme corner of the region, representing minimum X, Y, and Z coordinates</dd>
+</dl>
+</li>
+</ul>
+<a id="getEnd()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getEnd</h4>
+<pre class="methodSignature">public&nbsp;org.bukkit.Location&nbsp;getEnd()</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="Region.html#getEnd()">getEnd</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The most extreme corner of the region, representing maximum X, Y, and Z coordinates</dd>
+</dl>
+</li>
+</ul>
 <a id="add(redempt.redlib.region.Region)">
 <!--   -->
 </a>
@@ -489,7 +511,9 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <div class="block">Adds a Region to this MultiRegion</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>region</code> - The Region to add</dd>
+<dd><code>region</code> - The Overlappable Region to add</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>java.lang.IllegalArgumentException</code> - if the Region is not Overlappable or is in another world</dd>
 </dl>
 </li>
 </ul>
@@ -518,7 +542,7 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <pre class="methodSignature">public&nbsp;boolean&nbsp;contains&#8203;(org.bukkit.Location&nbsp;location)</pre>
 <div class="block">Checks whether this MultiRegion contains the given Location</div>
 <dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="Region.html#contains(org.bukkit.Location)">contains</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>location</code> - The Location to check</dd>
@@ -551,7 +575,7 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <div class="block">Sums the block volume of all the Regions that make up this MultiRegion.
  Will be inaccurate if any of the Regions overlap. Call <a href="#recalculate()"><code>recalculate()</code></a> first.</div>
 <dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="Region.html#getBlockVolume()">getBlockVolume</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The volume of this MultiRegion</dd>
@@ -568,25 +592,10 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <div class="block">Sums the volume of all the Regions that make up this MultiRegion.
  Will be inaccurate if any of the Regions overlap. Call <a href="#recalculate()"><code>recalculate()</code></a> first.</div>
 <dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="Region.html#getVolume()">getVolume</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The volume of this MultiRegion</dd>
-</dl>
-</li>
-</ul>
-<a id="isMulti()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>isMulti</h4>
-<pre class="methodSignature">public&nbsp;boolean&nbsp;isMulti()</pre>
-<dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="Region.html#isMulti()">isMulti</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Whether this Region is a non-cuboid variant</dd>
 </dl>
 </li>
 </ul>
@@ -599,7 +608,7 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <pre class="methodSignature">public&nbsp;<a href="MultiRegion.html" title="class in redempt.redlib.region">MultiRegion</a>&nbsp;clone()</pre>
 <div class="block">Clones this MultiRegion</div>
 <dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="Region.html#clone()">clone</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A clone of this MultiRegion</dd>
@@ -621,7 +630,7 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
  after calling this, especially if it is a retraction. This is a fairly expensive operation,
  so use it sparingly.</div>
 <dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="Region.html#expand(org.bukkit.block.BlockFace,double)">expand</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>direction</code> - The direction to expand the region in</dd>
@@ -646,7 +655,7 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <div class="block">Expands the region, or retracts if negative. This makes 6 calls to <a href="#expand(org.bukkit.block.BlockFace,double)"><code>expand(BlockFace, double)</code></a>,
  meaning it is expensive. Avoid calling this method if possible.</div>
 <dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="Region.html#expand(double,double,double,double,double,double)">expand</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>posX</code> - The amount to expand the region in the positive X direction</dd>
@@ -657,20 +666,6 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <dd><code>negZ</code> - The amount to expand the region in the negative Z direction</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Itself</dd>
-</dl>
-</li>
-</ul>
-<a id="toCuboid()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>toCuboid</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;toCuboid()</pre>
-<div class="block">Turns this MultiRegion into a cuboid Region using the extreme corners</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>A cuboid region guaranteed to have equal or greater coverage compared to this MultiRegion</dd>
 </dl>
 </li>
 </ul>
@@ -739,35 +734,35 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 </dl>
 </li>
 </ul>
-<a id="overlaps(redempt.redlib.region.Region)">
+<a id="overlaps(redempt.redlib.region.Overlappable)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>overlaps</h4>
-<pre class="methodSignature">public&nbsp;boolean&nbsp;overlaps&#8203;(<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;o)</pre>
+<pre class="methodSignature">public&nbsp;boolean&nbsp;overlaps&#8203;(<a href="Overlappable.html" title="interface in redempt.redlib.region">Overlappable</a>&nbsp;overlap)</pre>
 <div class="block">Check if this Region overlaps with another.</div>
 <dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="Region.html#overlaps(redempt.redlib.region.Region)">overlaps</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="Overlappable.html#overlaps(redempt.redlib.region.Overlappable)">overlaps</a></code>&nbsp;in interface&nbsp;<code><a href="Overlappable.html" title="interface in redempt.redlib.region">Overlappable</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>o</code> - The Region to check against</dd>
+<dd><code>overlap</code> - The Region to check against</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Whether this Region overlaps with the given Region</dd>
 </dl>
 </li>
 </ul>
-<a id="getIntersection(redempt.redlib.region.Region)">
+<a id="getIntersection(redempt.redlib.region.Overlappable)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getIntersection</h4>
-<pre class="methodSignature">public&nbsp;<a href="MultiRegion.html" title="class in redempt.redlib.region">MultiRegion</a>&nbsp;getIntersection&#8203;(<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;other)</pre>
+<pre class="methodSignature">public&nbsp;<a href="MultiRegion.html" title="class in redempt.redlib.region">MultiRegion</a>&nbsp;getIntersection&#8203;(<a href="Overlappable.html" title="interface in redempt.redlib.region">Overlappable</a>&nbsp;other)</pre>
 <div class="block">Gets a MultiRegion representing the overlap. This is somewhat expensive.</div>
 <dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="Region.html#getIntersection(redempt.redlib.region.Region)">getIntersection</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="Overlappable.html#getIntersection(redempt.redlib.region.Overlappable)">getIntersection</a></code>&nbsp;in interface&nbsp;<code><a href="Overlappable.html" title="interface in redempt.redlib.region">Overlappable</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>other</code> - The Region to check for overlap with</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -784,12 +779,27 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <pre class="methodSignature">public&nbsp;<a href="MultiRegion.html" title="class in redempt.redlib.region">MultiRegion</a>&nbsp;move&#8203;(org.bukkit.util.Vector&nbsp;v)</pre>
 <div class="block">Moves this MultiRegion using the given vector</div>
 <dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="Region.html#move(org.bukkit.util.Vector)">move</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>v</code> - The vector to be applied to both corners of the region</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Itself</dd>
+</dl>
+</li>
+</ul>
+<a id="move(double,double,double)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>move</h4>
+<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;move&#8203;(double&nbsp;x,
+                   double&nbsp;y,
+                   double&nbsp;z)</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="Region.html#move(double,double,double)">move</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
 </dl>
 </li>
 </ul>
@@ -803,7 +813,7 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
                           int&nbsp;rotations)</pre>
 <div class="block">Rotates this MultiRegion and all of its sub-regions around the given point</div>
 <dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="Region.html#rotate(org.bukkit.Location,int)">rotate</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>center</code> - The point to rotate this Region around</dd>
@@ -823,7 +833,7 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <div class="block">Sets the world of this MultiRegion and all of its sub-regions, while keeping the coordinates
  the same</div>
 <dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="Region.html#setWorld(org.bukkit.World)">setWorld</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>world</code> - The world to set</dd>
@@ -873,7 +883,7 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <div class="block">A Stream of all the blocks in all of the Regions within this MultiRegion. May iterate the same block multiple
  times if any of the Regions overlap. Call <a href="#recalculate()"><code>recalculate()</code></a> first.</div>
 <dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="Region.html#stream()">stream</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A Stream of all the blocks in this MultiRegion</dd>
@@ -892,7 +902,7 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
  expensive than the same operations would be for a Region. If its shape is static, and it needs to be reused, save it.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="Region.html#toString()">toString</a></code>&nbsp;in class&nbsp;<code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></dd>
+<dd><code>toString</code>&nbsp;in class&nbsp;<code>java.lang.Object</code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The String representation of this MultiRegion</dd>
 </dl>
@@ -965,8 +975,8 @@ extends <a href="Region.html" title="class in redempt.redlib.region">Region</a><
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
-<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>

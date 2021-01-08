@@ -17,7 +17,7 @@ public class RegionUtils {
 	 * @param region The region to find the interior space of
 	 * @return A MultiRegion representing all of the "inside" space within the given region
 	 */
-	public static MultiRegion findInside(Region region) {
+	public static MultiRegion findInside(CuboidRegion region) {
 		int[] dim = region.getBlockDimensions();
 		MultiRegion multi = null;
 		multi = addAll(multi, iter(region, dim, new int[] {0, 1, 2}));
@@ -29,9 +29,9 @@ public class RegionUtils {
 		return multi;
 	}
 	
-	private static MultiRegion addAll(MultiRegion region, List<Region> reg) {
+	private static MultiRegion addAll(MultiRegion region, List<CuboidRegion> reg) {
 		int count = 0;
-		for (Region r : reg) {
+		for (CuboidRegion r : reg) {
 			count++;
 			if (region == null) {
 				region = new MultiRegion(r);
@@ -46,9 +46,9 @@ public class RegionUtils {
 		return region;
 	}
 	
-	private static List<Region> iter(Region region, int[] dim, int[] order) {
+	private static List<CuboidRegion> iter(CuboidRegion region, int[] dim, int[] order) {
 		int[] pos = new int[3];
-		List<Region> regions = new ArrayList<>();
+		List<CuboidRegion> regions = new ArrayList<>();
 		for (pos[order[0]] = 0; pos[order[0]] < dim[order[0]]; pos[order[0]]++) {
 			for (pos[order[1]] = 0; pos[order[1]] < dim[order[1]]; pos[order[1]]++) {
 				Block block = null;
@@ -68,7 +68,7 @@ public class RegionUtils {
 						break;
 					}
 					if (b.getType().isSolid()) {
-						Region reg = new Region(block.getLocation(), b.getLocation());
+						CuboidRegion reg = new CuboidRegion(block.getLocation(), b.getLocation());
 						reg.expand(1, 0, 1, 0, 1, 0);
 						regions.add(reg);
 						break;

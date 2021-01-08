@@ -102,6 +102,7 @@ public class CommandParser {
 		List<Command> children = new ArrayList<>();
 		boolean hideSub = false;
 		boolean noTab = false;
+		boolean noHelp = false;
 		for (int pos = lineNumber; pos < lines.size(); pos++) {
 			String line = lines.get(pos).trim();
 			if (line.endsWith("{")) {
@@ -204,6 +205,9 @@ public class CommandParser {
 						case "notab":
 							noTab = true;
 							break;
+						case "nohelp":
+							noHelp = true;
+							break;
 						case "hook":
 							hook = tag[1];
 							break;
@@ -219,7 +223,7 @@ public class CommandParser {
 							flags.toArray(new Flag[flags.size()]),
 							contextProviders.toArray(new ContextProvider<?>[contextProviders.size()]),
 							asserters.toArray(new ContextProvider<?>[asserters.size()]),
-							help, permission, type, hook, children, hideSub, noTab));
+							help, permission, type, hook, children, hideSub, noTab, noHelp));
 					children = new ArrayList<>();
 					names = null;
 					args = new ArrayList<>();
@@ -232,6 +236,7 @@ public class CommandParser {
 					hook = null;
 					hideSub = false;
 					noTab = false;
+					noHelp = false;
 					if (lineNumber != 0) {
 						return new CommandCollection(commands);
 					}

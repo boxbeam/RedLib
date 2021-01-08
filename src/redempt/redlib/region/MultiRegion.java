@@ -7,8 +7,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 import redempt.redlib.misc.LocationUtils;
+import redempt.redlib.multiblock.Rotator;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,7 +19,7 @@ import java.util.stream.Stream;
  *
  * @author Redempt
  */
-public class MultiRegion extends Region {
+public class MultiRegion extends Region implements Overlappable {
 	
 	private static Vector[] adjacent = {new Vector(.1, .1, .1), new Vector(.1, .1, -.1), new Vector(.1, -.1, .1), new Vector(-.1, .1, .1),
 										new Vector(-.1, -.1, .1), new Vector(-.1, .1, -.1), new Vector(.1, -.1, -.1), new Vector(-.1, -.1, -.1)};
@@ -25,6 +27,8 @@ public class MultiRegion extends Region {
 	private List<Region> regions = new ArrayList<>();
 	private List<Region> subtract = new ArrayList<>();
 	private boolean clustered = false;
+	private Location start;
+	private Location end;
 	
 	/**
 	 * Construct a MultiRegion using a list of Regions
@@ -37,7 +41,7 @@ public class MultiRegion extends Region {
 		}
 		World world = regions.get(0).getWorld();
 		for (Region region : regions) {
-			if (region.isMulti()) {
+			if (region instanceof MultiRegion) {
 				clustered = true;
 			}
 			if (!region.getWorld().equals(world)) {
@@ -77,6 +81,22 @@ public class MultiRegion extends Region {
 		return;
 	}
 	
+	protected void setLocations(Location start, Location end) {
+		if (!start.getWorld().equals(end.getWorld())) {
+			throw new IllegalArgumentException("Locations must be in the same world");
+		}
+		double minX = Math.min(start.getX(), end.getX());
+		double minY = Math.min(start.getY(), end.getY());
+		double minZ = Math.min(start.getZ(), end.getZ());
+		
+		double maxX = Math.max(start.getX(), end.getX());
+		double maxY = Math.max(start.getY(), end.getY());
+		double maxZ = Math.max(start.getZ(), end.getZ());
+		
+		this.start = new Location(start.getWorld(), minX, minY, minZ);
+		this.end = new Location(end.getWorld(), maxX, maxY, maxZ);
+	}
+	
 	/**
 	 * Construct a MultiRegion using a vararg of Regions
 	 *
@@ -87,15 +107,33 @@ public class MultiRegion extends Region {
 	}
 	
 	/**
+	 * @return The least extreme corner of the region, representing minimum X, Y, and Z coordinates
+	 */
+	public Location getStart() {
+		return start;
+	}
+	
+	/**
+	 * @return The most extreme corner of the region, representing maximum X, Y, and Z coordinates
+	 */
+	public Location getEnd() {
+		return end;
+	}
+	
+	/**
 	 * Adds a Region to this MultiRegion
 	 *
-	 * @param region The Region to add
+	 * @param region The Overlappable Region to add
+	 * @throws IllegalArgumentException if the Region is not Overlappable or is in another world
 	 */
 	public void add(Region region) {
+		if (!(region instanceof Overlappable)) {
+			throw new IllegalArgumentException("Cannot add non-Overlappable Region to MultiRegion");
+		}
 		if (!region.getWorld().equals(getWorld())) {
 			throw new IllegalArgumentException("Region is not in the same world as this MultiRegion");
 		}
-		if (region.isMulti() && !clustered) {
+		if (region instanceof MultiRegion && !clustered) {
 			MultiRegion multi = (MultiRegion) region;
 			for (Region r : multi.getRegions()) {
 				regions.add(r.clone());
@@ -187,14 +225,6 @@ public class MultiRegion extends Region {
 	}
 	
 	/**
-	 * @return Whether this Region is a non-cuboid variant
-	 */
-	@Override
-	public boolean isMulti() {
-		return true;
-	}
-	
-	/**
 	 * Clones this MultiRegion
 	 *
 	 * @return A clone of this MultiRegion
@@ -225,15 +255,15 @@ public class MultiRegion extends Region {
 			return this;
 		}
 		if (amount < 0) {
-			Region r = new Region(start, end);
+			Region r = new CuboidRegion(start, end);
 			r.expand(direction.getOppositeFace(), -r.measureBlocks(direction));
 			r.expand(direction.getOppositeFace(), Math.abs(amount));
 			subtract.add(r);
 			return this;
 		}
-		Region r = new Region(start, end);
+		Region r = new CuboidRegion(start, end);
 		r.expand(direction.getOppositeFace(), -(r.measureBlocks(direction) - 1));
-		MultiRegion slice = getIntersection(r);
+		MultiRegion slice = getIntersection((Overlappable) r);
 		slice.move(direction.getDirection());
 		for (int i = 0; i < amount; i++) {
 			MultiRegion clone = slice.clone();
@@ -263,15 +293,6 @@ public class MultiRegion extends Region {
 		expand(BlockFace.UP, posY);
 		expand(BlockFace.DOWN, negY);
 		return this;
-	}
-	
-	/**
-	 * Turns this MultiRegion into a cuboid Region using the extreme corners
-	 *
-	 * @return A cuboid region guaranteed to have equal or greater coverage compared to this MultiRegion
-	 */
-	public Region toCuboid() {
-		return new Region(this.start, this.end);
 	}
 	
 	/**
@@ -367,7 +388,7 @@ public class MultiRegion extends Region {
 		clustered = false;
 		List<Region> regions = new ArrayList<>();
 		for (Region region : this.regions) {
-			if (region.isMulti()) {
+			if (region instanceof MultiRegion) {
 				MultiRegion multi = (MultiRegion) region.clone();
 				multi.decluster();
 				regions.addAll(multi.getRegions());
@@ -396,7 +417,7 @@ public class MultiRegion extends Region {
 		}
 		int count = 0;
 		for (Region region : regions) {
-			if (region.isMulti()) {
+			if (region instanceof MultiRegion) {
 				count += ((MultiRegion) region).getRegionCount();
 				continue;
 			}
@@ -408,19 +429,20 @@ public class MultiRegion extends Region {
 	/**
 	 * Check if this Region overlaps with another.
 	 *
-	 * @param o The Region to check against
+	 * @param overlap The Region to check against
 	 * @return Whether this Region overlaps with the given Region
 	 */
 	@Override
-	public boolean overlaps(Region o) {
+	public boolean overlaps(Overlappable overlap) {
+		Region o = (Region) overlap;
 		if (!o.getWorld().equals(getWorld())) {
 			return false;
 		}
-		if (o.isMulti()) {
+		if (o instanceof MultiRegion) {
 			MultiRegion multi = (MultiRegion) o;
-			return multi.getRegions().stream().anyMatch(r -> r.overlaps(this));
+			return multi.getRegions().stream().anyMatch(r -> ((Overlappable) r).overlaps(this));
 		}
-		return regions.stream().anyMatch(r -> r.overlaps(o));
+		return regions.stream().anyMatch(r -> overlap.overlaps((Overlappable) r));
 	}
 	
 	/**
@@ -429,10 +451,10 @@ public class MultiRegion extends Region {
 	 * @param other The Region to check for overlap with
 	 * @return The overlapping portions of the Regions
 	 */
-	public MultiRegion getIntersection(Region other) {
+	public MultiRegion getIntersection(Overlappable other) {
 		MultiRegion region = null;
 		for (Region r : regions) {
-			Region intersect = other.getIntersection(r);
+			Region intersect = other.getIntersection((Overlappable) r);
 			if (intersect == null) {
 				continue;
 			}
@@ -458,6 +480,11 @@ public class MultiRegion extends Region {
 		return this;
 	}
 	
+	@Override
+	public Region move(double x, double y, double z) {
+		return move(new Vector(x, y, z));
+	}
+	
 	/**
 	 * Rotates this MultiRegion and all of its sub-regions around the given point
 	 * @param center The point to rotate this Region around
@@ -469,7 +496,20 @@ public class MultiRegion extends Region {
 		for (Region region : regions) {
 			region.rotate(center, rotations);
 		}
-		super.rotate(center, rotations);
+		Location start = getStart();
+		Location end = getEnd();
+		start.subtract(center);
+		end.subtract(center);
+		Rotator rotator = new Rotator(rotations, false);
+		rotator.setLocation(start.getX(), start.getZ());
+		start.setX(rotator.getRotatedX());
+		start.setZ(rotator.getRotatedZ());
+		rotator.setLocation(end.getX(), end.getZ());
+		end.setX(rotator.getRotatedX());
+		end.setZ(rotator.getRotatedZ());
+		start.add(center);
+		end.add(center);
+		setLocations(start, end);
 		return this;
 	}
 	
@@ -520,7 +560,7 @@ public class MultiRegion extends Region {
 		});
 		newRegions.addAll(subtract);
 		Location center = start.clone().add(end).multiply(0.5).getBlock().getLocation();
-		Region r = new Region(center, center);
+		Region r = new CuboidRegion(center, center);
 		if (contains(center) && expandToMax(r, null, summary)) {
 			newRegions.add(r);
 			blocks[0] = new MultiRegion(r);
@@ -530,9 +570,9 @@ public class MultiRegion extends Region {
 		while (added[0]) {
 			added[0] = false;
 			for (Region region : regions) {
-				Location loc = findFreePoint(region, newRegions);
+				Location loc = findFreePoint((CuboidRegion) region, newRegions);
 				if (loc != null) {
-					Region reg = new Region(loc, loc);
+					Region reg = new CuboidRegion(loc, loc);
 					if (expandToMax(reg, blocks[0], summary)) {
 						if (blocks[0] == null) {
 							blocks[0] = new MultiRegion(reg);
@@ -558,8 +598,8 @@ public class MultiRegion extends Region {
 		autoCluster();
 	}
 	
-	private Location findFreePoint(Region check, List<Region> exclude) {
-		List<Region> intersects = exclude.stream().map(check::getIntersection).filter(Objects::nonNull).collect(Collectors.toList());
+	private Location findFreePoint(CuboidRegion check, List<Region> exclude) {
+		List<Region> intersects = exclude.stream().map(r -> check.getIntersection((Overlappable) r)).filter(Objects::nonNull).collect(Collectors.toList());
 		if (intersects.size() == 0) {
 			return check.getCenter().getBlock().getLocation();
 		}
@@ -607,7 +647,7 @@ public class MultiRegion extends Region {
 	}
 	
 	private double getNonIntersectingVolume(Region r) {
-		MultiRegion intersection = getIntersection(r);
+		MultiRegion intersection = getIntersection((Overlappable) r);
 		if (intersection == null) {
 			return 0;
 		}
@@ -618,9 +658,9 @@ public class MultiRegion extends Region {
 			Region region = intersections.get(intersections.size() - 1);
 			for (int i = 0; i < intersections.size() - 1; i++) {
 				Region other = intersections.get(i);
-				Region tmp = region.getIntersection(other);
+				Region tmp = ((Overlappable) region).getIntersection((Overlappable) other);
 				if (tmp != null) {
-					tmp = tmp.getIntersection(r);
+					tmp = ((Overlappable) tmp).getIntersection((Overlappable) r);
 					if (tmp != null) {
 						overlap += tmp.getVolume();
 					}
@@ -675,7 +715,7 @@ public class MultiRegion extends Region {
 		String[] split = input.split(",");
 		List<Region> regions = new ArrayList<>(split.length);
 		for (String string : split) {
-			regions.add(Region.fromString(new StringBuilder(world.getName()).append(" ").append(string).toString()));
+			regions.add(CuboidRegion.fromString(new StringBuilder(world.getName()).append(" ").append(string).toString()));
 		}
 		return new MultiRegion(regions);
 	}

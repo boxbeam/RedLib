@@ -5,6 +5,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+import redempt.redlib.region.CuboidRegion;
 import redempt.redlib.region.Region;
 
 /**

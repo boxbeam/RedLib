@@ -159,6 +159,13 @@ extends java.lang.Object</pre>
 <div class="block">Constructs a CommandParser to parse input from the given stream.</div>
 </td>
 </tr>
+<tr class="rowColor">
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.io.InputStream,redempt.redlib.commandmanager.Messages)">CommandParser</a></span>&#8203;(java.io.InputStream&nbsp;stream,
+             <a href="Messages.html" title="class in redempt.redlib.commandmanager">Messages</a>&nbsp;messages)</code></th>
+<td class="colLast">
+<div class="block">Constructs a CommandParser to parse input from the given stream.</div>
+</td>
+</tr>
 </table>
 </li>
 </ul>
@@ -225,7 +232,7 @@ extends java.lang.Object</pre>
 <a id="&lt;init&gt;(java.io.InputStream)">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>CommandParser</h4>
 <pre>public&nbsp;CommandParser&#8203;(java.io.InputStream&nbsp;stream)</pre>
@@ -233,6 +240,22 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>stream</code> - The stream to read the command info from</dd>
+</dl>
+</li>
+</ul>
+<a id="&lt;init&gt;(java.io.InputStream,redempt.redlib.commandmanager.Messages)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>CommandParser</h4>
+<pre>public&nbsp;CommandParser&#8203;(java.io.InputStream&nbsp;stream,
+                     <a href="Messages.html" title="class in redempt.redlib.commandmanager">Messages</a>&nbsp;messages)</pre>
+<div class="block">Constructs a CommandParser to parse input from the given stream. Use <code>JavaPlugin.getResource(java.lang.String)</code> for this</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>stream</code> - The stream to read the command info from</dd>
+<dd><code>messages</code> - The messages to be used to supply help messages with the helpmsg tag</dd>
 </dl>
 </li>
 </ul>

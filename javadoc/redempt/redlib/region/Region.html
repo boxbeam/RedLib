@@ -27,8 +27,8 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":9,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":9,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10,"i37":10,"i38":10,"i39":10,"i40":10,"i41":10};
-var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
+var data = {"i0":6,"i1":6,"i2":10,"i3":10,"i4":6,"i5":6,"i6":10,"i7":10,"i8":6,"i9":10,"i10":10,"i11":10,"i12":10,"i13":6,"i14":10,"i15":10,"i16":10,"i17":10,"i18":6,"i19":6,"i20":10,"i21":10,"i22":10,"i23":6,"i24":6,"i25":10,"i26":10,"i27":6,"i28":6,"i29":6,"i30":10};
+var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -88,14 +88,14 @@ loadScripts(document, 'script');</script>
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
-<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
-<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
@@ -131,72 +131,24 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockList">
 <dl>
+<dt>All Implemented Interfaces:</dt>
+<dd><code>java.lang.Cloneable</code></dd>
+</dl>
+<dl>
 <dt>Direct Known Subclasses:</dt>
-<dd><code><a href="MultiRegion.html" title="class in redempt.redlib.region">MultiRegion</a></code></dd>
+<dd><code><a href="CuboidRegion.html" title="class in redempt.redlib.region">CuboidRegion</a></code>, <code><a href="MultiRegion.html" title="class in redempt.redlib.region">MultiRegion</a></code>, <code><a href="SpheroidRegion.html" title="class in redempt.redlib.region">SpheroidRegion</a></code></dd>
 </dl>
 <hr>
-<pre>public class <span class="typeNameLabel">Region</span>
-extends java.lang.Object</pre>
-<div class="block">Represents a cuboid region in a world</div>
+<pre>public abstract class <span class="typeNameLabel">Region</span>
+extends java.lang.Object
+implements java.lang.Cloneable</pre>
+<div class="block">Represents a region of an unspecified shape in the world</div>
 </li>
 </ul>
 </div>
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
-<!-- ======== NESTED CLASS SUMMARY ======== -->
-<section role="region">
-<ul class="blockList">
-<li class="blockList"><a id="nested.class.summary">
-<!--   -->
-</a>
-<h3>Nested Class Summary</h3>
-<table class="memberSummary">
-<caption><span>Nested Classes</span><span class="tabEnd">&nbsp;</span></caption>
-<tr>
-<th class="colFirst" scope="col">Modifier and Type</th>
-<th class="colSecond" scope="col">Class</th>
-<th class="colLast" scope="col">Description</th>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>static class&nbsp;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="Region.RegionState.html" title="class in redempt.redlib.region">Region.RegionState</a></span></code></th>
-<td class="colLast">
-<div class="block">Represents a state of a Region, not necessarily at the current point in time</div>
-</td>
-</tr>
-</table>
-</li>
-</ul>
-</section>
-<!-- =========== FIELD SUMMARY =========== -->
-<section role="region">
-<ul class="blockList">
-<li class="blockList"><a id="field.summary">
-<!--   -->
-</a>
-<h3>Field Summary</h3>
-<table class="memberSummary">
-<caption><span>Fields</span><span class="tabEnd">&nbsp;</span></caption>
-<tr>
-<th class="colFirst" scope="col">Modifier and Type</th>
-<th class="colSecond" scope="col">Field</th>
-<th class="colLast" scope="col">Description</th>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>protected org.bukkit.Location</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#end">end</a></span></code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>protected org.bukkit.Location</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#start">start</a></span></code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-</table>
-</li>
-</ul>
-</section>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <section role="region">
 <ul class="blockList">
@@ -207,22 +159,12 @@ extends java.lang.Object</pre>
 <table class="memberSummary">
 <caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
 <tr>
-<th class="colFirst" scope="col">Modifier</th>
-<th class="colSecond" scope="col">Constructor</th>
+<th class="colFirst" scope="col">Constructor</th>
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>protected </code></td>
 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E()">Region</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>&nbsp;</code></td>
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.bukkit.Location,org.bukkit.Location)">Region</a></span>&#8203;(org.bukkit.Location&nbsp;start,
-      org.bukkit.Location&nbsp;end)</code></th>
-<td class="colLast">
-<div class="block">Construct a Region using 2 corners</div>
-</td>
 </tr>
 </table>
 </li>
@@ -236,57 +178,40 @@ extends java.lang.Object</pre>
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t3" class="tableTab"><span><a href="javascript:show(4);">Abstract Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colSecond" scope="col">Method</th>
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
+<td class="colFirst"><code>abstract <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#clone()">clone</a></span>()</code></th>
-<td class="colLast">
-<div class="block">Clones this Region</div>
-</td>
+<td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>boolean</code></td>
+<td class="colFirst"><code>abstract boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#contains(org.bukkit.Location)">contains</a></span>&#8203;(org.bukkit.Location&nbsp;loc)</code></th>
 <td class="colLast">
-<div class="block">Check whether a location is inside this Region</div>
+<div class="block">Determines if this Region contains a Location</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code>static <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#cubeRadius(org.bukkit.Location,int)">cubeRadius</a></span>&#8203;(org.bukkit.Location&nbsp;loc,
-          int&nbsp;radius)</code></th>
-<td class="colLast">
-<div class="block">Gets a Region covering a cubic radius centered around a Location</div>
-</td>
-</tr>
-<tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#disableEvents()">disableEvents</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Disable RegionEnterEvent and RegionExitEvent for this region</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#enableEvents()">enableEvents</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Enable RegionEnterEvent and RegionExitEvent for this region</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
-<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#expand(double)">expand</a></span>&#8203;(double&nbsp;amount)</code></th>
-<td class="colLast">
-<div class="block">Expands the region in all directions, or retracts if negative.</div>
-</td>
-</tr>
-<tr id="i6" class="altColor">
-<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
+<tr id="i4" class="altColor">
+<td class="colFirst"><code>abstract <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#expand(double,double,double,double,double,double)">expand</a></span>&#8203;(double&nbsp;posX,
       double&nbsp;negX,
       double&nbsp;posY,
@@ -294,246 +219,173 @@ extends java.lang.Object</pre>
       double&nbsp;posZ,
       double&nbsp;negZ)</code></th>
 <td class="colLast">
-<div class="block">Expands the region, or retracts where negative values are passed</div>
+<div class="block">Expands this Region by a specified amount in each direction</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>abstract <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#expand(org.bukkit.block.BlockFace,double)">expand</a></span>&#8203;(org.bukkit.block.BlockFace&nbsp;face,
+      double&nbsp;amount)</code></th>
+<td class="colLast">
+<div class="block">Expands this Region in a specific direction</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#forEachBlock(java.util.function.Consumer)">forEachBlock</a></span>&#8203;(java.util.function.Consumer&lt;org.bukkit.block.Block&gt;&nbsp;forEach)</code></th>
+<td class="colLast">
+<div class="block">Streams every Block in this Region, running your lambda on it</div>
 </td>
 </tr>
 <tr id="i7" class="rowColor">
-<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#expand(int)">expand</a></span>&#8203;(int&nbsp;amount)</code></th>
-<td class="colLast">
-<div class="block">Expands the region in all directions, or retracts if negative.</div>
-</td>
-</tr>
-<tr id="i8" class="altColor">
-<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#expand(int,int,int,int,int,int)">expand</a></span>&#8203;(int&nbsp;posX,
-      int&nbsp;negX,
-      int&nbsp;posY,
-      int&nbsp;negY,
-      int&nbsp;posZ,
-      int&nbsp;negZ)</code></th>
-<td class="colLast">
-<div class="block">Expands the region, or retracts where negative values are passed</div>
-</td>
-</tr>
-<tr id="i9" class="rowColor">
-<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#expand(org.bukkit.block.BlockFace,double)">expand</a></span>&#8203;(org.bukkit.block.BlockFace&nbsp;direction,
-      double&nbsp;amount)</code></th>
-<td class="colLast">
-<div class="block">Expand the region in a given direction, or retracts if negative.</div>
-</td>
-</tr>
-<tr id="i10" class="altColor">
-<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#expand(org.bukkit.block.BlockFace,int)">expand</a></span>&#8203;(org.bukkit.block.BlockFace&nbsp;direction,
-      int&nbsp;amount)</code></th>
-<td class="colLast">
-<div class="block">Expand the region in a given direction, or retracts if negative.</div>
-</td>
-</tr>
-<tr id="i11" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#forEachBlock(java.util.function.Consumer)">forEachBlock</a></span>&#8203;(java.util.function.Consumer&lt;org.bukkit.block.Block&gt;&nbsp;lambda)</code></th>
-<td class="colLast">
-<div class="block">Run a lambda on every Block in this Region</div>
-</td>
-</tr>
-<tr id="i12" class="altColor">
-<td class="colFirst"><code>static <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromString(java.lang.String)">fromString</a></span>&#8203;(java.lang.String&nbsp;input)</code></th>
-<td class="colLast">
-<div class="block">Converts a String generated by <a href="#toString()"><code>toString()</code></a> back to a Region</div>
-</td>
-</tr>
-<tr id="i13" class="rowColor">
 <td class="colFirst"><code>int[]</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getBlockDimensions()">getBlockDimensions</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Get the dimensions of this Region [x, y, z] in blocks</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
-<td class="colFirst"><code>int</code></td>
+<tr id="i8" class="altColor">
+<td class="colFirst"><code>abstract int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getBlockVolume()">getBlockVolume</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>org.bukkit.Location</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCenter()">getCenter</a></span>()</code></th>
-<td class="colLast">
-<div class="block">Gets the center of this Region</div>
-</td>
+<td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;org.bukkit.Chunk&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getChunks()">getChunks</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>org.bukkit.Location[]</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCorners()">getCorners</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>double[]</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDimensions()">getDimensions</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Get the dimensions of this Region [x, y, z]</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
-<td class="colFirst"><code>org.bukkit.Location</code></td>
+<tr id="i13" class="rowColor">
+<td class="colFirst"><code>abstract org.bukkit.Location</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getEnd()">getEnd</a></span>()</code></th>
-<td class="colLast">
-<div class="block">Get the maximum corner of this Region</div>
-</td>
+<td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>java.util.List&lt;org.bukkit.entity.Entity&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getEntities()">getEntities</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Gets all entities contained in this Region in loaded chunks</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;org.bukkit.entity.Entity&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getEntities(boolean)">getEntities</a></span>&#8203;(boolean&nbsp;load)</code></th>
 <td class="colLast">
 <div class="block">Gets all entities contained in this Region</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
-<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getIntersection(redempt.redlib.region.Region)">getIntersection</a></span>&#8203;(<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;o)</code></th>
-<td class="colLast">
-<div class="block">Gets the cuboid intersection of this Region and another cuboid Region</div>
-</td>
-</tr>
-<tr id="i23" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;org.bukkit.Chunk&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLoadedChunks()">getLoadedChunks</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>java.util.List&lt;org.bukkit.entity.Player&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPlayers()">getPlayers</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Gets all players contained in this Region</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
-<td class="colFirst"><code>org.bukkit.Location</code></td>
+<tr id="i18" class="altColor">
+<td class="colFirst"><code>abstract org.bukkit.Location</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getStart()">getStart</a></span>()</code></th>
-<td class="colLast">
-<div class="block">Get the minimum corner of this Region</div>
-</td>
+<td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i26" class="altColor">
-<td class="colFirst"><code><a href="Region.RegionState.html" title="class in redempt.redlib.region">Region.RegionState</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getState()">getState</a></span>()</code></th>
-<td class="colLast">
-<div class="block">Gets the current state of this Region</div>
-</td>
-</tr>
-<tr id="i27" class="rowColor">
-<td class="colFirst"><code>double</code></td>
+<tr id="i19" class="rowColor">
+<td class="colFirst"><code>abstract double</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getVolume()">getVolume</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>org.bukkit.World</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getWorld()">getWorld</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i29" class="rowColor">
-<td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isMulti()">isMulti</a></span>()</code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr id="i30" class="altColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>double</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#measure(org.bukkit.block.BlockFace)">measure</a></span>&#8203;(org.bukkit.block.BlockFace&nbsp;direction)</code></th>
 <td class="colLast">
 <div class="block">Gets the length of this Region along a given axis</div>
 </td>
 </tr>
-<tr id="i31" class="rowColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#measureBlocks(org.bukkit.block.BlockFace)">measureBlocks</a></span>&#8203;(org.bukkit.block.BlockFace&nbsp;direction)</code></th>
 <td class="colLast">
 <div class="block">Gets the block length of this Region along a given axis</div>
 </td>
 </tr>
-<tr id="i32" class="altColor">
-<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#move(int,int,int)">move</a></span>&#8203;(int&nbsp;x,
-    int&nbsp;y,
-    int&nbsp;z)</code></th>
+<tr id="i23" class="rowColor">
+<td class="colFirst"><code>abstract <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#move(double,double,double)">move</a></span>&#8203;(double&nbsp;x,
+    double&nbsp;y,
+    double&nbsp;z)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i24" class="altColor">
+<td class="colFirst"><code>abstract <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#move(org.bukkit.util.Vector)">move</a></span>&#8203;(org.bukkit.util.Vector&nbsp;vec)</code></th>
 <td class="colLast">
-<div class="block">Move the region</div>
+<div class="block">Moves this Region</div>
 </td>
 </tr>
-<tr id="i33" class="rowColor">
-<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#move(org.bukkit.util.Vector)">move</a></span>&#8203;(org.bukkit.util.Vector&nbsp;v)</code></th>
+<tr id="i25" class="rowColor">
+<td class="colFirst"><code><a href="../protection/ProtectedRegion.html" title="class in redempt.redlib.protection">ProtectedRegion</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#protect(org.bukkit.plugin.Plugin,redempt.redlib.protection.ProtectionPolicy.ProtectionType...)">protect</a></span>&#8203;(org.bukkit.plugin.Plugin&nbsp;plugin,
+       <a href="../protection/ProtectionPolicy.ProtectionType.html" title="enum in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a>...&nbsp;types)</code></th>
 <td class="colLast">
-<div class="block">Move the region</div>
+<div class="block">Protects this Region</div>
 </td>
 </tr>
-<tr id="i34" class="altColor">
-<td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#overlaps(redempt.redlib.region.Region)">overlaps</a></span>&#8203;(<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;o)</code></th>
-<td class="colLast">
-<div class="block">Check if this Region overlaps with another.</div>
-</td>
-</tr>
-<tr id="i35" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code><a href="../protection/ProtectedRegion.html" title="class in redempt.redlib.protection">ProtectedRegion</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#protect(redempt.redlib.protection.ProtectionPolicy.ProtectionType...)">protect</a></span>&#8203;(<a href="../protection/ProtectionPolicy.ProtectionType.html" title="enum in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a>...&nbsp;types)</code></th>
 <td class="colLast">
-<div class="block">Protect this region with the given protection types</div>
+<div class="block">Protects this Region</div>
 </td>
 </tr>
-<tr id="i36" class="altColor">
-<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rotate(int)">rotate</a></span>&#8203;(int&nbsp;rotations)</code></th>
-<td class="colLast">
-<div class="block">Rotates this Region around its center</div>
-</td>
-</tr>
-<tr id="i37" class="rowColor">
-<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
+<tr id="i27" class="rowColor">
+<td class="colFirst"><code>abstract <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rotate(org.bukkit.Location,int)">rotate</a></span>&#8203;(org.bukkit.Location&nbsp;center,
       int&nbsp;rotations)</code></th>
 <td class="colLast">
-<div class="block">Rotates this Region around a point</div>
+<div class="block">Rotates this Region around a central point</div>
 </td>
 </tr>
-<tr id="i38" class="altColor">
-<td class="colFirst"><code>protected void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setLocations(org.bukkit.Location,org.bukkit.Location)">setLocations</a></span>&#8203;(org.bukkit.Location&nbsp;start,
-            org.bukkit.Location&nbsp;end)</code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr id="i39" class="rowColor">
-<td class="colFirst"><code><a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
+<tr id="i28" class="altColor">
+<td class="colFirst"><code>abstract <a href="Region.html" title="class in redempt.redlib.region">Region</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setWorld(org.bukkit.World)">setWorld</a></span>&#8203;(org.bukkit.World&nbsp;world)</code></th>
 <td class="colLast">
-<div class="block">Set the world of this region, while keeping the coordinates the same</div>
+<div class="block">Sets the World of this Region</div>
 </td>
 </tr>
-<tr id="i40" class="altColor">
-<td class="colFirst"><code>java.util.stream.Stream&lt;org.bukkit.block.Block&gt;</code></td>
+<tr id="i29" class="rowColor">
+<td class="colFirst"><code>abstract java.util.stream.Stream&lt;org.bukkit.block.Block&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#stream()">stream</a></span>()</code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr id="i41" class="rowColor">
-<td class="colFirst"><code>java.lang.String</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString()">toString</a></span>()</code></th>
 <td class="colLast">
-<div class="block">Converts this Region to a String which can be converted back with <a href="#fromString(java.lang.String)"><code>fromString(String)</code></a> later</div>
+<div class="block">Streams all Blocks inside this Region</div>
 </td>
+</tr>
+<tr id="i30" class="altColor">
+<td class="colFirst"><code><a href="CuboidRegion.html" title="class in redempt.redlib.region">CuboidRegion</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toCuboid()">toCuboid</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -541,7 +393,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;java.lang.Object</h3>
-<code>equals, finalize, getClass, hashCode, notify, notifyAll, wait, wait, wait</code></li>
+<code>equals, finalize, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</code></li>
 </ul>
 </li>
 </ul>
@@ -552,34 +404,6 @@ extends java.lang.Object</pre>
 <div class="details">
 <ul class="blockList">
 <li class="blockList">
-<!-- ============ FIELD DETAIL =========== -->
-<section role="region">
-<ul class="blockList">
-<li class="blockList"><a id="field.detail">
-<!--   -->
-</a>
-<h3>Field Detail</h3>
-<a id="start">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>start</h4>
-<pre>protected&nbsp;org.bukkit.Location start</pre>
-</li>
-</ul>
-<a id="end">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>end</h4>
-<pre>protected&nbsp;org.bukkit.Location end</pre>
-</li>
-</ul>
-</li>
-</ul>
-</section>
 <!-- ========= CONSTRUCTOR DETAIL ======== -->
 <section role="region">
 <ul class="blockList">
@@ -587,29 +411,13 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(org.bukkit.Location,org.bukkit.Location)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>Region</h4>
-<pre>public&nbsp;Region&#8203;(org.bukkit.Location&nbsp;start,
-              org.bukkit.Location&nbsp;end)</pre>
-<div class="block">Construct a Region using 2 corners</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>start</code> - The first corner</dd>
-<dd><code>end</code> - The second corner</dd>
-</dl>
-</li>
-</ul>
 <a id="&lt;init&gt;()">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>Region</h4>
-<pre>protected&nbsp;Region()</pre>
+<pre>public&nbsp;Region()</pre>
 </li>
 </ul>
 </li>
@@ -622,32 +430,232 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="cubeRadius(org.bukkit.Location,int)">
+<a id="getStart()">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>cubeRadius</h4>
-<pre class="methodSignature">public static&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;cubeRadius&#8203;(org.bukkit.Location&nbsp;loc,
-                                int&nbsp;radius)</pre>
-<div class="block">Gets a Region covering a cubic radius centered around a Location</div>
+<h4>getStart</h4>
+<pre class="methodSignature">public abstract&nbsp;org.bukkit.Location&nbsp;getStart()</pre>
 <dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>loc</code> - The center</dd>
-<dd><code>radius</code> - The block radius</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>A Region covering the specified radius</dd>
+<dd>The least extreme corner of this Region</dd>
 </dl>
 </li>
 </ul>
-<a id="setLocations(org.bukkit.Location,org.bukkit.Location)">
+<a id="getEnd()">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>setLocations</h4>
-<pre class="methodSignature">protected&nbsp;void&nbsp;setLocations&#8203;(org.bukkit.Location&nbsp;start,
-                            org.bukkit.Location&nbsp;end)</pre>
+<h4>getEnd</h4>
+<pre class="methodSignature">public abstract&nbsp;org.bukkit.Location&nbsp;getEnd()</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The most extreme corner of this Region</dd>
+</dl>
+</li>
+</ul>
+<a id="getVolume()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getVolume</h4>
+<pre class="methodSignature">public abstract&nbsp;double&nbsp;getVolume()</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The volume of this Region, in cubic meters</dd>
+</dl>
+</li>
+</ul>
+<a id="getBlockVolume()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getBlockVolume</h4>
+<pre class="methodSignature">public abstract&nbsp;int&nbsp;getBlockVolume()</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The volume of this Region, in whole blocks</dd>
+</dl>
+</li>
+</ul>
+<a id="expand(double,double,double,double,double,double)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>expand</h4>
+<pre class="methodSignature">public abstract&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;expand&#8203;(double&nbsp;posX,
+                              double&nbsp;negX,
+                              double&nbsp;posY,
+                              double&nbsp;negY,
+                              double&nbsp;posZ,
+                              double&nbsp;negZ)</pre>
+<div class="block">Expands this Region by a specified amount in each direction</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>posX</code> - The amount to increase in the positive X direction</dd>
+<dd><code>negX</code> - The amount to increase in the negative X direction</dd>
+<dd><code>posY</code> - The amount to increase in the positive Y direction</dd>
+<dd><code>negY</code> - The amount to increase in the negative Y direction</dd>
+<dd><code>posZ</code> - The amount to increase in the positive Z direction</dd>
+<dd><code>negZ</code> - The amount to increase in the negative Z direction</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Itself</dd>
+</dl>
+</li>
+</ul>
+<a id="expand(org.bukkit.block.BlockFace,double)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>expand</h4>
+<pre class="methodSignature">public abstract&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;expand&#8203;(org.bukkit.block.BlockFace&nbsp;face,
+                              double&nbsp;amount)</pre>
+<div class="block">Expands this Region in a specific direction</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>face</code> - The BlockFace representing the direction to expand in</dd>
+<dd><code>amount</code> - The amount to expand</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Itself</dd>
+</dl>
+</li>
+</ul>
+<a id="move(org.bukkit.util.Vector)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>move</h4>
+<pre class="methodSignature">public abstract&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;move&#8203;(org.bukkit.util.Vector&nbsp;vec)</pre>
+<div class="block">Moves this Region</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>vec</code> - The vector representing the direction and amount to move</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Itself</dd>
+</dl>
+</li>
+</ul>
+<a id="move(double,double,double)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>move</h4>
+<pre class="methodSignature">public abstract&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;move&#8203;(double&nbsp;x,
+                            double&nbsp;y,
+                            double&nbsp;z)</pre>
+</li>
+</ul>
+<a id="contains(org.bukkit.Location)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>contains</h4>
+<pre class="methodSignature">public abstract&nbsp;boolean&nbsp;contains&#8203;(org.bukkit.Location&nbsp;loc)</pre>
+<div class="block">Determines if this Region contains a Location</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>loc</code> - The location to check</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Whether the location is contained by this Region</dd>
+</dl>
+</li>
+</ul>
+<a id="clone()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>clone</h4>
+<pre class="methodSignature">public abstract&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;clone()</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code>clone</code>&nbsp;in class&nbsp;<code>java.lang.Object</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A clone of this Region</dd>
+</dl>
+</li>
+</ul>
+<a id="rotate(org.bukkit.Location,int)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>rotate</h4>
+<pre class="methodSignature">public abstract&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;rotate&#8203;(org.bukkit.Location&nbsp;center,
+                              int&nbsp;rotations)</pre>
+<div class="block">Rotates this Region around a central point</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>center</code> - The center of rotation</dd>
+<dd><code>rotations</code> - The number of clockwise rotations</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Itself</dd>
+</dl>
+</li>
+</ul>
+<a id="setWorld(org.bukkit.World)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setWorld</h4>
+<pre class="methodSignature">public abstract&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;setWorld&#8203;(org.bukkit.World&nbsp;world)</pre>
+<div class="block">Sets the World of this Region</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>world</code> - The World</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Itself</dd>
+</dl>
+</li>
+</ul>
+<a id="stream()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>stream</h4>
+<pre class="methodSignature">public abstract&nbsp;java.util.stream.Stream&lt;org.bukkit.block.Block&gt;&nbsp;stream()</pre>
+<div class="block">Streams all Blocks inside this Region</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The stream of all Blocks contained in this Region</dd>
+</dl>
+</li>
+</ul>
+<a id="getChunks()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getChunks</h4>
+<pre class="methodSignature">public&nbsp;java.util.Set&lt;org.bukkit.Chunk&gt;&nbsp;getChunks()</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>All the Chunks this Region overlaps</dd>
+</dl>
+</li>
+</ul>
+<a id="getLoadedChunks()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getLoadedChunks</h4>
+<pre class="methodSignature">public&nbsp;java.util.Set&lt;org.bukkit.Chunk&gt;&nbsp;getLoadedChunks()</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>All the loaded Chunks this Region overlaps</dd>
+</dl>
 </li>
 </ul>
 <a id="enableEvents()">
@@ -670,488 +678,17 @@ extends java.lang.Object</pre>
 <div class="block">Disable RegionEnterEvent and RegionExitEvent for this region</div>
 </li>
 </ul>
-<a id="getStart()">
+<a id="getPlayers()">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getStart</h4>
-<pre class="methodSignature">public&nbsp;org.bukkit.Location&nbsp;getStart()</pre>
-<div class="block">Get the minimum corner of this Region</div>
+<h4>getPlayers</h4>
+<pre class="methodSignature">public&nbsp;java.util.List&lt;org.bukkit.entity.Player&gt;&nbsp;getPlayers()</pre>
+<div class="block">Gets all players contained in this Region</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The corner with the lowest X, Y, and Z values</dd>
-</dl>
-</li>
-</ul>
-<a id="getEnd()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getEnd</h4>
-<pre class="methodSignature">public&nbsp;org.bukkit.Location&nbsp;getEnd()</pre>
-<div class="block">Get the maximum corner of this Region</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The corner with the highest X, Y, and Z values</dd>
-</dl>
-</li>
-</ul>
-<a id="getCorners()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getCorners</h4>
-<pre class="methodSignature">public&nbsp;org.bukkit.Location[]&nbsp;getCorners()</pre>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>An array of size 8 containing all corners of this Region</dd>
-</dl>
-</li>
-</ul>
-<a id="getCenter()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getCenter</h4>
-<pre class="methodSignature">public&nbsp;org.bukkit.Location&nbsp;getCenter()</pre>
-<div class="block">Gets the center of this Region</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>A Location representing the center of this Region</dd>
-</dl>
-</li>
-</ul>
-<a id="contains(org.bukkit.Location)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>contains</h4>
-<pre class="methodSignature">public&nbsp;boolean&nbsp;contains&#8203;(org.bukkit.Location&nbsp;loc)</pre>
-<div class="block">Check whether a location is inside this Region</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>loc</code> - The location to check</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Whether this Region contains the given Location</dd>
-</dl>
-</li>
-</ul>
-<a id="getBlockDimensions()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getBlockDimensions</h4>
-<pre class="methodSignature">public&nbsp;int[]&nbsp;getBlockDimensions()</pre>
-<div class="block">Get the dimensions of this Region [x, y, z] in blocks</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The dimensions of this Region</dd>
-</dl>
-</li>
-</ul>
-<a id="getVolume()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getVolume</h4>
-<pre class="methodSignature">public&nbsp;double&nbsp;getVolume()</pre>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The volume of this Region, in cubic meters</dd>
-</dl>
-</li>
-</ul>
-<a id="getBlockVolume()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getBlockVolume</h4>
-<pre class="methodSignature">public&nbsp;int&nbsp;getBlockVolume()</pre>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The volume of this Region, in blocks</dd>
-</dl>
-</li>
-</ul>
-<a id="getDimensions()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getDimensions</h4>
-<pre class="methodSignature">public&nbsp;double[]&nbsp;getDimensions()</pre>
-<div class="block">Get the dimensions of this Region [x, y, z]</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The dimensions of this Region</dd>
-</dl>
-</li>
-</ul>
-<a id="measure(org.bukkit.block.BlockFace)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>measure</h4>
-<pre class="methodSignature">public&nbsp;double&nbsp;measure&#8203;(org.bukkit.block.BlockFace&nbsp;direction)</pre>
-<div class="block">Gets the length of this Region along a given axis</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>direction</code> - The BlockFace representing the axis - opposites will act the same (i.e. UP, DOWN)</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The length of this Region along the given axis</dd>
-</dl>
-</li>
-</ul>
-<a id="measureBlocks(org.bukkit.block.BlockFace)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>measureBlocks</h4>
-<pre class="methodSignature">public&nbsp;int&nbsp;measureBlocks&#8203;(org.bukkit.block.BlockFace&nbsp;direction)</pre>
-<div class="block">Gets the block length of this Region along a given axis</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>direction</code> - The BlockFace representing the axis - opposites will act the same (i.e. UP, DOWN)</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The block length of this Region along the given axis</dd>
-</dl>
-</li>
-</ul>
-<a id="getState()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getState</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.RegionState.html" title="class in redempt.redlib.region">Region.RegionState</a>&nbsp;getState()</pre>
-<div class="block">Gets the current state of this Region</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The state of this Region</dd>
-</dl>
-</li>
-</ul>
-<a id="clone()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>clone</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;clone()</pre>
-<div class="block">Clones this Region</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>clone</code>&nbsp;in class&nbsp;<code>java.lang.Object</code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>A clone of this Region</dd>
-</dl>
-</li>
-</ul>
-<a id="expand(double)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>expand</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;expand&#8203;(double&nbsp;amount)</pre>
-<div class="block">Expands the region in all directions, or retracts if negative. If this is a MultiRegion,
- makes 6 calls to <a href="MultiRegion.html#expand(org.bukkit.block.BlockFace,double)"><code>MultiRegion.expand(BlockFace, double)</code></a>, meaning it is very expensive.
- Check if this is a MultiRegion before expanding.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>amount</code> - The amount to expand the region by</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Itself</dd>
-</dl>
-</li>
-</ul>
-<a id="expand(int)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>expand</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;expand&#8203;(int&nbsp;amount)</pre>
-<div class="block">Expands the region in all directions, or retracts if negative. If this is a MultiRegion,
- makes 6 calls to <a href="MultiRegion.html#expand(org.bukkit.block.BlockFace,double)"><code>MultiRegion.expand(BlockFace, double)</code></a>, meaning it is very expensive.
- Check if this is a MultiRegion before expanding.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>amount</code> - The amount to expand the region by</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Itself</dd>
-</dl>
-</li>
-</ul>
-<a id="expand(double,double,double,double,double,double)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>expand</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;expand&#8203;(double&nbsp;posX,
-                     double&nbsp;negX,
-                     double&nbsp;posY,
-                     double&nbsp;negY,
-                     double&nbsp;posZ,
-                     double&nbsp;negZ)</pre>
-<div class="block">Expands the region, or retracts where negative values are passed</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>posX</code> - The amount to expand the region in the positive X direction</dd>
-<dd><code>negX</code> - The amount to expand the region in the negative X direction</dd>
-<dd><code>posY</code> - The amount to expand the region in the positive Y direction</dd>
-<dd><code>negY</code> - The amount to expand the region in the negative Y direction</dd>
-<dd><code>posZ</code> - The amount to expand the region in the positive Z direction</dd>
-<dd><code>negZ</code> - The amount to expand the region in the negative Z direction</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Itself</dd>
-</dl>
-</li>
-</ul>
-<a id="expand(int,int,int,int,int,int)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>expand</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;expand&#8203;(int&nbsp;posX,
-                     int&nbsp;negX,
-                     int&nbsp;posY,
-                     int&nbsp;negY,
-                     int&nbsp;posZ,
-                     int&nbsp;negZ)</pre>
-<div class="block">Expands the region, or retracts where negative values are passed</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>posX</code> - The amount to expand the region in the positive X direction</dd>
-<dd><code>negX</code> - The amount to expand the region in the negative X direction</dd>
-<dd><code>posY</code> - The amount to expand the region in the positive Y direction</dd>
-<dd><code>negY</code> - The amount to expand the region in the negative Y direction</dd>
-<dd><code>posZ</code> - The amount to expand the region in the positive Z direction</dd>
-<dd><code>negZ</code> - The amount to expand the region in the negative Z direction</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Itself</dd>
-</dl>
-</li>
-</ul>
-<a id="expand(org.bukkit.block.BlockFace,double)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>expand</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;expand&#8203;(org.bukkit.block.BlockFace&nbsp;direction,
-                     double&nbsp;amount)</pre>
-<div class="block">Expand the region in a given direction, or retracts if negative.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>direction</code> - The direction to expand the region in</dd>
-<dd><code>amount</code> - The amount to expand the region in the given direction</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Itself</dd>
-</dl>
-</li>
-</ul>
-<a id="expand(org.bukkit.block.BlockFace,int)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>expand</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;expand&#8203;(org.bukkit.block.BlockFace&nbsp;direction,
-                     int&nbsp;amount)</pre>
-<div class="block">Expand the region in a given direction, or retracts if negative.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>direction</code> - The direction to expand the region in</dd>
-<dd><code>amount</code> - The amount to expand the region in the given direction</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Itself</dd>
-</dl>
-</li>
-</ul>
-<a id="move(org.bukkit.util.Vector)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>move</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;move&#8203;(org.bukkit.util.Vector&nbsp;v)</pre>
-<div class="block">Move the region</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>v</code> - The vector to be applied to both corners of the region</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Itself</dd>
-</dl>
-</li>
-</ul>
-<a id="setWorld(org.bukkit.World)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>setWorld</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;setWorld&#8203;(org.bukkit.World&nbsp;world)</pre>
-<div class="block">Set the world of this region, while keeping the coordinates the same</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>world</code> - The world to set</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Itself</dd>
-</dl>
-</li>
-</ul>
-<a id="move(int,int,int)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>move</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;move&#8203;(int&nbsp;x,
-                   int&nbsp;y,
-                   int&nbsp;z)</pre>
-<div class="block">Move the region</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>x</code> - How much to move the region on the X axis</dd>
-<dd><code>y</code> - How much to move the region on the Y axis</dd>
-<dd><code>z</code> - How much to move the region on the Z axis</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Itself</dd>
-</dl>
-</li>
-</ul>
-<a id="isMulti()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>isMulti</h4>
-<pre class="methodSignature">public&nbsp;boolean&nbsp;isMulti()</pre>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Whether this Region is a non-cuboid variant</dd>
-</dl>
-</li>
-</ul>
-<a id="protect(redempt.redlib.protection.ProtectionPolicy.ProtectionType...)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>protect</h4>
-<pre class="methodSignature">public&nbsp;<a href="../protection/ProtectedRegion.html" title="class in redempt.redlib.protection">ProtectedRegion</a>&nbsp;protect&#8203;(<a href="../protection/ProtectionPolicy.ProtectionType.html" title="enum in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a>...&nbsp;types)</pre>
-<div class="block">Protect this region with the given protection types</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>types</code> - The events to protect against. See <a href="../protection/ProtectionPolicy.ProtectionType.html#ALL"><code>ProtectionPolicy.ProtectionType.ALL</code></a> and <a href="../protection/ProtectionPolicy.ProtectionType.html#allExcept(redempt.redlib.protection.ProtectionPolicy.ProtectionType...)"><code>ProtectionPolicy.ProtectionType.allExcept(ProtectionType...)</code></a></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The <a href="../protection/ProtectedRegion.html" title="class in redempt.redlib.protection"><code>ProtectedRegion</code></a></dd>
-</dl>
-</li>
-</ul>
-<a id="forEachBlock(java.util.function.Consumer)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>forEachBlock</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;forEachBlock&#8203;(java.util.function.Consumer&lt;org.bukkit.block.Block&gt;&nbsp;lambda)</pre>
-<div class="block">Run a lambda on every Block in this Region</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>lambda</code> - The lambda to be run on each Block</dd>
-</dl>
-</li>
-</ul>
-<a id="getWorld()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getWorld</h4>
-<pre class="methodSignature">public&nbsp;org.bukkit.World&nbsp;getWorld()</pre>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The World this Region is in</dd>
-</dl>
-</li>
-</ul>
-<a id="overlaps(redempt.redlib.region.Region)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>overlaps</h4>
-<pre class="methodSignature">public&nbsp;boolean&nbsp;overlaps&#8203;(<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;o)</pre>
-<div class="block">Check if this Region overlaps with another.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>o</code> - The Region to check against</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Whether this Region overlaps with the given Region</dd>
-</dl>
-</li>
-</ul>
-<a id="rotate(org.bukkit.Location,int)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>rotate</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;rotate&#8203;(org.bukkit.Location&nbsp;center,
-                     int&nbsp;rotations)</pre>
-<div class="block">Rotates this Region around a point</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>center</code> - The point to rotate this Region around</dd>
-<dd><code>rotations</code> - The number of clockwise rotations to apply</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Itself</dd>
-</dl>
-</li>
-</ul>
-<a id="rotate(int)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>rotate</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;rotate&#8203;(int&nbsp;rotations)</pre>
-<div class="block">Rotates this Region around its center</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>rotations</code> - The number of clockwise rotations to apply</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>Itself</dd>
-</dl>
-</li>
-</ul>
-<a id="getIntersection(redempt.redlib.region.Region)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getIntersection</h4>
-<pre class="methodSignature">public&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;getIntersection&#8203;(<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;o)</pre>
-<div class="block">Gets the cuboid intersection of this Region and another cuboid Region</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>o</code> - The Region to get the intersection with</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The intersection Region, or null if there is no intersection</dd>
+<dd>The players in this Region</dd>
 </dl>
 </li>
 </ul>
@@ -1185,88 +722,163 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a id="getPlayers()">
+<a id="getWorld()">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getPlayers</h4>
-<pre class="methodSignature">public&nbsp;java.util.List&lt;org.bukkit.entity.Player&gt;&nbsp;getPlayers()</pre>
-<div class="block">Gets all players contained in this Region</div>
+<h4>getWorld</h4>
+<pre class="methodSignature">public&nbsp;org.bukkit.World&nbsp;getWorld()</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The players in this Region</dd>
+<dd>The World this Region is in</dd>
 </dl>
 </li>
 </ul>
-<a id="getChunks()">
+<a id="forEachBlock(java.util.function.Consumer)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getChunks</h4>
-<pre class="methodSignature">public&nbsp;java.util.Set&lt;org.bukkit.Chunk&gt;&nbsp;getChunks()</pre>
+<h4>forEachBlock</h4>
+<pre class="methodSignature">public&nbsp;void&nbsp;forEachBlock&#8203;(java.util.function.Consumer&lt;org.bukkit.block.Block&gt;&nbsp;forEach)</pre>
+<div class="block">Streams every Block in this Region, running your lambda on it</div>
 <dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>All the Chunks this Region overlaps</dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>forEach</code> - What to run on each Block</dd>
 </dl>
 </li>
 </ul>
-<a id="getLoadedChunks()">
+<a id="getBlockDimensions()">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getLoadedChunks</h4>
-<pre class="methodSignature">public&nbsp;java.util.Set&lt;org.bukkit.Chunk&gt;&nbsp;getLoadedChunks()</pre>
+<h4>getBlockDimensions</h4>
+<pre class="methodSignature">public&nbsp;int[]&nbsp;getBlockDimensions()</pre>
+<div class="block">Get the dimensions of this Region [x, y, z] in blocks</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>All the loaded Chunks this Region overlaps</dd>
+<dd>The dimensions of this Region</dd>
 </dl>
 </li>
 </ul>
-<a id="stream()">
+<a id="getDimensions()">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>stream</h4>
-<pre class="methodSignature">public&nbsp;java.util.stream.Stream&lt;org.bukkit.block.Block&gt;&nbsp;stream()</pre>
+<h4>getDimensions</h4>
+<pre class="methodSignature">public&nbsp;double[]&nbsp;getDimensions()</pre>
+<div class="block">Get the dimensions of this Region [x, y, z]</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>A Stream of all the blocks in this Region</dd>
+<dd>The dimensions of this Region</dd>
 </dl>
 </li>
 </ul>
-<a id="toString()">
+<a id="getCorners()">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>toString</h4>
-<pre class="methodSignature">public&nbsp;java.lang.String&nbsp;toString()</pre>
-<div class="block">Converts this Region to a String which can be converted back with <a href="#fromString(java.lang.String)"><code>fromString(String)</code></a> later</div>
+<h4>getCorners</h4>
+<pre class="methodSignature">public&nbsp;org.bukkit.Location[]&nbsp;getCorners()</pre>
 <dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>toString</code>&nbsp;in class&nbsp;<code>java.lang.Object</code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The String representation of this Region</dd>
+<dd>All 8 cuboid corners of this Region</dd>
 </dl>
 </li>
 </ul>
-<a id="fromString(java.lang.String)">
+<a id="toCuboid()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>toCuboid</h4>
+<pre class="methodSignature">public&nbsp;<a href="CuboidRegion.html" title="class in redempt.redlib.region">CuboidRegion</a>&nbsp;toCuboid()</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A cuboid representation of this Region using the extreme corners</dd>
+</dl>
+</li>
+</ul>
+<a id="getCenter()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getCenter</h4>
+<pre class="methodSignature">public&nbsp;org.bukkit.Location&nbsp;getCenter()</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The center of this Region, the midpoint of the two extreme corners</dd>
+</dl>
+</li>
+</ul>
+<a id="protect(org.bukkit.plugin.Plugin,redempt.redlib.protection.ProtectionPolicy.ProtectionType...)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>protect</h4>
+<pre class="methodSignature">public&nbsp;<a href="../protection/ProtectedRegion.html" title="class in redempt.redlib.protection">ProtectedRegion</a>&nbsp;protect&#8203;(org.bukkit.plugin.Plugin&nbsp;plugin,
+                               <a href="../protection/ProtectionPolicy.ProtectionType.html" title="enum in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a>...&nbsp;types)</pre>
+<div class="block">Protects this Region</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>plugin</code> - The plugin registering the protection</dd>
+<dd><code>types</code> - The ProtectionTypes to protect this Region with</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The ProtectedRegion using this Region and the given ProtectionTypes</dd>
+</dl>
+</li>
+</ul>
+<a id="protect(redempt.redlib.protection.ProtectionPolicy.ProtectionType...)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>protect</h4>
+<pre class="methodSignature">public&nbsp;<a href="../protection/ProtectedRegion.html" title="class in redempt.redlib.protection">ProtectedRegion</a>&nbsp;protect&#8203;(<a href="../protection/ProtectionPolicy.ProtectionType.html" title="enum in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a>...&nbsp;types)</pre>
+<div class="block">Protects this Region</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>types</code> - The ProtectionTypes to protect this Region with</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The ProtectedRegion using this Region and the given ProtectionTypes</dd>
+</dl>
+</li>
+</ul>
+<a id="measure(org.bukkit.block.BlockFace)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>measure</h4>
+<pre class="methodSignature">public&nbsp;double&nbsp;measure&#8203;(org.bukkit.block.BlockFace&nbsp;direction)</pre>
+<div class="block">Gets the length of this Region along a given axis</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>direction</code> - The BlockFace representing the axis - opposites will act the same (i.e. UP, DOWN)</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The length of this Region along the given axis</dd>
+</dl>
+</li>
+</ul>
+<a id="measureBlocks(org.bukkit.block.BlockFace)">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>fromString</h4>
-<pre class="methodSignature">public static&nbsp;<a href="Region.html" title="class in redempt.redlib.region">Region</a>&nbsp;fromString&#8203;(java.lang.String&nbsp;input)</pre>
-<div class="block">Converts a String generated by <a href="#toString()"><code>toString()</code></a> back to a Region</div>
+<h4>measureBlocks</h4>
+<pre class="methodSignature">public&nbsp;int&nbsp;measureBlocks&#8203;(org.bukkit.block.BlockFace&nbsp;direction)</pre>
+<div class="block">Gets the block length of this Region along a given axis</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>input</code> - The String representation of a Region</dd>
+<dd><code>direction</code> - The BlockFace representing the axis - opposites will act the same (i.e. UP, DOWN)</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The Region</dd>
+<dd>The block length of this Region along the given axis</dd>
 </dl>
 </li>
 </ul>
@@ -1321,14 +933,14 @@ extends java.lang.Object</pre>
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
-<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
-<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>

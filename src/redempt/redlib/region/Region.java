@@ -1,446 +1,166 @@
 package redempt.redlib.region;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import redempt.redlib.RedLib;
 import redempt.redlib.misc.LocationUtils;
-import redempt.redlib.multiblock.Rotator;
 import redempt.redlib.protection.ProtectedRegion;
 import redempt.redlib.protection.ProtectionPolicy.ProtectionType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Represents a cuboid region in a world
- * @author Redempt
+ * Represents a region of an unspecified shape in the world
  */
-public class Region {
+public abstract class Region implements Cloneable {
 	
 	/**
-	 * Gets a Region covering a cubic radius centered around a Location
-	 * @param loc The center
-	 * @param radius The block radius
-	 * @return A Region covering the specified radius
+	 * @return The least extreme corner of this Region
 	 */
-	public static Region cubeRadius(Location loc, int radius) {
-		return new Region(loc.clone().subtract(radius, radius, radius), loc.clone().add(radius + 1, radius + 1, radius + 1));
-	}
-	
-	protected Location start;
-	protected Location end;
-	private Set<Chunk> chunkCache = null;
+	public abstract Location getStart();
 	
 	/**
-	 * Construct a Region using 2 corners
-	 * @param start The first corner
-	 * @param end The second corner
+	 * @return The most extreme corner of this Region
 	 */
-	public Region(Location start, Location end) {
-		setLocations(start, end);
-	}
+	public abstract Location getEnd();
 	
-	protected Region() {}
+	/**
+	 * @return The volume of this Region, in cubic meters
+	 */
+	public abstract double getVolume();
 	
-	protected void setLocations(Location start, Location end) {
-		if (!start.getWorld().equals(end.getWorld())) {
-			throw new IllegalArgumentException("Locations must be in the same world");
+	/**
+	 * @return The volume of this Region, in whole blocks
+	 */
+	public abstract int getBlockVolume();
+	
+	/**
+	 * Expands this Region by a specified amount in each direction
+	 * @param posX The amount to increase in the positive X direction
+	 * @param negX The amount to increase in the negative X direction
+	 * @param posY The amount to increase in the positive Y direction
+	 * @param negY The amount to increase in the negative Y direction
+	 * @param posZ The amount to increase in the positive Z direction
+	 * @param negZ The amount to increase in the negative Z direction
+	 * @return Itself
+	 */
+	public abstract Region expand(double posX, double negX, double posY, double negY, double posZ, double negZ);
+	
+	/**
+	 * Expands this Region in a specific direction
+	 * @param face The BlockFace representing the direction to expand in
+	 * @param amount The amount to expand
+	 * @return Itself
+	 */
+	public abstract Region expand(BlockFace face, double amount);
+	
+	/**
+	 * Moves this Region
+	 * @param vec The vector representing the direction and amount to move
+	 * @return Itself
+	 */
+	public abstract Region move(Vector vec);
+	public abstract Region move(double x, double y, double z);
+	
+	/**
+	 * Determines if this Region contains a Location
+	 * @param loc The location to check
+	 * @return Whether the location is contained by this Region
+	 */
+	public abstract boolean contains(Location loc);
+	
+	/**
+	 * @return A clone of this Region
+	 */
+	public abstract Region clone();
+	
+	/**
+	 * Rotates this Region around a central point
+	 * @param center The center of rotation
+	 * @param rotations The number of clockwise rotations
+	 * @return Itself
+	 */
+	public abstract Region rotate(Location center, int rotations);
+	
+	/**
+	 * Sets the World of this Region
+	 * @param world The World
+	 * @return Itself
+	 */
+	public abstract Region setWorld(World world);
+	
+	/**
+	 * Streams all Blocks inside this Region
+	 * @return The stream of all Blocks contained in this Region
+	 */
+	public abstract Stream<Block> stream();
+	
+	/**
+	 * @return All the Chunks this Region overlaps
+	 */
+	public Set<Chunk> getChunks() {
+		Set<Chunk> chunks = new HashSet<>();
+		int[] cstart = LocationUtils.getChunkCoordinates(getStart());
+		int[] cend = LocationUtils.getChunkCoordinates(getEnd());
+		for (int cx = cstart[0]; cx <= cend[0]; cx++) {
+			for (int cz = cstart[1]; cz <= cend[1]; cz++) {
+				chunks.add(getWorld().getChunkAt(cx, cz));
+			}
 		}
-		double minX = Math.min(start.getX(), end.getX());
-		double minY = Math.min(start.getY(), end.getY());
-		double minZ = Math.min(start.getZ(), end.getZ());
-		
-		double maxX = Math.max(start.getX(), end.getX());
-		double maxY = Math.max(start.getY(), end.getY());
-		double maxZ = Math.max(start.getZ(), end.getZ());
-		
-		this.start = new Location(start.getWorld(), minX, minY, minZ);
-		this.end = new Location(end.getWorld(), maxX, maxY, maxZ);
-		chunkCache = null;
+		return chunks;
+	}
+	
+	/**
+	 * @return All the loaded Chunks this Region overlaps
+	 */
+	public Set<Chunk> getLoadedChunks() {
+		Set<Chunk> chunks = new HashSet<>();
+		int[] cstart = LocationUtils.getChunkCoordinates(getStart());
+		int[] cend = LocationUtils.getChunkCoordinates(getEnd());
+		for (int cx = cstart[0]; cx <= cend[0]; cx++) {
+			for (int cz = cstart[1]; cz <= cend[1]; cz++) {
+				if (getStart().getWorld().isChunkLoaded(cx, cz)) {
+					chunks.add(getStart().getWorld().getChunkAt(cx, cz));
+				}
+			}
+		}
+		return chunks;
 	}
 	
 	/**
 	 * Enable RegionEnterEvent and RegionExitEvent for this region
 	 */
 	public void enableEvents() {
-		RegionEnterExitListener.getRegionMap().set(this, this);
+		RegionEnterExitListener.getRegionMap().set(this.toCuboid(), this);
 	}
 	
 	/**
 	 * Disable RegionEnterEvent and RegionExitEvent for this region
 	 */
 	public void disableEvents() {
-		RegionEnterExitListener.getRegionMap().remove(this, this);
+		RegionEnterExitListener.getRegionMap().remove(this.toCuboid(), this);
 	}
 	
 	/**
-	 * Get the minimum corner of this Region
-	 * @return The corner with the lowest X, Y, and Z values
+	 * Gets all players contained in this Region
+	 * @return The players in this Region
 	 */
-	public Location getStart() {
-		return start.clone();
-	}
-	
-	/**
-	 * Get the maximum corner of this Region
-	 * @return The corner with the highest X, Y, and Z values
-	 */
-	public Location getEnd() {
-		return end.clone();
-	}
-	
-	/**
-	 * @return An array of size 8 containing all corners of this Region
-	 */
-	public Location[] getCorners() {
-		return new Location[] {
-					start,
-					end,
-					new Location(getWorld(), start.getX(), start.getY(), end.getZ()),
-					new Location(getWorld(), start.getX(), end.getY(), start.getZ()),
-					new Location(getWorld(), end.getX(), start.getY(), start.getZ()),
-					new Location(getWorld(), start.getX(), end.getY(), end.getZ()),
-					new Location(getWorld(), end.getX(), end.getY(), start.getZ()),
-					new Location(getWorld(), end.getX(), start.getY(), end.getZ())
-				};
-	}
-	
-	/**
-	 * Gets the center of this Region
-	 * @return A Location representing the center of this Region
-	 */
-	public Location getCenter() {
-		return start.clone().add(end).multiply(0.5);
-	}
-	
-	/**
-	 * Check whether a location is inside this Region
-	 * @param loc The location to check
-	 * @return Whether this Region contains the given Location
-	 */
-	public boolean contains(Location loc) {
-		return loc.getWorld().getName().equals(start.getWorld().getName()) &&
-				loc.getX() >= start.getX() && loc.getY() >= start.getY() && loc.getZ() >= start.getZ() &&
-				loc.getX() < end.getX() && loc.getY() < end.getY() && loc.getZ() < end.getZ();
-	}
-	
-	/**
-	 * Get the dimensions of this Region [x, y, z] in blocks
-	 * @return The dimensions of this Region
-	 */
-	public int[] getBlockDimensions() {
-		return new int[] {end.getBlockX() - start.getBlockX(), end.getBlockY() - start.getBlockY(), end.getBlockZ() - start.getBlockZ()};
-	}
-	
-	/**
-	 * @return The volume of this Region, in cubic meters
-	 */
-	public double getVolume() {
-		double[] dim = getDimensions();
-		return dim[0] * dim[1] * dim[2];
-	}
-	
-	/**
-	 * @return The volume of this Region, in blocks
-	 */
-	public int getBlockVolume() {
-		int[] dim = getBlockDimensions();
-		return dim[0] * dim[1] * dim[2];
-	}
-	
-	/**
-	 * Get the dimensions of this Region [x, y, z]
-	 * @return The dimensions of this Region
-	 */
-	public double[] getDimensions() {
-		return new double[] {end.getX() - start.getX(), end.getY() - start.getY(), end.getZ() - start.getZ()};
-	}
-	
-	/**
-	 * Gets the length of this Region along a given axis
-	 * @param direction The BlockFace representing the axis - opposites will act the same (i.e. UP, DOWN)
-	 * @return The length of this Region along the given axis
-	 */
-	public double measure(BlockFace direction) {
-		Vector v = direction.getDirection();
-		double[] dimensions = getDimensions();
-		if (Math.abs(v.getX()) > 0.5) {
-			return dimensions[0];
-		}
-		if (Math.abs(v.getY()) > 0.5) {
-			return dimensions[1];
-		}
-		return dimensions[2];
-	}
-	
-	/**
-	 * Gets the block length of this Region along a given axis
-	 * @param direction The BlockFace representing the axis - opposites will act the same (i.e. UP, DOWN)
-	 * @return The block length of this Region along the given axis
-	 */
-	public int measureBlocks(BlockFace direction) {
-		Vector v = direction.getDirection();
-		int[] dimensions = getBlockDimensions();
-		if (Math.abs(v.getX()) > 0.5) {
-			return dimensions[0];
-		}
-		if (Math.abs(v.getY()) > 0.5) {
-			return dimensions[1];
-		}
-		return dimensions[2];
-	}
-	
-	/**
-	 * Gets the current state of this Region
-	 * @return The state of this Region
-	 */
-	public RegionState getState() {
-		return new RegionState(this);
-	}
-	
-	/**
-	 * Clones this Region
-	 * @return A clone of this Region
-	 */
-	public Region clone() {
-		return new Region(start.clone(), end.clone());
-	}
-	
-	/**
-	 * Expands the region in all directions, or retracts if negative. If this is a MultiRegion,
-	 * makes 6 calls to {@link MultiRegion#expand(BlockFace, double)}, meaning it is very expensive.
-	 * Check if this is a MultiRegion before expanding.
-	 * @param amount The amount to expand the region by
-	 * @return Itself
-	 */
-	public Region expand(double amount) {
-		expand(amount, amount, amount, amount, amount, amount);
-		return this;
-	}
-	
-	/**
-	 * Expands the region in all directions, or retracts if negative. If this is a MultiRegion,
-	 * makes 6 calls to {@link MultiRegion#expand(BlockFace, double)}, meaning it is very expensive.
-	 * Check if this is a MultiRegion before expanding.
-	 * @param amount The amount to expand the region by
-	 * @return Itself
-	 */
-	public Region expand(int amount) {
-		expand((double) amount);
-		return this;
-	}
-	
-	/**
-	 * Expands the region, or retracts where negative values are passed
-	 * @param posX The amount to expand the region in the positive X direction
-	 * @param negX The amount to expand the region in the negative X direction
-	 * @param posY The amount to expand the region in the positive Y direction
-	 * @param negY The amount to expand the region in the negative Y direction
-	 * @param posZ The amount to expand the region in the positive Z direction
-	 * @param negZ The amount to expand the region in the negative Z direction
-	 * @return Itself
-	 */
-	public Region expand(double posX, double negX, double posY, double negY, double posZ, double negZ) {
-		start = start.subtract(negX, negY, negZ);
-		end = end.add(posX, posY, posZ);
-		setLocations(start, end);
-		return this;
-	}
-	
-	/**
-	 * Expands the region, or retracts where negative values are passed
-	 * @param posX The amount to expand the region in the positive X direction
-	 * @param negX The amount to expand the region in the negative X direction
-	 * @param posY The amount to expand the region in the positive Y direction
-	 * @param negY The amount to expand the region in the negative Y direction
-	 * @param posZ The amount to expand the region in the positive Z direction
-	 * @param negZ The amount to expand the region in the negative Z direction
-	 * @return Itself
-	 */
-	public Region expand(int posX, int negX, int posY, int negY, int posZ, int negZ) {
-		expand(posX, negX, posY, negY, posZ, (double) negZ);
-		return this;
-	}
-	
-	/**
-	 * Expand the region in a given direction, or retracts if negative.
-	 * @param direction The direction to expand the region in
-	 * @param amount The amount to expand the region in the given direction
-	 * @return Itself
-	 */
-	public Region expand(BlockFace direction, double amount) {
-		Vector vec = direction.getDirection();
-		if (vec.getX() + vec.getY() + vec.getZ() > 0) {
-			vec = vec.multiply(amount);
-			end = end.add(vec);
-		} else {
-			vec = vec.multiply(amount);
-			start = start.add(vec);
-		}
-		setLocations(start, end);
-		return this;
-	}
-	
-	/**
-	 * Expand the region in a given direction, or retracts if negative.
-	 * @param direction The direction to expand the region in
-	 * @param amount The amount to expand the region in the given direction
-	 * @return Itself
-	 */
-	public Region expand(BlockFace direction, int amount) {
-		expand(direction, (double) amount);
-		return this;
-	}
-	
-	/**
-	 * Move the region
-	 * @param v The vector to be applied to both corners of the region
-	 * @return Itself
-	 */
-	public Region move(Vector v) {
-		start = start.add(v);
-		end = end.add(v);
-		chunkCache = null;
-		return this;
-	}
-	
-	/**
-	 * Set the world of this region, while keeping the coordinates the same
-	 * @param world The world to set
-	 * @return Itself
-	 */
-	public Region setWorld(World world) {
-		start.setWorld(world);
-		end.setWorld(world);
-		return this;
-	}
-	
-	/**
-	 * Move the region
-	 * @param x How much to move the region on the X axis
-	 * @param y How much to move the region on the Y axis
-	 * @param z How much to move the region on the Z axis
-	 * @return Itself
-	 */
-	public Region move(int x, int y, int z) {
-		move(new Vector(x, y, z));
-		return this;
-	}
-	
-	/**
-	 * @return Whether this Region is a non-cuboid variant
-	 */
-	public boolean isMulti() {
-		return false;
-	}
-	
-	/**
-	 * Protect this region with the given protection types
-	 * @param types The events to protect against. See {@link ProtectionType#ALL} and {@link ProtectionType#allExcept(ProtectionType...)}
-	 * @return The {@link ProtectedRegion}
-	 */
-	public ProtectedRegion protect(ProtectionType... types) {
-		return new ProtectedRegion(RedLib.getCallingPlugin(), new Region(this.getStart(), this.getEnd()), types);
-	}
-	
-	/**
-	 * Run a lambda on every Block in this Region
-	 * @param lambda The lambda to be run on each Block
-	 */
-	public void forEachBlock(Consumer<Block> lambda) {
-		stream().forEach(lambda);
-	}
-	
-	/**
-	 * @return The World this Region is in
-	 */
-	public World getWorld() {
-		return start.getWorld();
-	}
-	
-	/**
-	 * Check if this Region overlaps with another.
-	 * @param o The Region to check against
-	 * @return Whether this Region overlaps with the given Region
-	 */
-	public boolean overlaps(Region o) {
-		if (!o.getWorld().equals(getWorld())) {
-			return false;
-		}
-		if (o.isMulti()) {
-			MultiRegion multi = (MultiRegion) o;
-			return multi.getRegions().stream().anyMatch(r -> r.overlaps(this));
-		}
-		return (!(start.getX() > o.end.getX() || o.start.getX() > end.getX()
-				|| start.getY() > o.end.getY() || o.start.getY() > end.getY()
-				|| start.getZ() > o.end.getZ() || o.start.getZ() > end.getZ()));
-	}
-	
-	/**
-	 * Rotates this Region around a point
-	 * @param center The point to rotate this Region around
-	 * @param rotations The number of clockwise rotations to apply
-	 * @return Itself
-	 */
-	public Region rotate(Location center, int rotations) {
-		Location start = getStart();
-		Location end = getEnd();
-		start.subtract(center);
-		end.subtract(center);
-		Rotator rotator = new Rotator(rotations, false);
-		rotator.setLocation(start.getX(), start.getZ());
-		start.setX(rotator.getRotatedX());
-		start.setZ(rotator.getRotatedZ());
-		rotator.setLocation(end.getX(), end.getZ());
-		end.setX(rotator.getRotatedX());
-		end.setZ(rotator.getRotatedZ());
-		start.add(center);
-		end.add(center);
-		setLocations(start, end);
-		return this;
-	}
-	
-	/**
-	 * Rotates this Region around its center
-	 * @param rotations The number of clockwise rotations to apply
-	 * @return Itself
-	 */
-	public Region rotate(int rotations) {
-		rotate(getCenter(), rotations);
-		return this;
-	}
-	
-	/**
-	 * Gets the cuboid intersection of this Region and another cuboid Region
-	 * @param o The Region to get the intersection with
-	 * @return The intersection Region, or null if there is no intersection
-	 */
-	public Region getIntersection(Region o) {
-		if (o instanceof MultiRegion) {
-			return o.getIntersection(this);
-		}
-		if (!overlaps(o)) {
-			return null;
-		}
-		double minX = Math.max(o.start.getX(), start.getX());
-		double minY = Math.max(o.start.getY(), start.getY());
-		double minZ = Math.max(o.start.getZ(), start.getZ());
-		
-		double maxX = Math.min(o.end.getX(), end.getX());
-		double maxY = Math.min(o.end.getY(), end.getY());
-		double maxZ = Math.min(o.end.getZ(), end.getZ());
-		
-		return new Region(new Location(getWorld(), minX, minY, minZ), new Location(getWorld(), maxX, maxY, maxZ));
+	public List<Player> getPlayers() {
+		return getEntities(false).stream().filter(e -> e instanceof Player).map(e -> (Player) e).collect(Collectors.toList());
 	}
 	
 	/**
@@ -464,176 +184,131 @@ public class Region {
 	}
 	
 	/**
-	 * Gets all players contained in this Region
-	 * @return The players in this Region
+	 * @return The World this Region is in
 	 */
-	public List<Player> getPlayers() {
-		return getEntities(false).stream().filter(e -> e instanceof Player).map(e -> (Player) e).collect(Collectors.toList());
+	public World getWorld() {
+		return getStart().getWorld();
 	}
 	
 	/**
-	 * @return All the Chunks this Region overlaps
+	 * Streams every Block in this Region, running your lambda on it
+	 * @param forEach What to run on each Block
 	 */
-	public Set<Chunk> getChunks() {
-		if (chunkCache == null) {
-			chunkCache = new HashSet<>();
-			int[] cstart = LocationUtils.getChunkCoordinates(start);
-			int[] cend = LocationUtils.getChunkCoordinates(end);
-			for (int cx = cstart[0]; cx <= cend[0]; cx++) {
-				for (int cz = cstart[1]; cz <= cend[1]; cz++) {
-					chunkCache.add(start.getWorld().getChunkAt(cx, cz));
-				}
-			}
-			return chunkCache;
-		}
-		return chunkCache;
+	public void forEachBlock(Consumer<Block> forEach) {
+		stream().forEach(forEach);
 	}
 	
 	/**
-	 * @return All the loaded Chunks this Region overlaps
+	 * Get the dimensions of this Region [x, y, z] in blocks
+	 * @return The dimensions of this Region
 	 */
-	public Set<Chunk> getLoadedChunks() {
-		Set<Chunk> chunks = new HashSet<>();
-		if (chunkCache != null) {
-			chunkCache.stream().filter(Chunk::isLoaded).forEach(chunks::add);
-			return chunks;
-		}
-		int[] cstart = LocationUtils.getChunkCoordinates(start);
-		int[] cend = LocationUtils.getChunkCoordinates(end);
-		for (int cx = cstart[0]; cx <= cend[0]; cx++) {
-			for (int cz = cstart[1]; cz <= cend[1]; cz++) {
-				if (start.getWorld().isChunkLoaded(cx, cz)) {
-					chunks.add(start.getWorld().getChunkAt(cx, cz));
-				}
-			}
-		}
-		return chunks;
+	public int[] getBlockDimensions() {
+		return new int[] {getEnd().getBlockX() - getStart().getBlockX(),
+				getEnd().getBlockY() - getStart().getBlockY(),
+				getEnd().getBlockZ() - getStart().getBlockZ()};
 	}
 	
 	/**
-	 * @return A Stream of all the blocks in this Region
+	 * Get the dimensions of this Region [x, y, z]
+	 * @return The dimensions of this Region
 	 */
-	public Stream<Block> stream() {
-		int[] dimensions = this.getBlockDimensions();
-		RegionIterator iterator = new RegionIterator(dimensions[0], dimensions[1], dimensions[2]);
-		Stream<Block> stream = Stream.generate(() -> {
-			int[] pos = iterator.getPosition();
-			Block block = start.clone().add(pos[0], pos[1], pos[2]).getBlock();
-			iterator.next();
-			return block;
-		});
-		return stream.sequential().limit(getBlockVolume());
+	public double[] getDimensions() {
+		return new double[] {getEnd().getX() - getStart().getX(),
+				getEnd().getY() - getStart().getY(),
+				getEnd().getZ() - getStart().getZ()};
 	}
 	
 	/**
-	 * Converts this Region to a String which can be converted back with {@link Region#fromString(String)} later
-	 * @return The String representation of this Region
+	 * @return All 8 cuboid corners of this Region
 	 */
-	public String toString() {
-		return getWorld().getName() + " " + start.getX() + " " + start.getY() + " " + start.getZ() + " "
-				+ end.getX() + " " + end.getY() + " " + end.getZ();
+	public Location[] getCorners() {
+		Location start = getStart();
+		Location end = getEnd();
+		return new Location[] {
+				start,
+				end,
+				new Location(getWorld(), start.getX(), start.getY(), end.getZ()),
+				new Location(getWorld(), start.getX(), end.getY(), start.getZ()),
+				new Location(getWorld(), end.getX(), start.getY(), start.getZ()),
+				new Location(getWorld(), start.getX(), end.getY(), end.getZ()),
+				new Location(getWorld(), end.getX(), end.getY(), start.getZ()),
+				new Location(getWorld(), end.getX(), start.getY(), end.getZ())
+		};
 	}
 	
 	/**
-	 * Converts a String generated by {@link Region#toString()} back to a Region
-	 * @param input The String representation of a Region
-	 * @return The Region
+	 * @return A cuboid representation of this Region using the extreme corners
 	 */
-	public static Region fromString(String input) {
-		String[] split = input.split(" ");
-		World world = Bukkit.getWorld(split[0]);
-		double minX = Double.parseDouble(split[1]);
-		double minY = Double.parseDouble(split[2]);
-		double minZ = Double.parseDouble(split[3]);
-		double maxX = Double.parseDouble(split[4]);
-		double maxY = Double.parseDouble(split[5]);
-		double maxZ = Double.parseDouble(split[6]);
-		return new Region(new Location(world, minX, minY, minZ), new Location(world, maxX, maxY, maxZ));
+	public CuboidRegion toCuboid() {
+		return new CuboidRegion(getStart().clone(), getEnd().clone());
 	}
 	
 	/**
-	 * Represents a state of a Region, not necessarily at the current point in time
-	 * @author Redempt
-	 *
+	 * @return The center of this Region, the midpoint of the two extreme corners
 	 */
-	public static class RegionState {
-		
-		BlockState[][][] blocks;
-		private Region region;
-			
-		private RegionState(Region region) {
-			this.region = region;
-			int[] dimensions = region.getBlockDimensions();
-			blocks = new BlockState[dimensions[0]][dimensions[1]][dimensions[2]];
-			for (int x = 0; x < dimensions[0]; x++) {
-				for (int y = 0; y < dimensions[1]; y++) {
-					for (int z = 0; z < dimensions[2]; z++) {
-						Location loc = region.getStart().add(x, y, z);
-						blocks[x][y][z] = loc.getBlock().getState();
-					}
-				}
-			}
-		}
-		
-		/**
-		 * Restores the Region to this state
-		 */
-		public void restore() {
-			int[] dimensions = region.getBlockDimensions();
-			for (int x = 0; x < dimensions[0]; x++) {
-				for (int y = 0; y < dimensions[1]; y++) {
-					for (int z = 0; z < dimensions[2]; z++) {
-						blocks[x][y][z].update(true, false);
-					}
-				}
-			}
-		}
-		
-		/**
-		 * Gets all the BlockStates in this RegionState
-		 * @return The 3-dimensional array of BlockStates
-		 */
-		public BlockState[][][] getBlocks() {
-			return blocks.clone();
-		}
-		
+	public Location getCenter() {
+		return getStart().clone().add(getEnd()).multiply(0.5);
 	}
 	
-	private static class RegionIterator {
-		
-		private int maxX;
-		private int maxY;
-		private int maxZ;
-		private int x = 0;
-		private int y = 0;
-		private int z = 0;
-		
-		public RegionIterator(int x, int y, int z) {
-			this.maxX = x;
-			this.maxY = y;
-			this.maxZ = z;
+	/**
+	 * Protects this Region
+	 * @param plugin The plugin registering the protection
+	 * @param types The ProtectionTypes to protect this Region with
+	 * @return The ProtectedRegion using this Region and the given ProtectionTypes
+	 */
+	public ProtectedRegion protect(Plugin plugin, ProtectionType... types) {
+		return new ProtectedRegion(plugin, this, types);
+	}
+	
+	/**
+	 * Protects this Region
+	 * @param types The ProtectionTypes to protect this Region with
+	 * @return The ProtectedRegion using this Region and the given ProtectionTypes
+	 */
+	public ProtectedRegion protect(ProtectionType... types) {
+		return protect(RedLib.getCallingPlugin(), types);
+	}
+	
+	/**
+	 * Gets the length of this Region along a given axis
+	 * @param direction The BlockFace representing the axis - opposites will act the same (i.e. UP, DOWN)
+	 * @return The length of this Region along the given axis
+	 */
+	public double measure(BlockFace direction) {
+		switch (direction) {
+			case UP:
+			case DOWN:
+				return getDimensions()[1];
+			case EAST:
+			case WEST:
+				return getDimensions()[0];
+			case NORTH:
+			case SOUTH:
+				return getDimensions()[2];
+			default:
+				throw new IllegalArgumentException("Face must be one of UP, DOWN, NORTH, SOUTH, EAST, or WEST");
 		}
-		
-		public int[] getPosition() {
-			return new int[] {x, y, z};
+	}
+	
+	/**
+	 * Gets the block length of this Region along a given axis
+	 * @param direction The BlockFace representing the axis - opposites will act the same (i.e. UP, DOWN)
+	 * @return The block length of this Region along the given axis
+	 */
+	public int measureBlocks(BlockFace direction) {
+		switch (direction) {
+			case UP:
+			case DOWN:
+				return getBlockDimensions()[1];
+			case EAST:
+			case WEST:
+				return getBlockDimensions()[0];
+			case NORTH:
+			case SOUTH:
+				return getBlockDimensions()[2];
+			default:
+				throw new IllegalArgumentException("Face must be one of UP, DOWN, NORTH, SOUTH, EAST, or WEST");
 		}
-		
-		public boolean next() {
-			x++;
-			if (x >= maxX) {
-				x = 0;
-				y++;
-				if (y >= maxY) {
-					y = 0;
-					z++;
-					if (z >= maxZ) {
-						return false;
-					}
-				}
-			}
-			return true;
-		}
-		
 	}
 	
 }

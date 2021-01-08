@@ -1,12 +1,10 @@
 package redempt.redlib.multiblock;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.inventory.ItemStack;
-import redempt.redlib.region.Region;
+import redempt.redlib.region.CuboidRegion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,10 +97,10 @@ public class Structure {
 	 * Gets the region this Structure occupies
 	 * @return The region this Structure occupies
 	 */
-	public Region getRegion() {
+	public CuboidRegion getRegion() {
 		int[] dim = this.getType().getDimensions();
 		Location loc = this.getRelative(dim[0] - 1, dim[1] - 1, dim[2] - 1).getBlock().getLocation();
-		return new Region(this.loc, loc).expand(1, 0, 1, 0, 1, 0);
+		return new CuboidRegion(this.loc, loc).expand(1, 0, 1, 0, 1, 0);
 	}
 	
 	/**

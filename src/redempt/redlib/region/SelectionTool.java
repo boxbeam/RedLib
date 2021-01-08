@@ -13,7 +13,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.server.PluginDisableEvent;
-import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.inventory.ItemStack;
 
 import org.bukkit.plugin.Plugin;
@@ -100,12 +99,12 @@ public class SelectionTool implements Listener {
 	 * @param uuid The UUID of the player
 	 * @return The Region selected by the player, or null if the player has not selected 2 locations
 	 */
-	public Region getRegion(UUID uuid) {
+	public CuboidRegion getRegion(UUID uuid) {
 		Location[] locations = selections.get(uuid);
 		if (locations == null || locations[0] == null || locations[1] == null) {
 			return null;
 		}
-		Region region = new Region(locations[0], locations[1]);
+		CuboidRegion region = new CuboidRegion(locations[0], locations[1]);
 		region.expand(1, 0, 1, 0, 1, 0);
 		return region;
 	}

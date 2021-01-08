@@ -1,6 +1,5 @@
 package redempt.redlib.region;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -45,7 +44,7 @@ public class RegionMap<T> {
 	 * @param region The Region to map the object to
 	 * @param object The object to set
 	 */
-	public void set(Region region, T object) {
+	public void set(CuboidRegion region, T object) {
 		Coordinate start = new Coordinate(region.getStart(), scale);
 		Coordinate end = new Coordinate(region.getEnd(), scale);
 		for (int x = start.getX(); x <= end.getX(); x++) {
@@ -81,7 +80,7 @@ public class RegionMap<T> {
 	 * @param region The region to remove the mapping from
 	 * @param object The object to remove
 	 */
-	public void remove(Region region, T object) {
+	public void remove(CuboidRegion region, T object) {
 		if (object == null) {
 			return;
 		}

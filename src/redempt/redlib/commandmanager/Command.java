@@ -70,13 +70,13 @@ public class Command {
 	protected boolean topLevel = false;
 	protected Command parent = null;
 	private boolean hideSub = false;
+	private boolean noHelp = false;
 	
-	protected Command() {
-	}
+	protected Command() {}
 	
 	protected Command(String[] names, CommandArgument[] args, Flag[] flags, ContextProvider<?>[] providers,
 	                  ContextProvider<?>[] asserters, String help, String permission, SenderType type, String hook,
-	                  List<Command> children, boolean hideSub, boolean noTab) {
+	                  List<Command> children, boolean hideSub, boolean noTab, boolean noHelp) {
 		this.names = names;
 		this.args = args;
 		this.flags = flags;
@@ -89,6 +89,7 @@ public class Command {
 		this.children = children;
 		this.hideSub = hideSub;
 		this.noTab = noTab;
+		this.noHelp = noHelp;
 		for (Command command : children) {
 			command.parent = this;
 		}
@@ -571,7 +572,7 @@ public class Command {
 			sender.sendMessage(msg("noPermission").replace("%permission%", permission));
 			return new Result<>(this, true, null);
 		}
-		if (args.length > 0 && args[0].equalsIgnoreCase("help")) {
+		if (args.length > 0 && args[0].equalsIgnoreCase("help") && !noHelp) {
 			showHelp(sender);
 			return new Result<>(this, true, null);
 		}

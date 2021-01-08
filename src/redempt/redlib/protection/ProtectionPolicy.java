@@ -39,7 +39,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
 import redempt.redlib.misc.EventListener;
-import redempt.redlib.region.Region;
+import redempt.redlib.region.CuboidRegion;
 import redempt.redlib.region.RegionMap;
 
 /**
@@ -149,7 +149,7 @@ public class ProtectionPolicy implements Listener {
 	private Set<ProtectionType> protections = EnumSet.noneOf(ProtectionType.class);
 	private Map<ProtectionType, String> messages = new HashMap<>();
 	private Predicate<Block> protectionCheck;
-	private Region bounds;
+	private CuboidRegion bounds;
 	private Plugin plugin;
 	
 	{
@@ -161,7 +161,7 @@ public class ProtectionPolicy implements Listener {
 		});
 	}
 	
-	protected ProtectionPolicy(Plugin plugin, Region bounds, Predicate<Block> protectionCheck, ProtectionType... protections) {
+	protected ProtectionPolicy(Plugin plugin, CuboidRegion bounds, Predicate<Block> protectionCheck, ProtectionType... protections) {
 		this.plugin = plugin;
 		this.bounds = bounds;
 		Arrays.stream(protections).forEach(this.protections::add);
@@ -175,7 +175,7 @@ public class ProtectionPolicy implements Listener {
 	 * @param protectionCheck A predicate which will be used to check whether blocks are protected by this ProtectionPolicy
 	 * @param protections The types of actions to protect against
 	 */
-	public ProtectionPolicy(Region bounds, Predicate<Block> protectionCheck, ProtectionType... protections) {
+	public ProtectionPolicy(CuboidRegion bounds, Predicate<Block> protectionCheck, ProtectionType... protections) {
 		plugin = RedLib.getCallingPlugin();
 		this.bounds = bounds;
 		Arrays.stream(protections).forEach(this.protections::add);
@@ -184,17 +184,13 @@ public class ProtectionPolicy implements Listener {
 	}
 	
 	/**
-	 * Create a ProtectionPolicy to protect blocks. Prefer {@link ProtectionPolicy#ProtectionPolicy(Region, Predicate, ProtectionType...)},
+	 * Create a ProtectionPolicy to protect blocks. Prefer {@link ProtectionPolicy#ProtectionPolicy(CuboidRegion, Predicate, ProtectionType...)},
 	 * as it will improve performance
 	 * @param protectionCheck A predicate which will be used to check whether blocks are protected by this ProtectionPolicy
 	 * @param protections The types of actions to protect against
 	 */
 	public ProtectionPolicy(Predicate<Block> protectionCheck, ProtectionType... protections) {
-		try {
-			plugin = JavaPlugin.getProvidingPlugin(Class.forName(new Exception().getStackTrace()[1].getClassName()));
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+		plugin = RedLib.getCallingPlugin();
 		this.protectionCheck = protectionCheck;
 		Arrays.stream(protections).forEach(this.protections::add);
 		globalPolicies.add(this);
@@ -293,6 +289,13 @@ public class ProtectionPolicy implements Listener {
 	 */
 	public void clearDenyMessages() {
 		messages.clear();
+	}
+	
+	/**
+	 * @return The cuboid bounds of this ProtectionPolicy, or null if it is a global policy
+	 */
+	public CuboidRegion getBounds() {
+		return bounds;
 	}
 	
 	private boolean canBypass(Player player, ProtectionType type, Block block) {

@@ -5,10 +5,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import redempt.redlib.RedLib;
-import redempt.redlib.region.Region;
+import redempt.redlib.region.CuboidRegion;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -365,14 +364,14 @@ public class MultiBlockStructure {
 	 * @param mirror Whether to mirror the structure on the X axis
 	 * @return The Region this multi-block structure would occupy
 	 */
-	public Region getRegion(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
+	public CuboidRegion getRegion(Location loc, int relX, int relY, int relZ, int rotation, boolean mirror) {
 		loc = loc.getBlock().getLocation();
 		Rotator rotator = new Rotator(rotation, mirror);
 		rotator.setLocation(relX, relZ);
 		Location start = loc.clone().subtract(rotator.getRotatedBlockX(), relY, rotator.getRotatedBlockZ());
 		rotator.setLocation(dimX, dimZ);
 		Location end = start.clone().add(rotator.getRotatedBlockX(), dimY, rotator.getRotatedBlockZ());
-		return new Region(start, end);
+		return new CuboidRegion(start, end);
 	}
 	
 	/**
@@ -382,7 +381,7 @@ public class MultiBlockStructure {
 	 * @param mirror Whether to mirror the structure on the X axis
 	 * @return The Region this multi-block structure would occupy
 	 */
-	public Region getRegion(Location loc, int rotation, boolean mirror) {
+	public CuboidRegion getRegion(Location loc, int rotation, boolean mirror) {
 		return getRegion(loc, 0, 0, 0, rotation, mirror);
 	}
 	
@@ -392,7 +391,7 @@ public class MultiBlockStructure {
 	 * @param rotation The number of 90-degree clockwise rotations to apply
 	 * @return The Region this multi-block structure would occupy
 	 */
-	public Region getRegion(Location loc, int rotation) {
+	public CuboidRegion getRegion(Location loc, int rotation) {
 		return getRegion(loc, 0, 0, 0, rotation, false);
 	}
 	
@@ -401,7 +400,7 @@ public class MultiBlockStructure {
 	 * @param loc The location of the multi-block structure
 	 * @return The Region this multi-block structure would occupy
 	 */
-	public Region getRegion(Location loc) {
+	public CuboidRegion getRegion(Location loc) {
 		return getRegion(loc, 0, 0, 0, 0, false);
 	}
 	
