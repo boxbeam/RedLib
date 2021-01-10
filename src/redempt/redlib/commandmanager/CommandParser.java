@@ -8,6 +8,7 @@ import redempt.redlib.commandmanager.exceptions.CommandParseException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -63,7 +64,10 @@ public class CommandParser {
 		if (Arrays.stream(providers).anyMatch(t -> t == null)) {
 			throw new IllegalArgumentException("Context providers cannot be null!");
 		}
-		this.contextProviders = providers;
+		List<ContextProvider<?>> list = new ArrayList<>();
+		list.add(ContextProvider.self);
+		Collections.addAll(list, providers);
+		this.contextProviders = list.toArray(new ContextProvider[0]);
 		return this;
 	}
 	
@@ -143,8 +147,7 @@ public class CommandParser {
 				} else if (depth == 2) {
 					children.addAll(fromLines(lines, pos).getCommands());
 				}
-			}
-			if (depth == 1) {
+			} else if (depth == 1) {
 				String[] tag = getTag(line);
 				try {
 					switch (tag[0]) {
@@ -343,7 +346,7 @@ public class CommandParser {
 	
 	private static String[] splitArgs(String args) {
 		List<String> split = new ArrayList<>();
-		String combine = "";
+		StringBuilder combine = new StringBuilder();
 		int depth = 0;
 		for (char c : args.toCharArray()) {
 			switch (c) {
@@ -355,17 +358,17 @@ public class CommandParser {
 					break;
 				case ' ':
 					if (depth == 0) {
-						split.add(combine);
-						combine = "";
+						split.add(combine.toString());
+						combine = new StringBuilder();
 					} else {
-						combine += c;
+						combine.append(c);
 					}
 					continue;
 			}
-			combine += c;
+			combine.append(c);
 		}
 		if (combine.length() > 0) {
-			split.add(combine);
+			split.add(combine.toString());
 		}
 		return split.toArray(new String[split.size()]);
 	}
