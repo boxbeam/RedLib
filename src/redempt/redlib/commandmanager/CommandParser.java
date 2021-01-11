@@ -81,14 +81,24 @@ public class CommandParser {
 		List<String> lines = new ArrayList<>();
 		try {
 			while ((line = reader.readLine()) != null) {
-				lines.add(line);
+				line = line.trim();
+				if (line.equals("{") && lines.size() > 0) {
+					String prev = lines.get(lines.size() - 1);
+					lines.set(lines.size() - 1, prev + " {");
+					continue;
+				}
+				lines.add(line.trim());
 			}
-		} catch (EOFException e) {
+		} catch (EOFException ignored) {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
 		return fromLines(lines, 0);
+	}
+	
+	private CommandParseException error(String message, int line) {
+		return new CommandParseException(message + ", line " + (line + 1));
 	}
 	
 	private CommandCollection fromLines(List<String> lines, int lineNumber) {
@@ -108,12 +118,17 @@ public class CommandParser {
 		boolean noTab = false;
 		boolean noHelp = false;
 		for (int pos = lineNumber; pos < lines.size(); pos++) {
-			String line = lines.get(pos).trim();
+			String line = lines.get(pos);
+			//New command data
 			if (line.endsWith("{")) {
 				depth++;
+				//Command at same depth, parse and add directly
 				if (depth == 1) {
 					line = line.substring(0, line.length() - 1).trim();
 					String[] split = splitArgs(line);
+					if (split.length == 0) {
+						throw error("Command name not specified", pos);
+					}
 					names = split[0].split(",");
 					for (int i = 1; i < split.length; i++) {
 						if (split[i].startsWith("-") && !split[i].contains(":")) {
@@ -122,15 +137,15 @@ public class CommandParser {
 						CommandArgument arg = parseArg(split[i], i, pos);
 						if (arg.getName().startsWith("-")) {
 							if (arg.isOptional()) {
-								throw new CommandParseException("Flags cannot be marked as optional, they are optional by definition, line " + pos);
+								throw error("Flags cannot be marked as optional, they are optional by definition", pos);
 							}
 							if (arg.consumes() || arg.isVararg()) {
-								throw new CommandParseException("Flags cannot be consuming or vararg, line " + pos);
+								throw error("Flags cannot be consuming or vararg", pos);
 							}
 							Flag flag = new Flag(arg.getType(), arg.getName(), arg.getPosition(), arg.getDefaultValue());
 							for (String name : flag.getNames()) {
 								if (!name.startsWith("-")) {
-									throw new CommandParseException("All flag names and aliases must start with a dash, line " + pos);
+									throw error("All flag names and aliases must start with a dash", pos);
 								}
 							}
 							flags.add(flag);
@@ -141,12 +156,14 @@ public class CommandParser {
 					for (int i = 0; i + 1 < args.size(); i++) {
 						CommandArgument arg = args.get(i);
 						if (arg.isVararg() || arg.consumes()) {
-							throw new CommandParseException("Vararg and consuming arguments must the final argument in the arg list, line " + pos);
+							throw error("Vararg and consuming arguments must the final argument in the arg list", pos);
 						}
 					}
+				//Command one level down, parse and add as child of this command
 				} else if (depth == 2) {
 					children.addAll(fromLines(lines, pos).getCommands());
 				}
+			//Line does not end in { and depth is 1, this is tag data for the current command
 			} else if (depth == 1) {
 				String[] tag = getTag(line);
 				try {
@@ -160,7 +177,7 @@ public class CommandParser {
 							break;
 						case "helpmsg":
 							if (messages == null) {
-								throw new IllegalStateException("No Messages supplied, cannot use helpmsg tag, line " + pos);
+								throw error("No Messages supplied, cannot use helpmsg tag", pos);
 							}
 							help = messages.get(tag[1]).replace("\\n", "\n");
 							break;
@@ -188,7 +205,7 @@ public class CommandParser {
 							int fpos = pos;
 							for (String name : split) {
 								ContextProvider<?> provider = Arrays.stream(this.contextProviders).filter(c -> c.getName().equals(name)).findFirst()
-										.orElseThrow(() -> new CommandParseException("Missing context provider " + name + ", line " + fpos));
+										.orElseThrow(() -> error("Missing context provider " + name, fpos));
 								contextProviders.add(provider);
 							}
 							break;
@@ -198,7 +215,7 @@ public class CommandParser {
 							fpos = pos;
 							for (String name : split) {
 								ContextProvider<?> provider = Arrays.stream(this.contextProviders).filter(c -> c.getName().equals(name)).findFirst()
-										.orElseThrow(() -> new CommandParseException("Missing context provider " + name + ", line " + fpos));
+										.orElseThrow(() -> error("Missing context provider " + name, fpos));
 								asserters.add(provider);
 							}
 							break;
@@ -216,11 +233,13 @@ public class CommandParser {
 							break;
 					}
 				} catch (ArrayIndexOutOfBoundsException ex) {
-					throw new CommandParseException("Missing tag data for tag " + tag[0] + ", line " + lineNumber);
+					throw error("Missing tag data for tag " + tag[0], pos);
 				}
 			}
+			//End of command data
 			if (line.equals("}")) {
 				depth--;
+				//If depth is now 0, this completes a same-level command. Instantiate and add it.
 				if (depth == 0) {
 					commands.add(new Command(names, args.toArray(new CommandArgument[args.size()]),
 							flags.toArray(new Flag[flags.size()]),
@@ -255,7 +274,7 @@ public class CommandParser {
 	private CommandArgument parseArg(String arg, int argPos, int pos) {
 		String[] argSplit = arg.split(":");
 		if (argSplit.length != 2) {
-			throw new CommandParseException("Invalid command argument syntax" + arg + ", line " + pos);
+			throw error("Invalid command argument syntax" + arg, pos);
 		}
 		boolean consumes = false;
 		boolean vararg = false;
@@ -267,12 +286,12 @@ public class CommandParser {
 			vararg = true;
 			argSplit[0] = argSplit[0].substring(0, argSplit[0].length() - 2);
 			if (consumes) {
-				throw new CommandParseException("Argument cannot be both consuming and vararg, line " + pos);
+				throw error("Argument cannot be both consuming and vararg", pos);
 			}
 		}
 		ArgType<?> argType = Command.getType(argSplit[0], argTypes);
 		if (argType == null) {
-			throw new CommandParseException("Missing command argument type " + argSplit[0] + ", line " + pos);
+			throw error("Missing command argument type " + argSplit[0], pos);
 		}
 		String name = argSplit[1];
 		boolean hideType = false;
@@ -296,18 +315,17 @@ public class CommandParser {
 				}
 			}
 			if (pdepth != 0) {
-				throw new CommandParseException("Unbalanced parenthesis in argument: " + name + ", line " + pos);
+				throw error("Unbalanced parenthesis in argument: " + name, pos);
 			}
 			if (startIndex + length < name.length()) {
-				throw new CommandParseException("Invalid format for argument " + name + ": Cannot define any argument info after default value (parenthesis), line " + pos);
+				throw error("Invalid format for argument " + name + ": Cannot define any argument info after default value (parenthesis)", pos);
 			}
 			String value = name.substring(startIndex + 1, startIndex + length - 1);
 			name = name.substring(0, startIndex);
 			if (value.startsWith("context ")) {
 				String pname = value.substring(8);
-				int fpos = pos;
 				ContextProvider<?> provider = Arrays.stream(this.contextProviders).filter(c -> c.getName().equals(pname)).findFirst()
-						.orElseThrow(() -> new CommandParseException("Missing context provider " + pname + ", line " + fpos));
+						.orElseThrow(() -> error("Missing context provider " + pname, pos));
 				defaultValue = c -> provider.provide((Player) c);
 			} else {
 				defaultValue = c -> argType.convert(c, value.startsWith("\\") ? value.substring(1) : value);
