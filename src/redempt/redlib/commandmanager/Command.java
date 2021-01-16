@@ -5,6 +5,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,6 +14,7 @@ import redempt.redlib.RedLib;
 import redempt.redlib.commandmanager.exceptions.CommandParseException;
 import redempt.redlib.commandmanager.exceptions.CommandHookException;
 import redempt.redlib.misc.EventListener;
+import redempt.redlib.nms.NMSObject;
 
 import java.io.InputStream;
 import java.lang.reflect.Array;
@@ -33,6 +36,26 @@ import static redempt.redlib.commandmanager.Messages.msg;
 public class Command {
 	
 	private static List<ArgType<?>> types = new ArrayList<>();
+	private static Map<String, org.bukkit.command.Command> knownCommands;
+	private static SimpleCommandMap commandMap;
+	
+	static {
+		try {
+			Field field = Bukkit.getPluginManager().getClass().getDeclaredField("commandMap");
+			field.setAccessible(true);
+			commandMap = (SimpleCommandMap) field.get(Bukkit.getPluginManager());
+			Class<?> clazz = commandMap.getClass();
+			while (!clazz.getSimpleName().equals("SimpleCommandMap")) {
+				clazz = clazz.getSuperclass();
+			}
+			Field mapField = clazz.getDeclaredField("knownCommands");
+			mapField.setAccessible(true);
+			knownCommands = (Map<String, org.bukkit.command.Command>) mapField.get(commandMap);
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+	
 	protected List<Command> children = new ArrayList<>();
 	
 	static {
@@ -283,8 +306,9 @@ public class Command {
 			}
 			cmdArgs = Arrays.stream(cargs).filter(arg -> arg != null).collect(Collectors.toList());
 		}
-		if (cmdArgs.size() != sargs.size() &&
-				(args.length == 0 || (!args[args.length - 1].consumes() && !args[args.length - 1].isVararg()))) {
+		boolean lastConsumes = args.length != 0 && (args[args.length - 1].consumes() || args[args.length - 1].isVararg());
+		boolean argCountWrong = (sargs.size() > cmdArgs.size() && !lastConsumes) || sargs.size() < cmdArgs.size();
+		if (argCountWrong) {
 			int minArgCount = args.length - (int) Arrays.stream(args).filter(CommandArgument::isOptional).count();
 			String argCount = minArgCount == args.length ? args.length + "" : minArgCount + "-" + args.length;
 			return new Result<>(this, null, Messages.msg("wrongArgumentCount")
@@ -392,50 +416,39 @@ public class Command {
 	 * @param listeners The listener objects containing method hooks
 	 */
 	public void register(String prefix, Object... listeners) {
-		Field field;
-		try {
-			field = Bukkit.getPluginManager().getClass().getDeclaredField("commandMap");
-			field.setAccessible(true);
-			SimpleCommandMap map = (SimpleCommandMap) field.get(Bukkit.getPluginManager());
-			org.bukkit.command.Command cmd = new org.bukkit.command.Command(names[0], help == null ? "None" : help, "", Arrays.stream(names).skip(1).collect(Collectors.toList())) {
-				
-				@Override
-				public boolean execute(CommandSender sender, String name, String[] args) {
-					Command.this.execute(sender, args);
-					return true;
-				}
-				
-				@Override
-				public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-					return tab(sender, args);
-				}
-				
-			};
-			Class<?> clazz = map.getClass();
-			while (!clazz.getSimpleName().equals("SimpleCommandMap")) {
-				clazz = clazz.getSuperclass();
+		org.bukkit.command.Command cmd = new org.bukkit.command.Command(names[0], help == null ? "None" : help, "", Arrays.stream(names).skip(1).collect(Collectors.toList())) {
+			
+			@Override
+			public boolean execute(CommandSender sender, String name, String[] args) {
+				Command.this.execute(sender, args);
+				return true;
 			}
-			Field mapField = clazz.getDeclaredField("knownCommands");
-			mapField.setAccessible(true);
-			Map<String, org.bukkit.command.Command> knownCommands = (Map<String, org.bukkit.command.Command>) mapField.get(map);
-			map.register(prefix, cmd);
-			if (plugin == null) {
-				plugin = JavaPlugin.getProvidingPlugin(Class.forName(new Exception().getStackTrace()[1].getClassName()));
+			
+			@Override
+			public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+				return tab(sender, args);
 			}
-			new EventListener<>(RedLib.getInstance(), PluginDisableEvent.class, (l, e) -> {
-				if (e.getPlugin().equals(plugin)) {
-					try {
-						l.unregister();
-						Arrays.stream(names).forEach(knownCommands::remove);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-				}
-			});
-			registerHook(createHookMap(listeners));
-		} catch (Exception e) {
-			e.printStackTrace();
+			
+		};
+		commandMap.register(prefix, cmd);
+		if (plugin == null) {
+			plugin = RedLib.getCallingPlugin();
 		}
+		new EventListener<>(RedLib.getInstance(), PluginDisableEvent.class, (l, e) -> {
+			if (e.getPlugin().equals(plugin)) {
+				try {
+					l.unregister();
+					unregister();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		registerHook(createHookMap(listeners));
+	}
+	
+	private void unregister() {
+		Arrays.stream(names).forEach(knownCommands::remove);
 	}
 	
 	protected Map<String, MethodHook> createHookMap(Object... listeners) {

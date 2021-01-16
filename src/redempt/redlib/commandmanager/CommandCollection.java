@@ -2,7 +2,7 @@ package redempt.redlib.commandmanager;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
+import redempt.redlib.RedLib;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,16 +30,9 @@ public class CommandCollection {
 	 */
 	public void register(String prefix, Object... listeners) {
 		mergeBaseCommands();
-		Plugin plugin = null;
-		try {
-			Class<?> clazz = Class.forName(new Exception().getStackTrace()[1].getClassName());
-			plugin = JavaPlugin.getProvidingPlugin(clazz);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		Plugin fplugin = plugin;
-		commands.stream().forEach(c -> {
-			c.plugin = fplugin;
+		Plugin plugin = RedLib.getCallingPlugin();
+		commands.forEach(c -> {
+			c.plugin = plugin;
 			c.register(prefix, listeners);
 		});
 	}

@@ -282,6 +282,9 @@ public class LocationUtils {
 		initialized = true;
 		new EventListener<>(RedLib.getInstance(), WorldLoadEvent.class, e -> {
 			List<Consumer<World>> list = waiting.remove(e.getWorld().getName());
+			if (list == null) {
+				return;
+			}
 			list.forEach(c -> c.accept(e.getWorld()));
 		});
 	}
