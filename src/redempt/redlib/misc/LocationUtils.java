@@ -130,7 +130,7 @@ public class LocationUtils {
 			if (!e.getPlayer().equals(player)) {
 				return;
 			}
-			if (start.distanceSquared(e.getTo()) > 0.125) {
+			if (!start.getWorld().equals(e.getTo().getWorld()) || start.distanceSquared(e.getTo()) > 0.125) {
 				player.sendMessage(Messages.msg("teleportCancelled"));
 				task[0].cancel();
 				l.unregister();

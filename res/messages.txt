@@ -15,3 +15,5 @@ needArgument: &cMust supply at least one argument for %arg%
 needFlagValue: &cMust supply value for flag %flag%
 wrongArgumentCount: &cIncorrect number of arguments. Expected %args% argument(s), got %count%
 invalidSubcommand: &cInvalid subcommand: %value%
+contextDefaultFromConsole: &cCannot infer default value of argument %arg% for console sender, please specify it
+contextDefaultFlagFromConsole: &cCannot infer default value of flag %flag% for console sender, please specify it

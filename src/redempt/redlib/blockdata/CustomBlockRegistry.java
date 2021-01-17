@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import redempt.redlib.RedLib;
@@ -37,6 +38,15 @@ import java.util.jar.JarFile;
  */
 public class CustomBlockRegistry implements Listener {
 	
+	private static List<CustomBlockRegistry> registries = new ArrayList<>();
+	
+	/**
+	 * @return All active CustomBlockRegistries
+	 */
+	public static List<CustomBlockRegistry> getAllRegistries() {
+		return registries;
+	}
+	
 	private BlockDataManager manager;
 	private Map<String, CustomBlockType<?>> types = new HashMap<>();
 	private Map<String, CustomBlockType<?>> byItemName = new HashMap<>();
@@ -49,6 +59,7 @@ public class CustomBlockRegistry implements Listener {
 	 */
 	public CustomBlockRegistry(BlockDataManager manager) {
 		this.manager = manager;
+		registries.add(this);
 	}
 	
 	/**
@@ -61,6 +72,7 @@ public class CustomBlockRegistry implements Listener {
 		this.manager = manager;
 		this.plugin = plugin;
 		Bukkit.getPluginManager().registerEvents(this, plugin);
+		registries.add(this);
 	}
 	
 	/**
@@ -205,7 +217,10 @@ public class CustomBlockRegistry implements Listener {
 			}
 			CustomBlockType<T> type = (CustomBlockType<T>) cb.getType();
 			DataBlock db = e.getDataBlock();
-			ItemStack item = type.getItem(type.get(db));
+			List<ItemStack> items = new ArrayList<>();
+			T custom = type.get(db);
+			items.add(type.getItem(custom));
+			items.addAll(type.getDrops(custom));
 			if (RedLib.MID_VERSION >= 12) {
 				BlockBreakEvent parent = (BlockBreakEvent) e.getParent();
 				if (!parent.isDropItems()) {
@@ -215,11 +230,11 @@ public class CustomBlockRegistry implements Listener {
 				parent.setDropItems(false);
 				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
 					List<Item> drops = new ArrayList<>();
-					drops.add(e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), item));
+					items.forEach(item -> drops.add(e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), item)));
 					Event event = (Event) NMSHelper.getClass("org.bukkit.event.block.BlockDropItemEvent").getInstance(e.getBlock(), state, e.getPlayer(), drops).getObject();
 					Bukkit.getPluginManager().callEvent(event);
 					if (((Cancellable) event).isCancelled()) {
-						drops.get(0).remove();
+						drops.forEach(Item::remove);
 					}
 				});
 			} else {
@@ -229,7 +244,7 @@ public class CustomBlockRegistry implements Listener {
 							.filter(en -> en instanceof Item && en.getTicksLived() < 2).map(en -> (Item) en)
 							.filter(i -> drops.stream().anyMatch(it -> it.isSimilar(i.getItemStack())))
 							.forEach(Entity::remove);
-					e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(0.5, 0.5, 0.5), item);
+					items.forEach(item -> e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(0.5, 0.5, 0.5), item));
 				});
 			}
 		}
@@ -269,6 +284,13 @@ public class CustomBlockRegistry implements Listener {
 					e.getWhoClicked().getInventory().setItem(e.getSlot(), item);
 				});
 			}
+		}
+	}
+	
+	@EventHandler
+	public void onDisable(PluginDisableEvent e) {
+		if (e.getPlugin().equals(plugin)) {
+			registries.remove(this);
 		}
 	}
 	

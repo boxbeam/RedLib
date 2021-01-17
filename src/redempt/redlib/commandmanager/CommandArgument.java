@@ -12,6 +12,7 @@ class CommandArgument {
 	private boolean hideType;
 	private boolean consume;
 	private boolean vararg;
+	private boolean contextDefault = false;
 	private Function<CommandSender, Object> defaultValue = null;
 	public int pos;
 	
@@ -29,8 +30,13 @@ class CommandArgument {
 		return name;
 	}
 	
-	public void setDefaultValue(Function<CommandSender, Object> value) {
+	public boolean isContextDefault() {
+		return contextDefault;
+	}
+	
+	public void setDefaultValue(Function<CommandSender, Object> value, boolean context) {
 		this.defaultValue = value;
+		this.contextDefault = context;
 	}
 	
 	public Object getDefaultValue(CommandSender sender) {

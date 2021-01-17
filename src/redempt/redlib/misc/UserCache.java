@@ -47,10 +47,10 @@ public class UserCache {
 		for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
 			nameCache.put(player.getName().toLowerCase(Locale.ROOT), player);
 		}
-		new EventListener<>(RedLib.getInstance(), PlayerLoginEvent.class, e -> {
+		Task.syncDelayed(RedLib.getInstance(), () -> new EventListener<>(RedLib.getInstance(), PlayerLoginEvent.class, e -> {
 			Player player = e.getPlayer();
 			nameCache.put(player.getName(), player);
-		});
+		}));
 	}
 	
 	/**

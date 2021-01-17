@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":6,"i3":10,"i4":6,"i5":10,"i6":10,"i7":10,"i8":6,"i9":10,"i10":10};
+var data = {"i0":10,"i1":10,"i2":6,"i3":10,"i4":10,"i5":6,"i6":10,"i7":10,"i8":10,"i9":6,"i10":10,"i11":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -212,32 +212,37 @@ implements org.bukkit.event.Listener</pre>
 </td>
 </tr>
 <tr id="i4" class="altColor">
+<td class="colFirst"><code>java.util.List&lt;org.bukkit.inventory.ItemStack&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDrops(T)">getDrops</a></span>&#8203;(<a href="CustomBlockType.html" title="type parameter in CustomBlockType">T</a>&nbsp;block)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>abstract org.bukkit.inventory.ItemStack</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getItem(T)">getItem</a></span>&#8203;(<a href="CustomBlockType.html" title="type parameter in CustomBlockType">T</a>&nbsp;block)</code></th>
 <td class="colLast">
 <div class="block">Gets the item to be dropped when this block is mined</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getName()">getName</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="CustomBlockType.html" title="type parameter in CustomBlockType">T</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#initialize(org.bukkit.block.Block)">initialize</a></span>&#8203;(org.bukkit.block.Block&nbsp;block)</code></th>
 <td class="colLast">
 <div class="block">Initializes the placement of this CustomBlockType for the given Block.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#itemMatches(org.bukkit.inventory.ItemStack)">itemMatches</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item)</code></th>
 <td class="colLast">
 <div class="block">Checks whether the item given matches the item for this CustomBlockType</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>abstract void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#place(org.bukkit.entity.Player,org.bukkit.inventory.ItemStack,T)">place</a></span>&#8203;(org.bukkit.entity.Player&nbsp;player,
      org.bukkit.inventory.ItemStack&nbsp;item,
@@ -246,12 +251,12 @@ implements org.bukkit.event.Listener</pre>
 <div class="block">Called when this CustomBlockType is placed.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#register(redempt.redlib.blockdata.BlockDataManager)">register</a></span>&#8203;(<a href="BlockDataManager.html" title="class in redempt.redlib.blockdata">BlockDataManager</a>&nbsp;manager)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#typeMatches(org.bukkit.Material)">typeMatches</a></span>&#8203;(org.bukkit.Material&nbsp;material)</code></th>
 <td class="colLast">
@@ -359,6 +364,17 @@ implements org.bukkit.event.Listener</pre>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The ItemStack to drop</dd>
 </dl>
+</li>
+</ul>
+<a id="getDrops(redempt.redlib.blockdata.CustomBlock)">
+<!--   -->
+</a><a id="getDrops(T)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getDrops</h4>
+<pre class="methodSignature">public&nbsp;java.util.List&lt;org.bukkit.inventory.ItemStack&gt;&nbsp;getDrops&#8203;(<a href="CustomBlockType.html" title="type parameter in CustomBlockType">T</a>&nbsp;block)</pre>
 </li>
 </ul>
 <a id="getBaseItemName()">

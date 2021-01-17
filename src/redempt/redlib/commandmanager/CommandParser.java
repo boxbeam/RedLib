@@ -142,7 +142,7 @@ public class CommandParser {
 							if (arg.consumes() || arg.isVararg()) {
 								throw error("Flags cannot be consuming or vararg", pos);
 							}
-							Flag flag = new Flag(arg.getType(), arg.getName(), arg.getPosition(), arg.getDefaultValue());
+							Flag flag = new Flag(arg.getType(), arg.getName(), arg.getPosition(), arg.getDefaultValue(), arg.isContextDefault());
 							for (String name : flag.getNames()) {
 								if (!name.startsWith("-")) {
 									throw error("All flag names and aliases must start with a dash", pos);
@@ -296,6 +296,7 @@ public class CommandParser {
 		String name = argSplit[1];
 		boolean hideType = false;
 		boolean optional = false;
+		boolean contextDefault = false;
 		Function<CommandSender, Object> defaultValue = c -> null;
 		int startIndex = -1;
 		if ((startIndex = name.indexOf('(')) != -1) {
@@ -327,6 +328,7 @@ public class CommandParser {
 				ContextProvider<?> provider = Arrays.stream(this.contextProviders).filter(c -> c.getName().equals(pname)).findFirst()
 						.orElseThrow(() -> error("Missing context provider " + pname, pos));
 				defaultValue = c -> provider.provide((Player) c);
+				contextDefault = true;
 			} else {
 				defaultValue = c -> argType.convert(c, value.startsWith("\\") ? value.substring(1) : value);
 			}
@@ -349,7 +351,7 @@ public class CommandParser {
 		}
 		CommandArgument carg = new CommandArgument(argType, argPos - 1, name, optional, hideType, consumes, vararg);
 		if (carg.isOptional() || name.startsWith("-")) {
-			carg.setDefaultValue(defaultValue);
+			carg.setDefaultValue(defaultValue, contextDefault);
 		}
 		return carg;
 	}

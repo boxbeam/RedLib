@@ -12,13 +12,15 @@ class Flag {
 	private String[] names;
 	private int pos;
 	private Function<CommandSender, Object> defaultValue = null;
+	private boolean contextDefault;
 	
-	public Flag(ArgType<?> type, String name, int pos, Function<CommandSender, Object> defaultValue) {
+	public Flag(ArgType<?> type, String name, int pos, Function<CommandSender, Object> defaultValue, boolean contextDefault) {
 		this.type = type;
 		this.name = name;
 		this.names = name.split(",");
 		this.pos = pos;
 		this.defaultValue = defaultValue;
+		this.contextDefault = contextDefault;
 	}
 	
 	public Object getDefaultValue(CommandSender sender) {
@@ -31,6 +33,10 @@ class Flag {
 	
 	public ArgType<?> getType() {
 		return type;
+	}
+	
+	public boolean isContextDefault() {
+		return contextDefault;
 	}
 	
 	public boolean nameMatches(String name) {

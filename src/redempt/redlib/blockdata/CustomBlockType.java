@@ -7,6 +7,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Represents a type of a CustomBlock that can be set
  * @param <T> The type of the CustomBlock represented by this CustomBlockType
@@ -49,6 +52,10 @@ public abstract class CustomBlockType<T extends CustomBlock> implements Listener
 	 * @return The ItemStack to drop
 	 */
 	public abstract ItemStack getItem(T block);
+	
+	public List<ItemStack> getDrops(T block) {
+		return new ArrayList<>();
+	}
 	
 	/**
 	 * @return A unique item name that the item for this CustomBlockType will have

@@ -214,6 +214,9 @@ public class Command {
 				output[flag.getPosition() + 1] = false;
 				continue;
 			}
+			if (flag.isContextDefault() && !(sender instanceof Player)) {
+				return new Result<>(this, null, Messages.msg("contextDefaultFlagFromConsole").replace("%flag%", flag.getName()));
+			}
 			output[flag.getPosition() + 1] = flag.getDefaultValue(sender);
 		}
 		//Flag argument handling
@@ -361,6 +364,9 @@ public class Command {
 		}
 		for (CommandArgument arg : args) {
 			if (arg.isOptional() && output[arg.getPosition() + 1] == null) {
+				if (arg.isContextDefault() && !(sender instanceof Player)) {
+					return new Result<>(this, null, Messages.msg("contextDefaultFromConsole").replace("%arg%", arg.getName()));
+				}
 				output[arg.getPosition() + 1] = arg.getDefaultValue(sender);
 			}
 		}
