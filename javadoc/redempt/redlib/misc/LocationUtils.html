@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9,"i15":9,"i16":9,"i17":9,"i18":9,"i19":9,"i20":9};
+var data = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9,"i15":9,"i16":9,"i17":9,"i18":9,"i19":9,"i20":9,"i21":9,"i22":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -206,6 +206,13 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>static org.bukkit.Location</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#center(org.bukkit.Location)">center</a></span>&#8203;(org.bukkit.Location&nbsp;loc)</code></th>
+<td class="colLast">
+<div class="block">Sets the location's coordinates to the center point of its block coordinates, then returns it</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#delayedTeleport(org.bukkit.entity.Player,org.bukkit.Location,int)">delayedTeleport</a></span>&#8203;(org.bukkit.entity.Player&nbsp;player,
                org.bukkit.Location&nbsp;loc,
@@ -214,7 +221,7 @@ extends java.lang.Object</pre>
 <div class="block">Initiates a delayed teleport for a player which will be cancelled if the player moves.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#delayedTeleport(org.bukkit.entity.Player,org.bukkit.Location,int,java.util.function.Consumer)">delayedTeleport</a></span>&#8203;(org.bukkit.entity.Player&nbsp;player,
                org.bukkit.Location&nbsp;loc,
@@ -224,7 +231,7 @@ extends java.lang.Object</pre>
 <div class="block">Initiates a delayed teleport for a player which will be cancelled if the player moves.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>static java.util.List&lt;org.bukkit.Location&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#directPathfind(org.bukkit.block.Block,org.bukkit.block.Block,int)">directPathfind</a></span>&#8203;(org.bukkit.block.Block&nbsp;start,
               org.bukkit.block.Block&nbsp;end,
@@ -233,7 +240,7 @@ extends java.lang.Object</pre>
 <div class="block">Finds the fastest path between a starting and ending location using A*, then removes unneeded steps for straight</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>static java.util.List&lt;org.bukkit.Location&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#directPathfind(org.bukkit.block.Block,org.bukkit.block.Block,int,java.util.function.Predicate)">directPathfind</a></span>&#8203;(org.bukkit.block.Block&nbsp;start,
               org.bukkit.block.Block&nbsp;end,
@@ -243,14 +250,14 @@ extends java.lang.Object</pre>
 <div class="block">Finds the fastest path between a starting and ending location using A*, then removes unneeded steps for straight</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>static org.bukkit.Location</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromString(java.lang.String)">fromString</a></span>&#8203;(java.lang.String&nbsp;string)</code></th>
 <td class="colLast">
 <div class="block">Converts a String back to a Location.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>static org.bukkit.Location</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromString(java.lang.String,java.lang.String)">fromString</a></span>&#8203;(java.lang.String&nbsp;string,
           java.lang.String&nbsp;separator)</code></th>
@@ -258,7 +265,7 @@ extends java.lang.Object</pre>
 <div class="block">Converts a String back to a Location</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromStringLater(java.lang.String,java.lang.String,java.util.function.Consumer)">fromStringLater</a></span>&#8203;(java.lang.String&nbsp;string,
                java.lang.String&nbsp;separator,
@@ -267,7 +274,7 @@ extends java.lang.Object</pre>
 <div class="block">Loads a Location from a String.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromStringLater(java.lang.String,java.util.function.Consumer)">fromStringLater</a></span>&#8203;(java.lang.String&nbsp;string,
                java.util.function.Consumer&lt;org.bukkit.Location&gt;&nbsp;callback)</code></th>
@@ -275,14 +282,14 @@ extends java.lang.Object</pre>
 <div class="block">Loads a Location from a String.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>static int[]</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getChunkCoordinates(org.bukkit.Location)">getChunkCoordinates</a></span>&#8203;(org.bukkit.Location&nbsp;loc)</code></th>
 <td class="colLast">
 <div class="block">Gets the chunk X and Z of a location</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>static org.bukkit.Location</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getNearestSafeLocation(org.bukkit.Location,int)">getNearestSafeLocation</a></span>&#8203;(org.bukkit.Location&nbsp;loc,
                       int&nbsp;maxDistance)</code></th>
@@ -290,7 +297,7 @@ extends java.lang.Object</pre>
 <div class="block">Gets the nearest safe location to the given location within the given distance</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>static org.bukkit.Location</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getNearestSafeLocation(org.bukkit.Location,int,java.util.function.Predicate)">getNearestSafeLocation</a></span>&#8203;(org.bukkit.Location&nbsp;loc,
                       int&nbsp;maxDistance,
@@ -299,21 +306,21 @@ extends java.lang.Object</pre>
 <div class="block">Gets the nearest safe location to the given location within the given distance passing the given predicate check</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>static boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isHazard(org.bukkit.Material)">isHazard</a></span>&#8203;(org.bukkit.Material&nbsp;type)</code></th>
 <td class="colLast">
 <div class="block">Checks if a given block type is a hazard - whether it would damage the player if they were on top of it</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>static boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isSafe(org.bukkit.Location)">isSafe</a></span>&#8203;(org.bukkit.Location&nbsp;loc)</code></th>
 <td class="colLast">
 <div class="block">Checks whether the given location is safe to teleport a player to - that a player would not be damaged as a result of being moved to this location</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>static java.util.Deque&lt;org.bukkit.Location&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#pathfind(org.bukkit.block.Block,org.bukkit.block.Block,int)">pathfind</a></span>&#8203;(org.bukkit.block.Block&nbsp;start,
         org.bukkit.block.Block&nbsp;end,
@@ -322,7 +329,7 @@ extends java.lang.Object</pre>
 <div class="block">Finds the fastest path between a starting and ending location using A*</div>
 </td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>static java.util.Deque&lt;org.bukkit.Location&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#pathfind(org.bukkit.block.Block,org.bukkit.block.Block,int,java.util.function.Predicate)">pathfind</a></span>&#8203;(org.bukkit.block.Block&nbsp;start,
         org.bukkit.block.Block&nbsp;end,
@@ -332,14 +339,21 @@ extends java.lang.Object</pre>
 <div class="block">Finds the fastest path between a starting and ending location using A*</div>
 </td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i17" class="rowColor">
+<td class="colFirst"><code>static org.bukkit.Location</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toBlockLocation(org.bukkit.Location)">toBlockLocation</a></span>&#8203;(org.bukkit.Location&nbsp;loc)</code></th>
+<td class="colLast">
+<div class="block">Sets the location's coordinates to its block coordinates, then returns it</div>
+</td>
+</tr>
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString(org.bukkit.block.Block)">toString</a></span>&#8203;(org.bukkit.block.Block&nbsp;block)</code></th>
 <td class="colLast">
 <div class="block">Converts a Location to a String representing its location</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString(org.bukkit.block.Block,java.lang.String)">toString</a></span>&#8203;(org.bukkit.block.Block&nbsp;block,
         java.lang.String&nbsp;separator)</code></th>
@@ -347,14 +361,14 @@ extends java.lang.Object</pre>
 <div class="block">Converts a Location to a String representing its location</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString(org.bukkit.Location)">toString</a></span>&#8203;(org.bukkit.Location&nbsp;loc)</code></th>
 <td class="colLast">
 <div class="block">Converts a Location to a String.</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString(org.bukkit.Location,java.lang.String)">toString</a></span>&#8203;(org.bukkit.Location&nbsp;loc,
         java.lang.String&nbsp;separator)</code></th>
@@ -362,7 +376,7 @@ extends java.lang.Object</pre>
 <div class="block">Converts a Location to a String</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#waitForWorld(java.lang.String,java.util.function.Consumer)">waitForWorld</a></span>&#8203;(java.lang.String&nbsp;worldname,
             java.util.function.Consumer&lt;org.bukkit.World&gt;&nbsp;callback)</code></th>
@@ -645,6 +659,38 @@ extends java.lang.Object</pre>
 <dd><code>block</code> - The Block to get the center of</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The center of the Block</dd>
+</dl>
+</li>
+</ul>
+<a id="toBlockLocation(org.bukkit.Location)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>toBlockLocation</h4>
+<pre class="methodSignature">public static&nbsp;org.bukkit.Location&nbsp;toBlockLocation&#8203;(org.bukkit.Location&nbsp;loc)</pre>
+<div class="block">Sets the location's coordinates to its block coordinates, then returns it</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>loc</code> - The location</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The block location</dd>
+</dl>
+</li>
+</ul>
+<a id="center(org.bukkit.Location)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>center</h4>
+<pre class="methodSignature">public static&nbsp;org.bukkit.Location&nbsp;center&#8203;(org.bukkit.Location&nbsp;loc)</pre>
+<div class="block">Sets the location's coordinates to the center point of its block coordinates, then returns it</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>loc</code> - The location</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The block location</dd>
 </dl>
 </li>
 </ul>

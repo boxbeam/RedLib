@@ -11,6 +11,7 @@ import redempt.redlib.multiblock.Rotator;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -176,8 +177,8 @@ public class SpheroidRegion extends Region {
 	}
 	
 	private void clearCached() {
-		clearCached();
 		surface = null;
+		cuboid = null;
 	}
 	
 	/**
@@ -365,12 +366,10 @@ public class SpheroidRegion extends Region {
 				for (double yaw = 0; yaw < 360; yaw += inc) {
 					loc.setPitch((float) pitch);
 					loc.setYaw((float) yaw);
-					Block block = getSurfacePoint(loc.getDirection()).getBlock();
-					if (toCuboid().contains(block)) {
-						surface.add(block);
-					}
+					Block toAdd = getSurfacePoint(loc.getDirection()).getBlock();
+					surface.add(toAdd);
 				}
-			}	
+			}
 		}
 		return surface;
 	}
@@ -381,7 +380,7 @@ public class SpheroidRegion extends Region {
 	 * @return Whether the block is on the surface of this SpheroidRegion
 	 */
 	public boolean surfaceContains(Block block) {
-		return getSurface().contains(block);
+		return surface.contains(block);
 	}
 	
 	/**

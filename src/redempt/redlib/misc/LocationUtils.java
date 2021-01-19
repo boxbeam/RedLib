@@ -245,6 +245,27 @@ public class LocationUtils {
 	}
 	
 	/**
+	 * Sets the location's coordinates to its block coordinates, then returns it
+	 * @param loc The location
+	 * @return The block location
+	 */
+	public static Location toBlockLocation(Location loc) {
+		loc.setX(loc.getBlockX());
+		loc.setY(loc.getBlockY());
+		loc.setZ(loc.getBlockZ());
+		return loc;
+	}
+	
+	/**
+	 * Sets the location's coordinates to the center point of its block coordinates, then returns it
+	 * @param loc The location
+	 * @return The block location
+	 */
+	public static Location center(Location loc) {
+		return loc.add(.5, .5, .5);
+	}
+	
+	/**
 	 * Loads a Location from a String. If the world this Location is in is not yet loaded, waits for it to load, then passes
 	 * the Location to the callback.
 	 * @param string The String to be parsed into a Location

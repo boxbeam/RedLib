@@ -3,12 +3,13 @@ package redempt.redlib.misc;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.PlayerJoinEvent;
 import redempt.redlib.RedLib;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A cache of offline users by name which can be queried without worrying about web requests
@@ -43,14 +44,14 @@ public class UserCache {
 		if (nameCache != null) {
 			return;
 		}
-		nameCache = new HashMap<>();
+		nameCache = new ConcurrentHashMap<>();
 		for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
 			nameCache.put(player.getName().toLowerCase(Locale.ROOT), player);
 		}
-		Task.syncDelayed(RedLib.getInstance(), () -> new EventListener<>(RedLib.getInstance(), PlayerLoginEvent.class, e -> {
+		new EventListener<>(RedLib.getInstance(), PlayerJoinEvent.class, EventPriority.LOWEST, e -> {
 			Player player = e.getPlayer();
-			nameCache.put(player.getName(), player);
-		}));
+			nameCache.put(player.getName().toLowerCase(Locale.ROOT), player);
+		});
 	}
 	
 	/**
