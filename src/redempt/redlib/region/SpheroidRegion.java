@@ -380,6 +380,9 @@ public class SpheroidRegion extends Region {
 	 * @return Whether the block is on the surface of this SpheroidRegion
 	 */
 	public boolean surfaceContains(Block block) {
+		if (surface == null) {
+			getSurface();
+		}
 		return surface.contains(block);
 	}
 	

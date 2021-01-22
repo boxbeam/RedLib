@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9};
+var data = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -176,26 +176,33 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#color(java.lang.String)">color</a></span>&#8203;(java.lang.String&nbsp;input)</code></th>
+<td class="colLast">
+<div class="block">Shorthand for <code>ChatColor.translateAlternateColorCodes(char, String)</code></div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#formatLargeInteger(long)">formatLargeInteger</a></span>&#8203;(long&nbsp;num)</code></th>
 <td class="colLast">
 <div class="block">Formats a large number with commas, like 12345 as 12,345</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#formatMoney(double)">formatMoney</a></span>&#8203;(double&nbsp;money)</code></th>
 <td class="colLast">
 <div class="block">Formats money like 3.5B representing 3.5 billion</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#formatTimeOffset(long)">formatTimeOffset</a></span>&#8203;(long&nbsp;millis)</code></th>
 <td class="colLast">
 <div class="block">Formats a time offset like 1h3m8s (1 hour, 3 minutes, 8 seconds)</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#formatTimeOffset(long,int)">formatTimeOffset</a></span>&#8203;(long&nbsp;millis,
                 int&nbsp;truncate)</code></th>
@@ -203,21 +210,21 @@ extends java.lang.Object</pre>
 <div class="block">Formats a time offset like 1h3m8s (1 hour, 3 minutes, 8 seconds)</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toCamelCase(java.lang.String)">toCamelCase</a></span>&#8203;(java.lang.String&nbsp;string)</code></th>
 <td class="colLast">
 <div class="block">Converts a string to camelCase, where every character after a space is capitalized.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toTitleCase(java.lang.String)">toTitleCase</a></span>&#8203;(java.lang.String&nbsp;string)</code></th>
 <td class="colLast">
 <div class="block">Converts a string to Title Case, where the first character and every character after a space is capitalized.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#truncateDouble(double)">truncateDouble</a></span>&#8203;(double&nbsp;input)</code></th>
 <td class="colLast">
@@ -315,6 +322,22 @@ extends java.lang.Object</pre>
 <dd><code>input</code> - The input double</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The formatted double</dd>
+</dl>
+</li>
+</ul>
+<a id="color(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>color</h4>
+<pre class="methodSignature">public static&nbsp;java.lang.String&nbsp;color&#8203;(java.lang.String&nbsp;input)</pre>
+<div class="block">Shorthand for <code>ChatColor.translateAlternateColorCodes(char, String)</code></div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>input</code> - The input string</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The colored string, replacing color codes using & with proper codes</dd>
 </dl>
 </li>
 </ul>

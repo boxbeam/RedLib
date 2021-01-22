@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -43,7 +44,8 @@ public class InventoryGUI implements Listener {
 	private List<ItemButton> buttons = new ArrayList<>();
 	private Set<Integer> openSlots = new HashSet<>();
 	private Runnable onDestroy;
-	private BiConsumer<InventoryClickEvent, List<Integer>> onClickOpenSlot = (e, i) -> { };
+	private BiConsumer<InventoryClickEvent, List<Integer>> onClickOpenSlot = (e, i) -> {};
+	private Consumer<InventoryDragEvent> onDragOpenSlot = e -> {};
 	
 	private boolean returnItems = true;
 	private boolean destroyOnClose = true;
@@ -329,11 +331,25 @@ public class InventoryGUI implements Listener {
 		buttons.clear();
 	}
 	
+	/**
+	 * Sets the handler for when items are drag-clicked into open slots
+	 * @param onDrag The handler
+	 */
+	public void setOnDragOpenSlot(Consumer<InventoryDragEvent> onDrag) {
+		this.onDragOpenSlot = onDrag;
+	}
+	
 	@EventHandler
 	public void onDrag(InventoryDragEvent e) {
-		if (e.getRawSlots().stream().anyMatch(s -> getInventory(e.getView(), s).equals(inventory) && !openSlots.contains(s))) {
-			e.setCancelled(true);
+		List<Integer> slots = e.getRawSlots().stream().filter(s -> getInventory(e.getView(), s).equals(inventory)).collect(Collectors.toList());
+		if (slots.size() == 0) {
+			return;
 		}
+		if (!openSlots.containsAll(slots)) {
+			e.setCancelled(true);
+			return;
+		}
+		onDragOpenSlot.accept(e);
 	}
 	
 	private Inventory getInventory(InventoryView view, int rawSlot) {

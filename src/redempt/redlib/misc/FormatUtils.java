@@ -1,5 +1,7 @@
 package redempt.redlib.misc;
 
+import org.bukkit.ChatColor;
+
 import java.text.DecimalFormat;
 
 /**
@@ -58,6 +60,15 @@ public class FormatUtils {
 	 */
 	public static String truncateDouble(double input) {
 		return format.format(input);
+	}
+	
+	/**
+	 * Shorthand for {@link ChatColor#translateAlternateColorCodes(char, String)}
+	 * @param input The input string
+	 * @return The colored string, replacing color codes using & with proper codes
+	 */
+	public static String color(String input) {
+		return ChatColor.translateAlternateColorCodes('&', input);
 	}
 	
 	/**
