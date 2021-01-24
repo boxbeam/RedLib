@@ -19,6 +19,12 @@ public class EventItems {
 	 * @param after The array of items after the event executes
 	 */
 	public EventItems(Event event, ItemStack[] before, ItemStack[] after) {
+		if (before == null) {
+			before = new ItemStack[after == null ? 1 : after.length];
+		}
+		if (after == null) {
+			after = new ItemStack[before.length];
+		}
 		this.before = before;
 		this.after = after;
 		this.event = event;
