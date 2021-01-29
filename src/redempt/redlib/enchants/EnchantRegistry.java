@@ -139,16 +139,16 @@ public class EnchantRegistry {
 					int beforeLevel = ench.getLevel(items.getBefore()[i]);
 					int afterLevel = ench.getLevel(items.getAfter()[i]);
 					if (beforeLevel == 0 && afterLevel > 0) {
-						ench.getTriggers().get(trigger).activate(e, afterLevel);
+						ench.getTriggers().get(trigger).activate(items.getEvent(), afterLevel);
 						continue;
 					}
 					if (beforeLevel > 0 && afterLevel == 0) {
-						ench.getTriggers().get(trigger).deactivate(e, beforeLevel);
+						ench.getTriggers().get(trigger).deactivate(items.getEvent(), beforeLevel);
 						continue;
 					}
 					if (beforeLevel != afterLevel) {
-						ench.getTriggers().get(trigger).deactivate(e, beforeLevel);
-						ench.getTriggers().get(trigger).activate(e, afterLevel);
+						ench.getTriggers().get(trigger).deactivate(items.getEvent(), beforeLevel);
+						ench.getTriggers().get(trigger).activate(items.getEvent(), afterLevel);
 					}
 				}
 			}

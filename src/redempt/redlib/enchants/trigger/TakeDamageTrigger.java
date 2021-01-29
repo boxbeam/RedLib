@@ -3,6 +3,7 @@ package redempt.redlib.enchants.trigger;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import redempt.redlib.enchants.EventItems;
@@ -18,6 +19,12 @@ class TakeDamageTrigger extends EnchantTrigger<EntityDamageEvent> {
 			return new EventItems(e, ((Player) e.getEntity()).getInventory().getArmorContents());
 		});
 		addListener(EntityDamageByEntityEvent.class, e -> {
+			if (!(e.getEntity() instanceof Player)) {
+				return null;
+			}
+			return new EventItems(e, ((Player) e.getEntity()).getInventory().getArmorContents());
+		});
+		addListener(EntityDamageByBlockEvent.class, e -> {
 			if (!(e.getEntity() instanceof Player)) {
 				return null;
 			}
