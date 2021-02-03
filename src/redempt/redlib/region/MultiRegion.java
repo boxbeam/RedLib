@@ -547,6 +547,7 @@ public class MultiRegion extends Region implements Overlappable {
 	 * @param autoCluster Whether to automatically cluster regions in clusters of 10 until there are less than 25 top-level regions
 	 */
 	public void recalculate(boolean autoCluster) {
+		decluster();
 		MultiRegionMeta summary = new MultiRegionMeta(regions);
 		List<Region> regions = this.regions;
 		List<Region> newRegions = new ArrayList<>();
