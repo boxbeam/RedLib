@@ -1,9 +1,11 @@
 package redempt.redlib.region;
 
 import org.bukkit.Bukkit;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import redempt.redlib.RedLib;
 import redempt.redlib.misc.EventListener;
@@ -61,6 +63,20 @@ public class RegionEnterExitListener {
 			});
 		});
 		new EventListener<>(RedLib.getInstance(), PlayerJoinEvent.class, e -> {
+			regionMap.get(e.getPlayer().getLocation()).forEach(r -> {
+				if (r.contains(e.getPlayer().getLocation())) {
+					Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), r, EnterCause.JOIN, null));
+				}
+			});
+		});
+		new EventListener<>(RedLib.getInstance(), PlayerDeathEvent.class, e -> {
+			regionMap.get(e.getEntity().getLocation()).forEach(r -> {
+				if (r.contains(e.getEntity().getLocation())) {
+					Bukkit.getPluginManager().callEvent(new RegionExitEvent(e.getEntity(), r, ExitCause.QUIT, null));
+				}
+			});
+		});
+		new EventListener<>(RedLib.getInstance(), PlayerRespawnEvent.class, e -> {
 			regionMap.get(e.getPlayer().getLocation()).forEach(r -> {
 				if (r.contains(e.getPlayer().getLocation())) {
 					Bukkit.getPluginManager().callEvent(new RegionEnterEvent(e.getPlayer(), r, EnterCause.JOIN, null));

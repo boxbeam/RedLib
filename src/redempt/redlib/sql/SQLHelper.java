@@ -520,6 +520,19 @@ public class SQLHelper implements Closeable {
 		}
 		
 		/**
+		 * Gets the column count from the returned data
+		 * @return The column count
+		 */
+		public int getColumnCount() {
+			try {
+				return results.getMetaData().getColumnCount();
+			} catch (SQLException e) {
+				sneakyThrow(e);
+				return 0;
+			}
+		}
+		
+		/**
 		 * Closes the wrapped ResultSet. Call this when you are done using these Results.
 		 */
 		@Override
