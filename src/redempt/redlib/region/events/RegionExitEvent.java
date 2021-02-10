@@ -102,7 +102,11 @@ public class RegionExitEvent extends Event implements Cancellable {
 		/**
 		 * When a player leaves the game whilst in a region
 		 */
-		QUIT
+		QUIT,
+		/**
+		 * When a player dies in a region
+		 */
+		DEATH
 	}
 	
 }

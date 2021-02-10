@@ -102,7 +102,11 @@ public class RegionEnterEvent extends Event implements Cancellable {
 		/**
 		 * When a player joins into a region
 		 */
-		JOIN
+		JOIN,
+		/**
+		 * When a players respawns into a region
+		 */
+		RESPAWN
 	}
 
 }
