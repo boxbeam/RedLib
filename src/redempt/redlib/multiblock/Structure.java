@@ -114,7 +114,7 @@ public class Structure {
 	public StructureBlock getRelative(int x, int y, int z) {
 		int[] dim = type.getDimensions();
 		if (x < 0 || y < 0 || z < 0
-				|| x > dim[0] || y > dim[1] || z > dim[2]) {
+				|| x >= dim[0] || y >= dim[1] || z >= dim[2]) {
 			throw new IndexOutOfBoundsException("Relative location outside bounds of structure: " + x + ", " + y + ", " + z);
 		}
 		rotator.setLocation(x, z);
@@ -141,7 +141,7 @@ public class Structure {
 		int y = offset.getBlockY();
 		int z = rotator.getRotatedBlockZ();
 		if (x < 0 || y < 0 || z < 0
-				|| x > dim[0] || y > dim[1] || z > dim[2]) {
+				|| x >= dim[0] || y >= dim[1] || z >= dim[2]) {
 			return null;
 		}
 		return new StructureBlock(block, this, x, y, z);
