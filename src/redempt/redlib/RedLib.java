@@ -55,7 +55,7 @@ public class RedLib extends JavaPlugin {
 		new ConfigManager(this).register(this).saveDefaults().load();
 		if (devMode) {
 			ChainCommand chain = new ChainCommand();
-			new CommandParser(this.getResource("command.txt"))
+			new CommandParser(this.getResource("command.rdcml"))
 					.setArgTypes(ArgType.of("material", Material.class), chain.getArgType())
 					.parse()
 					.register("redlib",
