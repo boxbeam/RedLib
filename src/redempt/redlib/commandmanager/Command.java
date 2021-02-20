@@ -174,7 +174,6 @@ public class Command {
 		List<Boolean> quoted = new ArrayList<>();
 		StringBuilder combine = new StringBuilder();
 		boolean quotes = false;
-		boolean argQuoted = false;
 		char[] chars = input.toCharArray();
 		for (int i = 0; i < chars.length; i++) {
 			char c = chars[i];
@@ -184,22 +183,27 @@ public class Command {
 				continue;
 			}
 			if (c == '"') {
-				argQuoted = true;
 				quotes = !quotes;
+				if (combine.length() > 0) {
+					args.add(combine.toString());
+					quoted.add(!quotes);
+					combine = new StringBuilder();
+				}
 				continue;
 			}
 			if (c == ' ' && !quotes) {
-				args.add(combine.toString());
-				quoted.add(argQuoted);
-				combine = new StringBuilder();
-				argQuoted = false;
+				if (combine.length() > 0) {
+					args.add(combine.toString());
+					quoted.add(false);
+					combine = new StringBuilder();
+				}
 				continue;
 			}
 			combine.append(c);
 		}
 		if (combine.length() > 0) {
 			args.add(combine.toString());
-			quoted.add(argQuoted);
+			quoted.add(false);
 		}
 		return new Result<>(null, args.toArray(new String[args.size()]), quoted.toArray(new Boolean[quoted.size()]));
 	}
@@ -323,7 +327,11 @@ public class Command {
 			if (arg.consumes()) {
 				StringBuilder builder = new StringBuilder();
 				for (int x = cmdArgs.size() - 1; x < sargs.size(); x++) {
-					builder.append(sargs.get(x)).append(" ");
+					if (quoted[x]) {
+						builder.append('"').append(sargs.get(x)).append("\" ");
+					} else {
+						builder.append(sargs.get(x)).append(" ");
+					}
 				}
 				String combine = builder.toString();
 				try {
@@ -562,6 +570,7 @@ public class Command {
 			}
 			flag = null;
 		}
+		args = splitArgsForTab(args);
 		//Remaining completions for command arguments
 		if (args.length - flagArgs < this.args.length && args.length - flagArgs >= 0) {
 			String partial = args[args.length - 1].replaceAll("(^\")|(\"$)", "").toLowerCase();
@@ -584,6 +593,23 @@ public class Command {
 					.filter(s -> s.toLowerCase().startsWith(partial) && !s.equals(partial)).forEach(completions::add);
 		}
 		return completions;
+	}
+	
+	private String[] splitArgsForTab(String[] args) {
+		List<String> argList = new ArrayList<>();
+		for (int i = 0; i < args.length; i++) {
+			String arg = args[i];
+			if (arg.length() > 0 && arg.charAt(0) == '"' && i + 1 < args.length) {
+				String next = args[i + 1];
+				if (next.length() > 0 && next.charAt(next.length() - 1) == '"') {
+					argList.add(arg + " " + next);
+					i++;
+					continue;
+				}
+			}
+			argList.add(args[i]);
+		}
+		return argList.toArray(new String[0]);
 	}
 	
 	protected Result<Boolean, String> execute(CommandSender sender, String[] args) {

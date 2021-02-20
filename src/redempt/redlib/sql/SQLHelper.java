@@ -538,9 +538,6 @@ public class SQLHelper implements Closeable {
 		@Override
 		public void close() {
 			try {
-				if (results.isClosed()) {
-					return;
-				}
 				results.close();
 			} catch (SQLException e) {
 				sneakyThrow(e);
