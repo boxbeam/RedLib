@@ -1,6 +1,5 @@
 package redempt.redlib.region;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -11,7 +10,6 @@ import redempt.redlib.multiblock.Rotator;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -128,7 +126,7 @@ public class SpheroidRegion extends Region {
 			default:
 				throw new IllegalArgumentException("Face must be UP, DOWN, NORTH, SOUTH, EAST, or WEST");
 		}
-		move(face.getDirection().multiply(amount / 2));
+		move(LocationUtils.getDirection(face).multiply(amount / 2));
 		clearCached();
 		return this;
 	}

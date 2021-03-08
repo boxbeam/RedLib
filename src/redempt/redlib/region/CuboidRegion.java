@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.util.Vector;
+import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.multiblock.Rotator;
 
 import java.util.function.Consumer;
@@ -153,7 +154,7 @@ public class CuboidRegion extends Region implements Overlappable {
 	 * @return Itself
 	 */
 	public CuboidRegion expand(BlockFace direction, double amount) {
-		Vector vec = direction.getDirection();
+		Vector vec = LocationUtils.getDirection(direction);
 		if (vec.getX() + vec.getY() + vec.getZ() > 0) {
 			vec = vec.multiply(amount);
 			end = end.add(vec);

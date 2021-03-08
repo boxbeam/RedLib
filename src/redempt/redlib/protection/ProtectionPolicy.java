@@ -20,6 +20,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
+import org.bukkit.entity.Wither;
 import org.bukkit.event.*;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -96,6 +97,12 @@ public class ProtectionPolicy implements Listener {
 		});
 		ProtectionListener.protect(EntityChangeBlockEvent.class, ProtectionType.SILVERFISH, e -> null, e -> {
 			if (!(e.getEntity() instanceof Silverfish)) {
+				return null;
+			}
+			return e.getBlock();
+		});
+		ProtectionListener.protect(EntityChangeBlockEvent.class, ProtectionType.WITHER, e -> null, e -> {
+			if (!(e.getEntity() instanceof Wither)) {
 				return null;
 			}
 			return e.getBlock();
@@ -402,6 +409,10 @@ public class ProtectionPolicy implements Listener {
 		 */
 		SILVERFISH,
 		/**
+		 * Wither spawning in and breaking blocks around it
+		 */
+		WITHER,
+		/**
 		 * Fire destroying blocks
 		 */
 		FIRE,
@@ -425,7 +436,7 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * All protection types relating to actions usually taken by players which indirectly affect blocks - Pistons, redstone, explosions, and falling blocks
 		 */
-		public static final ProtectionType[] INDIRECT_PLAYERS = {PISTONS, REDSTONE, ENTITY_EXPLOSION, BLOCK_EXPLOSION, FALLING_BLOCK, FIRE, PORTAL_PAIRING};
+		public static final ProtectionType[] INDIRECT_PLAYERS = {PISTONS, REDSTONE, ENTITY_EXPLOSION, BLOCK_EXPLOSION, FALLING_BLOCK, FIRE, PORTAL_PAIRING, WITHER};
 		/**
 		 * All protection types relating to natural processes not caused by players
 		 */

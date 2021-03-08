@@ -264,10 +264,10 @@ public class MultiRegion extends Region implements Overlappable {
 		Region r = new CuboidRegion(start, end);
 		r.expand(direction.getOppositeFace(), -(r.measureBlocks(direction) - 1));
 		MultiRegion slice = getIntersection((Overlappable) r);
-		slice.move(direction.getDirection());
+		slice.move(LocationUtils.getDirection(direction));
 		for (int i = 0; i < amount; i++) {
 			MultiRegion clone = slice.clone();
-			clone.move(direction.getDirection().multiply(i));
+			clone.move(LocationUtils.getDirection(direction).multiply(i));
 			add(clone);
 		}
 		fixCorners(null);

@@ -111,6 +111,15 @@ public class LocationUtils {
 		return getNearestSafeLocation(loc, maxDistance, l -> true);
 	}
 	
+	/**
+	 * Gets the Vector direction of a BlockFace. For use in versions below 1.13.
+	 * @param face The block face
+	 * @return The vector representing the direction
+	 */
+	public static Vector getDirection(BlockFace face) {
+		return new Vector(face.getModX(), face.getModY(), face.getModZ());
+	}
+	
 	private static DecimalFormat timeFormat = new DecimalFormat("0.#");
 	
 	/**
@@ -122,7 +131,7 @@ public class LocationUtils {
 	 * @param result A lambda to handle the result, given true if the teleport succeeded, false otherwise
 	 */
 	public static void delayedTeleport(Player player, Location loc, int ticks, Consumer<Boolean> result) {
-		double seconds = ticks / 20;
+		double seconds = ticks / 20d;
 		player.sendMessage(Messages.msg("teleportDelay").replace("%seconds%", timeFormat.format(seconds)));
 		Location start = player.getLocation();
 		Task[] task = {null};
