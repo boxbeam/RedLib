@@ -192,6 +192,20 @@ public class ItemUtils {
 	}
 	
 	/**
+	 * Sets the custom model data of the item
+	 * @param item The item to set the custom model data for
+	 * @param customModelData The custom model data to set
+	 * @return The modified item
+	 */
+	public static ItemStack setCustomModelData(ItemStack item, int customModelData) {
+		ItemMeta meta = item.getItemMeta();
+		meta.setCustomModelData(customModelData);
+		ItemStack clone = item.clone();
+		clone.setItemMeta(meta);
+		return clone;
+	}
+	
+	/**
 	 * Adds persistent data to the item
 	 * @param item The item to add persistent data to
 	 * @param key The key to add the data under

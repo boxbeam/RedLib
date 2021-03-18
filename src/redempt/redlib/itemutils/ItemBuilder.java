@@ -145,6 +145,15 @@ public class ItemBuilder extends ItemStack {
 	}
 	
 	/**
+	 * Sets the custom model data of this ItemBuilder
+	 * @param customModelData The custom model data to set
+	 * @return The ItemBuilder with the custom model data set
+	 */
+	public ItemBuilder setCustomModelData(int customModelData) {
+		return new ItemBuilder(ItemUtils.setCustomModelData(this, customModelData));
+	}
+	
+	/**
 	 * Add persistent tags to this ItemBuilder
 	 * @param key The key to add the data under
 	 * @param type The type of the data

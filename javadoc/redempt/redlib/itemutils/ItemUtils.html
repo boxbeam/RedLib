@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9,"i15":9,"i16":9,"i17":9,"i18":9,"i19":9,"i20":9,"i21":9,"i22":9,"i23":9,"i24":9,"i25":9,"i26":9,"i27":9,"i28":9,"i29":9,"i30":9,"i31":9};
+var data = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9,"i15":9,"i16":9,"i17":9,"i18":9,"i19":9,"i20":9,"i21":9,"i22":9,"i23":9,"i24":9,"i25":9,"i26":9,"i27":9,"i28":9,"i29":9,"i30":9,"i31":9,"i32":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -403,13 +403,21 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i26" class="altColor">
 <td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setCustomModelData(org.bukkit.inventory.ItemStack,int)">setCustomModelData</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item,
+                  int&nbsp;customModelData)</code></th>
+<td class="colLast">
+<div class="block">Sets the custom model data of the item</div>
+</td>
+</tr>
+<tr id="i27" class="rowColor">
+<td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setLore(org.bukkit.inventory.ItemStack,java.lang.String)">setLore</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item,
        java.lang.String&nbsp;line)</code></th>
 <td class="colLast">
 <div class="block">Set a single line of lore for an ItemStack</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setLore(org.bukkit.inventory.ItemStack,java.lang.String...)">setLore</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item,
        java.lang.String...&nbsp;lore)</code></th>
@@ -417,7 +425,7 @@ extends java.lang.Object</pre>
 <div class="block">Set multiple lines of lore for an ItemStack</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i29" class="rowColor">
 <td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setLore(org.bukkit.inventory.ItemStack,java.util.List)">setLore</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item,
        java.util.List&lt;java.lang.String&gt;&nbsp;lore)</code></th>
@@ -425,7 +433,7 @@ extends java.lang.Object</pre>
 <div class="block">Set multiple lines of lore for an ItemStack</div>
 </td>
 </tr>
-<tr id="i29" class="rowColor">
+<tr id="i30" class="altColor">
 <td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setName(org.bukkit.inventory.ItemStack,java.lang.String)">setName</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item,
        java.lang.String&nbsp;name)</code></th>
@@ -433,14 +441,14 @@ extends java.lang.Object</pre>
 <div class="block">Renames an ItemStack</div>
 </td>
 </tr>
-<tr id="i30" class="altColor">
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setUnbreakable(org.bukkit.inventory.ItemStack)">setUnbreakable</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item)</code></th>
 <td class="colLast">
 <div class="block">Sets an item to be unbreakable</div>
 </td>
 </tr>
-<tr id="i31" class="rowColor">
+<tr id="i32" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString(org.bukkit.inventory.ItemStack)">toString</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item)</code></th>
 <td class="colLast">
@@ -689,6 +697,24 @@ extends java.lang.Object</pre>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>item</code> - The item to add ItemFlags to</dd>
 <dd><code>flags</code> - The ItemFlags to add</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The modified item</dd>
+</dl>
+</li>
+</ul>
+<a id="setCustomModelData(org.bukkit.inventory.ItemStack,int)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setCustomModelData</h4>
+<pre class="methodSignature">public static&nbsp;org.bukkit.inventory.ItemStack&nbsp;setCustomModelData&#8203;(org.bukkit.inventory.ItemStack&nbsp;item,
+                                                                int&nbsp;customModelData)</pre>
+<div class="block">Sets the custom model data of the item</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>item</code> - The item to set the custom model data for</dd>
+<dd><code>customModelData</code> - The custom model data to set</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The modified item</dd>
 </dl>
