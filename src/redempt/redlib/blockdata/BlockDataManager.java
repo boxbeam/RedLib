@@ -362,7 +362,7 @@ public class BlockDataManager implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onFlowBreakBlock(BlockFromToEvent e) {
-		if(e.getBlock().getType() == Material.DRAGON_EGG) {
+		if (e.getBlock().getType() == Material.DRAGON_EGG) {
 			return;
 		}
 		DataBlock db = getExisting(e.getToBlock());
