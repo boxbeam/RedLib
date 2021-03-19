@@ -26,8 +26,8 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10};
-var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
+var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":9,"i11":9,"i12":10,"i13":10,"i14":10};
+var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -171,7 +171,7 @@ extends java.lang.Object</pre>
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colSecond" scope="col">Method</th>
@@ -233,6 +233,30 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i9" class="rowColor">
+<td class="colFirst"><code>org.bukkit.block.BlockFace</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rotateBlockFace(org.bukkit.block.BlockFace)">rotateBlockFace</a></span>&#8203;(org.bukkit.block.BlockFace&nbsp;face)</code></th>
+<td class="colLast">
+<div class="block">Rotates a BlockFace according to this Rotator</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
+<td class="colFirst"><code>static org.bukkit.block.BlockFace</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rotateBlockFace(org.bukkit.block.BlockFace,int)">rotateBlockFace</a></span>&#8203;(org.bukkit.block.BlockFace&nbsp;face,
+               int&nbsp;rotation)</code></th>
+<td class="colLast">
+<div class="block">Rotates a BlockFace according to given values</div>
+</td>
+</tr>
+<tr id="i11" class="rowColor">
+<td class="colFirst"><code>static org.bukkit.block.BlockFace</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rotateBlockFace(org.bukkit.block.BlockFace,int,boolean)">rotateBlockFace</a></span>&#8203;(org.bukkit.block.BlockFace&nbsp;face,
+               int&nbsp;rotation,
+               boolean&nbsp;mirror)</code></th>
+<td class="colLast">
+<div class="block">Rotates a BlockFace according to given values</div>
+</td>
+</tr>
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setLocation(double,double)">setLocation</a></span>&#8203;(double&nbsp;x,
            double&nbsp;z)</code></th>
@@ -240,14 +264,14 @@ extends java.lang.Object</pre>
 <div class="block">Sets the relative coordinates this Rotator will rotate</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setMirrored(boolean)">setMirrored</a></span>&#8203;(boolean&nbsp;mirrored)</code></th>
 <td class="colLast">
 <div class="block">Sets whether this rotator mirrors over the X axis</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setRotation(int)">setRotation</a></span>&#8203;(int&nbsp;rotation)</code></th>
 <td class="colLast">
@@ -304,6 +328,44 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a id="rotateBlockFace(org.bukkit.block.BlockFace,int,boolean)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>rotateBlockFace</h4>
+<pre class="methodSignature">public static&nbsp;org.bukkit.block.BlockFace&nbsp;rotateBlockFace&#8203;(org.bukkit.block.BlockFace&nbsp;face,
+                                                         int&nbsp;rotation,
+                                                         boolean&nbsp;mirror)</pre>
+<div class="block">Rotates a BlockFace according to given values</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>face</code> - The BlockFace to rotate</dd>
+<dd><code>rotation</code> - The number of clockwise rotations to apply</dd>
+<dd><code>mirror</code> - Whether or not to mirror over the X axis</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The rotated BlockFace</dd>
+</dl>
+</li>
+</ul>
+<a id="rotateBlockFace(org.bukkit.block.BlockFace,int)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>rotateBlockFace</h4>
+<pre class="methodSignature">public static&nbsp;org.bukkit.block.BlockFace&nbsp;rotateBlockFace&#8203;(org.bukkit.block.BlockFace&nbsp;face,
+                                                         int&nbsp;rotation)</pre>
+<div class="block">Rotates a BlockFace according to given values</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>face</code> - The BlockFace to rotate</dd>
+<dd><code>rotation</code> - The number of clockwise rotations to apply</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The rotated BlockFace</dd>
+</dl>
+</li>
+</ul>
 <a id="rotate(org.bukkit.block.data.BlockData)">
 <!--   -->
 </a>
@@ -317,6 +379,22 @@ extends java.lang.Object</pre>
 <dd><code>data</code> - The block data to rotate</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The rotated block data</dd>
+</dl>
+</li>
+</ul>
+<a id="rotateBlockFace(org.bukkit.block.BlockFace)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>rotateBlockFace</h4>
+<pre class="methodSignature">public&nbsp;org.bukkit.block.BlockFace&nbsp;rotateBlockFace&#8203;(org.bukkit.block.BlockFace&nbsp;face)</pre>
+<div class="block">Rotates a BlockFace according to this Rotator</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>face</code> - The BlockFace to rotate</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The rotated BlockFace</dd>
 </dl>
 </li>
 </ul>

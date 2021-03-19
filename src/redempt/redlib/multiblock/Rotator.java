@@ -10,8 +10,6 @@ import org.bukkit.block.data.type.Wall;
 import org.bukkit.block.data.type.Wall.Height;
 import redempt.redlib.RedLib;
 
-import static redempt.redlib.RedLib.MID_VERSION;
-
 /**
  * Used to rotate blocks and block sections when building or testing for the presence of a MultiBlockStructure
  * @author Redempt
@@ -21,6 +19,48 @@ public class Rotator {
 	
 	private static final String[] BLOCK_DIRECTIONS = {"north", "east", "south", "west"};
 	private static final BlockFace[] BLOCK_FACES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
+	
+	private static <T> int indexOf(T[] arr, T key) {
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i].equals(key)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	/**
+	 * Rotates a BlockFace according to given values
+	 * @param face The BlockFace to rotate
+	 * @param rotation The number of clockwise rotations to apply
+	 * @param mirror Whether or not to mirror over the X axis
+	 * @return The rotated BlockFace
+	 */
+	public static BlockFace rotateBlockFace(BlockFace face, int rotation, boolean mirror) {
+		rotation %= 4;
+		if (rotation < 0) {
+			rotation += 4;
+		}
+		int ind = indexOf(BLOCK_DIRECTIONS, face);
+		if (ind == -1) {
+			return face;
+		}
+		if (mirror && (ind == 1 || ind == 3)) {
+			ind = ind + 2;
+		}
+		ind = (ind + rotation) % 4;
+		return BLOCK_FACES[ind];
+	}
+	
+	/**
+	 * Rotates a BlockFace according to given values
+	 * @param face The BlockFace to rotate
+	 * @param rotation The number of clockwise rotations to apply
+	 * @return The rotated BlockFace
+	 */
+	public static BlockFace rotateBlockFace(BlockFace face, int rotation) {
+		return rotateBlockFace(face, rotation, false);
+	}
 	
 	private int rotation;
 	private boolean mirrored;
@@ -47,18 +87,10 @@ public class Rotator {
 	 */
 	public BlockData rotate(BlockData data) {
 		data = data.clone();
-		directional:
 		if (data instanceof Directional) {
 			Directional d = (Directional) data;
-			int ind = indexOf(BLOCK_DIRECTIONS, d.getFacing());
-			if (ind == -1) {
-				break directional;
-			}
-			if (mirrored && (ind == 1 || ind == 3)) {
-				ind = ind + 2;
-			}
-			ind = (ind + rotation) % 4;
-			d.setFacing(BLOCK_FACES[ind]);
+			BlockFace face = rotateBlockFace(d.getFacing());
+			d.setFacing(face);
 		}
 		if (data instanceof MultipleFacing) {
 			MultipleFacing d = (MultipleFacing) data;
@@ -91,15 +123,6 @@ public class Rotator {
 		return data;
 	}
 	
-	private <T> int indexOf(T[] arr, T key) {
-		for (int i = 0; i < arr.length; i++) {
-			if (arr[i].equals(key)) {
-				return i;
-			}
-		}
-		return -1;
-	}
-	
 	private <T> void rotate(T[] arr) {
 		Object[] rot = new Object[4];
 		for (int i = 0; i < 4; i++) {
@@ -112,6 +135,15 @@ public class Rotator {
 			}
 			arr[i] = (T) rot[dir];
 		}
+	}
+	
+	/**
+	 * Rotates a BlockFace according to this Rotator
+	 * @param face The BlockFace to rotate
+	 * @return The rotated BlockFace
+	 */
+	public BlockFace rotateBlockFace(BlockFace face) {
+		return rotateBlockFace(face, rotation, mirrored);
 	}
 	
 	/**
