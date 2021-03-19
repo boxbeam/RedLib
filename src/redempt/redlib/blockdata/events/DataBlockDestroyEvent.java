@@ -96,6 +96,8 @@ public class DataBlockDestroyEvent extends BlockEvent implements Cancellable {
 		
 		EXPLOSION,
 		FIRE,
+		LIQUID,
+		PLACE_BUCKET,
 		PLAYER;
 		
 	}

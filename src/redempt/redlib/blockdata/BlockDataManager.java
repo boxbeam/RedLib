@@ -1,9 +1,6 @@
 package redempt.redlib.blockdata;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,6 +8,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import redempt.redlib.RedLib;
 import redempt.redlib.blockdata.events.DataBlockDestroyEvent;
@@ -20,7 +18,6 @@ import redempt.redlib.json.JSONMap;
 import redempt.redlib.json.JSONParser;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.sql.SQLHelper;
-import redempt.redlib.misc.Task;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -340,6 +337,39 @@ public class BlockDataManager implements Listener {
 			return;
 		}
 		DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, e.getPlayer(), DestroyCause.PLAYER, e);
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			e.setCancelled(true);
+			return;
+		}
+		remove(db);
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onBucketEmpty(PlayerBucketEmptyEvent e) {
+		DataBlock db = getExisting(e.getBlockClicked());
+		if (db == null) {
+			return;
+		}
+		DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, e.getPlayer(), DestroyCause.PLACE_BUCKET, e);
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			e.setCancelled(true);
+			return;
+		}
+		remove(db);
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onFlowBreakBlock(BlockFromToEvent e) {
+		if(e.getBlock().getType() == Material.DRAGON_EGG) {
+			return;
+		}
+		DataBlock db = getExisting(e.getToBlock());
+		if (db == null) {
+			return;
+		}
+		DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, null, DestroyCause.LIQUID, e);
 		Bukkit.getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
 			e.setCancelled(true);
