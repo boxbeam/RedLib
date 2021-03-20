@@ -347,7 +347,7 @@ public class BlockDataManager implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onBucketEmpty(PlayerBucketEmptyEvent e) {
-		DataBlock db = getExisting(e.getBlockClicked());
+		DataBlock db = getExisting(e.getBlock());
 		if (db == null) {
 			return;
 		}
