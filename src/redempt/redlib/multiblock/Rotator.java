@@ -8,6 +8,7 @@ import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.block.data.Orientable;
 import org.bukkit.block.data.type.Wall;
 import org.bukkit.block.data.type.Wall.Height;
+import org.bukkit.util.Vector;
 import redempt.redlib.RedLib;
 
 /**
@@ -144,6 +145,16 @@ public class Rotator {
 	 */
 	public BlockFace rotateBlockFace(BlockFace face) {
 		return rotateBlockFace(face, rotation, mirrored);
+	}
+	
+	/**
+	 * Rotates a Vector according to this Rotator
+	 * @param vector The Vector to rotate
+	 * @return The rotated Vector
+	 */
+	public Vector rotateVector(Vector vector) {
+		setLocation(vector.getX(), vector.getZ());
+		return new Vector(getRotatedX(), vector.getY(), getRotatedZ());
 	}
 	
 	/**
