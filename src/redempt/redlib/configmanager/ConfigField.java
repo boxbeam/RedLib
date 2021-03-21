@@ -17,10 +17,19 @@ class ConfigField {
 	private Field field;
 	private String path;
 	private ConfigManager manager;
+	private ConversionType type;
+	private ConfigObjectMapper<?> mapper;
 	protected TypeConverter<?> converter;
 	protected int priority;
 	
-	public ConfigField(Field field, String path, int priority, ConfigManager manager) {
+	public ConfigField(ConversionType type, Field field, String path, int priority, ConfigManager manager) {
+		if (type == ConversionType.AUTO) {
+			type = ConversionType.auto(field.getType(), manager);
+		}
+		if (type == ConversionType.MAPPED_OBJECT) {
+			this.mapper = new ConfigObjectMapper<>(field.getType(), ConversionType.MAPPED_OBJECT, manager);
+		}
+		this.type = type;
 		this.field = field;
 		this.path = path;
 		this.priority = priority;
@@ -59,6 +68,8 @@ class ConfigField {
 			Object value;
 			if (converter != null) {
 				value = converter.load(config.getString(path));
+			} else if (type == ConversionType.MAPPED_OBJECT) {
+				value = mapper.load(config, path);
 			} else {
 				value = config.get(path);
 			}
@@ -83,10 +94,18 @@ class ConfigField {
 			if (converter != null) {
 				value = converter.save(value);
 			}
+			if (type == ConversionType.MAPPED_OBJECT) {
+				saveMapped(mapper, config, path, value);
+				return;
+			}
 			config.set(path, value);
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private <T> void saveMapped(ConfigObjectMapper<T> mapper, ConfigurationSection section, String path, Object value) {
+		mapper.save(section, path, (T) value);
 	}
 	
 	public void saveIfAbsent(Object object, ConfigurationSection config) {

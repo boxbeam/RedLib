@@ -166,6 +166,11 @@ public @interface <span class="memberNameLabel">ConfigValue</span></pre>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#priority()">priority</a></span></code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../ConversionType.html" title="enum in redempt.redlib.configmanager">ConversionType</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#type()">type</a></span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
 </table>
 </li>
 </ul>
@@ -205,13 +210,39 @@ public @interface <span class="memberNameLabel">ConfigValue</span></pre>
 <li class="blockList"><a id="priority()">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>priority</h4>
 <pre>int&nbsp;priority</pre>
 <dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The priority of this ConfigValue, higher priority will be loaded first</dd>
+</dl>
+<dl>
 <dt>Default:</dt>
 <dd>1</dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section role="region">
+<ul class="blockList">
+<li class="blockList"><a id="type()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>type</h4>
+<pre><a href="../ConversionType.html" title="enum in redempt.redlib.configmanager">ConversionType</a>&nbsp;type</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Which type of conversion this value should use</dd>
+</dl>
+<dl>
+<dt>Default:</dt>
+<dd>redempt.redlib.configmanager.ConversionType.AUTO</dd>
 </dl>
 </li>
 </ul>

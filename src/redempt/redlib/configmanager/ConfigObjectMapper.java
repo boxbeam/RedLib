@@ -46,7 +46,7 @@ class ConfigObjectMapper<T> {
 					if (hook == null) {
 						continue;
 					}
-					fields.add(new ConfigField(field, hook.value(), hook.priority(), manager));
+					fields.add(new ConfigField(hook.type(), field, hook.value(), hook.priority(), manager));
 				}
 				for (Method method : clazz.getDeclaredMethods()) {
 					if (method.isAnnotationPresent(ConfigPostInit.class)) {
