@@ -2,6 +2,7 @@ package redempt.redlib.blockdata;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Waterlogged;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -347,6 +348,9 @@ public class BlockDataManager implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onBucketEmpty(PlayerBucketEmptyEvent e) {
+		if (RedLib.MID_VERSION >= 13 && e.getBlock().getBlockData() instanceof Waterlogged) {
+			return;
+		}
 		DataBlock db = getExisting(e.getBlock());
 		if (db == null) {
 			return;
