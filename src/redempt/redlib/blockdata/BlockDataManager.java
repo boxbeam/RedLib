@@ -441,7 +441,7 @@ public class BlockDataManager implements Listener {
 		for (Block block : e.getBlocks()) {
 			DataBlock db = getExisting(block);
 			if (db == null) {
-				return;
+				continue;
 			}
 			dataBlocks.add(db);
 		}
@@ -464,7 +464,7 @@ public class BlockDataManager implements Listener {
 		for (Block block : e.getBlocks()) {
 			DataBlock db = getExisting(block);
 			if (db == null) {
-				return;
+				continue;
 			}
 			dataBlocks.add(db);
 		}
