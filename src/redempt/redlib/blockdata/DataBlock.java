@@ -75,6 +75,11 @@ public class DataBlock {
 		}
 	}
 	
+	protected void setData(JSONMap data) {
+		this.data = data;
+		modified = true;
+	}
+	
 	/**
 	 * Gets the object mapped to a certain key
 	 * @param key The key

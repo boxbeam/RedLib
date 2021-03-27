@@ -437,38 +437,48 @@ public class BlockDataManager implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onBlockPush(BlockPistonExtendEvent e) {
-		e.getBlocks().forEach(block -> {
+		List<DataBlock> dataBlocks = new ArrayList<>();
+		for (Block block : e.getBlocks()) {
 			DataBlock db = getExisting(block);
 			if (db == null) {
 				return;
 			}
-			Location to = block.getRelative(e.getDirection()).getLocation();
-			DataBlockMoveEvent event = new DataBlockMoveEvent(db, to);
+			dataBlocks.add(db);
+		}
+		for (DataBlock db : dataBlocks) {
+			Block block = db.getBlock().getRelative(e.getDirection());
+			DataBlockMoveEvent event = new DataBlockMoveEvent(db, block.getLocation());
 			Bukkit.getPluginManager().callEvent(event);
 			if (event.isCancelled()) {
-				e.setCancelled(true);
-				return;
+				continue;
 			}
-			db.move(to.getBlock());
-		});
+			JSONMap map = db.getData();
+			db.remove();
+			getDataBlock(block).setData(map);
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onBlockPull(BlockPistonRetractEvent e) {
-		e.getBlocks().forEach(block -> {
+		List<DataBlock> dataBlocks = new ArrayList<>();
+		for (Block block : e.getBlocks()) {
 			DataBlock db = getExisting(block);
 			if (db == null) {
 				return;
 			}
-			Location to = block.getRelative(e.getDirection()).getLocation();
-			DataBlockMoveEvent event = new DataBlockMoveEvent(db, to);
+			dataBlocks.add(db);
+		}
+		for (DataBlock db : dataBlocks) {
+			Block block = db.getBlock().getRelative(e.getDirection());
+			DataBlockMoveEvent event = new DataBlockMoveEvent(db, block.getLocation());
 			Bukkit.getPluginManager().callEvent(event);
 			if (event.isCancelled()) {
-				e.setCancelled(true);
-				return;
+				continue;
 			}
-			db.move(to.getBlock());
-		});
+			JSONMap map = db.getData();
+			db.remove();
+			getDataBlock(block).setData(map);
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)

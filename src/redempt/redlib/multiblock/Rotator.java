@@ -18,7 +18,6 @@ import redempt.redlib.RedLib;
  */
 public class Rotator {
 	
-	private static final String[] BLOCK_DIRECTIONS = {"north", "east", "south", "west"};
 	private static final BlockFace[] BLOCK_FACES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
 	
 	private static <T> int indexOf(T[] arr, T key) {
@@ -42,7 +41,7 @@ public class Rotator {
 		if (rotation < 0) {
 			rotation += 4;
 		}
-		int ind = indexOf(BLOCK_DIRECTIONS, face);
+		int ind = indexOf(BLOCK_FACES, face);
 		if (ind == -1) {
 			return face;
 		}
@@ -244,7 +243,7 @@ public class Rotator {
 	 * @param rotation The rotation to set
 	 */
 	public void setRotation(int rotation) {
-		this.rotation = rotation;
+		this.rotation = rotation % 4;
 	}
 	
 	/**
