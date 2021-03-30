@@ -343,7 +343,6 @@ public class Command {
 		}
 		Object arr = Array.newInstance(clazz, args.size() - start);
 		for (int i = start; i < args.size(); i++) {
-			System.out.println("Iter");
 			Result<Object, String> convert = convertArg(arg, args.get(i), output, sender);
 			if (convert.getMessage() != null) {
 				return convert;
