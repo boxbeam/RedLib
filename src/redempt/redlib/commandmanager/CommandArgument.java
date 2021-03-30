@@ -67,6 +67,10 @@ class CommandArgument {
 		return vararg;
 	}
 	
+	public boolean takesAll() {
+		return vararg || consume;
+	}
+	
 	@Override
 	public String toString() {
 		String name = hideType ? this.name : type.getName() + ":" + this.name;

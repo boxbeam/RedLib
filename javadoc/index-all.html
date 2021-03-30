@@ -247,6 +247,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Applies all the enchantments in a map of CustomEnchants to their levels to an item</div>
 </dd>
+<dt><a href="redempt/redlib/commandmanager/ArgSubtype.html" title="class in redempt.redlib.commandmanager"><span class="typeNameLink">ArgSubtype</span></a>&lt;<a href="redempt/redlib/commandmanager/ArgSubtype.html" title="type parameter in ArgSubtype">T</a>,&#8203;<a href="redempt/redlib/commandmanager/ArgSubtype.html" title="type parameter in ArgSubtype">K</a>&gt; - Class in <a href="redempt/redlib/commandmanager/package-summary.html">redempt.redlib.commandmanager</a></dt>
+<dd>
+<div class="block">An ArgType which is dependent on another type appearing before it and uses it for conversions and tab completion</div>
+</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgSubtype.html#%3Cinit%3E(java.lang.String,redempt.redlib.commandmanager.ArgType,redempt.redlib.commandmanager.ArgType.ArgConverter)">ArgSubtype(String, ArgType&lt;?&gt;, ArgType.ArgConverter&lt;T, ?&gt;)</a></span> - Constructor for class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgSubtype.html" title="class in redempt.redlib.commandmanager">ArgSubtype</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager"><span class="typeNameLink">ArgType</span></a>&lt;<a href="redempt/redlib/commandmanager/ArgType.html" title="type parameter in ArgType">T</a>&gt; - Class in <a href="redempt/redlib/commandmanager/package-summary.html">redempt.redlib.commandmanager</a></dt>
 <dd>
 <div class="block">A command argument type, which converts a String argument to another type</div>
@@ -259,6 +265,14 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Create a ArgType from a name and converter</div>
 </dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#%3Cinit%3E(java.lang.String,redempt.redlib.commandmanager.ArgType,redempt.redlib.commandmanager.ArgType.ArgConverter)">ArgType(String, ArgType&lt;?&gt;, ArgType.ArgConverter&lt;T, ?&gt;)</a></span> - Constructor for class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="redempt/redlib/commandmanager/ArgType.ArgConverter.html" title="interface in redempt.redlib.commandmanager"><span class="typeNameLink">ArgType.ArgConverter</span></a>&lt;<a href="redempt/redlib/commandmanager/ArgType.ArgConverter.html" title="type parameter in ArgType.ArgConverter">T</a>,&#8203;<a href="redempt/redlib/commandmanager/ArgType.ArgConverter.html" title="type parameter in ArgType.ArgConverter">K</a>&gt; - Interface in <a href="redempt/redlib/commandmanager/package-summary.html">redempt.redlib.commandmanager</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="redempt/redlib/commandmanager/ArgType.TabCompleter.html" title="interface in redempt.redlib.commandmanager"><span class="typeNameLink">ArgType.TabCompleter</span></a>&lt;<a href="redempt/redlib/commandmanager/ArgType.TabCompleter.html" title="type parameter in ArgType.TabCompleter">T</a>&gt; - Interface in <a href="redempt/redlib/commandmanager/package-summary.html">redempt.redlib.commandmanager</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="redempt/redlib/commandmanager/ArgType.TabStreamCompleter.html" title="interface in redempt.redlib.commandmanager"><span class="typeNameLink">ArgType.TabStreamCompleter</span></a>&lt;<a href="redempt/redlib/commandmanager/ArgType.TabStreamCompleter.html" title="type parameter in ArgType.TabStreamCompleter">T</a>&gt; - Interface in <a href="redempt/redlib/commandmanager/package-summary.html">redempt.redlib.commandmanager</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ContextProvider.html#assertProvider(java.lang.String,java.lang.String,java.util.function.Predicate)">assertProvider(String, String, Predicate&lt;Player&gt;)</a></span> - Static method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ContextProvider.html" title="class in redempt.redlib.commandmanager">ContextProvider</a></dt>
 <dd>
 <div class="block">Creates a ContextProvider which returns true if the predicate's condition is met, and null otherwise, which will cause the command to fail.</div>
@@ -768,10 +782,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Represents ways in which objects can be mapped from config</div>
 </dd>
-<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#convert(org.bukkit.command.CommandSender,java.lang.String)">convert(CommandSender, String)</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#convert(org.bukkit.command.CommandSender,java.lang.Object,java.lang.String)">convert(CommandSender, Object, String)</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
 <dd>
 <div class="block">Converts an argument to another type</div>
 </dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.ArgConverter.html#convert(org.bukkit.command.CommandSender,K,java.lang.String)">convert(CommandSender, K, String)</a></span> - Method in interface redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.ArgConverter.html" title="interface in redempt.redlib.commandmanager">ArgType.ArgConverter</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/configmanager/ConfigManager.html#converters">converters</a></span> - Variable in class redempt.redlib.configmanager.<a href="redempt/redlib/configmanager/ConfigManager.html" title="class in redempt.redlib.configmanager">ConfigManager</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/itemutils/ItemUtils.html#count(org.bukkit.inventory.Inventory,org.bukkit.inventory.ItemStack)">count(Inventory, ItemStack)</a></span> - Static method in class redempt.redlib.itemutils.<a href="redempt/redlib/itemutils/ItemUtils.html" title="class in redempt.redlib.itemutils">ItemUtils</a></dt>
@@ -2008,6 +2024,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/blockdata/events/DataBlockDestroyEvent.html#getParent()">getParent()</a></span> - Method in class redempt.redlib.blockdata.events.<a href="redempt/redlib/blockdata/events/DataBlockDestroyEvent.html" title="class in redempt.redlib.blockdata.events">DataBlockDestroyEvent</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#getParent()">getParent()</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/dev/profiler/SampleSummary.SampleMethod.html#getParent()">getParent()</a></span> - Method in class redempt.redlib.dev.profiler.<a href="redempt/redlib/dev/profiler/SampleSummary.SampleMethod.html" title="class in redempt.redlib.dev.profiler">SampleSummary.SampleMethod</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/json/JSONList.html#getParent()">getParent()</a></span> - Method in class redempt.redlib.json.<a href="redempt/redlib/json/JSONList.html" title="class in redempt.redlib.json">JSONList</a></dt>
@@ -3093,9 +3111,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#playerType">playerType</a></span> - Static variable in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
 <dd>
-<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
-<div class="deprecationComment">Now included by default, there is no need to add it yourself</div>
-</div>
+<div class="block">The ArgType for a Player</div>
 </dd>
 <dt><a href="redempt/redlib/misc/PlayerWrapper.html" title="class in redempt.redlib.misc"><span class="typeNameLink">PlayerWrapper</span></a> - Class in <a href="redempt/redlib/misc/package-summary.html">redempt.redlib.misc</a></dt>
 <dd>&nbsp;</dd>
@@ -3867,6 +3883,16 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/inventorygui/ItemButton.html#setSlot(int)">setSlot(int)</a></span> - Method in class redempt.redlib.inventorygui.<a href="redempt/redlib/inventorygui/ItemButton.html" title="class in redempt.redlib.inventorygui">ItemButton</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#setTab(java.util.function.BiFunction)">setTab(BiFunction&lt;CommandSender, String[], List&lt;String&gt;&gt;)</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
+<dd>
+<div class="block">Sets the tab completer for this type</div>
+</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#setTab(java.util.function.Function)">setTab(Function&lt;CommandSender, List&lt;String&gt;&gt;)</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
+<dd>
+<div class="block">Sets the tab completer for this type</div>
+</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#setTab(redempt.redlib.commandmanager.ArgType.TabCompleter)">setTab(ArgType.TabCompleter&lt;?&gt;)</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/json/JSONList.html#setTempKey(java.lang.String)">setTempKey(String)</a></span> - Method in class redempt.redlib.json.<a href="redempt/redlib/json/JSONList.html" title="class in redempt.redlib.json">JSONList</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/json/JSONMap.html#setTempKey(java.lang.String)">setTempKey(String)</a></span> - Method in class redempt.redlib.json.<a href="redempt/redlib/json/JSONMap.html" title="class in redempt.redlib.json">JSONMap</a></dt>
@@ -4079,6 +4105,14 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Subtracts a Region from this MultiRegion.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#subType(java.lang.String,java.util.function.BiFunction)">subType(String, BiFunction&lt;String, T, K&gt;)</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
+<dd>
+<div class="block">Creates a new ArgSubtype with this ArgType as its parent.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#subType(java.lang.String,redempt.redlib.commandmanager.ArgType.ArgConverter)">subType(String, ArgType.ArgConverter&lt;K, T&gt;)</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
+<dd>
+<div class="block">Creates a new ArgSubtype with this ArgType as its parent.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/dev/profiler/SampleSummary.SampleMethod.html#summary">summary</a></span> - Variable in class redempt.redlib.dev.profiler.<a href="redempt/redlib/dev/profiler/SampleSummary.SampleMethod.html" title="class in redempt.redlib.dev.profiler">SampleSummary.SampleMethod</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/dev/profiler/ProfilerCommands.html#summary(org.bukkit.entity.Player)">summary(Player)</a></span> - Method in class redempt.redlib.dev.profiler.<a href="redempt/redlib/dev/profiler/ProfilerCommands.html" title="class in redempt.redlib.dev.profiler">ProfilerCommands</a></dt>
@@ -4145,23 +4179,27 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </a>
 <h2 class="title">T</h2>
 <dl>
-<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#tab(java.util.function.BiFunction)">tab(BiFunction&lt;CommandSender, String[], List&lt;String&gt;&gt;)</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
-<dd>
-<div class="block">Sets the tab completer for this type</div>
-</dd>
-<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#tab(java.util.function.Function)">tab(Function&lt;CommandSender, List&lt;String&gt;&gt;)</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
-<dd>
-<div class="block">Sets the tab completer for this type</div>
-</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/Command.html#tab(org.bukkit.command.CommandSender,java.lang.String%5B%5D)">tab(CommandSender, String[])</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/Command.html" title="class in redempt.redlib.commandmanager">Command</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#tabComplete(org.bukkit.command.CommandSender,java.lang.String%5B%5D)">tabComplete(CommandSender, String[])</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgSubtype.html#tab(redempt.redlib.commandmanager.ArgType.TabCompleter)">tab(ArgType.TabCompleter&lt;K&gt;)</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgSubtype.html" title="class in redempt.redlib.commandmanager">ArgSubtype</a></dt>
+<dd>
+<div class="block">Sets the tab completer for this type</div>
+</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#tabComplete(org.bukkit.command.CommandSender,java.lang.String%5B%5D,java.lang.Object)">tabComplete(CommandSender, String[], Object)</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.TabCompleter.html#tabComplete(org.bukkit.command.CommandSender,java.lang.String%5B%5D,T)">tabComplete(CommandSender, String[], T)</a></span> - Method in interface redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.TabCompleter.html" title="interface in redempt.redlib.commandmanager">ArgType.TabCompleter</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.TabStreamCompleter.html#tabComplete(org.bukkit.command.CommandSender,T,java.lang.String%5B%5D)">tabComplete(CommandSender, T, String[])</a></span> - Method in interface redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.TabStreamCompleter.html" title="interface in redempt.redlib.commandmanager">ArgType.TabStreamCompleter</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#tabStream(java.util.function.BiFunction)">tabStream(BiFunction&lt;CommandSender, String[], Stream&lt;String&gt;&gt;)</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
 <dd>
 <div class="block">Sets the tab completer for this type, can be used instead of tab</div>
 </dd>
 <dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgType.html#tabStream(java.util.function.Function)">tabStream(Function&lt;CommandSender, Stream&lt;String&gt;&gt;)</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a></dt>
+<dd>
+<div class="block">Sets the tab completer for this type, can be used instead of tab</div>
+</dd>
+<dt><span class="memberNameLink"><a href="redempt/redlib/commandmanager/ArgSubtype.html#tabStream(redempt.redlib.commandmanager.ArgType.TabStreamCompleter)">tabStream(ArgType.TabStreamCompleter&lt;K&gt;)</a></span> - Method in class redempt.redlib.commandmanager.<a href="redempt/redlib/commandmanager/ArgSubtype.html" title="class in redempt.redlib.commandmanager">ArgSubtype</a></dt>
 <dd>
 <div class="block">Sets the tab completer for this type, can be used instead of tab</div>
 </dd>

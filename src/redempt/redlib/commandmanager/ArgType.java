@@ -23,7 +23,6 @@ public class ArgType<T> {
 	
 	/**
 	 * The ArgType for a Player
-	 * @deprecated Now included by default, there is no need to add it yourself
 	 */
 	public static ArgType<Player> playerType = new ArgType<Player>("player", s -> Bukkit.getPlayerExact(s))
 			.tabStream(c -> Bukkit.getOnlinePlayers().stream().map(Player::getName));
@@ -49,7 +48,7 @@ public class ArgType<T> {
 				} catch (Exception e) {
 					return null;
 				}
-			}).tab(c -> strings);
+			}).setTab(c -> strings);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -65,7 +64,7 @@ public class ArgType<T> {
 	public static ArgType<String> of(String name, String... values) {
 		List<String> list = Arrays.stream(values).collect(Collectors.toList());
 		return new ArgType<>(name, s -> list.contains(s) ? s : null)
-				.tab(c -> list);
+				.setTab(c -> list);
 	}
 	
 	/**
@@ -79,9 +78,34 @@ public class ArgType<T> {
 		return new ArgType<>(name, map::get).tabStream(c -> map.keySet().stream());
 	}
 	
-	private BiFunction<CommandSender, String, T> convert;
-	private BiFunction<CommandSender, String[], List<String>> tab = null;
+	private static <T, K> T convertCast(ArgConverter<T, K> convert, CommandSender sender, Object previous, String str) {
+		return convert.convert(sender, (K) previous, str);
+	}
+	
+	private static <T> List<String> tabCast(TabCompleter<T> tab, CommandSender sender, String[] args, Object prev) {
+		return tab.tabComplete(sender, args, (T) prev);
+	}
+	
+	private ArgConverter<T, ?> convert;
+	private ArgType<?> parent;
+	private TabCompleter<?> tab = null;
 	private String name;
+	
+	protected ArgType(String name, ArgType<?> parent, ArgConverter<T, ?> convert) {
+		if (name.contains(" ")) {
+			throw new IllegalArgumentException("Command argument type name cannot contain a space");
+		}
+		this.convert = convert;
+		this.name = name;
+		this.parent = parent;
+	}
+	
+	/**
+	 * @return The parent type of this ArgType, or null
+	 */
+	public ArgType<?> getParent() {
+		return parent;
+	}
 	
 	/**
 	 * Create a ArgType from a name and converter
@@ -89,11 +113,7 @@ public class ArgType<T> {
 	 * @param convert The {@link Function} to convert from a String to whatever type this converts to
 	 */
 	public ArgType(String name, Function<String, T> convert) {
-		if (name.contains(" ")) {
-			throw new IllegalArgumentException("Command argument type name cannot contain a space");
-		}
-		this.convert = (c, s) -> convert.apply(s);
-		this.name = name;
+		this(name, (c, s) -> convert.apply(s));
 	}
 	
 	/**
@@ -102,11 +122,7 @@ public class ArgType<T> {
 	 * @param convert The {@link BiFunction} to convert from a String to whatever type this converts to
 	 */
 	public ArgType(String name, BiFunction<CommandSender, String, T> convert) {
-		if (name.contains(" ")) {
-			throw new IllegalArgumentException("Command argument type name cannot contain a space");
-		}
-		this.convert = convert;
-		this.name = name;
+		this(name, null, (c, p, s) -> convert.apply(c, s));
 	}
 	
 	/**
@@ -114,8 +130,8 @@ public class ArgType<T> {
 	 * @param tab The function returning a List of all completions for this sender
 	 * @return itself
 	 */
-	public ArgType<T> tab(Function<CommandSender, List<String>> tab) {
-		this.tab = (c, s) -> tab.apply(c);
+	public ArgType<T> setTab(Function<CommandSender, List<String>> tab) {
+		this.tab = (c, s, o) -> tab.apply(c);
 		return this;
 	}
 	
@@ -124,7 +140,12 @@ public class ArgType<T> {
 	 * @param tab The function returning a List of all completions for this sender
 	 * @return itself
 	 */
-	public ArgType<T> tab(BiFunction<CommandSender, String[], List<String>> tab) {
+	public ArgType<T> setTab(BiFunction<CommandSender, String[], List<String>> tab) {
+		this.tab = (c, s, o) -> tab.apply(c, s);
+		return this;
+	}
+	
+	protected ArgType<T> setTab(TabCompleter<?> tab) {
 		this.tab = tab;
 		return this;
 	}
@@ -135,7 +156,7 @@ public class ArgType<T> {
 	 * @return itself
 	 */
 	public ArgType<T> tabStream(Function<CommandSender, Stream<String>> tab) {
-		this.tab = (c, s) -> tab.apply(c).collect(Collectors.toList());
+		this.tab = (c, s, o) -> tab.apply(c).collect(Collectors.toList());
 		return this;
 	}
 	
@@ -145,15 +166,15 @@ public class ArgType<T> {
 	 * @return itself
 	 */
 	public ArgType<T> tabStream(BiFunction<CommandSender, String[], Stream<String>> tab) {
-		this.tab = (c, s) -> tab.apply(c, s).collect(Collectors.toList());
+		this.tab = (c, s, o) -> tab.apply(c, s).collect(Collectors.toList());
 		return this;
 	}
 	
-	protected List<String> tabComplete(CommandSender sender, String[] args) {
-		if (tab == null) {
+	protected List<String> tabComplete(CommandSender sender, String[] args, Object prev) {
+		if (tab == null || prev == null && parent != null) {
 			return new ArrayList<>();
 		}
-		List<String> values = tab.apply(sender, args);
+		List<String> values = tabCast(tab, sender, args, prev);
 		if (values == null) {
 			return new ArrayList<>();
 		}
@@ -173,8 +194,8 @@ public class ArgType<T> {
 	 * @param argument The argument to be converted
 	 * @return The converted argument for use in a method hook
 	 */
-	public T convert(CommandSender sender, String argument) {
-		return convert.apply(sender, argument);
+	public T convert(CommandSender sender, Object previous, String argument) {
+		return convertCast(convert, sender, previous, argument);
 	}
 	
 	/**
@@ -185,13 +206,13 @@ public class ArgType<T> {
 	 * @return The resulting ArgType
 	 */
 	public <K> ArgType<K> map(String name, Function<T, K> func) {
-		return new ArgType<>(name, (c, s) -> {
-			T obj = convert(c, s);
+		return new ArgType<>(name, parent, (c, p, s) -> {
+			T obj = convert(c, p, s);
 			if (obj == null) {
 				return null;
 			}
 			return func.apply(obj);
-		}).tab(tab);
+		}).setTab(tab);
 	}
 	
 	/**
@@ -202,13 +223,57 @@ public class ArgType<T> {
 	 * @return The resulting ArgType
 	 */
 	public <K> ArgType<K> map(String name, BiFunction<CommandSender, T, K> func) {
-		return new ArgType<>(name, (c, s) -> {
-			T obj = convert(c, s);
+		return new ArgType<>(name, parent, (c, p, s) -> {
+			T obj = convert(c, p, s);
 			if (obj == null) {
 				return null;
 			}
 			return func.apply(c, obj);
-		}).tab(tab);
+		}).setTab(tab);
+	}
+	
+	/**
+	 * Creates a new ArgSubtype with this ArgType as its parent. ArgSubtypes are argument types
+	 * which must follow another argument type, and use info from the previous argument to determine
+	 * their values for conversion and tab completion.
+	 * @param name The name of the new ArgSubtype
+	 * @param convert The function to convert using the previous argument value
+	 * @param <K> The type the new ArgSubtype will convert to
+	 * @return The created ArgSubtype
+	 */
+	public <K> ArgSubtype<K, T> subType(String name, BiFunction<String, T, K> convert) {
+		return new ArgSubtype<>(name, this, (c, p, s) -> convert.apply(s, (T) p));
+	}
+	
+	/**
+	 * Creates a new ArgSubtype with this ArgType as its parent. ArgSubtypes are argument types
+	 * which must follow another argument type, and use info from the previous argument to determine
+	 * their values for conversion and tab completion.
+	 * @param name The name of the new ArgSubtype
+	 * @param convert The function to convert using the previous argument value
+	 * @param <K> The type the new ArgSubtype will convert to
+	 * @return The created ArgSubtype
+	 */
+	public <K> ArgSubtype<K, T> subType(String name, ArgConverter<K, T> convert) {
+		return new ArgSubtype<>(name, this, convert);
+	}
+	
+	public static interface ArgConverter<T, K> {
+		
+		public T convert(CommandSender sender, K previous, String str);
+		
+	}
+	
+	public static interface TabCompleter<T> {
+		
+		public List<String> tabComplete(CommandSender sender, String[] prev, T prevArg);
+		
+	}
+	
+	public static interface TabStreamCompleter<T> {
+		
+		public Stream<String> tabComplete(CommandSender sender, T prevArg, String[] prev);
+		
 	}
 	
 }

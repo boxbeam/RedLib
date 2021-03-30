@@ -209,176 +209,207 @@ public class Command {
 	}
 	
 	private Result<Object[], String> processArgs(String[] argArray, Boolean[] quoted, CommandSender sender) {
-		List<String> sargs = new ArrayList<>();
-		Collections.addAll(sargs, argArray);
 		Object[] output = new Object[args.length + flags.length + 1];
-		//Flag checks
-		for (Flag flag : flags) {
-			if (flag.getType().getName().equals("boolean")) {
-				output[flag.getPosition() + 1] = false;
-				continue;
-			}
-			if (flag.isContextDefault() && !(sender instanceof Player)) {
-				return new Result<>(this, null, Messages.msg("contextDefaultFlagFromConsole").replace("%flag%", flag.getName()));
-			}
-			output[flag.getPosition() + 1] = flag.getDefaultValue(sender);
+		output[0] = sender;
+		List<String> args = new ArrayList<>();
+		List<Boolean> quotedList = new ArrayList<>();
+		Collections.addAll(args, argArray);
+		Collections.addAll(quotedList, quoted);
+		String err;
+		
+		err = processFlags(args, output, quotedList, sender);
+		if (err != null) {
+			return new Result<>(this, null, err);
 		}
-		//Flag argument handling
-		for (int i = 0; i < sargs.size(); i++) {
-			String arg = sargs.get(i);
-			sargs.set(i, arg);
-			if (!arg.startsWith("-") || quoted[i]) {
+		
+		List<CommandArgument> commandArgs = new ArrayList<>();
+		Collections.addAll(commandArgs, this.args);
+		err = convertArgs(commandArgs, args, quotedList, output, sender);
+		if (err != null) {
+			return new Result<>(this, null, err);
+		}
+		return new Result<>(this, output, null);
+	}
+	
+	private String getWrongArgumentCountMessage(int args, int optionals) {
+		if (optionals == 0) {
+			return Messages.msg("wrongArgumentCount")
+					.replace("%args%", this.args.length + "")
+					.replace("%count%", args + "");
+		} else {
+			return Messages.msg("wrongArgumentCount")
+					.replace("%args%", (this.args.length - optionals) + "-" + this.args.length)
+					.replace("%count%", args + "");
+		}
+	}
+	
+	private String convertArgs(List<CommandArgument> commandArgs, List<String> args, List<Boolean> quoted, Object[] output, CommandSender sender) {
+		if (commandArgs.size() == 0) {
+			if (args.size() > 0) {
+				return getWrongArgumentCountMessage(args.size(), 0);
+			}
+			return null;
+		}
+		int diff = commandArgs.size() - args.size();
+		int optionals = (int) commandArgs.stream().filter(CommandArgument::isOptional).count();
+		boolean lastTakesAll = commandArgs.size() > 0 && commandArgs.get(commandArgs.size() - 1).takesAll();
+		if (optionals < diff || (args.size() > commandArgs.size() && !lastTakesAll)) {
+			return getWrongArgumentCountMessage(args.size(), optionals);
+		}
+		int argPos = 0;
+		for (int i = 0; i < args.size(); i++) {
+			CommandArgument carg = commandArgs.get(argPos);
+			String arg = args.get(i);
+			if (carg.takesAll()) {
+				Result<Object, String> result = processTakeAllArg(carg, args, quoted, i, output, sender);
+				if (result.getMessage() != null) {
+					return result.getMessage();
+				}
+				output[carg.getPosition() + 1] = result.getValue();
+				return null;
+			}
+			if (!carg.isOptional() || diff == 0) {
+				Result<Object, String> convertResult = convertArg(carg, arg, output, sender);
+				if (convertResult.getMessage() != null) {
+					return convertResult.getMessage();
+				}
+				output[carg.getPosition() + 1] = convertResult.getValue();
+				argPos++;
 				continue;
 			}
-			String farg = arg;
-			Flag flag = Arrays.stream(flags).filter(f -> f.nameMatches(farg)).findFirst().orElse(null);
+			Result<Object, String> convertResult = convertArg(carg, arg, output, sender);
+			if (convertResult.getValue() == null) {
+				if (carg.isContextDefault() && !(sender instanceof Player)) {
+					return Messages.msg("contextDefaultFromConsole").replace("%arg%", carg.getName());
+				}
+				diff--;
+				output[carg.getPosition() + 1] = carg.getDefaultValue(sender);
+				commandArgs.remove(argPos);
+				i--;
+				continue;
+			}
+			output[carg.getPosition() + 1] = convertResult.getValue();
+			argPos++;
+		}
+		for (int i = argPos; i < commandArgs.size(); i++) {
+			CommandArgument carg = commandArgs.get(i);
+			if (carg.isContextDefault() && !(sender instanceof Player)) {
+				return Messages.msg("contextDefaultFromConsole").replace("%arg%", carg.getName());
+			}
+			output[carg.getPosition() + 1] = carg.getDefaultValue(sender);
+			diff--;
+		}
+		if (diff != 0) {
+			return Messages.msg("ambiguousOptional");
+		}
+		return null;
+	}
+	
+	private Result<Object, String> processTakeAllArg(CommandArgument arg, List<String> args, List<Boolean> quoted, int start, Object[] output, CommandSender sender) {
+		if (start >= args.size()) {
+			if (!arg.isOptional()) {
+				return new Result<>(this, null, Messages.msg("needArgument").replace("%arg%", arg.getName()));
+			}
+			if (arg.isContextDefault() && !(sender instanceof Player)) {
+				return new Result<>(this, null, Messages.msg("contextDefaultFromConsole").replace("%arg%", arg.getName()));
+			}
+		}
+		if (arg.consumes()) {
+			if (start >= args.size()) {
+				return new Result<>(this, arg.getDefaultValue(sender), null);
+			}
+			StringBuilder builder = new StringBuilder();
+			for (int i = start; i < args.size(); i++) {
+				if (quoted.get(i)) {
+					builder.append('"').append(args.get(i)).append('"');
+				} else {
+					builder.append(args.get(i));
+				}
+				if (i != args.size() - 1) {
+					builder.append(' ');
+				}
+			}
+			return convertArg(arg, builder.toString(), output, sender);
+		}
+		Class<?> clazz = methodHook.getParameterTypes()[arg.getPosition() + 1];
+		if (!clazz.isArray()) {
+			throw new IllegalStateException("Expected type parameter #" + (arg.getPosition() + 2) + " for method hook " + methodHook.getName() + " to be an array");
+		}
+		clazz = clazz.getComponentType();
+		if (start >= args.size()) {
+			Object arr = Array.newInstance(clazz, 1);
+			Array.set(arr, 0, arg.getDefaultValue(sender));
+			return new Result<>(this, arr, null);
+		}
+		Object arr = Array.newInstance(clazz, args.size() - start);
+		for (int i = start; i < args.size(); i++) {
+			System.out.println("Iter");
+			Result<Object, String> convert = convertArg(arg, args.get(i), output, sender);
+			if (convert.getMessage() != null) {
+				return convert;
+			}
+			Array.set(arr, i, convert.getValue());
+		}
+		return new Result<>(this, arr, null);
+	}
+	
+	private Result<Object, String> convertArg(CommandArgument carg, String arg, Object[] output, CommandSender sender) {
+		ArgType<?> type = carg.getType();
+		Object prev = null;
+		if (type.getParent() != null && carg.getPosition() > 0) {
+			prev = output[carg.getPosition()];
+		}
+		try {
+			return new Result<>(this, Objects.requireNonNull(carg.getType().convert(sender, prev, arg)), null);
+		} catch (Exception e) {
+			return new Result<>(this, null, Messages.msg("invalidArgument").replace("%arg%", carg.getName()).replace("%value%", arg));
+		}
+	}
+	
+	private String processFlags(List<String> args, Object[] output, List<Boolean> quoted, CommandSender sender) {
+		for (int i = 0; i < args.size(); i++) {
+			String arg = args.get(i);
+			if (!arg.startsWith("-") || quoted.get(i)) {
+				continue;
+			}
+			Flag flag = Arrays.stream(flags).filter(f -> f.nameMatches(arg)).findFirst().orElse(null);
 			if (flag == null) {
 				continue;
 			}
 			if (flag.getType().getName().equals("boolean")) {
 				output[flag.getPosition() + 1] = true;
-				sargs.remove(i);
+				args.remove(i);
+				quoted.remove(i);
 				i--;
 				continue;
 			}
-			if (i == sargs.size() - 1) {
-				return new Result<>(this, null, Messages.msg("needFlagValue").replace("%flag%", flag.getName()));
+			if (i == args.size() - 1) {
+				return Messages.msg("needFlagValue").replace("%flag%", flag.getName());
 			}
-			String next = sargs.get(i + 1);
-			next = next.substring(0, next.length() - 1);
+			String next = args.get(i + 1);
 			try {
-				output[flag.getPosition() + 1] = Objects.requireNonNull(flag.getType().convert(sender, next));
-			} catch (Exception e) {
-				return new Result<>(this, null, Messages.msg("invalidArgument").replace("%arg%", flag.getName()).replace("%value%", next));
+				output[flag.getPosition() + 1] = Objects.requireNonNull(flag.getType().convert(sender, null, next));
+			} catch (Exception ex) {
+				return Messages.msg("invalidArgument").replace("%arg%", flag.getName()).replace("%value%", next);
 			}
-			sargs.remove(i);
-			sargs.remove(i);
+			args.subList(i, i + 2).clear();
+			quoted.subList(i, i + 1).clear();
 			i--;
 		}
-		//Remove unused optional args
-		List<CommandArgument> cmdArgs = Arrays.stream(args).collect(Collectors.toList());
-		if (cmdArgs.size() > sargs.size()) {
-			int diff = cmdArgs.size() - sargs.size();
-			int optional = (int) cmdArgs.stream().filter(CommandArgument::isOptional).count();
-			CommandArgument[] cargs = args.clone();
-			for (int i = 0; i < cargs.length; i++) {
-				if (cargs[i].isOptional()) {
-					cargs[i] = null;
-				}
+		for (Flag flag : flags) {
+			if (output[flag.getPosition() + 1] != null) {
+				continue;
 			}
-			List<CommandArgument> used = new ArrayList<>();
-			if (optional >= diff) {
-				for (int i = 0; i < sargs.size() && diff > 0; i++) {
-					String argString = sargs.get(i);
-					List<CommandArgument> optionals = new ArrayList<>();
-					if (!cmdArgs.get(i).isOptional()) {
-						continue;
-					}
-					optionals.add(cmdArgs.get(i));
-					for (int j = i - 1; j >= 0; j--) {
-						CommandArgument arg = cmdArgs.get(j);
-						if (arg.isOptional()) {
-							optionals.add(arg);
-						} else {
-							break;
-						}
-					}
-					for (int j = i + 1; j < cmdArgs.size(); j++) {
-						CommandArgument arg = cmdArgs.get(j);
-						if (arg.isOptional()) {
-							optionals.add(arg);
-						} else {
-							break;
-						}
-					}
-					optionals.removeIf(arg -> {
-						try {
-							return arg.getType().convert(sender, argString) == null;
-						} catch (Exception e) {
-							return true;
-						}
-					});
-					optionals.removeAll(used);
-					if (optionals.size() > 1 && !optionals.stream().allMatch(arg -> arg.getType().getName().equals("string"))) {
-						optionals.removeIf(arg -> arg.getType().getName().equals("string"));
-					}
-					if (optionals.size() == 0) {
-						continue;
-					}
-					CommandArgument chosen = optionals.get(0);
-					used.add(chosen);
-					cargs[i] = chosen;
-					diff--;
-				}
+			if (flag.getType().getName().equals("boolean")) {
+				output[flag.getPosition() + 1] = false;
+				continue;
 			}
-			cmdArgs = Arrays.stream(cargs).filter(arg -> arg != null).collect(Collectors.toList());
+			if (flag.isContextDefault() && !(sender instanceof Player)) {
+				return Messages.msg("contextDefaultFlagFromConsole").replace("%flag%", flag.getName());
+			}
+			output[flag.getPosition() + 1] = flag.getDefaultValue(sender);
 		}
-		boolean lastConsumes = args.length != 0 && (args[args.length - 1].consumes() || args[args.length - 1].isVararg());
-		boolean argCountWrong = (sargs.size() > cmdArgs.size() && !lastConsumes) || sargs.size() < cmdArgs.size();
-		if (argCountWrong) {
-			int minArgCount = args.length - (int) Arrays.stream(args).filter(CommandArgument::isOptional).count();
-			String argCount = minArgCount == args.length ? args.length + "" : minArgCount + "-" + args.length;
-			return new Result<>(this, null, Messages.msg("wrongArgumentCount")
-					.replace("%args%", argCount).replace("%count%", sargs.size() + ""));
-		}
-		output[0] = sender;
-		//Process remaining arguments
-		for (CommandArgument arg : cmdArgs) {
-			if (arg.consumes()) {
-				StringBuilder builder = new StringBuilder();
-				for (int x = cmdArgs.size() - 1; x < sargs.size(); x++) {
-					if (quoted[x]) {
-						builder.append('"').append(sargs.get(x)).append("\" ");
-					} else {
-						builder.append(sargs.get(x)).append(" ");
-					}
-				}
-				String combine = builder.toString();
-				try {
-					combine = combine.substring(0, combine.length() - 1);
-					output[arg.getPosition() + 1] = arg.getType().convert(sender, combine);
-				} catch (Exception e) {
-					return new Result<>(this, null, Messages.msg("invalidArgument").replace("%arg%", arg.getName()).replace("%value%", combine));
-				}
-				return new Result<>(this, output, null);
-			}
-			if (arg.isVararg()) {
-				Class<?> clazz = methodHook.getParameterTypes()[arg.getPosition() + 1];
-				if (!clazz.isArray()) {
-					throw new IllegalStateException("Expected type parameter #" + (arg.getPosition() + 2) + " for method hook " + methodHook.getName() + " to be an array");
-				}
-				Class<?> arrType = clazz.getComponentType();
-				Object arr = Array.newInstance(arrType, sargs.size() - cmdArgs.size() + 1);
-				if (Array.getLength(arr) == 0 && !arg.isOptional()) {
-					return new Result<>(this, null, Messages.msg("needArgument").replace("%arg%", arg.getName()));
-				}
-				int pos = 0;
-				for (int x = cmdArgs.size() - 1; x < sargs.size(); x++) {
-					try {
-						Array.set(arr, pos, Objects.requireNonNull(arg.getType().convert(sender, sargs.get(x))));
-						pos++;
-					} catch (Exception e) {
-						return new Result<>(this, null, Messages.msg("invalidArgument").replace("%arg%", arg.getName()).replace("%value%", sargs.get(x)));
-					}
-				}
-				output[arg.getPosition() + 1] = arr;
-				return new Result<>(this, output, null);
-			}
-			try {
-				output[arg.getPosition() + 1] = Objects.requireNonNull(arg.getType().convert(sender, sargs.get(cmdArgs.indexOf(arg))));
-			} catch (Exception e) {
-				return new Result<>(this, null, Messages.msg("invalidArgument").replace("%arg%", arg.getName()).replace("%value%", sargs.get(cmdArgs.indexOf(arg))));
-			}
-		}
-		for (CommandArgument arg : args) {
-			if (arg.isOptional() && output[arg.getPosition() + 1] == null) {
-				if (arg.isContextDefault() && !(sender instanceof Player)) {
-					return new Result<>(this, null, Messages.msg("contextDefaultFromConsole").replace("%arg%", arg.getName()));
-				}
-				output[arg.getPosition() + 1] = arg.getDefaultValue(sender);
-			}
-		}
-		return new Result<>(this, output, null);
+		return null;
 	}
 	
 	private Object[] getContext(CommandSender sender) {
@@ -551,7 +582,7 @@ public class Command {
 							.map(Flag::getNames).forEach(s -> Collections.addAll(completions, s));
 				}
 				if (flag != null && !flag.getType().getName().equals("boolean")) {
-					flag.getType().tabComplete(sender, args)
+					flag.getType().tabComplete(sender, null, args)
 							.stream().filter(s -> s.toLowerCase().startsWith(arg.toLowerCase()))
 							.map(s -> s.contains(" ") ? '"' + s + '"' : s)
 							.forEach(completions::add);
@@ -575,7 +606,8 @@ public class Command {
 		if (args.length - flagArgs < this.args.length && args.length - flagArgs >= 0) {
 			String partial = args[args.length - 1].replaceAll("(^\")|(\"$)", "").toLowerCase();
 			CommandArgument arg = this.args[args.length - flagArgs];
-			List<String> argCompletions = arg.getType().tabComplete(sender, args);
+			Object previous = getPrevious(args, args.length - 1, args.length - flagArgs, sender);
+			List<String> argCompletions = arg.getType().tabComplete(sender, args, previous);
 			for (String completion : argCompletions) {
 				if (completion == null) {
 					continue;
@@ -587,12 +619,26 @@ public class Command {
 					completions.add(completion);
 				}
 			}
-		} else if (this.args.length > 0 && (this.args[this.args.length - 1].isVararg() || this.args[this.args.length - 1].consumes()) && args.length > 0) {
+		} else if (this.args.length > 0 && this.args[this.args.length - 1].takesAll() && args.length > 0) {
 			String partial = args[args.length - 1].replaceAll("(^\")|(\"$)", "").toLowerCase();
-			this.args[this.args.length - 1].getType().tabComplete(sender, args).stream()
+			Object previous = getPrevious(args, args.length - 1, this.args.length - 1, sender);
+			this.args[this.args.length - 1].getType().tabComplete(sender, args, previous).stream()
 					.filter(s -> s.toLowerCase().startsWith(partial) && !s.equals(partial)).forEach(completions::add);
 		}
 		return completions;
+	}
+	
+	private Object getPrevious(String[] args, int pos, int argNum, CommandSender sender) {
+		if (argNum < 1 || pos < 1) {
+			return null;
+		}
+		CommandArgument arg = this.args[argNum];
+		CommandArgument prevArg = this.args[argNum - 1];
+		Object previous = null;
+		if (arg.getType().getParent() != null) {
+			previous = getPrevious(args, pos - 1, argNum - 1, sender);
+		}
+		return prevArg.getType().convert(sender, previous, args[argNum - 1]);
 	}
 	
 	private String[] splitArgsForTab(String[] args) {

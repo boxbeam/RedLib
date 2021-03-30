@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":9,"i5":9,"i6":9,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10};
+var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":9,"i6":9,"i7":9,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -87,7 +87,7 @@ loadScripts(document, 'script');</script>
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
 <li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
@@ -133,6 +133,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dt><span class="paramLabel">Type Parameters:</span></dt>
 <dd><code>T</code> - The type this ArgType converts to</dd>
 </dl>
+<dl>
+<dt>Direct Known Subclasses:</dt>
+<dd><code><a href="ArgSubtype.html" title="class in redempt.redlib.commandmanager">ArgSubtype</a></code></dd>
+</dl>
 <hr>
 <pre>public class <span class="typeNameLabel">ArgType&lt;T&gt;</span>
 extends java.lang.Object</pre>
@@ -143,6 +147,39 @@ extends java.lang.Object</pre>
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<section role="region">
+<ul class="blockList">
+<li class="blockList"><a id="nested.class.summary">
+<!--   -->
+</a>
+<h3>Nested Class Summary</h3>
+<table class="memberSummary">
+<caption><span>Nested Classes</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colSecond" scope="col">Class</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static interface&nbsp;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="ArgType.ArgConverter.html" title="interface in redempt.redlib.commandmanager">ArgType.ArgConverter</a>&lt;<a href="ArgType.ArgConverter.html" title="type parameter in ArgType.ArgConverter">T</a>,&#8203;<a href="ArgType.ArgConverter.html" title="type parameter in ArgType.ArgConverter">K</a>&gt;</span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static interface&nbsp;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="ArgType.TabCompleter.html" title="interface in redempt.redlib.commandmanager">ArgType.TabCompleter</a>&lt;<a href="ArgType.TabCompleter.html" title="type parameter in ArgType.TabCompleter">T</a>&gt;</span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static interface&nbsp;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="ArgType.TabStreamCompleter.html" title="interface in redempt.redlib.commandmanager">ArgType.TabStreamCompleter</a>&lt;<a href="ArgType.TabStreamCompleter.html" title="type parameter in ArgType.TabStreamCompleter">T</a>&gt;</span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+</table>
+</li>
+</ul>
+</section>
 <!-- =========== FIELD SUMMARY =========== -->
 <section role="region">
 <ul class="blockList">
@@ -161,9 +198,7 @@ extends java.lang.Object</pre>
 <td class="colFirst"><code>static <a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;org.bukkit.entity.Player&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#playerType">playerType</a></span></code></th>
 <td class="colLast">
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>
-<div class="deprecationComment">Now included by default, there is no need to add it yourself</div>
-</div>
+<div class="block">The ArgType for a Player</div>
 </td>
 </tr>
 </table>
@@ -180,10 +215,12 @@ extends java.lang.Object</pre>
 <table class="memberSummary">
 <caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
 <tr>
-<th class="colFirst" scope="col">Constructor</th>
+<th class="colFirst" scope="col">Modifier</th>
+<th class="colSecond" scope="col">Constructor</th>
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code>&nbsp;</code></td>
 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,java.util.function.BiFunction)">ArgType</a></span>&#8203;(java.lang.String&nbsp;name,
        java.util.function.BiFunction&lt;org.bukkit.command.CommandSender,&#8203;java.lang.String,&#8203;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;&nbsp;convert)</code></th>
 <td class="colLast">
@@ -191,11 +228,19 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code>&nbsp;</code></td>
 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,java.util.function.Function)">ArgType</a></span>&#8203;(java.lang.String&nbsp;name,
        java.util.function.Function&lt;java.lang.String,&#8203;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;&nbsp;convert)</code></th>
 <td class="colLast">
 <div class="block">Create a ArgType from a name and converter</div>
 </td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>protected </code></td>
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,redempt.redlib.commandmanager.ArgType,redempt.redlib.commandmanager.ArgType.ArgConverter)">ArgType</a></span>&#8203;(java.lang.String&nbsp;name,
+       <a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;?&gt;&nbsp;parent,
+       <a href="ArgType.ArgConverter.html" title="interface in redempt.redlib.commandmanager">ArgType.ArgConverter</a>&lt;<a href="ArgType.html" title="type parameter in ArgType">T</a>,&#8203;?&gt;&nbsp;convert)</code></th>
+<td class="colLast">&nbsp;</td>
 </tr>
 </table>
 </li>
@@ -217,7 +262,8 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="ArgType.html" title="type parameter in ArgType">T</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#convert(org.bukkit.command.CommandSender,java.lang.String)">convert</a></span>&#8203;(org.bukkit.command.CommandSender&nbsp;sender,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#convert(org.bukkit.command.CommandSender,java.lang.Object,java.lang.String)">convert</a></span>&#8203;(org.bukkit.command.CommandSender&nbsp;sender,
+       java.lang.Object&nbsp;previous,
        java.lang.String&nbsp;argument)</code></th>
 <td class="colLast">
 <div class="block">Converts an argument to another type</div>
@@ -229,6 +275,11 @@ extends java.lang.Object</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code><a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;?&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getParent()">getParent</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>&lt;K&gt;&nbsp;<a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;K&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#map(java.lang.String,java.util.function.BiFunction)">map</a></span>&#8203;(java.lang.String&nbsp;name,
    java.util.function.BiFunction&lt;org.bukkit.command.CommandSender,&#8203;<a href="ArgType.html" title="type parameter in ArgType">T</a>,&#8203;K&gt;&nbsp;func)</code></th>
@@ -236,7 +287,7 @@ extends java.lang.Object</pre>
 <div class="block">Creates a new ArgType based on this one which converts from this type to another</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>&lt;K&gt;&nbsp;<a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;K&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#map(java.lang.String,java.util.function.Function)">map</a></span>&#8203;(java.lang.String&nbsp;name,
    java.util.function.Function&lt;<a href="ArgType.html" title="type parameter in ArgType">T</a>,&#8203;K&gt;&nbsp;func)</code></th>
@@ -244,7 +295,7 @@ extends java.lang.Object</pre>
 <div class="block">Creates a new ArgType based on this one which converts from this type to another</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>static &lt;T extends java.lang.Enum&gt;<br><a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;T&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#of(java.lang.String,java.lang.Class)">of</a></span>&#8203;(java.lang.String&nbsp;name,
   java.lang.Class&lt;T&gt;&nbsp;clazz)</code></th>
@@ -252,7 +303,7 @@ extends java.lang.Object</pre>
 <div class="block">Creates a ArgType for an enum, which will accept all of the enum's values as arguments and offer all enum values as tab completions</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>static <a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#of(java.lang.String,java.lang.String...)">of</a></span>&#8203;(java.lang.String&nbsp;name,
   java.lang.String...&nbsp;values)</code></th>
@@ -260,7 +311,7 @@ extends java.lang.Object</pre>
 <div class="block">Creates a ArgType for a set of possible string inputs</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>static &lt;T&gt;&nbsp;<a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;T&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#of(java.lang.String,java.util.Map)">of</a></span>&#8203;(java.lang.String&nbsp;name,
   java.util.Map&lt;java.lang.String,&#8203;T&gt;&nbsp;map)</code></th>
@@ -268,34 +319,56 @@ extends java.lang.Object</pre>
 <div class="block">Creates an ArgType for a map of a String to another type</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
-<td class="colFirst"><code><a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#tab(java.util.function.BiFunction)">tab</a></span>&#8203;(java.util.function.BiFunction&lt;org.bukkit.command.CommandSender,&#8203;java.lang.String[],&#8203;java.util.List&lt;java.lang.String&gt;&gt;&nbsp;tab)</code></th>
-<td class="colLast">
-<div class="block">Sets the tab completer for this type</div>
-</td>
-</tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#tab(java.util.function.Function)">tab</a></span>&#8203;(java.util.function.Function&lt;org.bukkit.command.CommandSender,&#8203;java.util.List&lt;java.lang.String&gt;&gt;&nbsp;tab)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setTab(java.util.function.BiFunction)">setTab</a></span>&#8203;(java.util.function.BiFunction&lt;org.bukkit.command.CommandSender,&#8203;java.lang.String[],&#8203;java.util.List&lt;java.lang.String&gt;&gt;&nbsp;tab)</code></th>
 <td class="colLast">
 <div class="block">Sets the tab completer for this type</div>
 </td>
 </tr>
 <tr id="i9" class="rowColor">
-<td class="colFirst"><code>protected java.util.List&lt;java.lang.String&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#tabComplete(org.bukkit.command.CommandSender,java.lang.String%5B%5D)">tabComplete</a></span>&#8203;(org.bukkit.command.CommandSender&nbsp;sender,
-           java.lang.String[]&nbsp;args)</code></th>
-<td class="colLast">&nbsp;</td>
+<td class="colFirst"><code><a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setTab(java.util.function.Function)">setTab</a></span>&#8203;(java.util.function.Function&lt;org.bukkit.command.CommandSender,&#8203;java.util.List&lt;java.lang.String&gt;&gt;&nbsp;tab)</code></th>
+<td class="colLast">
+<div class="block">Sets the tab completer for this type</div>
+</td>
 </tr>
 <tr id="i10" class="altColor">
+<td class="colFirst"><code>protected <a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setTab(redempt.redlib.commandmanager.ArgType.TabCompleter)">setTab</a></span>&#8203;(<a href="ArgType.TabCompleter.html" title="interface in redempt.redlib.commandmanager">ArgType.TabCompleter</a>&lt;?&gt;&nbsp;tab)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i11" class="rowColor">
+<td class="colFirst"><code>&lt;K&gt;&nbsp;<a href="ArgSubtype.html" title="class in redempt.redlib.commandmanager">ArgSubtype</a>&lt;K,&#8203;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#subType(java.lang.String,java.util.function.BiFunction)">subType</a></span>&#8203;(java.lang.String&nbsp;name,
+       java.util.function.BiFunction&lt;java.lang.String,&#8203;<a href="ArgType.html" title="type parameter in ArgType">T</a>,&#8203;K&gt;&nbsp;convert)</code></th>
+<td class="colLast">
+<div class="block">Creates a new ArgSubtype with this ArgType as its parent.</div>
+</td>
+</tr>
+<tr id="i12" class="altColor">
+<td class="colFirst"><code>&lt;K&gt;&nbsp;<a href="ArgSubtype.html" title="class in redempt.redlib.commandmanager">ArgSubtype</a>&lt;K,&#8203;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#subType(java.lang.String,redempt.redlib.commandmanager.ArgType.ArgConverter)">subType</a></span>&#8203;(java.lang.String&nbsp;name,
+       <a href="ArgType.ArgConverter.html" title="interface in redempt.redlib.commandmanager">ArgType.ArgConverter</a>&lt;K,&#8203;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;&nbsp;convert)</code></th>
+<td class="colLast">
+<div class="block">Creates a new ArgSubtype with this ArgType as its parent.</div>
+</td>
+</tr>
+<tr id="i13" class="rowColor">
+<td class="colFirst"><code>protected java.util.List&lt;java.lang.String&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#tabComplete(org.bukkit.command.CommandSender,java.lang.String%5B%5D,java.lang.Object)">tabComplete</a></span>&#8203;(org.bukkit.command.CommandSender&nbsp;sender,
+           java.lang.String[]&nbsp;args,
+           java.lang.Object&nbsp;prev)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i14" class="altColor">
 <td class="colFirst"><code><a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#tabStream(java.util.function.BiFunction)">tabStream</a></span>&#8203;(java.util.function.BiFunction&lt;org.bukkit.command.CommandSender,&#8203;java.lang.String[],&#8203;java.util.stream.Stream&lt;java.lang.String&gt;&gt;&nbsp;tab)</code></th>
 <td class="colLast">
 <div class="block">Sets the tab completer for this type, can be used instead of tab</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code><a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#tabStream(java.util.function.Function)">tabStream</a></span>&#8203;(java.util.function.Function&lt;org.bukkit.command.CommandSender,&#8203;java.util.stream.Stream&lt;java.lang.String&gt;&gt;&nbsp;tab)</code></th>
 <td class="colLast">
@@ -333,9 +406,6 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>playerType</h4>
 <pre>public static&nbsp;<a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;org.bukkit.entity.Player&gt; playerType</pre>
-<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated.</span>
-<div class="deprecationComment">Now included by default, there is no need to add it yourself</div>
-</div>
 <div class="block">The ArgType for a Player</div>
 </li>
 </ul>
@@ -349,6 +419,17 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
+<a id="&lt;init&gt;(java.lang.String,redempt.redlib.commandmanager.ArgType,redempt.redlib.commandmanager.ArgType.ArgConverter)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>ArgType</h4>
+<pre>protected&nbsp;ArgType&#8203;(java.lang.String&nbsp;name,
+                  <a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;?&gt;&nbsp;parent,
+                  <a href="ArgType.ArgConverter.html" title="interface in redempt.redlib.commandmanager">ArgType.ArgConverter</a>&lt;<a href="ArgType.html" title="type parameter in ArgType">T</a>,&#8203;?&gt;&nbsp;convert)</pre>
+</li>
+</ul>
 <a id="&lt;init&gt;(java.lang.String,java.util.function.Function)">
 <!--   -->
 </a>
@@ -449,13 +530,26 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a id="tab(java.util.function.Function)">
+<a id="getParent()">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>tab</h4>
-<pre class="methodSignature">public&nbsp;<a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;&nbsp;tab&#8203;(java.util.function.Function&lt;org.bukkit.command.CommandSender,&#8203;java.util.List&lt;java.lang.String&gt;&gt;&nbsp;tab)</pre>
+<h4>getParent</h4>
+<pre class="methodSignature">public&nbsp;<a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;?&gt;&nbsp;getParent()</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The parent type of this ArgType, or null</dd>
+</dl>
+</li>
+</ul>
+<a id="setTab(java.util.function.Function)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setTab</h4>
+<pre class="methodSignature">public&nbsp;<a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;&nbsp;setTab&#8203;(java.util.function.Function&lt;org.bukkit.command.CommandSender,&#8203;java.util.List&lt;java.lang.String&gt;&gt;&nbsp;tab)</pre>
 <div class="block">Sets the tab completer for this type</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -465,13 +559,13 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a id="tab(java.util.function.BiFunction)">
+<a id="setTab(java.util.function.BiFunction)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>tab</h4>
-<pre class="methodSignature">public&nbsp;<a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;&nbsp;tab&#8203;(java.util.function.BiFunction&lt;org.bukkit.command.CommandSender,&#8203;java.lang.String[],&#8203;java.util.List&lt;java.lang.String&gt;&gt;&nbsp;tab)</pre>
+<h4>setTab</h4>
+<pre class="methodSignature">public&nbsp;<a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;&nbsp;setTab&#8203;(java.util.function.BiFunction&lt;org.bukkit.command.CommandSender,&#8203;java.lang.String[],&#8203;java.util.List&lt;java.lang.String&gt;&gt;&nbsp;tab)</pre>
 <div class="block">Sets the tab completer for this type</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -479,6 +573,15 @@ extends java.lang.Object</pre>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>itself</dd>
 </dl>
+</li>
+</ul>
+<a id="setTab(redempt.redlib.commandmanager.ArgType.TabCompleter)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setTab</h4>
+<pre class="methodSignature">protected&nbsp;<a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;&nbsp;setTab&#8203;(<a href="ArgType.TabCompleter.html" title="interface in redempt.redlib.commandmanager">ArgType.TabCompleter</a>&lt;?&gt;&nbsp;tab)</pre>
 </li>
 </ul>
 <a id="tabStream(java.util.function.Function)">
@@ -513,14 +616,15 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a id="tabComplete(org.bukkit.command.CommandSender,java.lang.String[])">
+<a id="tabComplete(org.bukkit.command.CommandSender,java.lang.String[],java.lang.Object)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>tabComplete</h4>
 <pre class="methodSignature">protected&nbsp;java.util.List&lt;java.lang.String&gt;&nbsp;tabComplete&#8203;(org.bukkit.command.CommandSender&nbsp;sender,
-                                                       java.lang.String[]&nbsp;args)</pre>
+                                                       java.lang.String[]&nbsp;args,
+                                                       java.lang.Object&nbsp;prev)</pre>
 </li>
 </ul>
 <a id="getName()">
@@ -536,13 +640,14 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a id="convert(org.bukkit.command.CommandSender,java.lang.String)">
+<a id="convert(org.bukkit.command.CommandSender,java.lang.Object,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>convert</h4>
 <pre class="methodSignature">public&nbsp;<a href="ArgType.html" title="type parameter in ArgType">T</a>&nbsp;convert&#8203;(org.bukkit.command.CommandSender&nbsp;sender,
+                 java.lang.Object&nbsp;previous,
                  java.lang.String&nbsp;argument)</pre>
 <div class="block">Converts an argument to another type</div>
 <dl>
@@ -577,7 +682,7 @@ extends java.lang.Object</pre>
 <a id="map(java.lang.String,java.util.function.BiFunction)">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>map</h4>
 <pre class="methodSignature">public&nbsp;&lt;K&gt;&nbsp;<a href="ArgType.html" title="class in redempt.redlib.commandmanager">ArgType</a>&lt;K&gt;&nbsp;map&#8203;(java.lang.String&nbsp;name,
@@ -591,6 +696,50 @@ extends java.lang.Object</pre>
 <dd><code>func</code> - The function to convert from the type this ArgType returns to the type the new one will</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The resulting ArgType</dd>
+</dl>
+</li>
+</ul>
+<a id="subType(java.lang.String,java.util.function.BiFunction)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>subType</h4>
+<pre class="methodSignature">public&nbsp;&lt;K&gt;&nbsp;<a href="ArgSubtype.html" title="class in redempt.redlib.commandmanager">ArgSubtype</a>&lt;K,&#8203;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;&nbsp;subType&#8203;(java.lang.String&nbsp;name,
+                                         java.util.function.BiFunction&lt;java.lang.String,&#8203;<a href="ArgType.html" title="type parameter in ArgType">T</a>,&#8203;K&gt;&nbsp;convert)</pre>
+<div class="block">Creates a new ArgSubtype with this ArgType as its parent. ArgSubtypes are argument types
+ which must follow another argument type, and use info from the previous argument to determine
+ their values for conversion and tab completion.</div>
+<dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>K</code> - The type the new ArgSubtype will convert to</dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - The name of the new ArgSubtype</dd>
+<dd><code>convert</code> - The function to convert using the previous argument value</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The created ArgSubtype</dd>
+</dl>
+</li>
+</ul>
+<a id="subType(java.lang.String,redempt.redlib.commandmanager.ArgType.ArgConverter)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>subType</h4>
+<pre class="methodSignature">public&nbsp;&lt;K&gt;&nbsp;<a href="ArgSubtype.html" title="class in redempt.redlib.commandmanager">ArgSubtype</a>&lt;K,&#8203;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;&nbsp;subType&#8203;(java.lang.String&nbsp;name,
+                                         <a href="ArgType.ArgConverter.html" title="interface in redempt.redlib.commandmanager">ArgType.ArgConverter</a>&lt;K,&#8203;<a href="ArgType.html" title="type parameter in ArgType">T</a>&gt;&nbsp;convert)</pre>
+<div class="block">Creates a new ArgSubtype with this ArgType as its parent. ArgSubtypes are argument types
+ which must follow another argument type, and use info from the previous argument to determine
+ their values for conversion and tab completion.</div>
+<dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>K</code> - The type the new ArgSubtype will convert to</dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - The name of the new ArgSubtype</dd>
+<dd><code>convert</code> - The function to convert using the previous argument value</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The created ArgSubtype</dd>
 </dl>
 </li>
 </ul>
@@ -645,7 +794,7 @@ extends java.lang.Object</pre>
 <div>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
-<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#nested.class.summary">Nested</a>&nbsp;|&nbsp;</li>
 <li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>

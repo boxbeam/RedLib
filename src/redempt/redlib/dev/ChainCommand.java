@@ -11,7 +11,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ChainCommand {
 	
@@ -43,7 +42,7 @@ public class ChainCommand {
 	}
 	
 	public ArgType<String> getArgType() {
-		return new ArgType<>("commandchain", s -> s).tab((c, s) -> {
+		return new ArgType<>("commandchain", s -> s).setTab((c, s) -> {
 			int i = s.length - 1;
 			while (i > 0 && !s[i].endsWith(";")) {
 				i--;

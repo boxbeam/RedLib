@@ -229,9 +229,9 @@ public class CuboidRegion extends Region implements Overlappable {
 			MultiRegion multi = (MultiRegion) o;
 			return multi.getRegions().stream().anyMatch(r -> overlap.overlaps(this));
 		}
-		return (!(start.getX() > o.getEnd().getX() || o.getStart().getX() > end.getX()
-				|| start.getY() > o.getEnd().getY() || o.getStart().getY() > end.getY()
-				|| start.getZ() > o.getEnd().getZ() || o.getStart().getZ() > end.getZ()));
+		return (!(start.getX() >= o.getEnd().getX() || o.getStart().getX() >= end.getX()
+				|| start.getY() >= o.getEnd().getY() || o.getStart().getY() >= end.getY()
+				|| start.getZ() >= o.getEnd().getZ() || o.getStart().getZ() >= end.getZ()));
 	}
 	
 	/**

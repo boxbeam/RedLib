@@ -136,6 +136,9 @@ public class CommandParser {
 						}
 						CommandArgument arg = parseArg(split[i], i, pos);
 						if (arg.getName().startsWith("-")) {
+							if (arg.getType().getParent() != null) {
+								throw error("Flags cannot use argument subtypes", pos);
+							}
 							if (arg.isOptional()) {
 								throw error("Flags cannot be marked as optional, they are optional by definition", pos);
 							}
@@ -150,6 +153,11 @@ public class CommandParser {
 							}
 							flags.add(flag);
 							continue;
+						}
+						ArgType<?> parent = arg.getType().getParent();
+						if (parent != null && (args.size() == 0 || !args.get(args.size() - 1).getType().getName().equals(parent.getName()))) {
+							throw error("Argument " + arg.getName() + " with subtype " + arg.getType().getName()
+									+ " must be preceded by an argument of type " + parent.getName(), pos);
 						}
 						args.add(arg);
 					}
@@ -330,7 +338,7 @@ public class CommandParser {
 				defaultValue = c -> provider.provide((Player) c);
 				contextDefault = true;
 			} else {
-				defaultValue = c -> argType.convert(c, value.startsWith("\\") ? value.substring(1) : value);
+				defaultValue = c -> argType.convert(c, null, value.startsWith("\\") ? value.substring(1) : value);
 			}
 		}
 		if (name.endsWith("*?") || name.endsWith("?*")) {
