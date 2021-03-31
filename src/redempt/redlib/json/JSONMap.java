@@ -59,7 +59,7 @@ public class JSONMap extends HashMap<String, Object> implements JSONStorage {
 				builder.append(o.toString()).append("L, ");
 				continue;
 			}
-			builder.append(o.toString()).append(", ");
+			builder.append(o).append(", ");
 		}
 		return builder.replace(builder.length() - 2, builder.length(), "}").toString();
 	}

@@ -55,6 +55,12 @@ public class JSONParser {
 					i++;
 					lastChar = i;
 					break;
+				case 'n':
+					if (!quoted) {
+						type = Type.NULL;
+					}
+					lastChar = i;
+					break;
 				case '"':
 					quoted = !quoted;
 					lastChar = i;
@@ -70,11 +76,6 @@ public class JSONParser {
 				case 'f':
 					if (!quoted) {
 						type = Type.BOOLEAN;
-					}
-					break;
-				case 'L':
-					if (!quoted) {
-						type = Type.LONG;
 					}
 					break;
 				case ':':
@@ -105,14 +106,15 @@ public class JSONParser {
 							case INT:
 								value = Integer.parseInt(json.substring(cursor, lastChar + 1));
 								break;
-							case LONG:
-								value = Long.parseLong(json.substring(cursor, lastChar + 1));
-								break;
 							case DOUBLE:
 								value = Double.parseDouble(json.substring(cursor, lastChar + 1));
 								break;
 							case BOOLEAN:
 								value = chars[cursor] == 't';
+								break;
+							case NULL:
+								value = null;
+								break;
 						}
 						currentParent.add(key, value);
 						key = null;
@@ -185,7 +187,7 @@ public class JSONParser {
 		BOOLEAN,
 		DOUBLE,
 		INT,
-		LONG;
+		NULL;
 		
 	}
 	
