@@ -117,6 +117,7 @@ public class CommandParser {
 		boolean hideSub = false;
 		boolean noTab = false;
 		boolean noHelp = false;
+		boolean postArg = false;
 		for (int pos = lineNumber; pos < lines.size(); pos++) {
 			String line = lines.get(pos);
 			//New command data
@@ -155,7 +156,7 @@ public class CommandParser {
 							continue;
 						}
 						ArgType<?> parent = arg.getType().getParent();
-						if (parent != null && (args.size() == 0 || !args.get(args.size() - 1).getType().getName().equals(parent.getName()))) {
+						if (parent != null && (args.size() > 0 && !args.get(args.size() - 1).getType().getName().equals(parent.getName()))) {
 							throw error("Argument " + arg.getName() + " with subtype " + arg.getType().getName()
 									+ " must be preceded by an argument of type " + parent.getName(), pos);
 						}
@@ -239,6 +240,12 @@ public class CommandParser {
 						case "hook":
 							hook = tag[1];
 							break;
+						case "postarg":
+							if (lineNumber == 0) {
+								throw error("Only subcommands may be post-argument commands", pos);
+							}
+							postArg = true;
+							break;
 					}
 				} catch (ArrayIndexOutOfBoundsException ex) {
 					throw error("Missing tag data for tag " + tag[0], pos);
@@ -249,11 +256,19 @@ public class CommandParser {
 				depth--;
 				//If depth is now 0, this completes a same-level command. Instantiate and add it.
 				if (depth == 0) {
+					if (children.stream().anyMatch(Command::isPostArg)) {
+						if (args.stream().anyMatch(CommandArgument::isOptional)) {
+							throw error("Commands with optional arguments may not have post-argument children", pos);
+						}
+						if (args.stream().anyMatch(CommandArgument::takesAll)) {
+							throw error("Commands with vararg or consuming arguments may not have post-argument children", pos);
+						}
+					}
 					commands.add(new Command(names, args.toArray(new CommandArgument[args.size()]),
 							flags.toArray(new Flag[flags.size()]),
 							contextProviders.toArray(new ContextProvider<?>[contextProviders.size()]),
 							asserters.toArray(new ContextProvider<?>[asserters.size()]),
-							help, permission, type, hook, children, hideSub, noTab, noHelp));
+							help, permission, type, hook, children, hideSub, noTab, noHelp, postArg));
 					children = new ArrayList<>();
 					names = null;
 					args = new ArrayList<>();
@@ -262,11 +277,12 @@ public class CommandParser {
 					asserters = new ArrayList<>();
 					help = null;
 					permission = null;
-					type = null;
+					type = SenderType.EVERYONE;
 					hook = null;
 					hideSub = false;
 					noTab = false;
 					noHelp = false;
+					postArg = false;
 					if (lineNumber != 0) {
 						return new CommandCollection(commands);
 					}

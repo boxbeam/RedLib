@@ -117,10 +117,10 @@ public class CommandCollection {
 		}
 		
 		@Override
-		public Result<Boolean, String> execute(CommandSender sender, String[] args) {
+		public Result<Boolean, String> execute(CommandSender sender, String[] args, Object[] prevArgs) {
 			List<Result<Boolean, String>> results = new ArrayList<>();
 			for (Command cmd : children) {
-				results.add(cmd.execute(sender, args));
+				results.add(cmd.execute(sender, args, prevArgs));
 			}
 			if (results.stream().anyMatch(Result::getValue)) {
 				return null;

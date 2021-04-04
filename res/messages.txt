@@ -18,3 +18,4 @@ invalidSubcommand: &cInvalid subcommand: %value%
 contextDefaultFromConsole: &cCannot infer default value of argument %arg% for console sender, please specify it
 contextDefaultFlagFromConsole: &cCannot infer default value of flag %flag% for console sender, please specify it
 ambiguousOptional: &cThere is at least one ambiguous optional argument, please try again with no arguments omitted
+commandError: &cAn error was encountered in running this command. Please contact an admin.

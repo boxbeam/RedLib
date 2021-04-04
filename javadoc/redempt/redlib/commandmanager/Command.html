@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":41,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":9,"i11":10,"i12":10,"i13":10,"i14":10};
+var data = {"i0":10,"i1":10,"i2":41,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":9,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -241,7 +241,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>protected </code></td>
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String%5B%5D,redempt.redlib.commandmanager.CommandArgument%5B%5D,redempt.redlib.commandmanager.Flag%5B%5D,redempt.redlib.commandmanager.ContextProvider%5B%5D,redempt.redlib.commandmanager.ContextProvider%5B%5D,java.lang.String,java.lang.String,redempt.redlib.commandmanager.Command.SenderType,java.lang.String,java.util.List,boolean,boolean,boolean)">Command</a></span>&#8203;(java.lang.String[]&nbsp;names,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String%5B%5D,redempt.redlib.commandmanager.CommandArgument%5B%5D,redempt.redlib.commandmanager.Flag%5B%5D,redempt.redlib.commandmanager.ContextProvider%5B%5D,redempt.redlib.commandmanager.ContextProvider%5B%5D,java.lang.String,java.lang.String,redempt.redlib.commandmanager.Command.SenderType,java.lang.String,java.util.List,boolean,boolean,boolean,boolean)">Command</a></span>&#8203;(java.lang.String[]&nbsp;names,
        redempt.redlib.commandmanager.CommandArgument[]&nbsp;args,
        redempt.redlib.commandmanager.Flag[]&nbsp;flags,
        <a href="ContextProvider.html" title="class in redempt.redlib.commandmanager">ContextProvider</a>&lt;?&gt;[]&nbsp;providers,
@@ -253,7 +253,8 @@ extends java.lang.Object</pre>
        java.util.List&lt;<a href="Command.html" title="class in redempt.redlib.commandmanager">Command</a>&gt;&nbsp;children,
        boolean&nbsp;hideSub,
        boolean&nbsp;noTab,
-       boolean&nbsp;noHelp)</code></th>
+       boolean&nbsp;noHelp,
+       boolean&nbsp;postArg)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -281,8 +282,9 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>protected redempt.redlib.commandmanager.Result&lt;java.lang.Boolean,&#8203;java.lang.String&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#execute(org.bukkit.command.CommandSender,java.lang.String%5B%5D)">execute</a></span>&#8203;(org.bukkit.command.CommandSender&nbsp;sender,
-       java.lang.String[]&nbsp;args)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#execute(org.bukkit.command.CommandSender,java.lang.String%5B%5D,java.lang.Object%5B%5D)">execute</a></span>&#8203;(org.bukkit.command.CommandSender&nbsp;sender,
+       java.lang.String[]&nbsp;args,
+       java.lang.Object[]&nbsp;parentArgs)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
@@ -338,6 +340,23 @@ extends java.lang.Object</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i11" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isPostArg()">isPostArg</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i12" class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#lastArgTakesAll()">lastArgTakesAll</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i13" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#nameMatches(java.lang.String)">nameMatches</a></span>&#8203;(java.lang.String&nbsp;name)</code></th>
+<td class="colLast">
+<div class="block">Check if a name matches any of this command's aliases</div>
+</td>
+</tr>
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#register(java.lang.String,java.lang.Object...)">register</a></span>&#8203;(java.lang.String&nbsp;prefix,
         java.lang.Object...&nbsp;listeners)</code></th>
@@ -345,19 +364,19 @@ extends java.lang.Object</pre>
 <div class="block">Registers this command and its children</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#registerHook(java.util.Map)">registerHook</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;<a href="Command.MethodHook.html" title="class in redempt.redlib.commandmanager">Command.MethodHook</a>&gt;&nbsp;hooks)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#showHelp(org.bukkit.command.CommandSender)">showHelp</a></span>&#8203;(org.bukkit.command.CommandSender&nbsp;sender)</code></th>
 <td class="colLast">
 <div class="block">Shows the help to a CommandSender</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>protected java.util.List&lt;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#tab(org.bukkit.command.CommandSender,java.lang.String%5B%5D)">tab</a></span>&#8203;(org.bukkit.command.CommandSender&nbsp;sender,
    java.lang.String[]&nbsp;args)</code></th>
@@ -469,7 +488,7 @@ extends java.lang.Object</pre>
 <pre>protected&nbsp;Command()</pre>
 </li>
 </ul>
-<a id="&lt;init&gt;(java.lang.String[],redempt.redlib.commandmanager.CommandArgument[],redempt.redlib.commandmanager.Flag[],redempt.redlib.commandmanager.ContextProvider[],redempt.redlib.commandmanager.ContextProvider[],java.lang.String,java.lang.String,redempt.redlib.commandmanager.Command.SenderType,java.lang.String,java.util.List,boolean,boolean,boolean)">
+<a id="&lt;init&gt;(java.lang.String[],redempt.redlib.commandmanager.CommandArgument[],redempt.redlib.commandmanager.Flag[],redempt.redlib.commandmanager.ContextProvider[],redempt.redlib.commandmanager.ContextProvider[],java.lang.String,java.lang.String,redempt.redlib.commandmanager.Command.SenderType,java.lang.String,java.util.List,boolean,boolean,boolean,boolean)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -487,7 +506,8 @@ extends java.lang.Object</pre>
                   java.util.List&lt;<a href="Command.html" title="class in redempt.redlib.commandmanager">Command</a>&gt;&nbsp;children,
                   boolean&nbsp;hideSub,
                   boolean&nbsp;noTab,
-                  boolean&nbsp;noHelp)</pre>
+                  boolean&nbsp;noHelp,
+                  boolean&nbsp;postArg)</pre>
 </li>
 </ul>
 </li>
@@ -594,14 +614,31 @@ extends java.lang.Object</pre>
                                                java.lang.String[]&nbsp;args)</pre>
 </li>
 </ul>
-<a id="execute(org.bukkit.command.CommandSender,java.lang.String[])">
+<a id="execute(org.bukkit.command.CommandSender,java.lang.String[],java.lang.Object[])">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
 <pre class="methodSignature">protected&nbsp;redempt.redlib.commandmanager.Result&lt;java.lang.Boolean,&#8203;java.lang.String&gt;&nbsp;execute&#8203;(org.bukkit.command.CommandSender&nbsp;sender,
-                                                                                                 java.lang.String[]&nbsp;args)</pre>
+                                                                                                 java.lang.String[]&nbsp;args,
+                                                                                                 java.lang.Object[]&nbsp;parentArgs)</pre>
+</li>
+</ul>
+<a id="nameMatches(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>nameMatches</h4>
+<pre class="methodSignature">public&nbsp;boolean&nbsp;nameMatches&#8203;(java.lang.String&nbsp;name)</pre>
+<div class="block">Check if a name matches any of this command's aliases</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - The name to check</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Whether the name matches any of this command's aliases</dd>
+</dl>
 </li>
 </ul>
 <a id="getType(java.lang.String,redempt.redlib.commandmanager.ArgType[])">
@@ -627,6 +664,19 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
+<a id="lastArgTakesAll()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>lastArgTakesAll</h4>
+<pre class="methodSignature">public&nbsp;boolean&nbsp;lastArgTakesAll()</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Whether the last argument in this command is consuming or vararg</dd>
+</dl>
+</li>
+</ul>
 <a id="getAliases()">
 <!--   -->
 </a>
@@ -637,6 +687,19 @@ extends java.lang.Object</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>All of the command's names/aliases</dd>
+</dl>
+</li>
+</ul>
+<a id="isPostArg()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isPostArg</h4>
+<pre class="methodSignature">public&nbsp;boolean&nbsp;isPostArg()</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Whether this subcommand comes after the arguments of its parent</dd>
 </dl>
 </li>
 </ul>
