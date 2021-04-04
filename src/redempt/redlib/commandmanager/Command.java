@@ -676,7 +676,7 @@ public class Command {
 		if ((argNum < 1 || pos < 1) && !postArg) {
 			return null;
 		}
-		if (argNum < 0 || pos < 0) {
+		if (argNum < 0 || pos < 0 || argNum >= this.args.length || pos >= args.length) {
 			return null;
 		}
 		if (postArg && argNum == 0) {
