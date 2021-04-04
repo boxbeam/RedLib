@@ -1,20 +1,16 @@
 package redempt.redlib.commandmanager;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.RedLib;
-import redempt.redlib.commandmanager.exceptions.CommandParseException;
 import redempt.redlib.commandmanager.exceptions.CommandHookException;
+import redempt.redlib.commandmanager.exceptions.CommandParseException;
 import redempt.redlib.misc.EventListener;
-import redempt.redlib.nms.NMSObject;
 
 import java.io.InputStream;
 import java.lang.reflect.Array;
@@ -551,8 +547,12 @@ public class Command {
 		plugin = JavaPlugin.getProvidingPlugin(methodHook.getDeclaringClass());
 		Class<?>[] params = methodHook.getParameterTypes();
 		int expectedLength = args.length + contextProviders.length + flags.length + 1;
-		if (postArg) {
-			expectedLength += parent.args.length + parent.contextProviders.length + parent.flags.length;
+		Command current = this;
+		while (current != null) {
+			if (current.postArg) {
+				expectedLength += current.parent.args.length + current.parent.contextProviders.length + current.parent.flags.length;
+			}
+			current = current.parent;
 		}
 		if (params.length != expectedLength) {
 			throw new IllegalStateException("Incorrect number of arguments for method hook! [" + methodHook.getDeclaringClass().getName() + "." + methodHook.getName() + "] "
@@ -683,7 +683,19 @@ public class Command {
 			pos--;
 		}
 		CommandArgument arg = this.args[argNum];
-		CommandArgument prevArg = argNum - 1 >= 0 ? this.args[argNum - 1] : parent.args[parent.args.length - 1];
+		CommandArgument prevArg = null;
+		if (argNum - 1 >= 0) {
+			prevArg = this.args[argNum - 1];
+		} else {
+			Command current = parent;
+			while (current != null) {
+				if (current.args.length > 0) {
+					prevArg = current.args[current.args.length - 1];
+					break;
+				}
+				current = current.parent;
+			}
+		}
 		Object previous = null;
 		if (arg.getType().getParent() != null) {
 			previous = getPrevious(args, pos - 1, argNum - 1, sender);
@@ -938,6 +950,7 @@ public class Command {
 		public MethodHook(Method method, Object listener) {
 			this.method = method;
 			this.listener = listener;
+			Player player;
 		}
 		
 		public Method getMethod() {
