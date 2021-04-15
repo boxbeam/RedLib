@@ -139,6 +139,11 @@ public class Command {
 		String title = msg("helpTitle").replace("%cmdname%", names[0]);
 		sender.sendMessage(title);
 		sender.sendMessage(getHelpRecursive(sender, 0).trim());
+		if (parent != null) {
+			parent.children.stream().filter(c -> c.nameMatches(names[0])).forEach(c -> {
+				sender.sendMessage(c.getHelpRecursive(sender, 0).trim());
+			});
+		}
 	}
 	
 	protected String getHelpRecursive(CommandSender sender, int level) {
@@ -171,7 +176,7 @@ public class Command {
 		}
 		name += flags.length > 0 ? String.join(" ", Arrays.stream(flags).map(Flag::toString).collect(Collectors.toList())) + " " : "";
 		name += String.join(" ", Arrays.stream(args).map(CommandArgument::toString).collect(Collectors.toList()));
-		return name;
+		return name.trim();
 	}
 	
 	/**
