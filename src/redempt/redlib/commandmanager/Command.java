@@ -351,7 +351,7 @@ public class Command {
 			}
 			return convertArg(arg, builder.toString(), output, offset, sender);
 		}
-		Class<?> clazz = methodHook.getParameterTypes()[arg.getPosition() + 1];
+		Class<?> clazz = methodHook.getParameterTypes()[arg.getPosition() + offset];
 		if (!clazz.isArray()) {
 			throw new IllegalStateException("Expected type parameter #" + (arg.getPosition() + 2) + " for method hook " + methodHook.getName() + " to be an array");
 		}
@@ -367,7 +367,7 @@ public class Command {
 			if (convert.getMessage() != null) {
 				return convert;
 			}
-			Array.set(arr, i, convert.getValue());
+			Array.set(arr, i - start, convert.getValue());
 		}
 		return new Result<>(this, arr, null);
 	}
@@ -808,7 +808,6 @@ public class Command {
 				return new Result<>(this, true, null);
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
-				System.out.println(objArgs.length);
 				if (topLevel) {
 					showHelp(sender);
 					return new Result<>(this, true, null);

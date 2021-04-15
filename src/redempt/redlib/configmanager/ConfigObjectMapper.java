@@ -41,6 +41,7 @@ class ConfigObjectMapper<T> {
 						} else if (!field.getType().equals(ConfigurationSection.class)) {
 							throw new ConfigMapException("Field annotated with @ConfigPath must be of type String or ConfigurationSection!");
 						}
+						continue;
 					}
 					ConfigValue hook = field.getAnnotation(ConfigValue.class);
 					if (hook == null) {
@@ -119,6 +120,10 @@ class ConfigObjectMapper<T> {
 			return;
 		}
 		fields.forEach(f -> f.save(inst, section));
+	}
+	
+	public ConversionType getType() {
+		return type;
 	}
 	
 	public void setPathField(T inst, ConfigurationSection section) {
