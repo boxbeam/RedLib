@@ -13,7 +13,10 @@ public class JSONMap extends HashMap<String, Object> implements JSONStorage {
 	
 	public int getInt(String key) {
 		Object o = get(key);
-		return (int) (long) o;
+		if (o instanceof Long) {
+			return (int) (long) o;
+		}
+		return (int) o;
 	}
 	
 	public boolean getBoolean(String key) {

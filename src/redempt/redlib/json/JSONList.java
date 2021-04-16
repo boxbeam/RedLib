@@ -14,7 +14,11 @@ public class JSONList extends ArrayList<Object> implements JSONStorage {
 	protected String key = null;
 	
 	public int getInt(int key) {
-		return (int) get(key);
+		Object o = get(key);
+		if (o instanceof Long) {
+			return (int) (long) o;
+		}
+		return (int) o;
 	}
 	
 	public boolean getBoolean(int key) {
