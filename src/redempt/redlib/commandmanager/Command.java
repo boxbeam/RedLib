@@ -140,7 +140,7 @@ public class Command {
 		sender.sendMessage(title);
 		sender.sendMessage(getHelpRecursive(sender, 0).trim());
 		if (parent != null) {
-			parent.children.stream().filter(c -> c.nameMatches(names[0])).forEach(c -> {
+			parent.children.stream().filter(c -> c != this && c.nameMatches(names[0])).forEach(c -> {
 				sender.sendMessage(c.getHelpRecursive(sender, 0).trim());
 			});
 		}
