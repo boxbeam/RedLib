@@ -104,10 +104,10 @@ public class JSONParser {
 								value= substring(chars, cursor + 1, lastChar);
 								break;
 							case INT:
-								value = Integer.parseInt(json.substring(cursor, lastChar + 1));
+								value = parseLong(json.substring(cursor, lastChar + 1));
 								break;
 							case DOUBLE:
-								value = Double.parseDouble(json.substring(cursor, lastChar + 1));
+								value = parseDouble(json.substring(cursor, lastChar + 1));
 								break;
 							case BOOLEAN:
 								value = chars[cursor] == 't';
@@ -163,6 +163,62 @@ public class JSONParser {
 			}
 		}
 		return root;
+	}
+	
+	private static double parseDouble(String input) {
+		int i = 0;
+		boolean negative = false;
+		if (input.charAt(0) == '-') {
+			negative = true;
+			i++;
+		}
+		double output = 0;
+		double after = 0;
+		int decimal = -1;
+		for (; i < input.length(); i++) {
+			char c = input.charAt(i);
+			if (c == '.') {
+				if (decimal != -1) {
+					throw new NumberFormatException("Second period in double");
+				}
+				decimal = i;
+				continue;
+			}
+			if (c > '9' || c < '0') {
+				throw new NumberFormatException("Non-numeric character");
+			}
+			if (decimal != -1) {
+				after *= 10;
+				after += c - '0';
+			} else {
+				output *= 10;
+				output += c - '0';
+			}
+		}
+		after /= Math.pow(10, input.length() - decimal - 1);
+		return negative ? -output - after: output + after;
+	}
+	
+	private static long parseLong(String input) {
+		int i = 0;
+		boolean negative = false;
+		if (input.charAt(0) == '-') {
+			negative = true;
+			i++;
+		}
+		long output = 0;
+		for (; i < input.length(); i++) {
+			char c = input.charAt(i);
+			if (c == 'L') {
+				continue;
+			}
+			if (c > '9' || c < '0') {
+				throw new NumberFormatException("Non-numeric character");
+			}
+			output *= 10;
+			output += c - '0';
+		}
+		return negative ? -output : output;
 	}
 	
 	private static String substring(char[] chars, int start, int end) {
