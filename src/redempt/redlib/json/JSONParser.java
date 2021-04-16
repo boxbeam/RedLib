@@ -104,7 +104,7 @@ public class JSONParser {
 								value= substring(chars, cursor + 1, lastChar);
 								break;
 							case INT:
-								value = parseLong(json.substring(cursor, lastChar + 1));
+								value = parseInteger(json.substring(cursor, lastChar + 1));
 								break;
 							case DOUBLE:
 								value = parseDouble(json.substring(cursor, lastChar + 1));
@@ -199,7 +199,7 @@ public class JSONParser {
 		return negative ? -output - after: output + after;
 	}
 	
-	private static long parseLong(String input) {
+	private static Object parseInteger(String input) {
 		int i = 0;
 		boolean negative = false;
 		if (input.charAt(0) == '-') {
@@ -218,7 +218,11 @@ public class JSONParser {
 			output *= 10;
 			output += c - '0';
 		}
-		return negative ? -output : output;
+		output = negative ? -output : output;
+		if (output > Integer.MAX_VALUE || output < Integer.MIN_VALUE) {
+			return output;
+		}
+		return (int) output;
 	}
 	
 	private static String substring(char[] chars, int start, int end) {
