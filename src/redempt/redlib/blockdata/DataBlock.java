@@ -1,7 +1,5 @@
 package redempt.redlib.blockdata;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import redempt.redlib.json.JSONList;
@@ -56,6 +54,27 @@ public class DataBlock {
 	public void setTransientProperty(String key, Object o) {
 		transientProperties.put(key, o);
 	}
+
+	/**
+	 * Attaches a transient property, if absent, to this DataBlock. Transient properties
+	 * are not saved and will be lost if the chunk is unloaded or the server is stopped
+	 * @param key The key of the transient property
+	 * @param o The value of the transient property
+	 */
+	public void setTransientPropertyIfAbsent(String key, Object o) {
+		if (!containsTransientProperty(key)) {
+			transientProperties.put(key, o);
+		}
+	}
+
+	/**
+	 * Checks to see if a transient property is associated with the key provided.
+	 * @param key The key
+	 * @return true if this DataBlock contains a transient property for the specified key
+	 */
+	public boolean containsTransientProperty(String key) {
+		return transientProperties.containsKey(key);
+	}
 	
 	/**
 	 * Sets a data value in this DataBlock. If this is the first piece of data attached to this
@@ -74,7 +93,19 @@ public class DataBlock {
 			save();
 		}
 	}
-	
+
+	/**
+	 * Sets a data value, if absent, in this DataBlock. If this is the first piece of data attached to this
+	 * DataBlock, it will be added to the map of the BlockDataManager it was created by.
+	 * @param key The key to put the data at
+	 * @param data The data to put
+	 */
+	public void setIfAbsent(String key, Object data) {
+		if (!contains(key)) {
+			set(key, data);
+		}
+	}
+
 	protected void setData(JSONMap data) {
 		this.data = data;
 		modified = true;
@@ -161,7 +192,17 @@ public class DataBlock {
 	public void remove(String key) {
 		this.data.remove(key);
 	}
-	
+
+
+	/**
+	 * Checks to see if an object is associated with the key provided.
+	 * @param key The key
+	 * @return true if this DataBlock contains an object for the specified key
+	 */
+	public boolean contains(String key) {
+		return this.data.containsKey(key);
+	}
+
 	/**
 	 * Moves the data in this DataBlock to a new Block
 	 * @param block The Block to move the data to
