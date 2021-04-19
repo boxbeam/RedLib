@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9,"i15":9,"i16":9,"i17":9,"i18":9,"i19":9,"i20":9,"i21":9,"i22":9,"i23":9,"i24":9,"i25":9,"i26":9,"i27":9,"i28":9,"i29":9,"i30":9,"i31":9,"i32":9};
+var data = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9,"i15":9,"i16":9,"i17":9,"i18":9,"i19":9,"i20":9,"i21":9,"i22":9,"i23":9,"i24":9,"i25":9,"i26":9,"i27":9,"i28":9,"i29":9,"i30":9,"i31":9,"i32":9,"i33":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -334,12 +334,20 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i18" class="altColor">
 <td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#damage(org.bukkit.inventory.ItemStack,int)">damage</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item,
+      int&nbsp;amount)</code></th>
+<td class="colLast">
+<div class="block">Damages an item</div>
+</td>
+</tr>
+<tr id="i19" class="rowColor">
+<td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromString(java.lang.String)">fromString</a></span>&#8203;(java.lang.String&nbsp;json)</code></th>
 <td class="colLast">
 <div class="block">Constructs an ItemStack from a previously-serialized JSON string</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#give(org.bukkit.entity.Player,org.bukkit.inventory.ItemStack...)">give</a></span>&#8203;(org.bukkit.entity.Player&nbsp;player,
     org.bukkit.inventory.ItemStack...&nbsp;items)</code></th>
@@ -347,7 +355,7 @@ extends java.lang.Object</pre>
 <div class="block">Give the player the specified items, dropping them on the ground if there is not enough room</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#give(org.bukkit.entity.Player,org.bukkit.inventory.ItemStack,int)">give</a></span>&#8203;(org.bukkit.entity.Player&nbsp;player,
     org.bukkit.inventory.ItemStack&nbsp;item,
@@ -356,7 +364,7 @@ extends java.lang.Object</pre>
 <div class="block">Gives the player the specified amount of the specified item, dropping them on the ground if there is not enough room</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#give(org.bukkit.entity.Player,org.bukkit.Material,int)">give</a></span>&#8203;(org.bukkit.entity.Player&nbsp;player,
     org.bukkit.Material&nbsp;type,
@@ -365,7 +373,7 @@ extends java.lang.Object</pre>
 <div class="block">Gives the player the specified amount of the specified item type, dropping them on the ground if there is not enough room</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>static boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#remove(org.bukkit.inventory.Inventory,org.bukkit.inventory.ItemStack,int)">remove</a></span>&#8203;(org.bukkit.inventory.Inventory&nbsp;inv,
       org.bukkit.inventory.ItemStack&nbsp;item,
@@ -374,7 +382,7 @@ extends java.lang.Object</pre>
 <div class="block">Removes the specified amount of the given item from the given inventory</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>static boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#remove(org.bukkit.inventory.Inventory,org.bukkit.inventory.ItemStack,int,java.util.function.BiPredicate)">remove</a></span>&#8203;(org.bukkit.inventory.Inventory&nbsp;inv,
       org.bukkit.inventory.ItemStack&nbsp;item,
@@ -384,7 +392,7 @@ extends java.lang.Object</pre>
 <div class="block">Removes the specified amount of the given item from the given inventory</div>
 </td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>static boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#remove(org.bukkit.inventory.Inventory,org.bukkit.Material,int)">remove</a></span>&#8203;(org.bukkit.inventory.Inventory&nbsp;inv,
       org.bukkit.Material&nbsp;type,
@@ -393,7 +401,7 @@ extends java.lang.Object</pre>
 <div class="block">Removes the specified amount of the given item type from the given inventory</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rename(org.bukkit.inventory.ItemStack,java.lang.String)">rename</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item,
       java.lang.String&nbsp;name)</code></th>
@@ -401,7 +409,7 @@ extends java.lang.Object</pre>
 <div class="block">Renames an ItemStack, functionally identical to <a href="#setName(org.bukkit.inventory.ItemStack,java.lang.String)"><code>setName(ItemStack, String)</code></a> but kept for legacy reasons</div>
 </td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setCustomModelData(org.bukkit.inventory.ItemStack,int)">setCustomModelData</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item,
                   int&nbsp;customModelData)</code></th>
@@ -409,7 +417,7 @@ extends java.lang.Object</pre>
 <div class="block">Sets the custom model data of the item</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setLore(org.bukkit.inventory.ItemStack,java.lang.String)">setLore</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item,
        java.lang.String&nbsp;line)</code></th>
@@ -417,7 +425,7 @@ extends java.lang.Object</pre>
 <div class="block">Set a single line of lore for an ItemStack</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i29" class="rowColor">
 <td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setLore(org.bukkit.inventory.ItemStack,java.lang.String...)">setLore</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item,
        java.lang.String...&nbsp;lore)</code></th>
@@ -425,7 +433,7 @@ extends java.lang.Object</pre>
 <div class="block">Set multiple lines of lore for an ItemStack</div>
 </td>
 </tr>
-<tr id="i29" class="rowColor">
+<tr id="i30" class="altColor">
 <td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setLore(org.bukkit.inventory.ItemStack,java.util.List)">setLore</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item,
        java.util.List&lt;java.lang.String&gt;&nbsp;lore)</code></th>
@@ -433,7 +441,7 @@ extends java.lang.Object</pre>
 <div class="block">Set multiple lines of lore for an ItemStack</div>
 </td>
 </tr>
-<tr id="i30" class="altColor">
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setName(org.bukkit.inventory.ItemStack,java.lang.String)">setName</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item,
        java.lang.String&nbsp;name)</code></th>
@@ -441,14 +449,14 @@ extends java.lang.Object</pre>
 <div class="block">Renames an ItemStack</div>
 </td>
 </tr>
-<tr id="i31" class="rowColor">
+<tr id="i32" class="altColor">
 <td class="colFirst"><code>static org.bukkit.inventory.ItemStack</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setUnbreakable(org.bukkit.inventory.ItemStack)">setUnbreakable</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item)</code></th>
 <td class="colLast">
 <div class="block">Sets an item to be unbreakable</div>
 </td>
 </tr>
-<tr id="i32" class="altColor">
+<tr id="i33" class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString(org.bukkit.inventory.ItemStack)">toString</a></span>&#8203;(org.bukkit.inventory.ItemStack&nbsp;item)</code></th>
 <td class="colLast">
@@ -768,6 +776,26 @@ extends java.lang.Object</pre>
 <dd><code>slot</code> - The slot this attribute will be effective in</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The modified item</dd>
+</dl>
+</li>
+</ul>
+<a id="damage(org.bukkit.inventory.ItemStack,int)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>damage</h4>
+<pre class="methodSignature">public static&nbsp;org.bukkit.inventory.ItemStack&nbsp;damage&#8203;(org.bukkit.inventory.ItemStack&nbsp;item,
+                                                    int&nbsp;amount)</pre>
+<div class="block">Damages an item</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>item</code> - The item to damage</dd>
+<dd><code>amount</code> - How much damage to apply</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The damaged item</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>java.lang.IllegalArgumentException</code> - if the item is not damageable</dd>
 </dl>
 </li>
 </ul>

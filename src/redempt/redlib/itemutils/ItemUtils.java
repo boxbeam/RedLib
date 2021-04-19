@@ -13,8 +13,10 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import redempt.redlib.RedLib;
 import redempt.redlib.json.JSONList;
 import redempt.redlib.json.JSONMap;
 import redempt.redlib.json.JSONParser;
@@ -239,6 +241,29 @@ public class ItemUtils {
 		ItemStack clone = item.clone();
 		clone.setItemMeta(meta);
 		return clone;
+	}
+	
+	/**
+	 * Damages an item
+	 * @param item The item to damage
+	 * @param amount How much damage to apply
+	 * @return The damaged item
+	 * @throws IllegalArgumentException if the item is not damageable
+	 */
+	public static ItemStack damage(ItemStack item, int amount) {
+		item = item.clone();
+		if (RedLib.MID_VERSION >= 13) {
+			ItemMeta meta = item.getItemMeta();
+			if (!(meta instanceof Damageable)) {
+				throw new IllegalArgumentException("Item must be damageable");
+			}
+			Damageable d = (Damageable) meta;
+			d.setDamage(d.getDamage() + amount);
+			item.setItemMeta(meta);
+			return item;
+		}
+		item.setDurability((short) (item.getDurability() + amount));
+		return item;
 	}
 	
 	/**

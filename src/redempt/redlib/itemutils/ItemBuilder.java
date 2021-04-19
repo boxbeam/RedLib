@@ -136,12 +136,21 @@ public class ItemBuilder extends ItemStack {
 	}
 	
 	/**
-	 * Add ItemFlags to this ItemBuilder
+	 * Adds ItemFlags to this ItemBuilder
 	 * @param flags The ItemFlags to add
 	 * @return The ItemBuilder with the flags added
 	 */
 	public ItemBuilder addItemFlags(ItemFlag... flags) {
 		return new ItemBuilder(ItemUtils.addItemFlags(this, flags));
+	}
+	
+	/**
+	 * Adds damage to this ItemBuilder
+	 * @param damage The amount of damage to apply
+	 * @return The ItemBuilder with the damage applied
+	 */
+	public ItemBuilder addDamage(int damage) {
+		return new ItemBuilder(ItemUtils.damage(this, damage));
 	}
 	
 	/**
