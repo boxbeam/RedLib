@@ -27,7 +27,7 @@ import java.util.UUID;
  * Called when a player changes any piece of armor
  * @author Redempt
  */
-public class PlayerChangedArmorEvent extends PlayerEvent {
+public class PlayerChangedArmorEvent extends Event {
 	
 	private static HandlerList handlers = new HandlerList();
 	private static boolean registered = false;
