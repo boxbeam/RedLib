@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.ItemStack;
 import redempt.redlib.RedLib;
 import redempt.redlib.misc.Task;
@@ -41,7 +42,6 @@ public class PlayerChangedHeldItemEvent extends Event {
 	
 	private ItemStack oldItem;
 	private ItemStack newItem;
-	private Player player;
 	
 	/**
 	 * Constructs a new PlayerChangedHeldItemEvent
@@ -50,7 +50,7 @@ public class PlayerChangedHeldItemEvent extends Event {
 	 * @param newItem The item they are now holding
 	 */
 	public PlayerChangedHeldItemEvent(Player player, ItemStack oldItem, ItemStack newItem) {
-		this.player = player;
+		super(player);
 		this.oldItem = oldItem;
 		this.newItem = newItem;
 	}
@@ -72,9 +72,6 @@ public class PlayerChangedHeldItemEvent extends Event {
 	/**
 	 * @return The player
 	 */
-	public Player getPlayer() {
-		return player;
-	}
 	
 	@Override
 	public HandlerList getHandlers() {

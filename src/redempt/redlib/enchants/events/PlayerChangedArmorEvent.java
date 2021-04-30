@@ -11,6 +11,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -58,8 +59,7 @@ public class PlayerChangedArmorEvent extends Event {
 			}
 		}, 1);
 	}
-	
-	private Player player;
+
 	private ItemStack[] previous;
 	private ItemStack[] current;
 	
@@ -70,16 +70,9 @@ public class PlayerChangedArmorEvent extends Event {
 	 * @param current The armor the Player is now wearing
 	 */
 	public PlayerChangedArmorEvent(Player player, ItemStack[] previous, ItemStack[] current) {
-		this.player = player;
+		super(player);
 		this.previous = previous;
 		this.current = current;
-	}
-	
-	/**
-	 * @return The Player who changed their armor
-	 */
-	public Player getPlayer() {
-		return player;
 	}
 	
 	/**
@@ -96,7 +89,7 @@ public class PlayerChangedArmorEvent extends Event {
 		return current;
 	}
 	
-	@Override
+
 	public HandlerList getHandlers() {
 		return handlers;
 	}
