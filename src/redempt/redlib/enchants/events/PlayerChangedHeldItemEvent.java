@@ -12,7 +12,7 @@ import redempt.redlib.misc.Task;
  * Called when a player changes the item they are holding, or a property of their held item changes
  * @author Redempt
  */
-public class PlayerChangedHeldItemEvent extends Event {
+public class PlayerChangedHeldItemEvent extends PlayerEvent {
 	
 	private static HandlerList handlers = new HandlerList();
 	private static boolean registered = false;
