@@ -2,7 +2,6 @@ package redempt.redlib.enchants.events;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.ItemStack;
@@ -13,7 +12,7 @@ import redempt.redlib.misc.Task;
  * Called when a player changes the item they are holding, or a property of their held item changes
  * @author Redempt
  */
-public class PlayerChangedHeldItemEvent extends Event {
+public class PlayerChangedHeldItemEvent extends PlayerEvent {
 	
 	private static HandlerList handlers = new HandlerList();
 	private static boolean registered = false;
