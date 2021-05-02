@@ -3,6 +3,8 @@ package redempt.redlib.misc;
 import org.bukkit.ChatColor;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Contains utilities for formatting various information
@@ -127,10 +129,10 @@ public class FormatUtils {
 	 */
 	public static String toTitleCase(String string) {
 		StringBuilder str = new StringBuilder();
-		boolean space = false;
+		boolean space = true;
 		for (int i = 0; i < string.length(); i++) {
 			char c = string.charAt(i);
-			str.append(space || i == 0 ? Character.toUpperCase(c) : Character.toLowerCase(c));
+			str.append(space ? Character.toUpperCase(c) : Character.toLowerCase(c));
 			space = c == ' ';
 		}
 		return str.toString();
@@ -150,6 +152,30 @@ public class FormatUtils {
 			space = c == ' ';
 		}
 		return str.toString();
+	}
+	
+	/**
+	 * Splits a line of text across multiple lines, attempting to limit the length of each line
+	 * @param line The line to wrap
+	 * @param maxLength The max length to cap each line at
+	 * @return The list of separate lines
+	 */
+	public static List<String> lineWrap(String line, int maxLength) {
+		String[] split = line.split(" ");
+		List<String> lines = new ArrayList<>();
+		StringBuilder current = new StringBuilder();
+		for (String word : split) {
+			if (current.length() + word.length() + 1 <= maxLength) {
+				current.append(word).append(' ');
+			} else {
+				lines.add(current.substring(0, current.length() - 1));
+				current = new StringBuilder(word).append(' ');
+			}
+		}
+		if (current.length() > 0) {
+			lines.add(current.substring(0, current.length() - 1));
+		}
+		return lines;
 	}
 	
 }

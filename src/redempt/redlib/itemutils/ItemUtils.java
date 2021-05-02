@@ -96,10 +96,25 @@ public class ItemUtils {
 	public static ItemStack addLore(ItemStack item, String line) {
 		ItemMeta meta = item.getItemMeta();
 		List<String> lore = meta.getLore();
-		if (lore == null) {
-			lore = new ArrayList<>();
-		}
+		lore = lore == null ? new ArrayList<>() : lore;
 		lore.add(line);
+		meta.setLore(lore);
+		ItemStack clone = item.clone();
+		clone.setItemMeta(meta);
+		return clone;
+	}
+	
+	/**
+	 * Adds multiple lines of lore to an ItemStack
+	 * @param item The ItemStack to be given lore
+	 * @param lines The lines or lore to add
+	 * @return The modified ItemStack
+	 */
+	public static ItemStack addLore(ItemStack item, Iterable<String> lines) {
+		ItemMeta meta = item.getItemMeta();
+		List<String> lore = meta.getLore();
+		lore = lore == null ? new ArrayList<>() : lore;
+		lines.forEach(lore::add);
 		meta.setLore(lore);
 		ItemStack clone = item.clone();
 		clone.setItemMeta(meta);

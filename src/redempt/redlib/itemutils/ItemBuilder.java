@@ -83,6 +83,15 @@ public class ItemBuilder extends ItemStack {
 	}
 	
 	/**
+	 * Add multiple lines of lore to this ItemBuilder
+	 * @param lines The lines of lore
+	 * @return The ItemBuilder with lore added
+	 */
+	public ItemBuilder addLore(Iterable<String> lines) {
+		return new ItemBuilder(ItemUtils.addLore(this, lines));
+	}
+	
+	/**
 	 * Renames this ItemBuilder
 	 * @param name The name to set
 	 * @return The renamed ItemBuilder
