@@ -168,7 +168,9 @@ public class FormatUtils {
 			if (current.length() + word.length() + 1 <= maxLength) {
 				current.append(word).append(' ');
 			} else {
-				lines.add(current.substring(0, current.length() - 1));
+				if (current.length() > 0) {
+					lines.add(current.substring(0, current.length() - 1));
+				}
 				current = new StringBuilder(word).append(' ');
 			}
 		}
