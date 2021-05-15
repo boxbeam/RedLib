@@ -3,11 +3,19 @@ package redempt.redlib.enchants.trigger;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import redempt.redlib.enchants.EventItems;
+import redempt.redlib.enchants.events.PlayerChangedArmorEvent;
+import redempt.redlib.enchants.events.PlayerChangedHeldItemEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Represents a trigger for a CustomEnchant which will smartly pass relevant events
@@ -19,39 +27,39 @@ public abstract class EnchantTrigger<T extends Event> {
 	/**
 	 * Calls activate with a BlockBreakEvent when a block is broken with an item that has a CustomEnchant with this trigger
 	 */
-	public static final MineBlockTrigger MINE_BLOCK = new MineBlockTrigger();
+	public static final EnchantTrigger<BlockBreakEvent> MINE_BLOCK = new MineBlockTrigger();
 	/**
 	 * Calls activate with an EntityDamageByEntityEvent when a player attacks an entity with an item that has a CustomEnchant with this trigger
 	 */
-	public static final AttackEntityTrigger ATTACK_ENTITY = new AttackEntityTrigger();
+	public static final EnchantTrigger<EntityDamageByEntityEvent> ATTACK_ENTITY = new AttackEntityTrigger();
 	/**
 	 * Calls activate with an EntityDeathEvent when a player kills an entity with an item that has a CustomEnchant with this trigger
 	 */
-	public static final KillEntityTrigger KILL_ENTITY = new KillEntityTrigger();
+	public static final EnchantTrigger<EntityDeathEvent> KILL_ENTITY = new KillEntityTrigger();
 	/**
 	 * Calls activate with a ProjectileLaunchEvent when a player shoots a projectile with an item that has a CustomEnchant with this trigger
 	 */
-	public static final ShootArrowTrigger SHOOT_ARROW = new ShootArrowTrigger();
+	public static final EnchantTrigger<ProjectileLaunchEvent> SHOOT_ARROW = new ShootArrowTrigger();
 	/**
 	 * Calls activate with an EntityDamageEvent when a player takes damage wearing armor that has a CustomEnchant with this trigger
 	 */
-	public static final TakeDamageTrigger TAKE_DAMAGE = new TakeDamageTrigger();
+	public static final EnchantTrigger<EntityDamageEvent> TAKE_DAMAGE = new TakeDamageTrigger();
 	/**
 	 * Calls activate with a PlayerChangedArmorEvent when a player equips armor that has a CustomEnchant with this trigger
 	 * Also calls activate when a player joins wearing armor with this trigger
 	 * Calls deactivate with a PlayerChangedArmorEvent when a player unequips armor that has a CustomEnchant with this trigger
 	 * Also calls deactivate when a player leaves wearing armor with this trigger
 	 */
-	public static final EquipArmorTrigger EQUIP_ARMOR = new EquipArmorTrigger();
+	public static final EnchantTrigger<PlayerChangedArmorEvent> EQUIP_ARMOR = new EquipArmorTrigger();
 	/**
 	 * Calls activate with a PlayerChangedHeldItemEvent when a player begins holding an item that has a CustomEnchant with this trigger
 	 * Also calls activate when a player joins holding an item with this trigger
 	 * Calls deactivate with a PlayerChangedHeldItemEvent when a player stops holding an item that has a CustomEnchant with this trigger
 	 * Also calls deactivate when a player leaves holding an item with this trigger
 	 */
-	public static final HoldItemTrigger HOLD_ITEM = new HoldItemTrigger();
+	public static final EnchantTrigger<PlayerChangedHeldItemEvent> HOLD_ITEM = new HoldItemTrigger();
 	
-	private Map<Class<? extends Event>, Function<Event, EventItems>> events = new HashMap<>();
+	protected Map<Class<? extends Event>, Function<Event, EventItems>> events = new HashMap<>();
 	
 	protected abstract void register();
 	
@@ -91,5 +99,37 @@ public abstract class EnchantTrigger<T extends Event> {
 	 * @return Whether this EnchantTrigger applies to the type by default
 	 */
 	public abstract boolean defaultAppliesTo(Material type);
+	
+	/**
+	 * Creates a copy of this EnchantTrigger with a different EventPriority
+	 * @param priority The EventPriority to set on the copy
+	 * @return A copy of this EnchantTrigger with the given priority
+	 */
+	public EnchantTrigger<T> withPriority(EventPriority priority) {
+		Predicate<Material> appliesTo = this::defaultAppliesTo;
+		Map<Class<? extends Event>, Function<Event, EventItems>> eventMap = this.events;
+		Runnable register = () -> {
+			if (events.isEmpty()) {
+				register();
+			}
+		};
+		return new EnchantTrigger<T>() {
+			@Override
+			protected void register() {
+				register.run();
+				this.events = eventMap;
+			}
+			
+			@Override
+			public boolean defaultAppliesTo(Material type) {
+				return appliesTo.test(type);
+			}
+			
+			@Override
+			public EventPriority getPriority() {
+				return priority;
+			}
+		};
+	}
 
 }

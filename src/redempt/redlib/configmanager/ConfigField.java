@@ -1,15 +1,10 @@
 package redempt.redlib.configmanager;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import redempt.redlib.configmanager.exceptions.ConfigFieldException;
-import redempt.redlib.configmanager.exceptions.ConfigListException;
-import redempt.redlib.configmanager.exceptions.ConfigMapException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 class ConfigField {

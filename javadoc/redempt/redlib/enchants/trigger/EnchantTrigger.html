@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":6,"i2":10,"i3":10,"i4":10,"i5":6};
+var data = {"i0":10,"i1":6,"i2":10,"i3":10,"i4":10,"i5":6,"i6":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -162,14 +162,14 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>static redempt.redlib.enchants.trigger.AttackEntityTrigger</code></td>
+<td class="colFirst"><code>static <a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;org.bukkit.event.entity.EntityDamageByEntityEvent&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#ATTACK_ENTITY">ATTACK_ENTITY</a></span></code></th>
 <td class="colLast">
 <div class="block">Calls activate with an EntityDamageByEntityEvent when a player attacks an entity with an item that has a CustomEnchant with this trigger</div>
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>static redempt.redlib.enchants.trigger.EquipArmorTrigger</code></td>
+<td class="colFirst"><code>static <a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;<a href="../events/PlayerChangedArmorEvent.html" title="class in redempt.redlib.enchants.events">PlayerChangedArmorEvent</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#EQUIP_ARMOR">EQUIP_ARMOR</a></span></code></th>
 <td class="colLast">
 <div class="block">Calls activate with a PlayerChangedArmorEvent when a player equips armor that has a CustomEnchant with this trigger
@@ -179,7 +179,12 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>static redempt.redlib.enchants.trigger.HoldItemTrigger</code></td>
+<td class="colFirst"><code>protected java.util.Map&lt;java.lang.Class&lt;? extends org.bukkit.event.Event&gt;,&#8203;java.util.function.Function&lt;org.bukkit.event.Event,&#8203;<a href="../EventItems.html" title="class in redempt.redlib.enchants">EventItems</a>&gt;&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#events">events</a></span></code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static <a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;<a href="../events/PlayerChangedHeldItemEvent.html" title="class in redempt.redlib.enchants.events">PlayerChangedHeldItemEvent</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#HOLD_ITEM">HOLD_ITEM</a></span></code></th>
 <td class="colLast">
 <div class="block">Calls activate with a PlayerChangedHeldItemEvent when a player begins holding an item that has a CustomEnchant with this trigger
@@ -188,29 +193,29 @@ extends java.lang.Object</pre>
  Also calls deactivate when a player leaves holding an item with this trigger</div>
 </td>
 </tr>
-<tr class="rowColor">
-<td class="colFirst"><code>static <a href="KillEntityTrigger.html" title="class in redempt.redlib.enchants.trigger">KillEntityTrigger</a></code></td>
+<tr class="altColor">
+<td class="colFirst"><code>static <a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;org.bukkit.event.entity.EntityDeathEvent&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#KILL_ENTITY">KILL_ENTITY</a></span></code></th>
 <td class="colLast">
 <div class="block">Calls activate with an EntityDeathEvent when a player kills an entity with an item that has a CustomEnchant with this trigger</div>
 </td>
 </tr>
-<tr class="altColor">
-<td class="colFirst"><code>static redempt.redlib.enchants.trigger.MineBlockTrigger</code></td>
+<tr class="rowColor">
+<td class="colFirst"><code>static <a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;org.bukkit.event.block.BlockBreakEvent&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#MINE_BLOCK">MINE_BLOCK</a></span></code></th>
 <td class="colLast">
 <div class="block">Calls activate with a BlockBreakEvent when a block is broken with an item that has a CustomEnchant with this trigger</div>
 </td>
 </tr>
-<tr class="rowColor">
-<td class="colFirst"><code>static redempt.redlib.enchants.trigger.ShootArrowTrigger</code></td>
+<tr class="altColor">
+<td class="colFirst"><code>static <a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;org.bukkit.event.entity.ProjectileLaunchEvent&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#SHOOT_ARROW">SHOOT_ARROW</a></span></code></th>
 <td class="colLast">
 <div class="block">Calls activate with a ProjectileLaunchEvent when a player shoots a projectile with an item that has a CustomEnchant with this trigger</div>
 </td>
 </tr>
-<tr class="altColor">
-<td class="colFirst"><code>static redempt.redlib.enchants.trigger.TakeDamageTrigger</code></td>
+<tr class="rowColor">
+<td class="colFirst"><code>static <a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;org.bukkit.event.entity.EntityDamageEvent&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#TAKE_DAMAGE">TAKE_DAMAGE</a></span></code></th>
 <td class="colLast">
 <div class="block">Calls activate with an EntityDamageEvent when a player takes damage wearing armor that has a CustomEnchant with this trigger</div>
@@ -292,6 +297,13 @@ extends java.lang.Object</pre>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#register()">register</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
+<tr id="i6" class="altColor">
+<td class="colFirst"><code><a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;<a href="EnchantTrigger.html" title="type parameter in EnchantTrigger">T</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withPriority(org.bukkit.event.EventPriority)">withPriority</a></span>&#8203;(org.bukkit.event.EventPriority&nbsp;priority)</code></th>
+<td class="colLast">
+<div class="block">Creates a copy of this EnchantTrigger with a different EventPriority</div>
+</td>
+</tr>
 </table>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -322,7 +334,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>MINE_BLOCK</h4>
-<pre>public static final&nbsp;redempt.redlib.enchants.trigger.MineBlockTrigger MINE_BLOCK</pre>
+<pre>public static final&nbsp;<a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;org.bukkit.event.block.BlockBreakEvent&gt; MINE_BLOCK</pre>
 <div class="block">Calls activate with a BlockBreakEvent when a block is broken with an item that has a CustomEnchant with this trigger</div>
 </li>
 </ul>
@@ -332,7 +344,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>ATTACK_ENTITY</h4>
-<pre>public static final&nbsp;redempt.redlib.enchants.trigger.AttackEntityTrigger ATTACK_ENTITY</pre>
+<pre>public static final&nbsp;<a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;org.bukkit.event.entity.EntityDamageByEntityEvent&gt; ATTACK_ENTITY</pre>
 <div class="block">Calls activate with an EntityDamageByEntityEvent when a player attacks an entity with an item that has a CustomEnchant with this trigger</div>
 </li>
 </ul>
@@ -342,7 +354,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>KILL_ENTITY</h4>
-<pre>public static final&nbsp;<a href="KillEntityTrigger.html" title="class in redempt.redlib.enchants.trigger">KillEntityTrigger</a> KILL_ENTITY</pre>
+<pre>public static final&nbsp;<a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;org.bukkit.event.entity.EntityDeathEvent&gt; KILL_ENTITY</pre>
 <div class="block">Calls activate with an EntityDeathEvent when a player kills an entity with an item that has a CustomEnchant with this trigger</div>
 </li>
 </ul>
@@ -352,7 +364,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>SHOOT_ARROW</h4>
-<pre>public static final&nbsp;redempt.redlib.enchants.trigger.ShootArrowTrigger SHOOT_ARROW</pre>
+<pre>public static final&nbsp;<a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;org.bukkit.event.entity.ProjectileLaunchEvent&gt; SHOOT_ARROW</pre>
 <div class="block">Calls activate with a ProjectileLaunchEvent when a player shoots a projectile with an item that has a CustomEnchant with this trigger</div>
 </li>
 </ul>
@@ -362,7 +374,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>TAKE_DAMAGE</h4>
-<pre>public static final&nbsp;redempt.redlib.enchants.trigger.TakeDamageTrigger TAKE_DAMAGE</pre>
+<pre>public static final&nbsp;<a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;org.bukkit.event.entity.EntityDamageEvent&gt; TAKE_DAMAGE</pre>
 <div class="block">Calls activate with an EntityDamageEvent when a player takes damage wearing armor that has a CustomEnchant with this trigger</div>
 </li>
 </ul>
@@ -372,7 +384,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>EQUIP_ARMOR</h4>
-<pre>public static final&nbsp;redempt.redlib.enchants.trigger.EquipArmorTrigger EQUIP_ARMOR</pre>
+<pre>public static final&nbsp;<a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;<a href="../events/PlayerChangedArmorEvent.html" title="class in redempt.redlib.enchants.events">PlayerChangedArmorEvent</a>&gt; EQUIP_ARMOR</pre>
 <div class="block">Calls activate with a PlayerChangedArmorEvent when a player equips armor that has a CustomEnchant with this trigger
  Also calls activate when a player joins wearing armor with this trigger
  Calls deactivate with a PlayerChangedArmorEvent when a player unequips armor that has a CustomEnchant with this trigger
@@ -382,14 +394,23 @@ extends java.lang.Object</pre>
 <a id="HOLD_ITEM">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>HOLD_ITEM</h4>
-<pre>public static final&nbsp;redempt.redlib.enchants.trigger.HoldItemTrigger HOLD_ITEM</pre>
+<pre>public static final&nbsp;<a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;<a href="../events/PlayerChangedHeldItemEvent.html" title="class in redempt.redlib.enchants.events">PlayerChangedHeldItemEvent</a>&gt; HOLD_ITEM</pre>
 <div class="block">Calls activate with a PlayerChangedHeldItemEvent when a player begins holding an item that has a CustomEnchant with this trigger
  Also calls activate when a player joins holding an item with this trigger
  Calls deactivate with a PlayerChangedHeldItemEvent when a player stops holding an item that has a CustomEnchant with this trigger
  Also calls deactivate when a player leaves holding an item with this trigger</div>
+</li>
+</ul>
+<a id="events">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>events</h4>
+<pre>protected&nbsp;java.util.Map&lt;java.lang.Class&lt;? extends org.bukkit.event.Event&gt;,&#8203;java.util.function.Function&lt;org.bukkit.event.Event,&#8203;<a href="../EventItems.html" title="class in redempt.redlib.enchants">EventItems</a>&gt;&gt; events</pre>
 </li>
 </ul>
 </li>
@@ -487,7 +508,7 @@ extends java.lang.Object</pre>
 <a id="defaultAppliesTo(org.bukkit.Material)">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>defaultAppliesTo</h4>
 <pre class="methodSignature">public abstract&nbsp;boolean&nbsp;defaultAppliesTo&#8203;(org.bukkit.Material&nbsp;type)</pre>
@@ -497,6 +518,22 @@ extends java.lang.Object</pre>
 <dd><code>type</code> - The type to check</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Whether this EnchantTrigger applies to the type by default</dd>
+</dl>
+</li>
+</ul>
+<a id="withPriority(org.bukkit.event.EventPriority)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>withPriority</h4>
+<pre class="methodSignature">public&nbsp;<a href="EnchantTrigger.html" title="class in redempt.redlib.enchants.trigger">EnchantTrigger</a>&lt;<a href="EnchantTrigger.html" title="type parameter in EnchantTrigger">T</a>&gt;&nbsp;withPriority&#8203;(org.bukkit.event.EventPriority&nbsp;priority)</pre>
+<div class="block">Creates a copy of this EnchantTrigger with a different EventPriority</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>priority</code> - The EventPriority to set on the copy</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A copy of this EnchantTrigger with the given priority</dd>
 </dl>
 </li>
 </ul>
