@@ -80,7 +80,11 @@ public abstract class CustomEnchant {
 			case "X":
 				return 10;
 			default:
-				return Integer.parseInt(romanNumerals);
+				try {
+					return Integer.parseInt(romanNumerals);
+				} catch (NumberFormatException e) {
+					return 0;
+				}
 		}
 	}
 	
