@@ -204,6 +204,14 @@ public class DataBlock {
 	}
 
 	/**
+	 * Removes all of the data from this block.
+	 */
+
+	public void clear() {
+		this.data.clear();
+	}
+
+	/**
 	 * Moves the data in this DataBlock to a new Block
 	 * @param block The Block to move the data to
 	 */
