@@ -309,7 +309,6 @@ public class BlockDataManager implements Listener {
 			int cx = r.get(2);
 			int cz = r.get(3);
 			if (isChunkLoaded(world, cx, cz)) {
-				System.out.println("Skipping chunk, already loaded: " + world.getName() + " " + cx + " " + cz);
 				set.addAll(getLoaded(world, cx, cz));
 				return;
 			}
