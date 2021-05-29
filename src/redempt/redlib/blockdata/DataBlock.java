@@ -239,12 +239,12 @@ public class DataBlock {
 		if (exists) {
 			manager.sql.execute("UPDATE blocks SET data=? WHERE x=? AND y=? AND z=? AND world=?;",
 					data.toString(), block.getX(), block.getY(), block.getZ(), getWorld().getName());
-		} else {
-			int[] pos = getChunkCoordinates();
-			manager.sql.execute("INSERT INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?);",
-					getWorld().getName(), pos[0], pos[1], block.getX(), block.getY(), block.getZ(), data.toString());
-			exists = true;
+			return;
 		}
+		int[] pos = getChunkCoordinates();
+		manager.sql.execute("INSERT INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?);",
+				getWorld().getName(), pos[0], pos[1], block.getX(), block.getY(), block.getZ(), data.toString());
+		exists = true;
 	}
 	
 	/**

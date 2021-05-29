@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":9,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10};
+var data = {"i0":10,"i1":10,"i2":10,"i3":9,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -212,44 +212,50 @@ implements org.bukkit.event.Listener</pre>
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>protected java.util.Set&lt;<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#ensureExists(org.bukkit.World,redempt.redlib.blockdata.BlockDataManager.ChunkPosition)">ensureExists</a></span>&#8203;(org.bukkit.World&nbsp;world,
+            redempt.redlib.blockdata.BlockDataManager.ChunkPosition&nbsp;pos)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAll()">getAll</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Loads and returns a set of all DataBlocks managed by this BlockDataManager.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAllLoaded()">getAllLoaded</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>static java.util.List&lt;<a href="BlockDataManager.html" title="class in redempt.redlib.blockdata">BlockDataManager</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAllManagers()">getAllManagers</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDataBlock(org.bukkit.block.Block)">getDataBlock</a></span>&#8203;(org.bukkit.block.Block&nbsp;block)</code></th>
 <td class="colLast">
 <div class="block">Gets a DataBlock from a given Block, creating a new one if that Block had no data attached to it.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getExisting(org.bukkit.block.Block)">getExisting</a></span>&#8203;(org.bukkit.block.Block&nbsp;block)</code></th>
 <td class="colLast">
 <div class="block">Gets an existing DataBlock, returning null if that Block has no data attached to it.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLoaded(org.bukkit.Chunk)">getLoaded</a></span>&#8203;(org.bukkit.Chunk&nbsp;chunk)</code></th>
 <td class="colLast">
 <div class="block">Gets all the loaded DataBlocks in a chunk</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLoaded(org.bukkit.World,int,int)">getLoaded</a></span>&#8203;(org.bukkit.World&nbsp;world,
          int&nbsp;cx,
@@ -258,7 +264,7 @@ implements org.bukkit.event.Listener</pre>
 <div class="block">Gets all the loaded DataBlocks in a chunk</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getNearby(org.bukkit.Location,int)">getNearby</a></span>&#8203;(org.bukkit.Location&nbsp;loc,
          int&nbsp;radius)</code></th>
@@ -266,26 +272,26 @@ implements org.bukkit.event.Listener</pre>
 <div class="block">Gets all the DataBlocks near an approximate location</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isChunkLoaded(org.bukkit.Chunk)">isChunkLoaded</a></span>&#8203;(org.bukkit.Chunk&nbsp;chunk)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isChunkLoaded(org.bukkit.World,int,int)">isChunkLoaded</a></span>&#8203;(org.bukkit.World&nbsp;world,
              int&nbsp;cx,
              int&nbsp;cz)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#load(org.bukkit.Chunk)">load</a></span>&#8203;(org.bukkit.Chunk&nbsp;chunk)</code></th>
 <td class="colLast">
 <div class="block">Loads all of the DataBlocks in a given chunk, or retrieves the already-loaded set of DataBlocks</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>java.util.Set&lt;<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#load(org.bukkit.World,int,int)">load</a></span>&#8203;(org.bukkit.World&nbsp;world,
     int&nbsp;cx,
@@ -294,92 +300,115 @@ implements org.bukkit.event.Listener</pre>
 <div class="block">Loads all of the DataBlocks in a given chunk, or retrieves the already-loaded set of DataBlocks</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#onBlockExplode(org.bukkit.event.block.BlockExplodeEvent)">onBlockExplode</a></span>&#8203;(org.bukkit.event.block.BlockExplodeEvent&nbsp;e)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#onBlockPull(org.bukkit.event.block.BlockPistonRetractEvent)">onBlockPull</a></span>&#8203;(org.bukkit.event.block.BlockPistonRetractEvent&nbsp;e)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#onBlockPush(org.bukkit.event.block.BlockPistonExtendEvent)">onBlockPush</a></span>&#8203;(org.bukkit.event.block.BlockPistonExtendEvent&nbsp;e)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i15" class="rowColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#onBreakBlock(org.bukkit.event.block.BlockBreakEvent)">onBreakBlock</a></span>&#8203;(org.bukkit.event.block.BlockBreakEvent&nbsp;e)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i16" class="altColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#onBucketEmpty(org.bukkit.event.player.PlayerBucketEmptyEvent)">onBucketEmpty</a></span>&#8203;(org.bukkit.event.player.PlayerBucketEmptyEvent&nbsp;e)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#onBurnBlock(org.bukkit.event.block.BlockBurnEvent)">onBurnBlock</a></span>&#8203;(org.bukkit.event.block.BlockBurnEvent&nbsp;e)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#onChunkUnload(org.bukkit.event.world.ChunkUnloadEvent)">onChunkUnload</a></span>&#8203;(org.bukkit.event.world.ChunkUnloadEvent&nbsp;e)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#onEntityExplode(org.bukkit.event.entity.EntityExplodeEvent)">onEntityExplode</a></span>&#8203;(org.bukkit.event.entity.EntityExplodeEvent&nbsp;e)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#onFlowBreakBlock(org.bukkit.event.block.BlockFromToEvent)">onFlowBreakBlock</a></span>&#8203;(org.bukkit.event.block.BlockFromToEvent&nbsp;e)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#register(redempt.redlib.blockdata.DataBlock)">register</a></span>&#8203;(<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&nbsp;db)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#remove(redempt.redlib.blockdata.DataBlock)">remove</a></span>&#8203;(<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&nbsp;db)</code></th>
 <td class="colLast">
 <div class="block">Removes a DataBlock from this DataBlockManager</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#save()">save</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Saves all data to the save file.</div>
 </td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#saveAndClose()">saveAndClose</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Saves all data to the save file, and closes the SQL connection.</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setAutoSave(boolean)">setAutoSave</a></span>&#8203;(boolean&nbsp;autoSave)</code></th>
 <td class="colLast">
 <div class="block">Sets whether this BlockDataManager will automatically save every 5 minutes.</div>
 </td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i27" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setAutoUnload(boolean)">setAutoUnload</a></span>&#8203;(boolean&nbsp;autoUnload)</code></th>
+<td class="colLast">
+<div class="block">Sets whether this BlockDataManager will automatically unload chunks of DataBlocks when a chunk is unloaded</div>
+</td>
+</tr>
+<tr id="i28" class="altColor">
+<td class="colFirst"><code>protected redempt.redlib.blockdata.BlockDataManager.ChunkPosition</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toChunkPosition(org.bukkit.block.Block)">toChunkPosition</a></span>&#8203;(org.bukkit.block.Block&nbsp;block)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i29" class="rowColor">
+<td class="colFirst"><code>protected redempt.redlib.blockdata.BlockDataManager.ChunkPosition</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toChunkPosition(org.bukkit.Location)">toChunkPosition</a></span>&#8203;(org.bukkit.Location&nbsp;loc)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i30" class="altColor">
+<td class="colFirst"><code>protected java.util.Optional&lt;java.util.Set&lt;<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&gt;&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#tryExists(org.bukkit.World,redempt.redlib.blockdata.BlockDataManager.ChunkPosition)">tryExists</a></span>&#8203;(org.bukkit.World&nbsp;world,
+         redempt.redlib.blockdata.BlockDataManager.ChunkPosition&nbsp;pos)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#unload(org.bukkit.Chunk)">unload</a></span>&#8203;(org.bukkit.Chunk&nbsp;chunk)</code></th>
 <td class="colLast">
 <div class="block">Saves and unloads all of the DataBlocks in a chunk</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i32" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#unload(org.bukkit.World,int,int)">unload</a></span>&#8203;(org.bukkit.World&nbsp;world,
       int&nbsp;cx,
@@ -388,7 +417,7 @@ implements org.bukkit.event.Listener</pre>
 <div class="block">Saves and unloads all of the DataBlocks in a chunk</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i33" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#unloadAll()">unloadAll</a></span>()</code></th>
 <td class="colLast">
@@ -499,6 +528,20 @@ implements org.bukkit.event.Listener</pre>
 </dl>
 </li>
 </ul>
+<a id="setAutoUnload(boolean)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setAutoUnload</h4>
+<pre class="methodSignature">public&nbsp;void&nbsp;setAutoUnload&#8203;(boolean&nbsp;autoUnload)</pre>
+<div class="block">Sets whether this BlockDataManager will automatically unload chunks of DataBlocks when a chunk is unloaded</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>autoUnload</code> - Whether to automatically unload DataBlocks</dd>
+</dl>
+</li>
+</ul>
 <a id="save()">
 <!--   -->
 </a>
@@ -517,6 +560,44 @@ implements org.bukkit.event.Listener</pre>
 <h4>saveAndClose</h4>
 <pre class="methodSignature">public&nbsp;void&nbsp;saveAndClose()</pre>
 <div class="block">Saves all data to the save file, and closes the SQL connection. Call this in your onDisable.</div>
+</li>
+</ul>
+<a id="ensureExists(org.bukkit.World,redempt.redlib.blockdata.BlockDataManager.ChunkPosition)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>ensureExists</h4>
+<pre class="methodSignature">protected&nbsp;java.util.Set&lt;<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&gt;&nbsp;ensureExists&#8203;(org.bukkit.World&nbsp;world,
+                                                redempt.redlib.blockdata.BlockDataManager.ChunkPosition&nbsp;pos)</pre>
+</li>
+</ul>
+<a id="tryExists(org.bukkit.World,redempt.redlib.blockdata.BlockDataManager.ChunkPosition)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>tryExists</h4>
+<pre class="methodSignature">protected&nbsp;java.util.Optional&lt;java.util.Set&lt;<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&gt;&gt;&nbsp;tryExists&#8203;(org.bukkit.World&nbsp;world,
+                                                                 redempt.redlib.blockdata.BlockDataManager.ChunkPosition&nbsp;pos)</pre>
+</li>
+</ul>
+<a id="toChunkPosition(org.bukkit.Location)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>toChunkPosition</h4>
+<pre class="methodSignature">protected&nbsp;redempt.redlib.blockdata.BlockDataManager.ChunkPosition&nbsp;toChunkPosition&#8203;(org.bukkit.Location&nbsp;loc)</pre>
+</li>
+</ul>
+<a id="toChunkPosition(org.bukkit.block.Block)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>toChunkPosition</h4>
+<pre class="methodSignature">protected&nbsp;redempt.redlib.blockdata.BlockDataManager.ChunkPosition&nbsp;toChunkPosition&#8203;(org.bukkit.block.Block&nbsp;block)</pre>
 </li>
 </ul>
 <a id="getExisting(org.bukkit.block.Block)">
@@ -604,7 +685,7 @@ implements org.bukkit.event.Listener</pre>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>chunk</code> - The chunk to get the loaded DataBlocks in</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>A set of DataBlocks in the chunk, or an empty set if the chunk is not loaded</dd>
+<dd>A set of DataBlocks in the chunk, or null if the chunk is not loaded</dd>
 </dl>
 </li>
 </ul>

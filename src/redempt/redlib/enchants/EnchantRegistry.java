@@ -202,8 +202,8 @@ public class EnchantRegistry {
 		}
 		item.getItemMeta().getLore().forEach(s -> {
 			EnchantInfo info = fromLoreLine(s);
-			if (info != null) {
-				map.put(info.getEnchant(), info.getLevel());
+			if (info != null && info.getLevel() != 0) {
+				map.putIfAbsent(info.getEnchant(), info.getLevel());
 			}
 		});
 		return map;

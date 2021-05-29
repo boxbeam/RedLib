@@ -42,6 +42,7 @@ public class BlockDataManager implements Listener {
 	
 	protected Map<World, Map<ChunkPosition, Set<DataBlock>>> blocks = new HashMap<>();
 	protected SQLHelper sql;
+	private boolean autoUnload = true;
 	
 	/**
 	 * Create a BlockDataManager instance with a save file location, to be saved to and loaded from. This constructor
@@ -52,6 +53,7 @@ public class BlockDataManager implements Listener {
 		Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
 		sql = new SQLHelper(SQLHelper.openSQLite(saveFile));
 		sql.execute("CREATE TABLE IF NOT EXISTS blocks (world TEXT, cx INT, cz INT, x INT, y INT, z INT, data TEXT, PRIMARY KEY (world, x, y, z));");
+		sql.execute("CREATE INDEX IF NOT EXISTS chunkPos ON blocks (cx, cz);");
 		sql.execute("PRAGMA synchronous = OFF;");
 		managers.add(this);
 		setAutoSave(true);
@@ -63,6 +65,14 @@ public class BlockDataManager implements Listener {
 	 */
 	public void setAutoSave(boolean autoSave) {
 		sql.setCommitInterval(autoSave ? 20 * 60 * 5 : -1);
+	}
+	
+	/**
+	 * Sets whether this BlockDataManager will automatically unload chunks of DataBlocks when a chunk is unloaded
+	 * @param autoUnload Whether to automatically unload DataBlocks
+	 */
+	public void setAutoUnload(boolean autoUnload) {
+		this.autoUnload = autoUnload;
 	}
 	
 	/**
@@ -84,15 +94,36 @@ public class BlockDataManager implements Listener {
 		HandlerList.unregisterAll(this);
 	}
 	
+	protected Set<DataBlock> ensureExists(World world, ChunkPosition pos) {
+		return blocks.computeIfAbsent(world, k -> new HashMap<>()).computeIfAbsent(pos, k -> new HashSet<>());
+	}
+	
+	protected Optional<Set<DataBlock>> tryExists(World world, ChunkPosition pos) {
+		Map<ChunkPosition, Set<DataBlock>> map = blocks.get(world);
+		if (map == null) {
+			return Optional.empty();
+		}
+		Set<DataBlock> set = map.get(pos);
+		return Optional.ofNullable(set);
+	}
+	
+	protected ChunkPosition toChunkPosition(Location loc) {
+		int[] pos = LocationUtils.getChunkCoordinates(loc);
+		return new ChunkPosition(pos[0], pos[1]);
+	}
+	
+	protected ChunkPosition toChunkPosition(Block block) {
+		return toChunkPosition(block.getLocation());
+	}
+	
 	/**
 	 * Gets an existing DataBlock, returning null if that Block has no data attached to it.
 	 * @param block The block to check
 	 * @return A DataBlock, or null
 	 */
 	public DataBlock getExisting(Block block) {
-		int[] pos = LocationUtils.getChunkCoordinates(block.getLocation());
-		blocks.putIfAbsent(block.getWorld(), new HashMap<>());
-		Set<DataBlock> set = load(block.getWorld(), pos[0], pos[1]);
+		ChunkPosition pos = toChunkPosition(block);
+		Set<DataBlock> set = load(block.getWorld(), pos.x, pos.z);
 		for (DataBlock db : set) {
 			if (db.getBlock().equals(block)) {
 				return db;
@@ -112,25 +143,14 @@ public class BlockDataManager implements Listener {
 			return db;
 		}
 		db = new DataBlock(block, this);
-		blocks.putIfAbsent(block.getWorld(), new HashMap<>());
-		Map<ChunkPosition, Set<DataBlock>> map = blocks.get(block.getWorld());
-		int[] pos = db.getChunkCoordinates();
-		ChunkPosition cpos = new ChunkPosition(pos[0], pos[1]);
-		map.putIfAbsent(cpos, new HashSet<>());
-		Set<DataBlock> set = map.get(cpos);
-		set.add(db);
+		ChunkPosition pos = toChunkPosition(block);
+		load(block.getWorld(), pos.x, pos.z).add(db);
 		return db;
 	}
 	
 	protected void register(DataBlock db) {
-		int[] pos = db.getChunkCoordinates();
-		if (!isChunkLoaded(db.getWorld(), pos[0], pos[1])) {
-			return;
-		}
-		Map<ChunkPosition, Set<DataBlock>> map = blocks.get(db.getWorld());
-		ChunkPosition cpos = new ChunkPosition(pos[0], pos[1]);
-		Set<DataBlock> set = map.get(cpos);
-		set.add(db);
+		ChunkPosition pos = toChunkPosition(db.getBlock());
+		load(db.getWorld(), pos.x, pos.z).add(db);
 	}
 	
 	/**
@@ -159,11 +179,7 @@ public class BlockDataManager implements Listener {
 		int[] pos = LocationUtils.getChunkCoordinates(loc);
 		for (int x = pos[0] - radius; x <= pos[0] + radius; x++) {
 			for (int z = pos[1] - radius; z <= pos[1] + radius; z++) {
-				if (isChunkLoaded(loc.getWorld(), x, z)) {
-					set.addAll(getLoaded(loc.getWorld(), x, z));
-				} else {
-					set.addAll(load(loc.getWorld(), x, z));
-				}
+				set.addAll(load(loc.getWorld(), x, z));
 			}
 		}
 		return set;
@@ -172,7 +188,7 @@ public class BlockDataManager implements Listener {
 	/**
 	 * Gets all the loaded DataBlocks in a chunk
 	 * @param chunk The chunk to get the loaded DataBlocks in
-	 * @return A set of DataBlocks in the chunk, or an empty set if the chunk is not loaded
+	 * @return A set of DataBlocks in the chunk, or null if the chunk is not loaded
 	 */
 	public Set<DataBlock> getLoaded(Chunk chunk) {
 		return getLoaded(chunk.getWorld(), chunk.getX(), chunk.getZ());
@@ -186,12 +202,7 @@ public class BlockDataManager implements Listener {
 	 * @return A set of DataBlocks in the chunk, or an empty set if the chunk is not loaded
 	 */
 	public Set<DataBlock> getLoaded(World world, int cx, int cz) {
-		ChunkPosition pos = new ChunkPosition(cx, cz);
-		Map<ChunkPosition, Set<DataBlock>> worldMap = blocks.get(world);
-		if (worldMap == null) {
-			return new HashSet<>();
-		}
-		return worldMap.getOrDefault(pos, new HashSet<>());
+		return tryExists(world, new ChunkPosition(cx, cz)).orElse(null);
 	}
 	
 	/**
@@ -205,10 +216,7 @@ public class BlockDataManager implements Listener {
 		if (isChunkLoaded(world, cx, cz)) {
 			return getLoaded(world, cx, cz);
 		}
-		Set<DataBlock> set = new HashSet<>();
-		blocks.putIfAbsent(world, new HashMap<>());
-		Map<ChunkPosition, Set<DataBlock>> worldMap = blocks.get(world);
-		ChunkPosition pos = new ChunkPosition(cx, cz);
+		Set<DataBlock> set = ensureExists(world, new ChunkPosition(cx, cz));
 		sql.queryResults("SELECT x,y,z,data FROM blocks WHERE world=? AND cx=? AND cz=?;", world.getName(), cx, cz).forEach(r -> {
 			int x = r.get(1);
 			int y = r.get(2);
@@ -220,7 +228,6 @@ public class BlockDataManager implements Listener {
 			db.data = data;
 			set.add(db);
 		});
-		worldMap.put(pos, set);
 		return set;
 	}
 	
@@ -240,17 +247,11 @@ public class BlockDataManager implements Listener {
 	 * @param cz The chunk Z
 	 */
 	public void unload(World world, int cx, int cz) {
-		Map<ChunkPosition, Set<DataBlock>> worldMap = blocks.get(world);
-		if (worldMap == null) {
-			return;
-		}
 		ChunkPosition pos = new ChunkPosition(cx, cz);
-		Set<DataBlock> set = worldMap.get(pos);
-		if (set == null) {
-			return;
-		}
-		set.forEach(DataBlock::save);
-		worldMap.remove(pos);
+		tryExists(world, pos).ifPresent(s -> {
+			s.forEach(DataBlock::save);
+			blocks.get(world).remove(pos);
+		});
 	}
 	
 	/**
@@ -285,7 +286,7 @@ public class BlockDataManager implements Listener {
 	 * @return Whether the DataBlocks in the chunk are loaded in this BlockDataManager
 	 */
 	public boolean isChunkLoaded(World world, int cx, int cz) {
-		return blocks.containsKey(world) && blocks.get(world).containsKey(new ChunkPosition(cx, cz));
+		return tryExists(world, new ChunkPosition(cx, cz)).isPresent();
 	}
 	
 	/**
@@ -293,9 +294,7 @@ public class BlockDataManager implements Listener {
 	 */
 	public Set<DataBlock> getAllLoaded() {
 		Set<DataBlock> set = new HashSet<>();
-		blocks.values().forEach(v -> {
-			v.values().forEach(set::addAll);
-		});
+		blocks.values().forEach(v -> v.values().forEach(set::addAll));
 		return set;
 	}
 	
@@ -321,11 +320,8 @@ public class BlockDataManager implements Listener {
 			DataBlock db = new DataBlock(block, this);
 			db.exists = true;
 			db.data = data;
-			blocks.putIfAbsent(world, new HashMap<>());
 			ChunkPosition pos = new ChunkPosition(cx, cz);
-			blocks.get(world).putIfAbsent(pos, new HashSet<>());
-			Set<DataBlock> chunk = blocks.get(world).get(pos);
-			chunk.add(db);
+			ensureExists(world, pos).add(db);
 			set.add(db);
 		});
 		return set;
@@ -483,7 +479,9 @@ public class BlockDataManager implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onChunkUnload(ChunkUnloadEvent e) {
-		unload(e.getChunk());
+		if (autoUnload) {
+			unload(e.getChunk());
+		}
 	}
 	
 	private static class ChunkPosition {
