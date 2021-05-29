@@ -80,6 +80,11 @@ public abstract class CustomEnchant {
 			case "X":
 				return 10;
 			default:
+				for (char c : romanNumerals.toCharArray()) {
+					if (c > '9' || c < '0') {
+						return 0;
+					}
+				}
 				return Integer.parseInt(romanNumerals);
 		}
 	}
