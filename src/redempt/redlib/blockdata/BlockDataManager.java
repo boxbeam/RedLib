@@ -40,7 +40,7 @@ public class BlockDataManager implements Listener {
 		return managers;
 	}
 	
-	protected Map<World, Map<ChunkPosition, Set<DataBlock>>> blocks = new HashMap<>();
+	private Map<World, Map<ChunkPosition, Set<DataBlock>>> blocks = new HashMap<>();
 	protected SQLHelper sql;
 	private boolean autoUnload = true;
 	
@@ -300,16 +300,24 @@ public class BlockDataManager implements Listener {
 	
 	/**
 	 * Loads and returns a set of all DataBlocks managed by this BlockDataManager. Avoid calling this if possible.
+	 * Will not return DataBlocks in unloaded worlds.
 	 * @return The set of all DataBlocks managed by this BlockDataManager
 	 */
 	public Set<DataBlock> getAll() {
 		Set<DataBlock> set = new HashSet<>();
+		Map<World, Set<ChunkPosition>> positions = new HashMap<>();
+		blocks.forEach((w, m) -> positions.computeIfAbsent(w, k -> new HashSet<>()).addAll(m.keySet()));
 		sql.queryResults("SELECT world,cx,cz,x,y,z,data FROM blocks;").forEach(r -> {
 			World world = Bukkit.getWorld(r.getString(1));
+			if (world == null) {
+				return;
+			}
 			int cx = r.get(2);
 			int cz = r.get(3);
-			if (isChunkLoaded(world, cx, cz)) {
-				set.addAll(getLoaded(world, cx, cz));
+			ChunkPosition pos = new ChunkPosition(cx, cz);
+			Set<ChunkPosition> pset = positions.get(world);
+			if (pset != null && pset.contains(pos)) {
+				tryExists(world, pos).ifPresent(set::addAll);
 				return;
 			}
 			int x = r.get(4);
@@ -320,7 +328,6 @@ public class BlockDataManager implements Listener {
 			DataBlock db = new DataBlock(block, this);
 			db.exists = true;
 			db.data = data;
-			ChunkPosition pos = new ChunkPosition(cx, cz);
 			ensureExists(world, pos).add(db);
 			set.add(db);
 		});
@@ -501,7 +508,11 @@ public class BlockDataManager implements Listener {
 		
 		@Override
 		public boolean equals(Object o) {
-			return o.hashCode() == hashCode();
+			if (!(o instanceof ChunkPosition)) {
+				return false;
+			}
+			ChunkPosition pos = (ChunkPosition) o;
+			return pos.x == x && pos.z == z;
 		}
 		
 	}

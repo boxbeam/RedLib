@@ -1,14 +1,6 @@
 package redempt.redlib.protection;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -154,7 +146,7 @@ public class ProtectionPolicy implements Listener {
 	
 	private List<BypassPolicy> bypassPolicies = new ArrayList<>();
 	private Set<ProtectionType> protections = EnumSet.noneOf(ProtectionType.class);
-	private Map<ProtectionType, String> messages = new HashMap<>();
+	private Map<ProtectionType, String> messages = new EnumMap<>(ProtectionType.class);
 	private Predicate<Block> protectionCheck;
 	private CuboidRegion bounds;
 	private Plugin plugin;
@@ -448,7 +440,7 @@ public class ProtectionPolicy implements Listener {
 		 * @return All protection types except those specified
 		 */
 		public static ProtectionType[] allExcept(ProtectionType... types) {
-			Set<ProtectionType> list = new HashSet<>();
+			Set<ProtectionType> list = EnumSet.noneOf(ProtectionType.class);
 			Arrays.stream(ALL).forEach(list::add);
 			Arrays.stream(types).forEach(list::remove);
 			return list.toArray(new ProtectionType[list.size()]);
@@ -460,7 +452,7 @@ public class ProtectionPolicy implements Listener {
 		 * @return The combined arrays
 		 */
 		public static ProtectionType[] and(ProtectionType[]... types) {
-			Set<ProtectionType> list = new HashSet<>();
+			Set<ProtectionType> list = EnumSet.noneOf(ProtectionType.class);
 			for (ProtectionType[] arr : types) {
 				for (ProtectionType type : arr) {
 					list.add(type);

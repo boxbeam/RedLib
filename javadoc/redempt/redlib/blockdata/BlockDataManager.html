@@ -161,11 +161,6 @@ implements org.bukkit.event.Listener</pre>
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>protected java.util.Map&lt;org.bukkit.World,&#8203;java.util.Map&lt;redempt.redlib.blockdata.BlockDataManager.ChunkPosition,&#8203;java.util.Set&lt;<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&gt;&gt;&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#blocks">blocks</a></span></code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr class="rowColor">
 <td class="colFirst"><code>protected <a href="../sql/SQLHelper.html" title="class in redempt.redlib.sql">SQLHelper</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#sql">sql</a></span></code></th>
 <td class="colLast">&nbsp;</td>
@@ -448,15 +443,6 @@ implements org.bukkit.event.Listener</pre>
 <!--   -->
 </a>
 <h3>Field Detail</h3>
-<a id="blocks">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>blocks</h4>
-<pre>protected&nbsp;java.util.Map&lt;org.bukkit.World,&#8203;java.util.Map&lt;redempt.redlib.blockdata.BlockDataManager.ChunkPosition,&#8203;java.util.Set&lt;<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&gt;&gt;&gt; blocks</pre>
-</li>
-</ul>
 <a id="sql">
 <!--   -->
 </a>
@@ -841,7 +827,8 @@ implements org.bukkit.event.Listener</pre>
 <li class="blockList">
 <h4>getAll</h4>
 <pre class="methodSignature">public&nbsp;java.util.Set&lt;<a href="DataBlock.html" title="class in redempt.redlib.blockdata">DataBlock</a>&gt;&nbsp;getAll()</pre>
-<div class="block">Loads and returns a set of all DataBlocks managed by this BlockDataManager. Avoid calling this if possible.</div>
+<div class="block">Loads and returns a set of all DataBlocks managed by this BlockDataManager. Avoid calling this if possible.
+ Will not return DataBlocks in unloaded worlds.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The set of all DataBlocks managed by this BlockDataManager</dd>
