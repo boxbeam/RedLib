@@ -26,7 +26,7 @@ dependencies {
 }
 ```
 
-Replace `Tag` with a release tag for RedLib. Example: `4.3.6`.
+Replace `Tag` with a release tag for RedLib. Example: `4.3.6`. You can also use `master` as the tag to get the latest version, though you will have to clear your gradle caches in order to update it.
 
 Maven:
 
@@ -44,7 +44,7 @@ Maven:
 	<version>Tag</version>
 </dependency>
 ```
-Replace `Tag` with a release tag for RedLib. Example: `4.3.6`.
+Replace `Tag` with a release tag for RedLib. Example: `4.3.6`. You can also use `master` as the tag to get the latest version, though you will have to clear your maven caches in order to update it.
 
 ## Build locally:
 
