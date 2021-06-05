@@ -1,6 +1,6 @@
 package redempt.redlib.sql;
 
-import java.sql.PreparedStatement;
+import java.util.Arrays;
 import java.util.Objects;
 
 class SQLCacheEntry {
@@ -22,7 +22,10 @@ class SQLCacheEntry {
 	
 	@Override
 	public boolean equals(Object o) {
-		return o != null && o.hashCode() == hashCode();
+		if (!(o instanceof SQLCacheEntry)) {
+			return false;
+		}
+		return Arrays.equals(params, ((SQLCacheEntry) o).params);
 	}
 	
 }

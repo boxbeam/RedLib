@@ -289,10 +289,10 @@ public class DataBlock {
 	
 	@Override
 	public boolean equals(Object o) {
-		if (o == null) {
+		if (!(o instanceof DataBlock)) {
 			return false;
 		}
-		return o.hashCode() == hashCode();
+		return ((DataBlock) o).block.equals(block);
 	}
 	
 }
