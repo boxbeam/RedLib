@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":9,"i2":9,"i3":9,"i4":10,"i5":10,"i6":10,"i7":10,"i8":9,"i9":10,"i10":10,"i11":10};
+var data = {"i0":10,"i1":9,"i2":9,"i3":9,"i4":9,"i5":10,"i6":10,"i7":10,"i8":10,"i9":9,"i10":10,"i11":10,"i12":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -196,20 +196,29 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>static &lt;T,&#8203;K&gt;<br><a href="WeightedRandom.html" title="class in redempt.redlib.misc">WeightedRandom</a>&lt;T&gt;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromCollection(java.util.Collection,java.util.function.Function,java.util.function.ToDoubleFunction)">fromCollection</a></span>&#8203;(java.util.Collection&lt;K&gt;&nbsp;collection,
+              java.util.function.Function&lt;K,&#8203;T&gt;&nbsp;converter,
+              java.util.function.ToDoubleFunction&lt;K&gt;&nbsp;weightGetter)</code></th>
+<td class="colLast">
+<div class="block">Creates a WeightedRandom from a collection</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>static &lt;T&gt;&nbsp;<a href="WeightedRandom.html" title="class in redempt.redlib.misc">WeightedRandom</a>&lt;T&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromDoubleMap(java.util.Map)">fromDoubleMap</a></span>&#8203;(java.util.Map&lt;T,&#8203;java.lang.Double&gt;&nbsp;map)</code></th>
 <td class="colLast">
 <div class="block">Create a new WeightedRandom from a map of outcomes to their weights</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>static &lt;T&gt;&nbsp;<a href="WeightedRandom.html" title="class in redempt.redlib.misc">WeightedRandom</a>&lt;T&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromIntMap(java.util.Map)">fromIntMap</a></span>&#8203;(java.util.Map&lt;T,&#8203;java.lang.Integer&gt;&nbsp;map)</code></th>
 <td class="colLast">
 <div class="block">Create a new WeightedRandom from a map of outcomes to their weights</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>static &lt;T&gt;&nbsp;<a href="WeightedRandom.html" title="class in redempt.redlib.misc">WeightedRandom</a>&lt;T&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromString(java.lang.String,java.util.function.Function)">fromString</a></span>&#8203;(java.lang.String&nbsp;str,
           java.util.function.Function&lt;java.lang.String,&#8203;T&gt;&nbsp;converter)</code></th>
@@ -217,42 +226,42 @@ extends java.lang.Object</pre>
 <div class="block">Deserializes a string to create a WeightedRandom</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;<a href="WeightedRandom.html" title="type parameter in WeightedRandom">T</a>,&#8203;java.lang.Double&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPercentages()">getPercentages</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Gets the chance each outcome has to occur in percentage (0-100)</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>java.util.Map&lt;<a href="WeightedRandom.html" title="type parameter in WeightedRandom">T</a>,&#8203;java.lang.Double&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getWeights()">getWeights</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Gets the map of weights for this WeightedRandom</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#remove(T)">remove</a></span>&#8203;(<a href="WeightedRandom.html" title="type parameter in WeightedRandom">T</a>&nbsp;outcome)</code></th>
 <td class="colLast">
 <div class="block">Removes an outcome from this WeightedRandom</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="WeightedRandom.html" title="type parameter in WeightedRandom">T</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#roll()">roll</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Rolls and gets a weighted random outcome</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>static &lt;T&gt;&nbsp;T</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#roll(java.util.Map)">roll</a></span>&#8203;(java.util.Map&lt;T,&#8203;java.lang.Integer&gt;&nbsp;map)</code></th>
 <td class="colLast">
 <div class="block">Performs a single roll given a map of outcomes to weights.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#set(T,double)">set</a></span>&#8203;(<a href="WeightedRandom.html" title="type parameter in WeightedRandom">T</a>&nbsp;outcome,
    double&nbsp;weight)</code></th>
@@ -260,7 +269,7 @@ extends java.lang.Object</pre>
 <div class="block">Sets another weight in this WeightedRandom, replacing the weight of the outcome if it has already been added</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#set(T,int)">set</a></span>&#8203;(<a href="WeightedRandom.html" title="type parameter in WeightedRandom">T</a>&nbsp;outcome,
    int&nbsp;weight)</code></th>
@@ -268,7 +277,7 @@ extends java.lang.Object</pre>
 <div class="block">Sets another weight in this WeightedRandom, replacing the weight of the outcome if it has already been added</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString(java.util.function.Function)">toString</a></span>&#8203;(java.util.function.Function&lt;<a href="WeightedRandom.html" title="type parameter in WeightedRandom">T</a>,&#8203;java.lang.String&gt;&nbsp;converter)</code></th>
 <td class="colLast">
@@ -369,6 +378,29 @@ extends java.lang.Object</pre>
 <dd><code>map</code> - The map of outcomes to their weights</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A WeightedRandom which can be used to roll for the given outcome</dd>
+</dl>
+</li>
+</ul>
+<a id="fromCollection(java.util.Collection,java.util.function.Function,java.util.function.ToDoubleFunction)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>fromCollection</h4>
+<pre class="methodSignature">public static&nbsp;&lt;T,&#8203;K&gt;&nbsp;<a href="WeightedRandom.html" title="class in redempt.redlib.misc">WeightedRandom</a>&lt;T&gt;&nbsp;fromCollection&#8203;(java.util.Collection&lt;K&gt;&nbsp;collection,
+                                                           java.util.function.Function&lt;K,&#8203;T&gt;&nbsp;converter,
+                                                           java.util.function.ToDoubleFunction&lt;K&gt;&nbsp;weightGetter)</pre>
+<div class="block">Creates a WeightedRandom from a collection</div>
+<dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>T</code> - The type the WeightedRandom will roll on</dd>
+<dd><code>K</code> - The type of the elements in the Collection</dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>collection</code> - The collection to convert</dd>
+<dd><code>converter</code> - The function to convert from the type in the collection to the type in the WeightedRandom</dd>
+<dd><code>weightGetter</code> - The function to get the weight of an element in the collection</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The populated WeightedRandom</dd>
 </dl>
 </li>
 </ul>

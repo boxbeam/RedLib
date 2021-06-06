@@ -303,11 +303,12 @@ public class Command {
 				continue;
 			}
 			Result<Object, String> convertResult = convertArg(carg, arg, output, offset, sender);
-			if (convertResult.getValue() == null) {
+			if (convertResult.getValue() == null || diff >= optionals) {
 				if (carg.isContextDefault() && !(sender instanceof Player)) {
 					return Messages.msg("contextDefaultFromConsole").replace("%arg%", carg.getName());
 				}
 				diff--;
+				optionals--;
 				output[carg.getPosition() + offset] = carg.getDefaultValue(sender);
 				commandArgs.remove(argPos);
 				i--;

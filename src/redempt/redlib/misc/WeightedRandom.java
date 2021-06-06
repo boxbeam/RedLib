@@ -6,6 +6,7 @@ import redempt.redlib.json.JSONParser;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Uses a map of outcomes to weights to get random values
@@ -41,6 +42,23 @@ public class WeightedRandom<T> {
 	 */
 	public static <T> WeightedRandom<T> fromDoubleMap(Map<T, Double> map) {
 		return new WeightedRandom<T>(map, false);
+	}
+	
+	/**
+	 * Creates a WeightedRandom from a collection
+	 * @param collection The collection to convert
+	 * @param converter The function to convert from the type in the collection to the type in the WeightedRandom
+	 * @param weightGetter The function to get the weight of an element in the collection
+	 * @param <T> The type the WeightedRandom will roll on
+	 * @param <K> The type of the elements in the Collection
+	 * @return The populated WeightedRandom
+	 */
+	public static <T, K> WeightedRandom<T> fromCollection(Collection<K> collection, Function<K, T> converter, ToDoubleFunction<K> weightGetter) {
+		Map<T, Double> map = new HashMap<>();
+		for (K element : collection) {
+			map.put(converter.apply(element), weightGetter.applyAsDouble(element));
+		}
+		return fromDoubleMap(map);
 	}
 	
 	/**
