@@ -191,6 +191,7 @@ public class DataBlock {
 	 */
 	public void remove(String key) {
 		this.data.remove(key);
+		modified = true;
 	}
 
 
@@ -209,6 +210,7 @@ public class DataBlock {
 
 	public void clear() {
 		this.data.clear();
+		modified = true;
 	}
 
 	/**
