@@ -113,7 +113,7 @@ public class ConfigManager {
 	}
 	
 	/**
-	 * Creates a ConfigSet from a given type with initial elements. A ConfigSet extends HashSet. The class
+	 * Creates a ConfigSet from a given type with initial elements. A ConfigSet extends LinkedHashSet. The class
 	 * is not accessible, so store it in a HashSet variable. This method must be used to set the initial
 	 * value for a variable which loads a set from config using type converters or mapped objects.
 	 * @param clazz The class of the type of the list
@@ -126,7 +126,7 @@ public class ConfigManager {
 	}
 	
 	/**
-	 * Creates a ConfigSet from a given type with initial elements. A ConfigSet extends HashSet. The class
+	 * Creates a ConfigSet from a given type with initial elements. A ConfigSet extends LinkedHashSet. The class
 	 * is not accessible, so store it in a HashSet variable. This method must be used to set the initial
 	 * value for a variable which loads a set from config using type converters or mapped objects.
 	 * @param clazz The class of the type of the list

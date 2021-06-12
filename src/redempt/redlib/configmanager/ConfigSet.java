@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
-class ConfigSet<T> extends HashSet<T> implements ConfigStorage {
+class ConfigSet<T> extends LinkedHashSet<T> implements ConfigStorage {
 	
 	protected Class<T> clazz;
 	private ConfigObjectMapper<T> mapper;
