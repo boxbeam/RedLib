@@ -56,8 +56,6 @@ class StructureFinder {
 				return null;
 			}
 		}
-		List<Integer> rotations = new ArrayList<>();
-		Collections.addAll(rotations, 0, 1, 2, 3);
 		Rotator rotator = new Rotator(1, false);
 		for (int rot = 0; rot < 4; rot++) {
 			for (int mirror = 0; mirror < 2; mirror++) {

@@ -134,11 +134,11 @@ public class StructureData {
 	 * @return Whether the block matches this StructureData within the given parameters
 	 */
 	public boolean compare(Block block, boolean strict, boolean ignoreAir) {
-		if (!strict) {
-			return block.getType() == getType();
-		}
 		if (ignoreAir && isAir()) {
 			return true;
+		}
+		if (!strict) {
+			return block.getType() == getType();
 		}
 		if (RedLib.MID_VERSION >= 13) {
 			return block.getBlockData().matches(data);

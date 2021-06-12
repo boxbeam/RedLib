@@ -874,7 +874,7 @@ public class MultiBlockStructure {
 	}
 	
 	protected boolean compare(StructureData data, Block block, Rotator rotator) {
-		return data.getRotated(rotator).compare(block, strictMode && strictModeExclude.contains(data.getType()), ignoreAir);
+		return data.getRotated(rotator).compare(block, strictMode && !strictModeExclude.contains(data.getType()), ignoreAir);
 	}
 	
 	@Override
