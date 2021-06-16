@@ -135,15 +135,23 @@ public class Command {
 	 *
 	 * @param sender The sender to show the help to
 	 */
-	public void showHelp(CommandSender sender) {
+	public boolean showHelp(CommandSender sender) {
 		String title = msg("helpTitle").replace("%cmdname%", names[0]);
-		sender.sendMessage(title);
-		sender.sendMessage(getHelpRecursive(sender, 0).trim());
+		List<String> lines = new ArrayList<>();
+		Collections.addAll(lines, getHelpRecursive(sender, 0).trim().split("\n"));
 		if (parent != null) {
 			parent.children.stream().filter(c -> c != this && c.nameMatches(names[0])).forEach(c -> {
-				sender.sendMessage(c.getHelpRecursive(sender, 0).trim());
+				Collections.addAll(lines, c.getHelpRecursive(sender, 0).trim().split("\n"));
 			});
 		}
+		lines.removeIf(s -> s.length() == 0);
+		if (lines.size() > 0) {
+			sender.sendMessage(title);
+			lines.forEach(sender::sendMessage);
+		} else {
+			sender.sendMessage(Messages.msg("showUsage").replace("%usage%", getFullName()));
+		}
+		return lines.size() > 0;
 	}
 	
 	protected String getHelpRecursive(CommandSender sender, int level) {
