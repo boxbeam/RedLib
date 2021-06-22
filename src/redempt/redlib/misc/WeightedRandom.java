@@ -20,6 +20,8 @@ public class WeightedRandom<T> {
 	private List<Double> totals;
 	private List<T> items;
 	
+	private boolean removeOnRollFlag = false;
+	
 	/**
 	 * Create a new WeightedRandom from a map of outcomes to their weights
 	 * @param map The map of outcomes to their weights
@@ -84,6 +86,17 @@ public class WeightedRandom<T> {
 		total = 0;
 	}
 	
+	/**
+	 * Sets the removeOnRoll flag to true
+	 */
+	public void removeOnRoll() { this.removeOnRollFlag = true; }
+
+	/**
+	 * Sets the removeOnRollFlag
+	 */
+    	public void setRemoveOnRoll(boolean removeOnRoll) { this.removeOnRollFlag = removeOnRoll; }
+	
+	
 	private WeightedRandom(Map<T, Double> weights, boolean no) {
 		initialize(weights);
 	}
@@ -103,6 +116,23 @@ public class WeightedRandom<T> {
 	}
 	
 	/**
+	 * Remaps all the weights and items if removeOnRoll
+	 * is activated
+	 */
+	private void reMap(int index) {
+        	T rolled = items.get(index);
+        	Double rolledWeight = weights.get(rolled);
+
+        	total -= rolledWeight;
+        	totals.remove(index);
+        	IntStream.range(index, totals.size())
+                	.forEach(value ->
+                        	totals.set(index, totals.get(index) - rolledWeight));
+        	items.remove(index);
+       		weights.remove(rolled);
+    }
+	
+	/**
 	 * Rolls and gets a weighted random outcome
 	 * @return A weighted random outcome, or null if there are no possible outcomes
 	 */
@@ -116,7 +146,9 @@ public class WeightedRandom<T> {
 			pos = -(pos + 1);
 		}
 		pos = Math.min(pos, items.size() - 1);
-		return items.get(pos);
+		T rolled = items.get(pos);
+		if (removeOnRollFlag) reMap(pos);
+        	return rolled;
 	}
 	
 	/**
