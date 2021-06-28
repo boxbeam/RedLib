@@ -5,7 +5,9 @@ RedLib is a Spigot plugin development library, designed to make your life easier
 
 RedLib is a standalone plugin, so you will need to install it on any servers that have plugins which depend on it, and specify it as a dependency in your plugin.yml like this:
 
-`depend: [RedLib]`
+```yaml
+depend: [RedLib]
+```
 
 To get the jar, either download it from the releases tab either here on [GitHub](https://github.com/Redempt/RedLib/releases) or on [Spigot](https://www.spigotmc.org/resources/redlib.78713/), or [build it locally](https://github.com/Redempt/RedLib#build-locally).
 
@@ -15,14 +17,14 @@ Gradle:
 
 ```groovy
 repositories {
-    maven { url 'https://jitpack.io' }
+        maven { url 'https://jitpack.io' }
 }
 
 ```
 
 ```groovy
 dependencies {
-    compileOnly 'com.github.Redempt:RedLib:Tag'
+        compileOnly 'com.github.Redempt:RedLib:Tag'
 }
 ```
 
@@ -32,17 +34,17 @@ Maven:
 
 ```xml
 <repository>
-    <id>jitpack.io</id>
-    <url>https://jitpack.io</url>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
 </repository>
 ```
 
 ```xml
 <dependency>
-    <groupId>com.github.Redempt</groupId>
-    <artifactId>RedLib</artifactId>
-    <version>Tag</version>
-    <scope>provided</scope>
+        <groupId>com.github.Redempt</groupId>
+        <artifactId>RedLib</artifactId>
+        <version>Tag</version>
+        <scope>provided</scope>
 </dependency>
 ```
 Replace `Tag` with a release tag for RedLib. Example: `4.3.6`. You can also use `master` as the tag to get the latest version, though you will have to clear your maven caches in order to update it.
