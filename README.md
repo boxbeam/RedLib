@@ -13,14 +13,14 @@ To get the jar, either download it from the releases tab either here on [GitHub]
 
 Gradle:
 
-```		
+```groovy
 repositories {
     maven { url 'https://jitpack.io' }
 }
 
 ```
 
-```
+```groovy
 dependencies {
     compileOnly 'com.github.Redempt:RedLib:Tag'
 }
@@ -30,14 +30,14 @@ Replace `Tag` with a release tag for RedLib. Example: `4.3.6`. You can also use 
 
 Maven:
 
-```
+```xml
 <repository>
     <id>jitpack.io</id>
     <url>https://jitpack.io</url>
 </repository>
 ```
 
-```
+```xml
 <dependency>
     <groupId>com.github.Redempt</groupId>
     <artifactId>RedLib</artifactId>
