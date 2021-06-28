@@ -15,14 +15,14 @@ Gradle:
 
 ```		
 repositories {
-	maven { url 'https://jitpack.io' }
+    maven { url 'https://jitpack.io' }
 }
 
 ```
 
 ```
 dependencies {
-	implementation 'com.github.Redempt:RedLib:Tag'
+    compileOnly 'com.github.Redempt:RedLib:Tag'
 }
 ```
 
@@ -32,16 +32,17 @@ Maven:
 
 ```
 <repository>
-	<id>jitpack.io</id>
-	<url>https://jitpack.io</url>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
 </repository>
 ```
 
 ```
 <dependency>
-	<groupId>com.github.Redempt</groupId>
-	<artifactId>RedLib</artifactId>
-	<version>Tag</version>
+    <groupId>com.github.Redempt</groupId>
+    <artifactId>RedLib</artifactId>
+    <version>Tag</version>
+    <scope>provided</scope>
 </dependency>
 ```
 Replace `Tag` with a release tag for RedLib. Example: `4.3.6`. You can also use `master` as the tag to get the latest version, though you will have to clear your maven caches in order to update it.
