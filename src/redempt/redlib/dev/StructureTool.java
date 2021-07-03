@@ -102,6 +102,7 @@ public class StructureTool implements Listener {
 	@CommandHook("wand")
 	public void giveWand(Player player) {
 		player.getInventory().addItem(getTool());
+		player.sendMessage(ChatColor.GREEN + "You've been given a wand!");
 	}
 	
 	@CommandHook("create")
