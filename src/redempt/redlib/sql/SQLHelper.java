@@ -181,6 +181,7 @@ public class SQLHelper implements Closeable {
 		try {
 			PreparedStatement statement = prepareStatement(command, fields);
 			statement.execute();
+			statement.close();
 		} catch (SQLException e) {
 			sneakyThrow(e);
 		}
@@ -203,6 +204,7 @@ public class SQLHelper implements Closeable {
 			}
 			T obj = (T) results.getObject(1);
 			results.close();
+			statement.close();
 			return obj;
 		} catch (SQLException e) {
 			sneakyThrow(e);
@@ -226,7 +228,10 @@ public class SQLHelper implements Closeable {
 			if (!results.next()) {
 				return null;
 			}
-			return results.getString(1);
+			String val = results.getString(1);
+			results.close();
+			statement.close();
+			return val;
 		} catch (SQLException e) {
 			sneakyThrow(e);
 			return null;
@@ -249,7 +254,10 @@ public class SQLHelper implements Closeable {
 			if (!results.next()) {
 				return null;
 			}
-			return results.getLong(1);
+			long val = results.getLong(1);
+			results.close();
+			statement.close();
+			return val;
 		} catch (SQLException e) {
 			sneakyThrow(e);
 			return null;
@@ -273,6 +281,7 @@ public class SQLHelper implements Closeable {
 				list.add((T) results.getObject(1));
 			}
 			results.close();
+			statement.close();
 		} catch (SQLException e) {
 			sneakyThrow(e);
 		}
@@ -297,6 +306,7 @@ public class SQLHelper implements Closeable {
 				list.add(results.getString(1));
 			}
 			results.close();
+			statement.close();
 		} catch (SQLException e) {
 			sneakyThrow(e);
 		}
@@ -312,8 +322,9 @@ public class SQLHelper implements Closeable {
 	 */
 	public Results queryResults(String query, Object... fields) {
 		try {
-			ResultSet results = prepareStatement(query, fields).executeQuery();
-			return new Results(results);
+			PreparedStatement statement = prepareStatement(query, fields);
+			ResultSet results = statement.executeQuery();
+			return new Results(results, statement);
 		} catch (SQLException e) {
 			sneakyThrow(e);
 			return null;
@@ -421,13 +432,15 @@ public class SQLHelper implements Closeable {
 	 * Wraps a {@link ResultSet} with easier use
 	 * @author Redempt
 	 */
-	public static class Results implements Closeable {
+	public static class Results implements AutoCloseable {
 		
 		private ResultSet results;
 		private boolean empty;
+		private PreparedStatement statement;
 		
-		private Results(ResultSet results) {
+		private Results(ResultSet results, PreparedStatement statement) {
 			this.results = results;
+			this.statement = statement;
 			try {
 				empty = !results.next();
 			} catch (SQLException e) {
@@ -539,6 +552,7 @@ public class SQLHelper implements Closeable {
 		public void close() {
 			try {
 				results.close();
+				statement.close();
 			} catch (SQLException e) {
 				sneakyThrow(e);
 			}

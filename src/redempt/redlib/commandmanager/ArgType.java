@@ -191,6 +191,7 @@ public class ArgType<T> {
 	/**
 	 * Converts an argument to another type
 	 * @param sender The sender of the command
+	 * @param previous The value of the previous argument
 	 * @param argument The argument to be converted
 	 * @return The converted argument for use in a method hook
 	 */

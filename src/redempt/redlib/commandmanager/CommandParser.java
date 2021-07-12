@@ -120,6 +120,9 @@ public class CommandParser {
 		boolean postArg = false;
 		for (int pos = lineNumber; pos < lines.size(); pos++) {
 			String line = lines.get(pos);
+			if (line.startsWith("//")) {
+				continue;
+			}
 			//New command data
 			if (line.endsWith("{")) {
 				depth++;

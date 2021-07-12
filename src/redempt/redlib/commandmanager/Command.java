@@ -134,6 +134,7 @@ public class Command {
 	 * Shows the help to a CommandSender
 	 *
 	 * @param sender The sender to show the help to
+	 * @return True if the help was shown to the user, false if the usage was shown instead
 	 */
 	public boolean showHelp(CommandSender sender) {
 		String title = msg("helpTitle").replace("%cmdname%", names[0]);

@@ -67,7 +67,7 @@ public class FormatUtils {
 	/**
 	 * Shorthand for {@link ChatColor#translateAlternateColorCodes(char, String)}
 	 * @param input The input string
-	 * @return The colored string, replacing color codes using & with proper codes
+	 * @return The colored string, replacing color codes using ampersands with proper codes
 	 */
 	public static String color(String input) {
 		return ChatColor.translateAlternateColorCodes('&', input);
