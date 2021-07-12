@@ -22,6 +22,20 @@ public class CommandCollection {
 	public CommandCollection(List<Command> commands) {
 		this.commands = commands;
 	}
+
+	/**
+	 * Register all commands in this CommandCollection
+	 * @param plugin the plugin that owns the commands
+	 * @param prefix The fallback prefix of the commands
+	 * @param listeners The list of listener objects which contain hooks for the commands in this collection
+	 */
+	public void register(Plugin plugin, String prefix, Object... listeners) {
+		mergeBaseCommands();
+		commands.forEach(c -> {
+			c.plugin = plugin;
+			c.register(prefix, listeners);
+		});
+	}
 	
 	/**
 	 * Register all commands in this CommandCollection
@@ -29,12 +43,7 @@ public class CommandCollection {
 	 * @param listeners The list of listener objects which contain hooks for the commands in this collection
 	 */
 	public void register(String prefix, Object... listeners) {
-		mergeBaseCommands();
-		Plugin plugin = RedLib.getCallingPlugin();
-		commands.forEach(c -> {
-			c.plugin = plugin;
-			c.register(prefix, listeners);
-		});
+		register(RedLib.getCallingPlugin(), prefix, listeners);
 	}
 	
 	private void mergeBaseCommands() {
