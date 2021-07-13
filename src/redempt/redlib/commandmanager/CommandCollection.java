@@ -156,7 +156,7 @@ public class CommandCollection {
 			super.register(prefix, listeners);
 			Map<String, MethodHook> hooks = createHookMap(listeners);
 			for (Command command : children) {
-				command.registerHook(hooks);
+				command.registerHook(hooks, this.plugin);
 			}
 		}
 		

@@ -524,7 +524,7 @@ public class Command {
 				}
 			}
 		});
-		registerHook(createHookMap(listeners));
+		registerHook(createHookMap(listeners), plugin);
 	}
 	
 	private void unregister() {
@@ -547,10 +547,11 @@ public class Command {
 		return hooks;
 	}
 	
-	protected void registerHook(Map<String, MethodHook> hooks) {
+	protected void registerHook(Map<String, MethodHook> hooks, Plugin plugin) {
 		for (Command child : children) {
-			child.registerHook(hooks);
+			child.registerHook(hooks, plugin);
 		}
+		this.plugin = plugin;
 		if (hook == null) {
 			return;
 		}
@@ -559,7 +560,6 @@ public class Command {
 			throw new CommandHookException("Command with hook name " + hook + " has no method hook");
 		}
 		methodHook = mh.getMethod();
-		plugin = JavaPlugin.getProvidingPlugin(methodHook.getDeclaringClass());
 		Class<?>[] params = methodHook.getParameterTypes();
 		int expectedLength = args.length + contextProviders.length + flags.length + 1;
 		Command current = this;
