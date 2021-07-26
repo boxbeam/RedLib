@@ -520,6 +520,15 @@ public class ItemUtils {
 	}
 	
 	/**
+	 * Calculates the minimum chest size (next highest multiple of 9) required to fit the given number of item stacks
+	 * @param items The number of item stacks
+	 * @return The minimum chest size to accommodate the items
+	 */
+	public static int minimumChestSize(int items) {
+		return (int) Math.max(9, Math.ceil(items / 9d) * 9);
+	}
+	
+	/**
 	 * Converts an ItemStack to a JSON string
 	 * @param item The ItemStack to convert to a string
 	 * @return A JSON string representing the given item
