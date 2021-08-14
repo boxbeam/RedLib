@@ -15,7 +15,7 @@ public @interface ConfigValue {
 	/**
 	 * @return The path to the config value represented by the field bearing this annotation
 	 */
-	String value();
+	String value() default "";
 	
 	/**
 	 * @return The priority of this ConfigValue, higher priority will be loaded first

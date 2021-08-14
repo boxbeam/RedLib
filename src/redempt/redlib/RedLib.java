@@ -32,13 +32,13 @@ import java.util.jar.JarFile;
  */
 public class RedLib extends JavaPlugin {
 	
-	@ConfigValue("devMode")
+	@ConfigValue
 	public static boolean devMode = false;
-	@ConfigValue("autoStartPassiveProfiler")
+	@ConfigValue
 	private static boolean autoStartPassiveProfiler = false;
-	@ConfigValue("autoStartTickMonitorProfiler")
+	@ConfigValue
 	private static boolean autoStartTickMonitorProfiler = false;
-	@ConfigValue("tickMonitorProfilerMinTickLength")
+	@ConfigValue
 	private static int tickMonitorProfilerMinTickLength = 100;
 	/**
 	 * The middle number of the server version - for example, if the server version is 1.15.2, this will be 15

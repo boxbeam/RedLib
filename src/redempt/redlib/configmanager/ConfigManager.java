@@ -219,7 +219,9 @@ public class ConfigManager {
 				if (hook == null) {
 					continue;
 				}
-				fields.add(new ConfigField(hook.type(), field, hook.value(), hook.priority(), this));
+				String value = hook.value();
+				value = value.length() == 0 ? field.getName() : value;
+				fields.add(new ConfigField(hook.type(), field, value, hook.priority(), this));
 			}
 			this.data.put(obj, fields);
 			fields.sort(Comparator.comparingInt(f -> f.priority));
