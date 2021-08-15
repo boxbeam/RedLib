@@ -129,30 +129,32 @@ public class EnchantRegistry {
 	
 	private <T extends Event> void register(EnchantTrigger<T> trigger) {
 		trigger.init();
-		trigger.getEvents().forEach((c, it) -> listeners.add(new EventListener<>(plugin, c, trigger.getPriority(), e -> {
-			EventItems items = it.apply(e);
-			if (items == null) {
-				return;
-			}
-			for (CustomEnchant ench : triggers.get(trigger)) {
-				for (int i = 0; i < items.getAfter().length; i++) {
-					int beforeLevel = ench.getLevel(items.getBefore()[i]);
-					int afterLevel = ench.getLevel(items.getAfter()[i]);
-					if (beforeLevel == 0 && afterLevel > 0) {
-						ench.getTriggers().get(trigger).activate(items.getEvent(), afterLevel);
-						continue;
-					}
-					if (beforeLevel > 0 && afterLevel == 0) {
-						ench.getTriggers().get(trigger).deactivate(items.getEvent(), beforeLevel);
-						continue;
-					}
-					if (beforeLevel != afterLevel) {
-						ench.getTriggers().get(trigger).deactivate(items.getEvent(), beforeLevel);
-						ench.getTriggers().get(trigger).activate(items.getEvent(), afterLevel);
-					}
+		trigger.getEvents().forEach((c, it) -> listeners.add(new EventListener<>(plugin, c, trigger.getPriority(), e -> triggerEnchant(it, e, trigger))));
+	}
+
+	private <T extends Event> void triggerEnchant(Function<Event, EventItems> it, Event e, EnchantTrigger<T> trigger) {
+		EventItems items = it.apply(e);
+		if (items == null) {
+			return;
+		}
+		for (CustomEnchant ench : triggers.get(trigger)) {
+			for (int i = 0; i < items.getAfter().length; i++) {
+				int beforeLevel = ench.getLevel(items.getBefore()[i]);
+				int afterLevel = ench.getLevel(items.getAfter()[i]);
+				if (beforeLevel == 0 && afterLevel > 0) {
+					ench.getTriggers().get(trigger).activate(items.getEvent(), afterLevel);
+					continue;
+				}
+				if (beforeLevel > 0 && afterLevel == 0) {
+					ench.getTriggers().get(trigger).deactivate(items.getEvent(), beforeLevel);
+					continue;
+				}
+				if (beforeLevel != afterLevel) {
+					ench.getTriggers().get(trigger).deactivate(items.getEvent(), beforeLevel);
+					ench.getTriggers().get(trigger).activate(items.getEvent(), afterLevel);
 				}
 			}
-		})));
+		}
 	}
 	
 	/**
