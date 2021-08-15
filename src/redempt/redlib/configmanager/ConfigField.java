@@ -29,7 +29,7 @@ class ConfigField {
 		this.path = path;
 		this.priority = priority;
 		this.manager = manager;
-		converter = manager.converters.get(field.getType());
+		converter = manager.getConverter(field.getType());
 		field.setAccessible(true);
 		if (Modifier.isFinal(field.getModifiers())) {
 			throw new ConfigFieldException("Config hook field may not be final!");

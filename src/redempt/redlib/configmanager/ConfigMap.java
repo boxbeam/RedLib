@@ -62,7 +62,7 @@ class ConfigMap<K, V> extends LinkedHashMap<K, V> implements ConfigStorage {
 			return (String) key;
 		}
 		if (converter == null) {
-			converter = (TypeConverter<K>) manager.converters.get(keyClass);
+			converter = manager.getConverter(keyClass);
 			if (converter == null) {
 				throw new ConfigMapException("No converter for class " + keyClass.getName());
 			}
@@ -75,7 +75,7 @@ class ConfigMap<K, V> extends LinkedHashMap<K, V> implements ConfigStorage {
 			return (K) key;
 		}
 		if (converter == null) {
-			converter = (TypeConverter<K>) manager.converters.get(keyClass);
+			converter = manager.getConverter(keyClass);
 			if (converter == null) {
 				throw new ConfigMapException("No converter for class " + keyClass.getName());
 			}

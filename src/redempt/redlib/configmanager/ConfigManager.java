@@ -145,7 +145,7 @@ public class ConfigManager {
 	private File file = null;
 	private Map<Object, List<ConfigField>> data = new HashMap<>();
 	private boolean registered = false;
-	protected Map<Class<?>, TypeConverter<?>> converters = new HashMap<>();
+	private Map<Class<?>, TypeConverter<?>> converters = new HashMap<>();
 	
 	/**
 	 * Instantiates a ConfigManager with the default config name config.yml in the plugin's data folder
@@ -196,6 +196,23 @@ public class ConfigManager {
 		converters.put(clazz, new TypeConverter<T>(load, save));
 		return this;
 	}
+
+	protected <T> TypeConverter<T> getConverter(Class<T> clazz) {
+		TypeConverter<T> converter = (TypeConverter<T>) converters.get(clazz);
+		if (converter != null) {
+			return converter;
+		}
+		if (Enum.class.isAssignableFrom(clazz)) {
+			converter = (TypeConverter<T>) enumConverter(clazz);
+			converters.put(clazz, converter);
+		}
+		return converter;
+	}
+
+	private <T extends Enum<T>> TypeConverter<T> enumConverter(Class<?> clazz) {
+		Class<T> enumClazz = (Class<T>) clazz;
+		return new TypeConverter<T>(s -> Enum.valueOf(enumClazz, s), Enum::name);
+	}
 	
 	/**
 	 * Initiates a ConfigManager using a specific path for the config
@@ -204,7 +221,7 @@ public class ConfigManager {
 	public ConfigManager(Path path) {
 		this(path.toFile());
 	}
-	
+
 	/**
 	 * Register all the hooks for annotated fields in the the given objects. Pass classes instead if static
 	 * fields are used.

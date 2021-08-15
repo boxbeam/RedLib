@@ -64,7 +64,7 @@ class ConfigObjectMapper<T> {
 				fields.sort(Comparator.comparingInt(f -> f.priority));
 				break;
 			case STRING_CONVERTED:
-				converter = (TypeConverter<T>) manager.converters.get(clazz);
+				converter = manager.getConverter(clazz);
 				if (converter == null) {
 					throw new ConfigMapException("No type converter for " + clazz.getName());
 				}

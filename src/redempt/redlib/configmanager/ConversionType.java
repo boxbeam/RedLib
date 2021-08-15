@@ -29,7 +29,7 @@ public enum ConversionType {
 		if (clazz.isAnnotationPresent(ConfigMappable.class)) {
 			return ConversionType.MAPPED_OBJECT;
 		}
-		if (manager.converters.get(clazz) != null) {
+		if (manager.getConverter(clazz) != null) {
 			return ConversionType.STRING_CONVERTED;
 		}
 		return ConversionType.PLAIN;
