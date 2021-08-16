@@ -17,7 +17,7 @@ import java.util.stream.Stream;
  * Represents a cuboid region in a world
  * @author Redempt
  */
-public class CuboidRegion extends Region implements Overlappable {
+public class CuboidRegion extends Overlappable {
 	
 	/**
 	 * Gets a Region covering a cubic radius centered around a Location

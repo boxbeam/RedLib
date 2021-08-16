@@ -41,7 +41,7 @@ loadScripts(document, 'script');</script>
 <ul class="sub-nav-list">
 <li>Summary:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li><a href="#annotation.type.required.element.summary">Required</a>&nbsp;|&nbsp;</li>
+<li>Required&nbsp;|&nbsp;</li>
 <li><a href="#annotation.type.optional.element.summary">Optional</a></li>
 </ul>
 <ul class="sub-nav-list">
@@ -76,31 +76,6 @@ public @interface <span class="type-name-label">ConfigValue</span></pre>
 </section>
 <section class="summary">
 <ul class="summary-list">
-<!-- =========== ANNOTATION TYPE REQUIRED MEMBER SUMMARY =========== -->
-<li>
-<section class="member-summary" id="annotation.type.required.element.summary">
-<h2>Required Element Summary</h2>
-<div class="member-summary">
-<table class="summary-table">
-<caption><span>Required Elements</span></caption>
-<thead>
-<tr>
-<th class="col-first" scope="col">Modifier and Type</th>
-<th class="col-second" scope="col">Required Element</th>
-<th class="col-last" scope="col">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="alt-color">
-<td class="col-first"><code>java.lang.String</code></td>
-<th class="col-second" scope="row"><code><span class="member-name-link"><a href="#value()">value</a></span></code></th>
-<td class="col-last">&nbsp;</td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-</li>
 <!-- =========== ANNOTATION TYPE OPTIONAL MEMBER SUMMARY =========== -->
 <li>
 <section class="member-summary" id="annotation.type.optional.element.summary">
@@ -126,6 +101,11 @@ public @interface <span class="type-name-label">ConfigValue</span></pre>
 <th class="col-second" scope="row"><code><span class="member-name-link"><a href="#type()">type</a></span></code></th>
 <td class="col-last">&nbsp;</td>
 </tr>
+<tr class="alt-color">
+<td class="col-first"><code>java.lang.String</code></td>
+<th class="col-second" scope="row"><code><span class="member-name-link"><a href="#value()">value</a></span></code></th>
+<td class="col-last">&nbsp;</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -148,15 +128,12 @@ public @interface <span class="type-name-label">ConfigValue</span></pre>
 <dt>Returns:</dt>
 <dd>The path to the config value represented by the field bearing this annotation</dd>
 </dl>
+<dl class="notes">
+<dt>Default:</dt>
+<dd>""</dd>
+</dl>
 </section>
 </li>
-</ul>
-</section>
-</li>
-<!-- ============ ANNOTATION TYPE MEMBER DETAIL =========== -->
-<li>
-<section class="member-details">
-<ul class="member-list">
 <li>
 <section class="detail" id="priority()">
 <h3>priority</h3>
@@ -212,7 +189,7 @@ public @interface <span class="type-name-label">ConfigValue</span></pre>
 <ul class="sub-nav-list">
 <li>Summary:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li><a href="#annotation.type.required.element.summary">Required</a>&nbsp;|&nbsp;</li>
+<li>Required&nbsp;|&nbsp;</li>
 <li><a href="#annotation.type.optional.element.summary">Optional</a></li>
 </ul>
 <ul class="sub-nav-list">

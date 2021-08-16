@@ -19,7 +19,7 @@ import java.util.stream.Stream;
  *
  * @author Redempt
  */
-public class MultiRegion extends Region implements Overlappable {
+public class MultiRegion extends Overlappable {
 	
 	private static Vector[] adjacent = {new Vector(.1, .1, .1), new Vector(.1, .1, -.1), new Vector(.1, -.1, .1), new Vector(-.1, .1, .1),
 										new Vector(-.1, -.1, .1), new Vector(-.1, .1, -.1), new Vector(.1, -.1, -.1), new Vector(-.1, -.1, -.1)};

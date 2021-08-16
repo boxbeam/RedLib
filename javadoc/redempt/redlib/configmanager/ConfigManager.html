@@ -15,7 +15,7 @@
 <script type="text/javascript" src="../../../script-dir/jquery-ui.min.js"></script>
 </head>
 <body class="class-declaration-page">
-<script type="text/javascript">var data = {"i0":10,"i1":10,"i2":10,"i3":9,"i4":9,"i5":10,"i6":9,"i7":9,"i8":9,"i9":9,"i10":10,"i11":10,"i12":10,"i13":9,"i14":9,"i15":9};
+<script type="text/javascript">var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":9,"i5":9,"i6":10,"i7":9,"i8":9,"i9":9,"i10":9,"i11":10,"i12":10,"i13":10,"i14":9,"i15":9,"i16":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "alt-color";
 var rowColor = "row-color";
@@ -47,13 +47,13 @@ loadScripts(document, 'script');</script>
 <ul class="sub-nav-list">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="sub-nav-list">
 <li>Detail:&nbsp;</li>
-<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
@@ -86,31 +86,6 @@ extends java.lang.Object</pre>
 </section>
 <section class="summary">
 <ul class="summary-list">
-<!-- =========== FIELD SUMMARY =========== -->
-<li>
-<section class="field-summary" id="field.summary">
-<h2>Field Summary</h2>
-<div class="member-summary">
-<table class="summary-table">
-<caption><span>Fields</span></caption>
-<thead>
-<tr>
-<th class="col-first" scope="col">Modifier and Type</th>
-<th class="col-second" scope="col">Field</th>
-<th class="col-last" scope="col">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="alt-color">
-<td class="col-first"><code>protected java.util.Map&lt;java.lang.Class&lt;?&gt;,&#8203;redempt.redlib.configmanager.TypeConverter&lt;?&gt;&gt;</code></td>
-<th class="col-second" scope="row"><code><span class="member-name-link"><a href="#converters">converters</a></span></code></th>
-<td class="col-last">&nbsp;</td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-</li>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <li>
 <section class="constructor-summary" id="constructor.summary">
@@ -192,6 +167,11 @@ java.util.function.Function&lt;T,&#8203;java.lang.String&gt;&nbsp;save)</code></
 <td class="col-last">&nbsp;</td>
 </tr>
 <tr class="row-color" id="i3">
+<td class="col-first"><code>protected &lt;T&gt;&nbsp;redempt.redlib.configmanager.TypeConverter&lt;T&gt;</code></td>
+<th class="col-second" scope="row"><code><span class="member-name-link"><a href="#getConverter(java.lang.Class)">getConverter</a></span>&#8203;(java.lang.Class&lt;T&gt;&nbsp;clazz)</code></th>
+<td class="col-last">&nbsp;</td>
+</tr>
+<tr class="alt-color" id="i4">
 <td class="col-first"><code>static &lt;T&gt;&nbsp;redempt.redlib.configmanager.ConfigList&lt;T&gt;</code></td>
 <th class="col-second" scope="row"><code><span class="member-name-link"><a href="#list(java.lang.Class,redempt.redlib.configmanager.ConversionType,T...)">list</a></span>&#8203;(java.lang.Class&lt;T&gt;&nbsp;clazz,
 <a href="ConversionType.html" title="enum in redempt.redlib.configmanager">ConversionType</a>&nbsp;type,
@@ -200,7 +180,7 @@ T...&nbsp;elements)</code></th>
 <div class="block">Creates a ConfigList from a given type with initial elements.</div>
 </td>
 </tr>
-<tr class="alt-color" id="i4">
+<tr class="row-color" id="i5">
 <td class="col-first"><code>static &lt;T&gt;&nbsp;redempt.redlib.configmanager.ConfigList&lt;T&gt;</code></td>
 <th class="col-second" scope="row"><code><span class="member-name-link"><a href="#list(java.lang.Class,T...)">list</a></span>&#8203;(java.lang.Class&lt;T&gt;&nbsp;clazz,
 T...&nbsp;elements)</code></th>
@@ -208,14 +188,14 @@ T...&nbsp;elements)</code></th>
 <div class="block">Creates a ConfigList from a given type with initial elements.</div>
 </td>
 </tr>
-<tr class="row-color" id="i5">
+<tr class="alt-color" id="i6">
 <td class="col-first"><code><a href="ConfigManager.html" title="class in redempt.redlib.configmanager">ConfigManager</a></code></td>
 <th class="col-second" scope="row"><code><span class="member-name-link"><a href="#load()">load</a></span>()</code></th>
 <td class="col-last">
 <div class="block">Loads all values from config into the annotated hook fields</div>
 </td>
 </tr>
-<tr class="alt-color" id="i6">
+<tr class="row-color" id="i7">
 <td class="col-first"><code>static &lt;K,&#8203;
 V&gt;&nbsp;redempt.redlib.configmanager.ConfigMap&lt;K,&#8203;V&gt;</code></td>
 <th class="col-second" scope="row"><code><span class="member-name-link"><a href="#map(java.lang.Class,java.lang.Class)">map</a></span>&#8203;(java.lang.Class&lt;K&gt;&nbsp;keyClass,
@@ -224,7 +204,7 @@ java.lang.Class&lt;V&gt;&nbsp;valueClass)</code></th>
 <div class="block">Creates a ConfigMap from a given type.</div>
 </td>
 </tr>
-<tr class="row-color" id="i7">
+<tr class="alt-color" id="i8">
 <td class="col-first"><code>static &lt;K,&#8203;
 V&gt;&nbsp;redempt.redlib.configmanager.ConfigMap&lt;K,&#8203;V&gt;</code></td>
 <th class="col-second" scope="row"><code><span class="member-name-link"><a href="#map(java.lang.Class,java.lang.Class,redempt.redlib.configmanager.ConversionType)">map</a></span>&#8203;(java.lang.Class&lt;K&gt;&nbsp;keyClass,
@@ -234,14 +214,14 @@ java.lang.Class&lt;V&gt;&nbsp;valueClass,
 <div class="block">Creates a ConfigMap from a given type.</div>
 </td>
 </tr>
-<tr class="alt-color" id="i8">
+<tr class="row-color" id="i9">
 <td class="col-first"><code>static &lt;T&gt;&nbsp;redempt.redlib.configmanager.ConfigMap&lt;java.lang.String,&#8203;T&gt;</code></td>
 <th class="col-second" scope="row"><code><span class="member-name-link"><a href="#map(java.lang.Class)">map</a></span>&#8203;(java.lang.Class&lt;T&gt;&nbsp;clazz)</code></th>
 <td class="col-last">
 <div class="block">Creates a ConfigMap from a given type.</div>
 </td>
 </tr>
-<tr class="row-color" id="i9">
+<tr class="alt-color" id="i10">
 <td class="col-first"><code>static &lt;T&gt;&nbsp;redempt.redlib.configmanager.ConfigMap&lt;java.lang.String,&#8203;T&gt;</code></td>
 <th class="col-second" scope="row"><code><span class="member-name-link"><a href="#map(java.lang.Class,redempt.redlib.configmanager.ConversionType)">map</a></span>&#8203;(java.lang.Class&lt;T&gt;&nbsp;clazz,
 <a href="ConversionType.html" title="enum in redempt.redlib.configmanager">ConversionType</a>&nbsp;type)</code></th>
@@ -249,28 +229,28 @@ java.lang.Class&lt;V&gt;&nbsp;valueClass,
 <div class="block">Creates a ConfigMap from a given type.</div>
 </td>
 </tr>
-<tr class="alt-color" id="i10">
+<tr class="row-color" id="i11">
 <td class="col-first"><code><a href="ConfigManager.html" title="class in redempt.redlib.configmanager">ConfigManager</a></code></td>
 <th class="col-second" scope="row"><code><span class="member-name-link"><a href="#register(java.lang.Object...)">register</a></span>&#8203;(java.lang.Object...&nbsp;data)</code></th>
 <td class="col-last">
 <div class="block">Register all the hooks for annotated fields in the the given objects.</div>
 </td>
 </tr>
-<tr class="row-color" id="i11">
+<tr class="alt-color" id="i12">
 <td class="col-first"><code><a href="ConfigManager.html" title="class in redempt.redlib.configmanager">ConfigManager</a></code></td>
 <th class="col-second" scope="row"><code><span class="member-name-link"><a href="#save()">save</a></span>()</code></th>
 <td class="col-last">
 <div class="block">Saves all values from the annotated hook fields to config</div>
 </td>
 </tr>
-<tr class="alt-color" id="i12">
+<tr class="row-color" id="i13">
 <td class="col-first"><code><a href="ConfigManager.html" title="class in redempt.redlib.configmanager">ConfigManager</a></code></td>
 <th class="col-second" scope="row"><code><span class="member-name-link"><a href="#saveDefaults()">saveDefaults</a></span>()</code></th>
 <td class="col-last">
 <div class="block">Save default values - initial values in the hook fields - where they do not already exist in the config</div>
 </td>
 </tr>
-<tr class="row-color" id="i13">
+<tr class="alt-color" id="i14">
 <td class="col-first"><code>static &lt;T&gt;&nbsp;redempt.redlib.configmanager.ConfigSet&lt;T&gt;</code></td>
 <th class="col-second" scope="row"><code><span class="member-name-link"><a href="#set(java.lang.Class,redempt.redlib.configmanager.ConversionType,T...)">set</a></span>&#8203;(java.lang.Class&lt;T&gt;&nbsp;clazz,
 <a href="ConversionType.html" title="enum in redempt.redlib.configmanager">ConversionType</a>&nbsp;type,
@@ -279,7 +259,7 @@ T...&nbsp;elements)</code></th>
 <div class="block">Creates a ConfigSet from a given type with initial elements.</div>
 </td>
 </tr>
-<tr class="alt-color" id="i14">
+<tr class="row-color" id="i15">
 <td class="col-first"><code>static &lt;T&gt;&nbsp;redempt.redlib.configmanager.ConfigSet&lt;T&gt;</code></td>
 <th class="col-second" scope="row"><code><span class="member-name-link"><a href="#set(java.lang.Class,T...)">set</a></span>&#8203;(java.lang.Class&lt;T&gt;&nbsp;clazz,
 T...&nbsp;elements)</code></th>
@@ -287,7 +267,7 @@ T...&nbsp;elements)</code></th>
 <div class="block">Creates a ConfigSet from a given type with initial elements.</div>
 </td>
 </tr>
-<tr class="row-color" id="i15">
+<tr class="alt-color" id="i16">
 <td class="col-first"><code>static java.util.List&lt;java.lang.String&gt;</code></td>
 <th class="col-second" scope="row"><code><span class="member-name-link"><a href="#stringList(java.lang.String...)">stringList</a></span>&#8203;(java.lang.String...&nbsp;strings)</code></th>
 <td class="col-last">
@@ -307,20 +287,6 @@ T...&nbsp;elements)</code></th>
 </section>
 <section class="details">
 <ul class="details-list">
-<!-- ============ FIELD DETAIL =========== -->
-<li>
-<section class="field-details" id="field.detail">
-<h2>Field Details</h2>
-<ul class="member-list">
-<li>
-<section class="detail" id="converters">
-<h3>converters</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">java.util.Map&lt;java.lang.Class&lt;?&gt;,&#8203;redempt.redlib.configmanager.TypeConverter&lt;?&gt;&gt;</span>&nbsp;<span class="member-name">converters</span></div>
-</section>
-</li>
-</ul>
-</section>
-</li>
 <!-- ========= CONSTRUCTOR DETAIL ======== -->
 <li>
 <section class="constructor-details" id="constructor.detail">
@@ -584,6 +550,13 @@ java.util.function.Function&lt;T,&#8203;java.lang.String&gt;&nbsp;save)</span></
 </section>
 </li>
 <li>
+<section class="detail" id="getConverter(java.lang.Class)">
+<h3>getConverter</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="type-parameters">&lt;T&gt;</span>
+<span class="return-type">redempt.redlib.configmanager.TypeConverter&lt;T&gt;</span>&nbsp;<span class="member-name">getConverter</span>&#8203;(<span class="parameters">java.lang.Class&lt;T&gt;&nbsp;clazz)</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="register(java.lang.Object...)">
 <h3>register</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="ConfigManager.html" title="class in redempt.redlib.configmanager">ConfigManager</a></span>&nbsp;<span class="member-name">register</span>&#8203;(<span class="parameters">java.lang.Object...&nbsp;data)</span></div>
@@ -683,13 +656,13 @@ java.util.function.Function&lt;T,&#8203;java.lang.String&gt;&nbsp;save)</span></
 <ul class="sub-nav-list">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="sub-nav-list">
 <li>Detail:&nbsp;</li>
-<li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
