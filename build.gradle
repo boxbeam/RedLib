@@ -30,10 +30,6 @@ task updateJars {
 		}
 		copy {
 			from 'build/libs'
-			into '/home/redempt/Desktop/Spigot/1.11/plugins'
-		}
-		copy {
-			from 'build/libs'
 			into '/home/redempt/Desktop/Spigot/1.12/plugins'
 		}
 		copy {
@@ -51,6 +47,10 @@ task updateJars {
 		copy {
 			from 'build/libs'
 			into '/home/redempt/Desktop/Spigot/1.16/plugins'
+		}
+		copy {
+			from 'build/libs'
+			into '/home/redempt/Desktop/Spigot/1.17/plugins'
 		}
 	}
 }
