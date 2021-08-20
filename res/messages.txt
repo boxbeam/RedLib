@@ -1,5 +1,6 @@
 helpTitle: &a--[ &eHelp for %cmdname% &a]--
 helpEntry: &e%cmdname%&a: %help%
+helpTextColor: &a
 noPermission: &cYou do not have permission to run this command! (%permission%)
 firstLocationSet: &aFirst location set!
 secondLocationSet: &aSecond location set!

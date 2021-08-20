@@ -1,8 +1,6 @@
 redempt.redlib
 redempt.redlib.blockdata
 redempt.redlib.blockdata.events
-redempt.redlib.commandmanager
-redempt.redlib.commandmanager.exceptions
 redempt.redlib.configmanager
 redempt.redlib.configmanager.annotations
 redempt.redlib.configmanager.exceptions
