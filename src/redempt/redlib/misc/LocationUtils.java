@@ -132,7 +132,7 @@ public class LocationUtils {
 	 */
 	public static void delayedTeleport(Player player, Location loc, int ticks, Consumer<Boolean> result) {
 		double seconds = ticks / 20d;
-		player.sendMessage(Messages.msg("teleportDelay").replace("%seconds%", timeFormat.format(seconds)));
+		player.sendMessage(RedLib.msg("teleportDelay").replace("%seconds%", timeFormat.format(seconds)));
 		Location start = player.getLocation();
 		Task[] task = {null};
 		EventListener<?> listener = new EventListener<>(RedLib.getInstance(), PlayerMoveEvent.class, (l, e) -> {
@@ -140,7 +140,7 @@ public class LocationUtils {
 				return;
 			}
 			if (!start.getWorld().equals(e.getTo().getWorld()) || start.distanceSquared(e.getTo()) > 0.125) {
-				player.sendMessage(Messages.msg("teleportCancelled"));
+				player.sendMessage(RedLib.msg("teleportCancelled"));
 				task[0].cancel();
 				l.unregister();
 				result.accept(false);

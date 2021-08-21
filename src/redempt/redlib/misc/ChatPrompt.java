@@ -36,7 +36,7 @@ public class ChatPrompt implements Listener {
 		}
 		prompts.put(player, new Prompt(onResponse, onCancel));
 		player.sendMessage(prompt);
-		player.sendMessage(Messages.msg("cancelPromptMessage").replace("%canceltext%", Messages.msg("cancelText")));
+		player.sendMessage(RedLib.msg("cancelPromptMessage").replace("%canceltext%", RedLib.msg("cancelText")));
 	}
 	
 	/**
@@ -60,7 +60,7 @@ public class ChatPrompt implements Listener {
 			return;
 		}
 		e.setCancelled(true);
-		if (e.getMessage().equalsIgnoreCase(Messages.msg("cancelText"))) {
+		if (e.getMessage().equalsIgnoreCase(RedLib.msg("cancelText"))) {
 			p.cancel(CancelReason.PLAYER_CANCELLED);
 			return;
 		}

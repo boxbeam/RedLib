@@ -44,13 +44,12 @@ public class ProtectionPolicy implements Listener {
 	
 	protected static Set<ProtectionPolicy> globalPolicies = new HashSet<>();
 	protected static RegionMap<ProtectionPolicy> regionMap = new RegionMap<>();
-	private static boolean registered = false;
 	
-	public static void registerProtections() {
-		if (registered) {
-			return;
-		}
-		registered = true;
+	static {
+		registerProtections();
+	}
+	
+	private static void registerProtections() {
 		ProtectionListener.protect(BlockBreakEvent.class, ProtectionType.BREAK_BLOCK, e -> e.getPlayer(), e -> e.getBlock());
 		ProtectionListener.protect(BlockPlaceEvent.class, ProtectionType.PLACE_BLOCK, e -> e.getPlayer(), e -> e.getBlock());
 		ProtectionListener.protect(PlayerInteractEvent.class, ProtectionType.INTERACT, e -> e.getPlayer(), e -> {

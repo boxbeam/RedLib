@@ -15,17 +15,16 @@ import redempt.redlib.misc.Task;
 public class PlayerChangedArmorEvent extends PlayerEvent {
 	
 	private static HandlerList handlers = new HandlerList();
-	private static boolean registered = false;
+	
+	static {
+		register();
+	}
 	
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 	
-	public static void register() {
-		if (registered) {
-			return;
-		}
-		registered = true;
+	private static void register() {
 		Task.syncRepeating(RedLib.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(PlayerChangedArmorEvent::check), 1, 1);
 	}
 	

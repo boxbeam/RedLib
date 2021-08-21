@@ -5,7 +5,6 @@ redempt.redlib.configmanager
 redempt.redlib.configmanager.annotations
 redempt.redlib.configmanager.exceptions
 redempt.redlib.dev
-redempt.redlib.dev.profiler
 redempt.redlib.enchants
 redempt.redlib.enchants.events
 redempt.redlib.enchants.trigger

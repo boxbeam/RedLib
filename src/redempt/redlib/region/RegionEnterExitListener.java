@@ -20,17 +20,12 @@ import redempt.redlib.region.events.RegionExitEvent.ExitCause;
 public class RegionEnterExitListener {
 	
 	private static RegionMap<Region> regionMap = new RegionMap<>();
-	private static boolean registered = false;
 	
-	/**
-	 * Registers the listener which calls {@link RegionEnterEvent} and {@link RegionExitEvent}. Called automatically
-	 * by RedLib upon enabling.
-	 */
-	public static void register() {
-		if (registered) {
-			return;
-		}
-		registered = true;
+	static {
+		register();
+	}
+	
+	private static void register() {
 		new EventListener<>(RedLib.getInstance(), PlayerMoveEvent.class, e -> {
 			regionMap.get(e.getFrom()).forEach(r -> {
 				if (r.contains(e.getFrom()) && !r.contains(e.getTo())) {

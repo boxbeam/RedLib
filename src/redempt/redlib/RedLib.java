@@ -11,16 +11,11 @@ import redempt.redlib.configmanager.ConfigManager;
 import redempt.redlib.configmanager.annotations.ConfigValue;
 import redempt.redlib.dev.ChainCommand;
 import redempt.redlib.dev.StructureTool;
-import redempt.redlib.dev.profiler.Profiler;
-import redempt.redlib.dev.profiler.ProfilerCommands;
-import redempt.redlib.dev.profiler.TickMonitorProfiler;
-import redempt.redlib.enchants.events.PlayerChangedArmorEvent;
-import redempt.redlib.enchants.events.PlayerChangedHeldItemEvent;
-import redempt.redlib.protection.ProtectionPolicy;
-import redempt.redlib.region.RegionEnterExitListener;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -31,6 +26,18 @@ import java.util.jar.JarFile;
  * @author Redempt
  */
 public class RedLib extends JavaPlugin {
+	
+	private static Messages globalMessages;
+	private static RedLib redLib;
+	
+	static {
+		Path path = Paths.get("plugins/RedLib/messages.txt");
+		globalMessages = Messages.load(RedLib.class.getClassLoader().getResourceAsStream("redlib/messages.txt"), path);
+	}
+	
+	public static String msg(String msg) {
+		return globalMessages.get(msg);
+	}
 	
 	@ConfigValue
 	public static boolean devMode = false;
@@ -45,39 +52,29 @@ public class RedLib extends JavaPlugin {
 	 */
 	public static final int MID_VERSION = Integer.parseInt(getServerVersion().split("\\.")[1]);
 	
-	public static RedLib getInstance() {
-		return RedLib.getPlugin(RedLib.class);
+	/**
+	 * @return An instance of RedLib if it is a plugin dependency, or your plugin if RedLib is shaded
+	 */
+	public static Plugin getInstance() {
+		return redLib != null ? redLib : getCallingPlugin();
+	}
+	
+	@Override
+	public void onLoad() {
+		redLib = this;
 	}
 	
 	@Override
 	public void onEnable() {
-		Messages.load(this);
 		new ConfigManager(this).register(this).saveDefaults().load();
 		if (devMode) {
 			ChainCommand chain = new ChainCommand();
 			new CommandParser(this.getResource("command.rdcml"))
 					.setArgTypes(ArgType.of("material", Material.class), chain.getArgType())
 					.parse()
-					.register("redlib",
-					new ProfilerCommands(),
-					StructureTool.enable(), chain);
-			if (autoStartPassiveProfiler) {
-				ProfilerCommands.getProfiler().start();
-			}
-			if (autoStartTickMonitorProfiler) {
-				TickMonitorProfiler.setTickMinimum(tickMonitorProfilerMinTickLength);
-				TickMonitorProfiler.start();
-			}
+					.register("redlib", StructureTool.enable(), chain);
+			
 		}
-		PlayerChangedArmorEvent.register();
-		PlayerChangedHeldItemEvent.register();
-		RegionEnterExitListener.register();
-		ProtectionPolicy.registerProtections();
-	}
-	
-	@Override
-	public void onDisable() {
-		Profiler.stopAll();
 	}
 	
 	/**
@@ -91,6 +88,7 @@ public class RedLib extends JavaPlugin {
 	
 	/**
 	 * Gets the plugin that called the calling method of this method
+	 *
 	 * @return The plugin which called the method
 	 */
 	public static Plugin getCallingPlugin() {
@@ -107,9 +105,10 @@ public class RedLib extends JavaPlugin {
 	
 	/**
 	 * Gets all non-abstract, non-interface classes which extend a certain class within a plugin
+	 *
 	 * @param plugin The plugin
-	 * @param clazz The class
-	 * @param <T> The type of the class
+	 * @param clazz  The class
+	 * @param <T>    The type of the class
 	 * @return The list of matching classes
 	 */
 	public static <T> List<Class<? extends T>> getExtendingClasses(Plugin plugin, Class<T> clazz) {

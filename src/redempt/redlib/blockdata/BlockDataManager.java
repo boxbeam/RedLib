@@ -202,7 +202,7 @@ public class BlockDataManager implements Listener {
 	 * @return A set of DataBlocks in the chunk, or an empty set if the chunk is not loaded
 	 */
 	public Set<DataBlock> getLoaded(World world, int cx, int cz) {
-		return tryExists(world, new ChunkPosition(cx, cz)).orElse(null);
+		return tryExists(world, new ChunkPosition(cx, cz)).orElse(new HashSet<>());
 	}
 	
 	/**

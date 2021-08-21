@@ -69,10 +69,10 @@ public class SelectionTool implements Listener {
 		}
 		if (locations[0] == null) {
 			locations[0] = e.getClickedBlock().getLocation();
-			e.getPlayer().sendMessage(Messages.msg("firstLocationSet"));
+			e.getPlayer().sendMessage(RedLib.msg("firstLocationSet"));
 		} else if (locations[1] == null) {
 			locations[1] = e.getClickedBlock().getLocation();
-			e.getPlayer().sendMessage(Messages.msg("secondLocationSet"));
+			e.getPlayer().sendMessage(RedLib.msg("secondLocationSet"));
 		}
 		selections.put(e.getPlayer().getUniqueId(), locations);
 	}
