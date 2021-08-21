@@ -1,23 +1,6 @@
-helpTitle: &a--[ &eHelp for %cmdname% &a]--
-helpEntry: &e%cmdname%&a: %help%
-helpTextColor: &a
-noPermission: &cYou do not have permission to run this command! (%permission%)
 firstLocationSet: &aFirst location set!
 secondLocationSet: &aSecond location set!
 cancelPromptMessage: &cType '%canceltext%' to cancel.
 cancelText: cancel
-mustHoldItem: &cYou must be holding an item to do this!
-playerOnly: &cThis command can only be executed as a player!
-consoleOnly: &cThis command can only be executed as console!
 teleportDelay: &aPlease stand still for %seconds% seconds to teleport...
 teleportCancelled: &cTeleport cancelled!
-invalidArgument: &cInvalid argument for %arg%: %value%
-needArgument: &cMust supply at least one argument for %arg%
-needFlagValue: &cMust supply value for flag %flag%
-wrongArgumentCount: &cIncorrect number of arguments. Expected %args% argument(s), got %count%
-invalidSubcommand: &cInvalid subcommand: %value%
-contextDefaultFromConsole: &cCannot infer default value of argument %arg% for console sender, please specify it
-contextDefaultFlagFromConsole: &cCannot infer default value of flag %flag% for console sender, please specify it
-ambiguousOptional: &cThere is at least one ambiguous optional argument, please try again with no arguments omitted
-commandError: &cAn error was encountered in running this command. Please contact an admin.
-showUsage: &cUsage: %usage%
