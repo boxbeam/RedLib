@@ -3,7 +3,7 @@ RedLib is a Spigot plugin development library, designed to make your life easier
 
 # Installation for Development
 
-RedLib is a standalone plugin, so you will need to install it on any servers that have plugins which depend on it, and specify it as a dependency in your plugin.yml like this:
+RedLib is a standalone plugin, but can also be used as a shaded dependency if you do not want to distribute RedLib directly. To use it as a plugin dependency, you must add it as a dependency in your plugin.yml:
 
 ```yaml
 depend: [RedLib]
@@ -28,7 +28,9 @@ dependencies {
 }
 ```
 
-Replace `Tag` with a release tag for RedLib. Example: `4.3.6`. You can also use `master` as the tag to get the latest version, though you will have to clear your gradle caches in order to update it.
+Replace `Tag` with a release tag for RedLib. Example: `6.0`. You can also use `master` as the tag to get the latest version, though you will have to clear your gradle caches in order to update it.
+
+To shade RedLib, change the dependency from `compileOnly` to `implementation`, and install the [gradle shadow plugin](https://github.com/johnrengelman/shadow).
 
 Maven:
 
@@ -47,7 +49,9 @@ Maven:
         <scope>provided</scope>
 </dependency>
 ```
-Replace `Tag` with a release tag for RedLib. Example: `4.3.6`. You can also use `master` as the tag to get the latest version, though you will have to clear your maven caches in order to update it.
+Replace `Tag` with a release tag for RedLib. Example: `6.0`. You can also use `master` as the tag to get the latest version, though you will have to clear your maven caches in order to update it.
+
+To shade RedLib, change the scope from `provided` to `compile`.
 
 ## Build locally:
 
