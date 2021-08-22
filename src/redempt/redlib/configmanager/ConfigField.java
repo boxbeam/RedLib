@@ -1,5 +1,6 @@
 package redempt.redlib.configmanager;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import redempt.redlib.configmanager.exceptions.ConfigFieldException;
 

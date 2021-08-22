@@ -181,6 +181,7 @@ public class ConfigManager {
 		converters.put(Double.class, new TypeConverter<>(Double::parseDouble, Object::toString));
 		converters.put(Boolean.class, new TypeConverter<>(Boolean::valueOf, Object::toString));
 		converters.put(Float.class, new TypeConverter<>(Float::parseFloat, Object::toString));
+		converters.put(float.class, new TypeConverter<>(Float::parseFloat, Object::toString));
 	}
 	
 	/**
