@@ -194,7 +194,10 @@ public class ProfilerCommands {
 	}
 	
 	@CommandHook("startmonitor")
-	public void startMonitor(CommandSender sender) {
+	public void startMonitor(CommandSender sender, Integer minimum) {
+		if (minimum != null) {
+			TickMonitorProfiler.setTickMinimum(minimum);
+		}
 		TickMonitorProfiler.start();
 		sender.sendMessage(ChatColor.YELLOW + "Tick monitor profiler started.");
 	}

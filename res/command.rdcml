@@ -30,7 +30,7 @@ structure,struct {
 profiler,rprofiler {
 	permission redlib.dev
 	monitor {
-		start {
+		start int:--minimum {
 			help Starts the tick monitor profiler
 			hook startmonitor
 		}
