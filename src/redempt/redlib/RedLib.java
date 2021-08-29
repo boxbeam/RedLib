@@ -11,6 +11,7 @@ import redempt.redlib.configmanager.ConfigManager;
 import redempt.redlib.configmanager.annotations.ConfigValue;
 import redempt.redlib.dev.ChainCommand;
 import redempt.redlib.dev.StructureTool;
+import redempt.redlib.dev.profiler.ProfilerCommands;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
@@ -67,8 +68,7 @@ public class RedLib extends JavaPlugin {
 			new CommandParser(this.getResource("command.rdcml"))
 					.setArgTypes(ArgType.of("material", Material.class), chain.getArgType())
 					.parse()
-					.register("redlib", StructureTool.enable(), chain);
-			
+					.register("redlib", new ProfilerCommands(), StructureTool.enable(), chain);
 		}
 	}
 	
