@@ -1,7 +1,7 @@
 # RedLib
 RedLib is a Spigot plugin development library, designed to make your life easier and soothe the pain points of plugin development. Below, find instructions for the various components of RedLib.
 
-Discord: https://discord.gg/agu5xGy2YZ
+Support Discord: https://discord.gg/agu5xGy2YZ
 
 # Installation for Development
 
