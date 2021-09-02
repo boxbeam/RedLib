@@ -86,6 +86,9 @@ class ConfigObjectMapper<T> {
 	}
 	
 	private T loadMapped(ConfigurationSection section) {
+		if (section == null) {
+			return null;
+		}
 		try {
 			Constructor<T> constructor = clazz.getDeclaredConstructor();
 			constructor.setAccessible(true);
