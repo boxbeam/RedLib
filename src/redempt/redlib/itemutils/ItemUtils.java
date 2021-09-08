@@ -42,9 +42,8 @@ public class ItemUtils {
 	public static ItemStack rename(ItemStack item, String name) {
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(name);
-		ItemStack clone = item.clone();
-		clone.setItemMeta(meta);
-		return clone;
+		item.setItemMeta(meta);
+		return item;
 	}
 	
 	/**
@@ -68,9 +67,8 @@ public class ItemUtils {
 		List<String> lore = new ArrayList<>();
 		lore.add(line);
 		meta.setLore(lore);
-		ItemStack clone = item.clone();
-		clone.setItemMeta(meta);
-		return clone;
+		item.setItemMeta(meta);
+		return item;
 	}
 	
 	/**
@@ -82,9 +80,8 @@ public class ItemUtils {
 	public static ItemStack setLore(ItemStack item, List<String> lore) {
 		ItemMeta meta = item.getItemMeta();
 		meta.setLore(lore);
-		ItemStack clone = item.clone();
-		clone.setItemMeta(meta);
-		return clone;
+		item.setItemMeta(meta);
+		return item;
 	}
 	
 	/**
@@ -99,9 +96,8 @@ public class ItemUtils {
 		lore = lore == null ? new ArrayList<>() : lore;
 		lore.add(line);
 		meta.setLore(lore);
-		ItemStack clone = item.clone();
-		clone.setItemMeta(meta);
-		return clone;
+		item.setItemMeta(meta);
+		return item;
 	}
 	
 	/**
@@ -116,9 +112,8 @@ public class ItemUtils {
 		lore = lore == null ? new ArrayList<>() : lore;
 		lines.forEach(lore::add);
 		meta.setLore(lore);
-		ItemStack clone = item.clone();
-		clone.setItemMeta(meta);
-		return clone;
+		item.setItemMeta(meta);
+		return item;
 	}
 	
 	/**
@@ -157,9 +152,8 @@ public class ItemUtils {
 		if (level == 0) {
 			meta.removeEnchant(enchant);
 		}
-		ItemStack clone = item.clone();
-		clone.setItemMeta(meta);
-		return clone;
+		item.setItemMeta(meta);
+		return item;
 	}
 	
 	/**
@@ -172,9 +166,8 @@ public class ItemUtils {
 	public static ItemStack addAttribute(ItemStack item, Attribute attribute, AttributeModifier modifier) {
 		ItemMeta meta = item.getItemMeta();
 		meta.addAttributeModifier(attribute, modifier);
-		ItemStack clone = item.clone();
-		clone.setItemMeta(meta);
-		return clone;
+		item.setItemMeta(meta);
+		return item;
 	}
 	
 	/**
@@ -189,9 +182,8 @@ public class ItemUtils {
 		ItemMeta meta = item.getItemMeta();
 		AttributeModifier modifier = new AttributeModifier(attribute.toString(), amount, operation);
 		meta.addAttributeModifier(attribute, modifier);
-		ItemStack clone = item.clone();
-		clone.setItemMeta(meta);
-		return clone;
+		item.setItemMeta(meta);
+		return item;
 	}
 	
 	/**
@@ -203,9 +195,8 @@ public class ItemUtils {
 	public static ItemStack addItemFlags(ItemStack item, ItemFlag... flags) {
 		ItemMeta meta = item.getItemMeta();
 		meta.addItemFlags(flags);
-		ItemStack clone = item.clone();
-		clone.setItemMeta(meta);
-		return clone;
+		item.setItemMeta(meta);
+		return item;
 	}
 	
 	/**
@@ -217,9 +208,8 @@ public class ItemUtils {
 	public static ItemStack setCustomModelData(ItemStack item, int customModelData) {
 		ItemMeta meta = item.getItemMeta();
 		meta.setCustomModelData(customModelData);
-		ItemStack clone = item.clone();
-		clone.setItemMeta(meta);
-		return clone;
+		item.setItemMeta(meta);
+		return item;
 	}
 	
 	/**
@@ -235,9 +225,8 @@ public class ItemUtils {
 	public static <T, Z> ItemStack addPersistentTag(ItemStack item, NamespacedKey key, PersistentDataType<T, Z> type, Z data) {
 		ItemMeta meta = item.getItemMeta();
 		meta.getPersistentDataContainer().set(key, type, data);
-		ItemStack clone = item.clone();
-		clone.setItemMeta(meta);
-		return clone;
+		item.setItemMeta(meta);
+		return item;
 	}
 	
 	/**
@@ -253,9 +242,8 @@ public class ItemUtils {
 		ItemMeta meta = item.getItemMeta();
 		AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), attribute.toString(), amount, operation, slot);
 		meta.addAttributeModifier(attribute, modifier);
-		ItemStack clone = item.clone();
-		clone.setItemMeta(meta);
-		return clone;
+		item.setItemMeta(meta);
+		return item;
 	}
 	
 	/**
@@ -266,7 +254,6 @@ public class ItemUtils {
 	 * @throws IllegalArgumentException if the item is not damageable
 	 */
 	public static ItemStack damage(ItemStack item, int amount) {
-		item = item.clone();
 		if (RedLib.MID_VERSION >= 13) {
 			ItemMeta meta = item.getItemMeta();
 			if (!(meta instanceof Damageable)) {

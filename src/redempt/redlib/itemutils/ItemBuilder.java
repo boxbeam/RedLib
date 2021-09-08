@@ -49,9 +49,8 @@ public class ItemBuilder extends ItemStack {
 	 * @return The ItemBuilder with the new stack size
 	 */
 	public ItemBuilder setCount(int amount) {
-		ItemBuilder clone = new ItemBuilder(this.clone());
-		clone.setAmount(amount);
-		return clone;
+		setAmount(amount);
+		return this;
 	}
 	
 	/**
@@ -61,7 +60,8 @@ public class ItemBuilder extends ItemStack {
 	 * @return The enchanted ItemBuilder
 	 */
 	public ItemBuilder addEnchant(Enchantment enchant, int level) {
-		return new ItemBuilder(ItemUtils.addEnchant(this, enchant, level));
+		ItemUtils.addEnchant(this, enchant, level);
+		return this;
 	}
 	
 	/**
@@ -70,7 +70,8 @@ public class ItemBuilder extends ItemStack {
 	 * @return The ItemBuilder with lore added
 	 */
 	public ItemBuilder setLore(String... lore) {
-		return new ItemBuilder(ItemUtils.setLore(this, lore));
+		ItemUtils.setLore(this, lore);
+		return this;
 	}
 	
 	/**
@@ -79,7 +80,8 @@ public class ItemBuilder extends ItemStack {
 	 * @return The ItemBuilder with lore added
 	 */
 	public ItemBuilder addLore(String line) {
-		return new ItemBuilder(ItemUtils.addLore(this, line));
+		ItemUtils.addLore(this, line);
+		return this;
 	}
 	
 	/**
@@ -88,7 +90,8 @@ public class ItemBuilder extends ItemStack {
 	 * @return The ItemBuilder with lore added
 	 */
 	public ItemBuilder addLore(Iterable<String> lines) {
-		return new ItemBuilder(ItemUtils.addLore(this, lines));
+		ItemUtils.addLore(this, lines);
+		return this;
 	}
 	
 	/**
@@ -97,7 +100,8 @@ public class ItemBuilder extends ItemStack {
 	 * @return The renamed ItemBuilder
 	 */
 	public ItemBuilder setName(String name) {
-		return new ItemBuilder(ItemUtils.rename(this, name));
+		ItemUtils.rename(this, name);
+		return this;
 	}
 	
 	/**
@@ -108,7 +112,7 @@ public class ItemBuilder extends ItemStack {
 	@SuppressWarnings("deprecation")
 	public ItemBuilder setDurability(int durability) {
 		this.setDurability((short) durability);
-		return new ItemBuilder(this);
+		return this;
 	}
 	
 	/**
@@ -118,7 +122,8 @@ public class ItemBuilder extends ItemStack {
 	 * @return The ItemBuilder with the attribute added
 	 */
 	public ItemBuilder addAttribute(Attribute attribute, AttributeModifier modifier) {
-		return new ItemBuilder(ItemUtils.addAttribute(this, attribute, modifier));
+		ItemUtils.addAttribute(this, attribute, modifier);
+		return this;
 	}
 	
 	/**
@@ -129,7 +134,8 @@ public class ItemBuilder extends ItemStack {
 	 * @return The ItemBuilder with the attribute added
 	 */
 	public ItemBuilder addAttribute(Attribute attribute, double amount, Operation operation) {
-		return new ItemBuilder(ItemUtils.addAttribute(this, attribute, amount, operation));
+		ItemUtils.addAttribute(this, attribute, amount, operation);
+		return this;
 	}
 	
 	/**
@@ -141,7 +147,8 @@ public class ItemBuilder extends ItemStack {
 	 * @return The ItemBuilder with the attribute added
 	 */
 	public ItemBuilder addAttribute(Attribute attribute, double amount, Operation operation, EquipmentSlot slot) {
-		return new ItemBuilder(ItemUtils.addAttribute(this, attribute, amount, operation, slot));
+		ItemUtils.addAttribute(this, attribute, amount, operation, slot);
+		return this;
 	}
 	
 	/**
@@ -150,7 +157,8 @@ public class ItemBuilder extends ItemStack {
 	 * @return The ItemBuilder with the flags added
 	 */
 	public ItemBuilder addItemFlags(ItemFlag... flags) {
-		return new ItemBuilder(ItemUtils.addItemFlags(this, flags));
+		ItemUtils.addItemFlags(this, flags);
+		return this;
 	}
 	
 	/**
@@ -159,7 +167,8 @@ public class ItemBuilder extends ItemStack {
 	 * @return The ItemBuilder with the damage applied
 	 */
 	public ItemBuilder addDamage(int damage) {
-		return new ItemBuilder(ItemUtils.damage(this, damage));
+		ItemUtils.damage(this, damage);
+		return this;
 	}
 	
 	/**
@@ -168,7 +177,8 @@ public class ItemBuilder extends ItemStack {
 	 * @return The ItemBuilder with the custom model data set
 	 */
 	public ItemBuilder setCustomModelData(int customModelData) {
-		return new ItemBuilder(ItemUtils.setCustomModelData(this, customModelData));
+		ItemUtils.setCustomModelData(this, customModelData);
+		return this;
 	}
 	
 	/**
@@ -181,7 +191,8 @@ public class ItemBuilder extends ItemStack {
 	 * @return The ItemBuilder with the persistent data added
 	 */
 	public <T, Z> ItemBuilder addPersistentTag(NamespacedKey key, PersistentDataType<T, Z> type, Z data) {
-		return new ItemBuilder(ItemUtils.addPersistentTag(this, key, type, data));
+		ItemUtils.addPersistentTag(this, key, type, data);
+		return this;
 	}
 	
 	/**
@@ -189,7 +200,8 @@ public class ItemBuilder extends ItemStack {
 	 * @return The ItemBuilder with the unbreakable tag added
 	 */
 	public ItemBuilder unbreakable() {
-		return new ItemBuilder(ItemUtils.setUnbreakable(this));
+		ItemUtils.setUnbreakable(this);
+		return this;
 	}
 	
 }
