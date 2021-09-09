@@ -173,6 +173,7 @@ public class WeightedRandom<T> {
 		int index = items.indexOf(outcome);
 		items.remove(index);
 		totals.remove(index);
+		total -= value;
 		for (int i = index; i < totals.size(); i++) {
 			totals.set(i, totals.get(i) - value);
 		}
