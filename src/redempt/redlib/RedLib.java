@@ -125,7 +125,7 @@ public class RedLib extends JavaPlugin {
 				Class<?> c;
 				try {
 					c = Class.forName(name, true, loader);
-				} catch (ClassNotFoundException ex) {
+				} catch (ClassNotFoundException | NoClassDefFoundError ex) {
 					continue;
 				}
 				if (!clazz.isAssignableFrom(c) || Modifier.isAbstract(c.getModifiers()) || c.isInterface()) {
