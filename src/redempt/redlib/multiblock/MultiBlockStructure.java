@@ -3,6 +3,7 @@ package redempt.redlib.multiblock;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
@@ -19,6 +20,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * A utility class intended to create interactive multi-block structures.
@@ -43,6 +46,8 @@ public class MultiBlockStructure {
 		if (!start.getWorld().equals(end.getWorld())) {
 			throw new IllegalArgumentException("Locations must be in the same  world");
 		}
+		World world = start.getWorld();
+		
 		int minX = Math.min(start.getBlockX(), end.getBlockX());
 		int minY = Math.min(start.getBlockY(), end.getBlockY());
 		int minZ = Math.min(start.getBlockZ(), end.getBlockZ());
@@ -51,32 +56,80 @@ public class MultiBlockStructure {
 		int maxY = Math.max(start.getBlockY(), end.getBlockY());
 		int maxZ = Math.max(start.getBlockZ(), end.getBlockZ());
 		
-		String output = (maxX - minX + 1) + "x" + (maxY - minY + 1) + "x" + (maxZ - minZ + 1) + ";";
-		StringBuilder builder = new StringBuilder();
+		String dims = (maxX - minX + 1) + "x" + (maxY - minY + 1) + "x" + (maxZ - minZ + 1) + ";";
+		List<String> parts = new ArrayList<>();
+		Map<String, Integer> counts = new LinkedHashMap<>();
+		int count = 0;
+		
 		for (int x = minX; x <= maxX; x++) {
 			for (int y = minY; y <= maxY; y++) {
 				for (int z = minZ; z <= maxZ; z++) {
-					Block block = start.getWorld().getBlockAt(x, y, z);
-					if (RedLib.MID_VERSION >= 13) {
-						if (block.getType() == skip) {
-							builder.append("air;");
-							continue;
-						}
-						builder.append(block.getBlockData().getAsString()).append(';');
-					} else {
-						if (block.getType() == skip) {
-							builder.append("AIR:0;");
-							continue;
-						}
-						builder.append(block.getType().toString()).append(":").append(block.getData()).append(";");
+					Block b = world.getBlockAt(x, y, z);
+					String block = stringify(b, skip);
+					int last = parts.size() - 1;
+					if (last >= 0 && block.equals(parts.get(last))) {
+						count++;
+						continue;
 					}
+					counts.compute(block, (k, v) -> v == null ? 1 : v + 1);
+					if (count > 0) {
+						String part = parts.get(last);
+						part += "*" + (count + 1);
+						parts.set(last, part);
+						count = 0;
+					}
+					parts.add(block);
 				}
 			}
 		}
-		output += builder.toString();
-		output = output.substring(0, output.length() - 1);
-		output = minify(output);
-		return output;
+		
+		if (count > 0) {
+			int last = parts.size() - 1;
+			String part = parts.get(last);
+			part += "*" + (count + 1);
+			parts.set(last, part);
+		}
+		
+		List<String> replace = counts.entrySet().stream().filter(e -> e.getValue() > 1)
+				.map(Entry::getKey).sorted().collect(Collectors.toList());
+		counts.clear();
+		IntStream.range(0, replace.size()).forEach(i -> counts.put(replace.get(i), i));
+		
+		String prefix = "";
+		if (replace.size() > 0) {
+			for (int i = 0; i < parts.size(); i++) {
+				String part = parts.get(i);
+				int ind = part.indexOf('*');
+				String type = ind == -1 ? part : part.substring(0, ind);
+				Integer index = counts.get(type);
+				if (index == null) {
+					continue;
+				}
+				ind = ind == -1 ? part.length() : ind;
+				part = index + part.substring(ind);
+				parts.set(i, part);
+			}
+			prefix = "(" + String.join(";", replace) + ")";
+		}
+		
+		StringBuilder builder = new StringBuilder(prefix).append(dims);
+		
+		for (String part : parts) {
+			builder.append(part).append(';');
+		}
+		
+		return builder.substring(0, builder.length() - 1);
+	}
+	
+	private static String stringify(Block block, Material skip) {
+		Material type = block.getType();
+		if (RedLib.MID_VERSION >= 13) {
+			if (type == skip) {
+				return "air";
+			}
+			return block.getBlockData().getAsString();
+		}
+		return type + ":" + block.getData();
 	}
 	
 	/**
@@ -169,60 +222,6 @@ public class MultiBlockStructure {
 		return create(stream, name, true, false);
 	}
 	
-	private static String minify(String data) {
-		data = data.replace("minecraft:", "");
-		String[] split = data.split(";");
-		int same = 0;
-		StringBuilder output = new StringBuilder().append(split[0]).append(";");
-		for (int i = 1; i < split.length - 1; i++) {
-			if (split[i].equals(split[i + 1])) {
-				same += same == 0 ? 2 : 1;
-				continue;
-			} else if (same > 0) {
-				output.append(split[i - 1]).append('*').append(same).append(';');
-				same = 0;
-				continue;
-			}
-			output.append(split[i]).append(';');
-		}
-		if (same > 0) {
-			output.append(split[split.length - 1]).append('*').append(same).append(';');
-		} else {
-			output.append(split[split.length - 1]);
-		}
-		Map<String, Integer> count = new HashMap<>();
-		String combine = output.toString();
-		split = combine.split(";");
-		for (int i = 1; i < split.length; i++) {
-			String str = split[i];
-			if (str.contains("*")) {
-				str = str.substring(0, str.indexOf('*'));
-			}
-			if (!count.containsKey(str)) {
-				count.put(str, 1);
-				continue;
-			}
-			count.put(str, count.get(str) + 1);
-		}
-		List<String> replace = new ArrayList<>();
-		for (Entry<String, Integer> entry : count.entrySet()) {
-			if (entry.getValue() >= 2) {
-				replace.add(entry.getKey());
-			}
-		}
-		replace.sort(Comparator.comparingInt(String::length));
-		StringBuilder prepend = new StringBuilder();
-		for (int i = 0; i < replace.size(); i++) {
-			String str = replace.get(i);
-			prepend.append(str).append(';');
-			combine = combine.replaceAll("(?<=;|^)" + Pattern.quote(str) + "(?=[^a-z_]|$)", i + "");
-		}
-		if (replace.size() > 0) {
-			combine = "(" + prepend.substring(0, prepend.length() - 1) + ")" + combine + ";";
-		}
-		return combine;
-	}
-	
 	private static int findFromEnd(String str, char c) {
 		for (int i = str.length() - 1; i >= 0; i--) {
 			if (str.charAt(i) == c) {
@@ -266,12 +265,13 @@ public class MultiBlockStructure {
 	}
 	
 	private void expand(String data, Consumer<StructureData> consumer) {
-		StructureData[][] replace = {null};
+		StructureData[] replace = {null};
 		if (data.startsWith("(")) {
 			String list = data.substring(1, data.indexOf(')'));
-			replace[0] = Arrays.stream(list.split(";")).map(StructureData::new).toArray(StructureData[]::new);
+			replace = Arrays.stream(list.split(";")).map(StructureData::new).toArray(StructureData[]::new);
 			data = data.substring(data.indexOf(')') + 1);
 		}
+		StructureData[] freplace = replace;
 		boolean[] first = {true};
 		split(data, ';', str -> {
 			if (first[0]) {
@@ -292,7 +292,7 @@ public class MultiBlockStructure {
 			char c = str.charAt(0);
 			String type = ind == -1 ? str : str.substring(0, ind);
 			if (c >= '0' && c <= '9') {
-				val = replace[0][Integer.parseInt(type)];
+				val = freplace[Integer.parseInt(type)];
 			} else {
 				val = new StructureData(type);
 			}
