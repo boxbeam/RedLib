@@ -127,7 +127,11 @@ public class MultiBlockStructure {
 			if (type == skip) {
 				return "air";
 			}
-			return block.getBlockData().getAsString();
+			String data = block.getBlockData().getAsString();
+			if (data.length() > 9 && data.charAt(9) == ':') {
+				data = data.substring(10);
+			}
+			return data;
 		}
 		return type + ":" + block.getData();
 	}
