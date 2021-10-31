@@ -129,6 +129,21 @@ loadScripts(document, 'script');</script>
 <div class="block">Adds a type converter, which will attempt to convert a String from config to another type that
  is not usually able to be stored in config</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;T&gt;&nbsp;<a href="ConfigCollection.html" title="class in redempt.redlib.configmanager">ConfigCollection</a>&lt;T&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#collection(java.lang.Class,java.util.Collection,T...)" class="member-name-link">collection</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;clazz,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;T&gt;&nbsp;toWrap,
+ T...&nbsp;elements)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Creates a ConfigCollection from a given type with initial elements.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;T&gt;&nbsp;<a href="ConfigCollection.html" title="class in redempt.redlib.configmanager">ConfigCollection</a>&lt;T&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#collection(java.lang.Class,redempt.redlib.configmanager.ConversionType,java.util.Collection,T...)" class="member-name-link">collection</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;clazz,
+ <a href="ConversionType.html" title="enum class in redempt.redlib.configmanager">ConversionType</a>&nbsp;type,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;T&gt;&nbsp;toWrap,
+ T...&nbsp;elements)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Creates a ConfigCollection from a given type with initial elements.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#configExists()" class="member-name-link">configExists</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
@@ -443,7 +458,7 @@ V&gt;</span>
 <dd><code>clazz</code> - The class of the type of the list</dd>
 <dd><code>elements</code> - The elements to initialize the list with</dd>
 <dt>Returns:</dt>
-<dd>A list of the given type which has been populated with the given elements</dd>
+<dd>A set of the given type which has been populated with the given elements</dd>
 </dl>
 </section>
 </li>
@@ -465,7 +480,51 @@ V&gt;</span>
 <dd><code>elements</code> - The elements to initialize the list with</dd>
 <dd><code>type</code> - The method which will be used to convert the stored type</dd>
 <dt>Returns:</dt>
-<dd>A list of the given type which has been populated with the given elements</dd>
+<dd>A set of the given type which has been populated with the given elements</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="collection(java.lang.Class,redempt.redlib.configmanager.ConversionType,java.util.Collection,T...)">
+<h3 id="collection(java.lang.Class,redempt.redlib.configmanager.ConversionType,java.util.Collection,java.lang.Object[])">collection</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="ConfigCollection.html" title="class in redempt.redlib.configmanager">ConfigCollection</a>&lt;T&gt;</span>&nbsp;<span class="element-name">collection</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;clazz,
+ <a href="ConversionType.html" title="enum class in redempt.redlib.configmanager">ConversionType</a>&nbsp;type,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;T&gt;&nbsp;toWrap,
+ T...&nbsp;elements)</span></div>
+<div class="block">Creates a ConfigCollection from a given type with initial elements. A ConfigCollection wraps the given collection.
+ This method must be used to set the initial value for a variable which loads a set from config using type
+ converters or mapped objects.</div>
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><code>T</code> - The type</dd>
+<dt>Parameters:</dt>
+<dd><code>clazz</code> - The class of the type of the list</dd>
+<dd><code>elements</code> - The elements to initialize the list with</dd>
+<dd><code>type</code> - The method which will be used to convert the stored type</dd>
+<dd><code>toWrap</code> - The Collection to wrap</dd>
+<dt>Returns:</dt>
+<dd>A wrapped collection of the given type which has been populated with the given elements</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="collection(java.lang.Class,java.util.Collection,T...)">
+<h3 id="collection(java.lang.Class,java.util.Collection,java.lang.Object[])">collection</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="ConfigCollection.html" title="class in redempt.redlib.configmanager">ConfigCollection</a>&lt;T&gt;</span>&nbsp;<span class="element-name">collection</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;clazz,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;T&gt;&nbsp;toWrap,
+ T...&nbsp;elements)</span></div>
+<div class="block">Creates a ConfigCollection from a given type with initial elements. A ConfigCollection wraps the given collection.
+ This method must be used to set the initial value for a variable which loads a set from config using type
+ converters or mapped objects.</div>
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><code>T</code> - The type</dd>
+<dt>Parameters:</dt>
+<dd><code>clazz</code> - The class of the type of the list</dd>
+<dd><code>elements</code> - The elements to initialize the list with</dd>
+<dd><code>toWrap</code> - The Collection to wrap</dd>
+<dt>Returns:</dt>
+<dd>A wrapped collection of the given type which has been populated with the given elements</dd>
 </dl>
 </section>
 </li>

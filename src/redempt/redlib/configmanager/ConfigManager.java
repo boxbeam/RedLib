@@ -119,7 +119,7 @@ public class ConfigManager {
 	 * @param clazz The class of the type of the list
 	 * @param elements The elements to initialize the list with
 	 * @param <T> The type
-	 * @return A list of the given type which has been populated with the given elements
+	 * @return A set of the given type which has been populated with the given elements
 	 */
 	public static <T> ConfigSet<T> set(Class<T> clazz, T... elements) {
 		return set(clazz, ConversionType.AUTO, elements);
@@ -133,12 +133,43 @@ public class ConfigManager {
 	 * @param elements The elements to initialize the list with
 	 * @param <T> The type
 	 * @param type The method which will be used to convert the stored type
-	 * @return A list of the given type which has been populated with the given elements
+	 * @return A set of the given type which has been populated with the given elements
 	 */
 	public static <T> ConfigSet<T> set(Class<T> clazz, ConversionType type, T... elements) {
 		ConfigSet<T> set = new ConfigSet<T>(clazz, type);
 		Collections.addAll(set, elements);
 		return set;
+	}
+	
+	/**
+	 * Creates a ConfigCollection from a given type with initial elements. A ConfigCollection wraps the given collection.
+	 * This method must be used to set the initial value for a variable which loads a set from config using type
+	 * converters or mapped objects.
+	 * @param clazz The class of the type of the list
+	 * @param elements The elements to initialize the list with
+	 * @param <T> The type
+	 * @param type The method which will be used to convert the stored type
+	 * @param toWrap The Collection to wrap
+	 * @return A wrapped collection of the given type which has been populated with the given elements
+	 */
+	public static <T> ConfigCollection<T> collection(Class<T> clazz, ConversionType type, Collection<T> toWrap, T... elements) {
+		Collections.addAll(toWrap, elements);
+		return new ConfigCollection<>(clazz, type, toWrap);
+	}
+	
+	/**
+	 * Creates a ConfigCollection from a given type with initial elements. A ConfigCollection wraps the given collection.
+	 * This method must be used to set the initial value for a variable which loads a set from config using type
+	 * converters or mapped objects.
+	 * @param clazz The class of the type of the list
+	 * @param elements The elements to initialize the list with
+	 * @param <T> The type
+	 * @param toWrap The Collection to wrap
+	 * @return A wrapped collection of the given type which has been populated with the given elements
+	 */
+	public static <T> ConfigCollection<T> collection(Class<T> clazz, Collection<T> toWrap, T... elements) {
+		Collections.addAll(toWrap, elements);
+		return new ConfigCollection<>(clazz, ConversionType.AUTO, toWrap);
 	}
 	
 	private YamlConfiguration config;

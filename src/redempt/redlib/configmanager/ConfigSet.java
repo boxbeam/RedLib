@@ -10,7 +10,6 @@ class ConfigSet<T> extends LinkedHashSet<T> implements ConfigStorage {
 	
 	protected Class<T> clazz;
 	private ConfigObjectMapper<T> mapper;
-	private ConfigurationSection section;
 	private ConfigManager manager;
 	private ConversionType type;
 	

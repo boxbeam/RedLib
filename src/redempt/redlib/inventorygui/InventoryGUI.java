@@ -1,8 +1,10 @@
 package redempt.redlib.inventorygui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -41,11 +43,11 @@ public class InventoryGUI implements Listener {
 	}
 	
 	private final Inventory inventory;
-	private List<ItemButton> buttons = new ArrayList<>();
 	private Set<Integer> openSlots = new HashSet<>();
 	private Runnable onDestroy;
 	private BiConsumer<InventoryClickEvent, List<Integer>> onClickOpenSlot = (e, i) -> {};
 	private Consumer<InventoryDragEvent> onDragOpenSlot = e -> {};
+	private Map<Integer, ItemButton> buttons = new HashMap<>();
 	
 	private boolean returnItems = true;
 	private boolean destroyOnClose = true;
@@ -62,6 +64,7 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Creates a new GUI, instantiating a new inventory with the given size and name
+	 *
 	 * @param size The size of the inventory
 	 * @param name The name of the inventory
 	 */
@@ -86,8 +89,8 @@ public class InventoryGUI implements Listener {
 	 */
 	public void addButton(ItemButton button, int slot) {
 		button.setSlot(slot);
-		buttons.add(button);
 		inventory.setItem(slot, button.getItem());
+		buttons.put(slot, button);
 	}
 	
 	/**
@@ -148,22 +151,44 @@ public class InventoryGUI implements Listener {
 	 * @param button The button to be removed
 	 */
 	public void removeButton(ItemButton button) {
-		buttons.remove(button);
-		inventory.remove(button.getItem());
+		inventory.setItem(button.getSlot(), new ItemStack(Material.AIR));
+		buttons.remove(button.getSlot());
 	}
 	
 	/**
 	 * @return All the ItemButtons in this GUI
 	 */
 	public List<ItemButton> getButtons() {
-		return buttons;
+		return new ArrayList<>(buttons.values());
+	}
+	
+	/**
+	 * Gets the ItemButton in a given slot
+	 * @param slot The slot the button is in
+	 * @return The ItemButton, or null if there is no button in that slot
+	 */
+	public ItemButton getButton(int slot) {
+		return buttons.get(slot);
+	}
+	
+	/**
+	 * Clears a single slot, removing a button if it is present
+	 * @param slot The slot to clear
+	 */
+	public void clearSlot(int slot) {
+		ItemButton button = buttons.get(slot);
+		if (button != null) {
+			removeButton(button);
+			return;
+		}
+		inventory.setItem(slot, new ItemStack(Material.AIR));
 	}
 	
 	/**
 	 * Refresh the inventory.
 	 */
 	public void update() {
-		for (ItemButton button : buttons) {
+		for (ItemButton button : buttons.values()) {
 			inventory.setItem(button.getSlot(), button.getItem());
 		}
 	}
@@ -221,6 +246,7 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Opens this GUI for a player
+	 *
 	 * @param player The player to open this GUI for
 	 */
 	public void open(Player player) {
@@ -333,6 +359,7 @@ public class InventoryGUI implements Listener {
 	
 	/**
 	 * Sets the handler for when items are drag-clicked into open slots
+	 *
 	 * @param onDrag The handler
 	 */
 	public void setOnDragOpenSlot(Consumer<InventoryDragEvent> onDrag) {
@@ -416,11 +443,9 @@ public class InventoryGUI implements Listener {
 				return;
 			}
 			e.setCancelled(true);
-			for (ItemButton button : buttons) {
-				if (e.getSlot() == button.getSlot()) {
-					button.onClick(e);
-					break;
-				}
+			ItemButton button = buttons.get(e.getSlot());
+			if (button != null) {
+				button.onClick(e);
 			}
 		}
 	}
@@ -432,41 +457,6 @@ public class InventoryGUI implements Listener {
 				destroy((Player) e.getPlayer());
 			}
 		}
-	}
-	
-	/**
-	 * Gets the state of the GUI, which can be restored later
-	 *
-	 * @return The state of this GUI
-	 */
-	public GUIState getState() {
-		return new GUIState(buttons, openSlots, inventory.getContents(), this);
-	}
-	
-	public static class GUIState {
-		
-		private List<ItemButton> buttons;
-		private Set<Integer> openSlots;
-		private ItemStack[] contents;
-		private InventoryGUI gui;
-		
-		private GUIState(List<ItemButton> buttons, Set<Integer> openSlots, ItemStack[] contents, InventoryGUI gui) {
-			this.buttons = new ArrayList<>(buttons);
-			this.openSlots = new HashSet<>(openSlots);
-			this.contents = contents.clone();
-			this.gui = gui;
-		}
-		
-		/**
-		 * Restore the GUI to this state
-		 */
-		public void restore() {
-			gui.clear();
-			gui.buttons = new ArrayList<>(buttons);
-			gui.openSlots = new HashSet<>(openSlots);
-			gui.inventory.setContents(contents.clone());
-		}
-		
 	}
 	
 }

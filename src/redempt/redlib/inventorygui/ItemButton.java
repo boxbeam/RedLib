@@ -1,5 +1,6 @@
 package redempt.redlib.inventorygui;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -28,6 +29,24 @@ public abstract class ItemButton {
 			@Override
 			public void onClick(InventoryClickEvent e) {
 				listener.accept(e);
+			}
+			
+		};
+	}
+	
+	/**
+	 * Create an ItemButton from the given ItemStack and listener.
+	 * Useful if you, like most people, would rather use lambdas than the anonymous class definition.
+	 * @param item The ItemStack to be used as this button's icon
+	 * @param listener The listener which will be called whenever this button is clicked and accepts the event and button
+	 * @return The ItemButton, which can be added to an InventoryGUI
+	 */
+	public static ItemButton create(ItemStack item, BiConsumer<InventoryClickEvent, ItemButton> listener) {
+		return new ItemButton(item) {
+			
+			@Override
+			public void onClick(InventoryClickEvent e) {
+				listener.accept(e, this);
 			}
 			
 		};
