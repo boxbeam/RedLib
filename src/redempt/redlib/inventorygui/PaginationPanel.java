@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+import java.util.stream.Collectors;
 
 /**
  * A panel in an InventoryGUI which can be used to paginate items and buttons
@@ -19,8 +20,8 @@ public class PaginationPanel {
 	
 	private InventoryGUI gui;
 	private int page = 1;
-	private List<Consumer<Integer>> buttons = new ArrayList<>();
-	private Map<Object, Consumer<Integer>> items = new HashMap<>();
+	private List<IntConsumer> buttons = new ArrayList<>();
+	private Map<Object, IntConsumer> items = new HashMap<>();
 	private Set<Integer> slots = new TreeSet<>();
 	private Runnable onUpdate = () -> {};
 	
@@ -41,7 +42,7 @@ public class PaginationPanel {
 	}
 	
 	private void addPagedButton0(ItemButton button) {
-		Consumer<Integer> setter = i -> gui.addButton(button, i);
+		IntConsumer setter = i -> gui.addButton(button, i);
 		items.put(button, setter);
 		buttons.add(setter);
 	}
@@ -56,7 +57,7 @@ public class PaginationPanel {
 	}
 	
 	private void addPagedItem0(ItemStack item) {
-		Consumer<Integer> setter = i -> gui.getInventory().setItem(i, item);
+		IntConsumer setter = i -> gui.getInventory().setItem(i, item);
 		items.put(item, setter);
 		buttons.add(setter);
 	}
@@ -150,7 +151,7 @@ public class PaginationPanel {
 	 * @return The maximum page number of this panel with the current number of elements
 	 */
 	public int getMaxPage() {
-		return (buttons.size() / slots.size()) + 1;
+		return (buttons.size() / Math.max(1, slots.size())) + 1;
 	}
 	
 	/**
@@ -240,7 +241,7 @@ public class PaginationPanel {
 		}
 		slots.forEach(gui::clearSlot);
 		int start = (page - 1) * getPageSize();
-		int end = Math.min(buttons.size() - 1, page * getPageSize());
+		int end = Math.min(buttons.size(), page * getPageSize());
 		Iterator<Integer> iter = slots.iterator();
 		for (int i = start; i < end; i++) {
 			buttons.get(i).accept(iter.next());
@@ -258,6 +259,29 @@ public class PaginationPanel {
 		}
 		this.page = page;
 		updatePage();
+	}
+	
+	/**
+	 * Removes all items and buttons from the panel
+	 */
+	public void clear() {
+		buttons.clear();
+		items.clear();
+		updatePage();
+	}
+	
+	/**
+	 * @return All ItemStacks added to this panel
+	 */
+	public List<ItemStack> getItems() {
+		return items.keySet().stream().filter(ItemStack.class::isInstance).map(ItemStack.class::cast).collect(Collectors.toList());
+	}
+	
+	/**
+	 * @return All ItemButtons added to this panel
+	 */
+	public List<ItemButton> getButtons() {
+		return items.keySet().stream().filter(ItemButton.class::isInstance).map(ItemButton.class::cast).collect(Collectors.toList());
 	}
 	
 	/**
