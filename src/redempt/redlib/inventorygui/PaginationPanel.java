@@ -249,6 +249,18 @@ public class PaginationPanel {
 	}
 	
 	/**
+	 * Sets the page of this panel
+	 * @param page The page to set
+	 */
+	public void setPage(int page) {
+		if (page < 1 || page > getMaxPage()) {
+			throw new IllegalArgumentException("Invalid page: " + page);
+		}
+		this.page = page;
+		updatePage();
+	}
+	
+	/**
 	 * Navigates to the next page, if there is one
 	 */
 	public void nextPage() {
