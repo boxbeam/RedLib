@@ -151,7 +151,7 @@ public class PaginationPanel {
 	 * @return The maximum page number of this panel with the current number of elements
 	 */
 	public int getMaxPage() {
-		return (buttons.size() / Math.max(1, slots.size())) + 1;
+		return (Math.max(0, buttons.size() - 1) / Math.max(1, slots.size())) + 1;
 	}
 	
 	/**
@@ -235,11 +235,11 @@ public class PaginationPanel {
 	 * Updates the elements displayed on the current page
 	 */
 	public void updatePage() {
+		slots.forEach(gui::clearSlot);
 		if (getPageSize() == 0 || buttons.size() == 0) {
 			onUpdate.run();
 			return;
 		}
-		slots.forEach(gui::clearSlot);
 		int start = (page - 1) * getPageSize();
 		int end = Math.min(buttons.size(), page * getPageSize());
 		Iterator<Integer> iter = slots.iterator();
