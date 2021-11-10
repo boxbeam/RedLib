@@ -7,6 +7,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.FallingBlock;
@@ -26,6 +27,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.event.world.PortalCreateEvent.CreateReason;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.InventoryHolder;
 
 import org.bukkit.plugin.Plugin;
@@ -99,11 +101,12 @@ public class ProtectionPolicy implements Listener {
 			return e.getBlock();
 		});
 		ProtectionListener.protect(BlockGrowEvent.class, ProtectionType.GROWTH, e -> null, e -> e.getBlock());
-		ProtectionListener.protect(BlockSpreadEvent.class, ProtectionType.GROWTH, e -> null, e -> e.getBlock());
+		ProtectionListener.protect(BlockSpreadEvent.class, ProtectionType.GROWTH, e -> null, e -> e.getNewState().getType() == Material.FIRE ? null : e.getBlock());
 		ProtectionListener.protect(BlockFormEvent.class, ProtectionType.GROWTH, e -> null, e -> e.getBlock());
 		ProtectionListener.protect(BlockFadeEvent.class, ProtectionType.FADE, e -> null, e -> e.getBlock());
 		ProtectionListener.protect(BlockFromToEvent.class, ProtectionType.FLOW, e -> null, e -> e.getBlock(), e -> e.getToBlock());
 		ProtectionListener.protect(BlockBurnEvent.class, ProtectionType.FIRE, e -> null, e -> e.getBlock());
+		ProtectionListener.protect(BlockSpreadEvent.class, ProtectionType.FIRE, e -> null, e -> e.getNewState().getType() == Material.FIRE ? e.getBlock() : null);
 		ProtectionListener.protect(CreatureSpawnEvent.class, ProtectionType.MOB_SPAWN, e -> null, e -> {
 			if (e.getSpawnReason() == SpawnReason.CUSTOM) {
 				return null;
@@ -119,6 +122,8 @@ public class ProtectionPolicy implements Listener {
 		ProtectionListener.protectDirectional(BlockFromToEvent.class, ProtectionType.FLOW_IN, e -> null, e -> e.getBlock(), e -> Collections.singletonList(e.getToBlock()));
 		ProtectionListener.protectDirectional(BlockPistonExtendEvent.class, ProtectionType.PISTONS_IN, e -> null, e -> e.getBlock(), e -> e.getBlocks());
 		ProtectionListener.protectDirectional(BlockPistonRetractEvent.class, ProtectionType.PISTONS_IN, e -> null, e -> e.getBlock(), e -> e.getBlocks());
+		ProtectionListener.protectMultiBlock(StructureGrowEvent.class, ProtectionType.STRUCTURE_GROWTH, e -> null, (e, b) -> e.setCancelled(true), e -> e.getBlocks().stream().map(BlockState::getBlock).collect(Collectors.toList()));
+		ProtectionListener.protectDirectional(StructureGrowEvent.class, ProtectionType.STRUCTURE_GROWTH_IN, e -> null, e -> e.getLocation().getBlock(), e -> e.getBlocks().stream().map(BlockState::getBlock).collect(Collectors.toList()));
 	}
 	
 	/**
@@ -386,6 +391,14 @@ public class ProtectionPolicy implements Listener {
 		 * Crop growth and block spreading/formation
 		 */
 		GROWTH,
+		/**
+		 * Structure growth, like trees
+		 */
+		STRUCTURE_GROWTH,
+		/**
+		 * Structure growth of a block outside the protected area which would create blocks inside the protected area
+		 */
+		STRUCTURE_GROWTH_IN,
 		/**
 		 * Blocks fading
 		 */
