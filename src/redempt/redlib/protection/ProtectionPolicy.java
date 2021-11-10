@@ -124,6 +124,7 @@ public class ProtectionPolicy implements Listener {
 		ProtectionListener.protectDirectional(BlockPistonRetractEvent.class, ProtectionType.PISTONS_IN, e -> null, e -> e.getBlock(), e -> e.getBlocks());
 		ProtectionListener.protectMultiBlock(StructureGrowEvent.class, ProtectionType.STRUCTURE_GROWTH, e -> null, (e, b) -> e.setCancelled(true), e -> e.getBlocks().stream().map(BlockState::getBlock).collect(Collectors.toList()));
 		ProtectionListener.protectDirectional(StructureGrowEvent.class, ProtectionType.STRUCTURE_GROWTH_IN, e -> null, e -> e.getLocation().getBlock(), e -> e.getBlocks().stream().map(BlockState::getBlock).collect(Collectors.toList()));
+		ProtectionListener.protect(EntityBlockFormEvent.class, ProtectionType.ENTITY_FORM_BLOCK, e -> e.getEntity() instanceof Player ? (Player) e.getEntity() : null, e -> e.getBlock());
 	}
 	
 	/**
@@ -436,6 +437,10 @@ public class ProtectionPolicy implements Listener {
 		 */
 		PORTAL_PAIRING,
 		/**
+		 * Snow golems placing snow, frost walker
+		 */
+		ENTITY_FORM_BLOCK,
+		/**
 		 * Does nothing by default, but other plugins can register their events to be protected against by this type.
 		 */
 		MISCELLANEOUS;
@@ -447,7 +452,7 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * All protection types relating to actions taken directly by players - Breaking, placing, and interacting with blocks
 		 */
-		public static final ProtectionType[] DIRECT_PLAYERS = {BREAK_BLOCK, PLACE_BLOCK, INTERACT, CONTAINER_ACCESS, USE_BUCKETS};
+		public static final ProtectionType[] DIRECT_PLAYERS = {BREAK_BLOCK, PLACE_BLOCK, INTERACT, CONTAINER_ACCESS, USE_BUCKETS, ENTITY_FORM_BLOCK};
 		/**
 		 * All protection types relating to actions usually taken by players which indirectly affect blocks - Pistons, redstone, explosions, and falling blocks
 		 */
