@@ -58,6 +58,9 @@ public class ProtectionPolicy implements Listener {
 			if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getClickedBlock() == null || (RedLib.MID_VERSION >= 13 && !e.getClickedBlock().getType().isInteractable())) {
 				return null;
 			}
+			if (e.getClickedBlock().getState() instanceof InventoryHolder && !e.getPlayer().isSneaking()) {
+				return null;
+			}
 			return e.getClickedBlock();
 		});
 		ProtectionListener.protect(InventoryOpenEvent.class, ProtectionType.CONTAINER_ACCESS, e -> (Player) e.getPlayer(), e -> {
