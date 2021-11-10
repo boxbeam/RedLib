@@ -144,25 +144,33 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">
 <div class="block">Lava and water flowing</div>
 </div>
-<div class="col-first odd-row-color"><code><a href="#GROWTH" class="member-name-link">GROWTH</a></code></div>
+<div class="col-first odd-row-color"><code><a href="#FLOW_IN" class="member-name-link">FLOW_IN</a></code></div>
 <div class="col-last odd-row-color">
+<div class="block">Lava an water flowing from unprotected areas into protected areas</div>
+</div>
+<div class="col-first even-row-color"><code><a href="#GROWTH" class="member-name-link">GROWTH</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">Crop growth and block spreading/formation</div>
 </div>
-<div class="col-first even-row-color"><code><a href="#INTERACT" class="member-name-link">INTERACT</a></code></div>
-<div class="col-last even-row-color">
+<div class="col-first odd-row-color"><code><a href="#INTERACT" class="member-name-link">INTERACT</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">Players interacting with non-container blocks</div>
 </div>
-<div class="col-first odd-row-color"><code><a href="#MISCELLANEOUS" class="member-name-link">MISCELLANEOUS</a></code></div>
-<div class="col-last odd-row-color">
+<div class="col-first even-row-color"><code><a href="#MISCELLANEOUS" class="member-name-link">MISCELLANEOUS</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">Does nothing by default, but other plugins can register their events to be protected against by this type.</div>
 </div>
-<div class="col-first even-row-color"><code><a href="#MOB_SPAWN" class="member-name-link">MOB_SPAWN</a></code></div>
-<div class="col-last even-row-color">
+<div class="col-first odd-row-color"><code><a href="#MOB_SPAWN" class="member-name-link">MOB_SPAWN</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">Mobs spawning</div>
 </div>
-<div class="col-first odd-row-color"><code><a href="#PISTONS" class="member-name-link">PISTONS</a></code></div>
-<div class="col-last odd-row-color">
+<div class="col-first even-row-color"><code><a href="#PISTONS" class="member-name-link">PISTONS</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">Pistons pushing and pulling blocks</div>
+</div>
+<div class="col-first odd-row-color"><code><a href="#PISTONS_IN" class="member-name-link">PISTONS_IN</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Pistons pushing blocks in or pulling blocks out</div>
 </div>
 <div class="col-first even-row-color"><code><a href="#PLACE_BLOCK" class="member-name-link">PLACE_BLOCK</a></code></div>
 <div class="col-last even-row-color">
@@ -332,6 +340,13 @@ the order they are declared.</div>
 </section>
 </li>
 <li>
+<section class="detail" id="PISTONS_IN">
+<h3>PISTONS_IN</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="ProtectionPolicy.ProtectionType.html" title="enum class in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a></span>&nbsp;<span class="element-name">PISTONS_IN</span></div>
+<div class="block">Pistons pushing blocks in or pulling blocks out</div>
+</section>
+</li>
+<li>
 <section class="detail" id="REDSTONE">
 <h3>REDSTONE</h3>
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="ProtectionPolicy.ProtectionType.html" title="enum class in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a></span>&nbsp;<span class="element-name">REDSTONE</span></div>
@@ -364,6 +379,13 @@ the order they are declared.</div>
 <h3>FLOW</h3>
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="ProtectionPolicy.ProtectionType.html" title="enum class in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a></span>&nbsp;<span class="element-name">FLOW</span></div>
 <div class="block">Lava and water flowing</div>
+</section>
+</li>
+<li>
+<section class="detail" id="FLOW_IN">
+<h3>FLOW_IN</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="ProtectionPolicy.ProtectionType.html" title="enum class in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a></span>&nbsp;<span class="element-name">FLOW_IN</span></div>
+<div class="block">Lava an water flowing from unprotected areas into protected areas</div>
 </section>
 </li>
 <li>

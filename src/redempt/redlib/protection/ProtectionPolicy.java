@@ -116,6 +116,9 @@ public class ProtectionPolicy implements Listener {
 			}
 			return e.getBlocks().stream().map(BlockState::getBlock).collect(Collectors.toList());
 		});
+		ProtectionListener.protectDirectional(BlockFromToEvent.class, ProtectionType.FLOW_IN, e -> null, e -> e.getBlock(), e -> Collections.singletonList(e.getToBlock()));
+		ProtectionListener.protectDirectional(BlockPistonExtendEvent.class, ProtectionType.PISTONS_IN, e -> null, e -> e.getBlock(), e -> e.getBlocks());
+		ProtectionListener.protectDirectional(BlockPistonRetractEvent.class, ProtectionType.PISTONS_IN, e -> null, e -> e.getBlock(), e -> e.getBlocks());
 	}
 	
 	/**
@@ -368,6 +371,10 @@ public class ProtectionPolicy implements Listener {
 		 */
 		PISTONS,
 		/**
+		 * Pistons pushing blocks in or pulling blocks out
+		 */
+		PISTONS_IN,
+		/**
 		 * Redstone wires and components
 		 */
 		REDSTONE,
@@ -387,6 +394,10 @@ public class ProtectionPolicy implements Listener {
 		 * Lava and water flowing
 		 */
 		FLOW,
+		/**
+		 * Lava an water flowing from unprotected areas into protected areas
+		 */
+		FLOW_IN,
 		/**
 		 * Players using an anvil damaging it (1.13+ only)
 		 */
@@ -427,7 +438,7 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * All protection types relating to actions usually taken by players which indirectly affect blocks - Pistons, redstone, explosions, and falling blocks
 		 */
-		public static final ProtectionType[] INDIRECT_PLAYERS = {PISTONS, REDSTONE, ENTITY_EXPLOSION, BLOCK_EXPLOSION, FALLING_BLOCK, FIRE, PORTAL_PAIRING, WITHER};
+		public static final ProtectionType[] INDIRECT_PLAYERS = {REDSTONE, ENTITY_EXPLOSION, BLOCK_EXPLOSION, FALLING_BLOCK, FIRE, PORTAL_PAIRING, WITHER, FLOW_IN, PISTONS_IN};
 		/**
 		 * All protection types relating to natural processes not caused by players
 		 */

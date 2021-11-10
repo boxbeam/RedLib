@@ -1,5 +1,6 @@
 package redempt.redlib.protection;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -8,8 +9,10 @@ import org.bukkit.event.EventPriority;
 import redempt.redlib.RedLib;
 import redempt.redlib.misc.EventListener;
 import redempt.redlib.protection.ProtectionPolicy.ProtectionType;
+import redempt.redlib.region.CuboidRegion;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -27,6 +30,29 @@ class ProtectionListener {
 		Set<ProtectionPolicy> applicable = ProtectionPolicy.regionMap.get(block.getLocation());
 		for (ProtectionPolicy policy : applicable) {
 			if (!policy.allow(block, type, player)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private static boolean testAll(Block outside, List<Block> inside, ProtectionType type, Player player) {
+		Location min = outside.getLocation();
+		Location max = outside.getLocation();
+		for (Block block : inside) {
+			max.setX(Math.max(max.getX(), block.getX()));
+			max.setY(Math.max(max.getY(), block.getY()));
+			max.setZ(Math.max(max.getZ(), block.getZ()));
+			
+			min.setX(Math.min(min.getX(), block.getX()));
+			min.setY(Math.min(min.getY(), block.getY()));
+			min.setZ(Math.min(min.getZ(), block.getZ()));
+		}
+		CuboidRegion region = new CuboidRegion(min, max);
+		int radius = (int) Arrays.stream(region.getDimensions()).max().getAsDouble();
+		Set<ProtectionPolicy> applicable = ProtectionPolicy.regionMap.getNearby(region.getCenter(), radius);
+		for (ProtectionPolicy policy : applicable) {
+			if (policy.allow(outside, type, player) && inside.stream().anyMatch(b -> !policy.allow(b, type, player))) {
 				return false;
 			}
 		}
@@ -81,6 +107,18 @@ class ProtectionListener {
 						cancel.accept(e, block);
 					}
 				}
+			}
+		});
+	}
+	
+	protected static <T extends Event & Cancellable> void protectDirectional(Class<T> clazz, ProtectionType type, Function<T, Player> getPlayer, Function<T, Block> getBaseBlock, Function<T, List<Block>> getProtectedBlocks) {
+		new EventListener<>(RedLib.getInstance(), clazz, EventPriority.HIGHEST, e -> {
+			Player player = null;
+			if (getPlayer != null) {
+				player = getPlayer.apply(e);
+			}
+			if (!testAll(getBaseBlock.apply(e), getProtectedBlocks.apply(e), type, player)) {
+				e.setCancelled(true);
 			}
 		});
 	}
