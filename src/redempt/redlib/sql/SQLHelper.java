@@ -4,7 +4,11 @@ import redempt.redlib.RedLib;
 import redempt.redlib.misc.Task;
 
 import java.io.Closeable;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +28,7 @@ public class SQLHelper implements Closeable {
 	public static Connection openSQLite(java.nio.file.Path file) {
 		try {
 			Class.forName("org.sqlite.JDBC");
-			return DriverManager.getConnection("jdbc:sqlite:" + file.toAbsolutePath().toString());
+			return DriverManager.getConnection("jdbc:sqlite:" + file.toAbsolutePath() + "?foreign_keys=on;");
 		} catch (ClassNotFoundException | SQLException e) {
 			sneakyThrow(e);
 			return null;
