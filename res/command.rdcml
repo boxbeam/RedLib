@@ -11,7 +11,7 @@ structure,struct {
 		hook create
 		user player
 	}
-	build int:rotation?(0) boolean:mirrored?(true) {
+	build int<0,3>:rotation?(0) boolean:mirrored?(true) {
 		help Build the created structure at your location
 		hook build
 		user player
@@ -30,11 +30,11 @@ structure,struct {
 profiler,rprofiler {
 	permission redlib.dev
 	monitor {
-		start int:--minimum {
+		start int<0,>:--minimum {
 			help Starts the tick monitor profiler
 			hook startmonitor
 		}
-		setminimum int:minimum {
+		setminimum int<0,>:minimum {
 			help Sets the minimum milliseconds for a tick to take to be reported
 			hook setminimum
 		}
@@ -85,7 +85,7 @@ profiler,rprofiler {
 		user player
 		notab
 	}
-	up int:count?(1) {
+	up int<1,>:count?(1) {
 		help Selects the parent method of the currently selected method
 		hook up
 		user player
@@ -100,12 +100,12 @@ profiler,rprofiler {
 		user player
 		notab
 	}
-	search int:--depth(0) double:--over-percent(0) int:--over-milliseconds(0) string:term {
+	search int<0,>:--depth(0) double<0,>:--over-percent(0) int<0,>:--over-milliseconds(0) string:term {
 		help Searches the profiler with the given conditions
 		hook search
 		user player
 	}
-	limit int:amount {
+	limit int<1,>:amount {
 		help Limits the number of children that can be shown under a single method
 		hook limit
 		user player
