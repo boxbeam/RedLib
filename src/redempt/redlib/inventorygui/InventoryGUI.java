@@ -394,7 +394,7 @@ public class InventoryGUI implements Listener {
 		}
 		if (!inventory.equals(e.getClickedInventory()) && e.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
 			if (openSlots.size() > 0) {
-				List<Integer> slots = new ArrayList<>();
+				Map<Integer, ItemStack> slots = new HashMap<>();
 				int amount = e.getCurrentItem().getAmount();
 				for (int slot : openSlots) {
 					if (amount <= 0) {
@@ -406,31 +406,33 @@ public class InventoryGUI implements Listener {
 						amount -= diff;
 						ItemStack clone = e.getCurrentItem().clone();
 						clone.setAmount(diff);
-						inventory.setItem(slot, clone);
-						slots.add(slot);
+						slots.put(slot, clone);
 						continue;
 					}
 					if (e.getCurrentItem().isSimilar(item)) {
 						int max = item.getType().getMaxStackSize() - item.getAmount();
 						int diff = Math.min(max, e.getCurrentItem().getAmount());
 						amount -= diff;
-						ItemStack clone = inventory.getItem(slot);
+						ItemStack clone = item.clone();
 						clone.setAmount(clone.getAmount() + diff);
-						inventory.setItem(slot, clone);
-						slots.add(slot);
+						slots.put(slot, clone);
 					}
 				}
-				e.setCancelled(true);
-				if (amount == e.getCurrentItem().getAmount()) {
+				if (slots.size() == 0) {
 					return;
 				}
+				onClickOpenSlot.accept(e, new ArrayList<>(slots.keySet()));
+				if (e.isCancelled()) {
+					return;
+				}
+				e.setCancelled(true);
 				ItemStack item = e.getCurrentItem();
 				item.setAmount(amount);
 				e.setCurrentItem(item);
+				slots.forEach(inventory::setItem);
 				Bukkit.getScheduler().scheduleSyncDelayedTask(RedLib.getInstance(), () -> {
 					((Player) e.getWhoClicked()).updateInventory();
 				});
-				onClickOpenSlot.accept(e, slots);
 				return;
 			}
 			e.setCancelled(true);
