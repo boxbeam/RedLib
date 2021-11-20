@@ -225,8 +225,8 @@ public class InventoryGUI implements Listener {
 	 * @param y2 The y position to open to, exclusive
 	 */
 	public void openSlots(int x1, int y1, int x2, int y2) {
-		for (int x = x1; x < x2; x++) {
-			for (int y = y1; y < y2; y++) {
+		for (int y = y1; y < y2; y++) {
+			for (int x = x1; x < x2; x++) {
 				openSlots.add(y * 9 + x);
 			}
 		}
@@ -262,8 +262,8 @@ public class InventoryGUI implements Listener {
 	 * @param y2 The y position to close to, exclusive
 	 */
 	public void closeSlots(int x1, int y1, int x2, int y2) {
-		for (int x = x1; x < x2; x++) {
-			for (int y = y1; y < y2; y++) {
+		for (int y = y1; y < y2; y++) {
+			for (int x = x1; x < x2; x++) {
 				openSlots.remove(y * 9 + x);
 			}
 		}
