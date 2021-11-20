@@ -185,7 +185,7 @@ public class PaginationPanel {
 	public void addSlots(int x1, int y1, int x2, int y2) {
 		for (int x = x1; x < x2; x++) {
 			for (int y = y1; y < y2; y++) {
-				slots.add(y * 9 + y);
+				slots.add(y * 9 + x);
 			}
 		}
 		updatePage();
@@ -225,7 +225,7 @@ public class PaginationPanel {
 		slots.forEach(gui::clearSlot);
 		for (int x = x1; x < x2; x++) {
 			for (int y = y1; y < y2; y++) {
-				slots.remove(y * 9 + y);
+				slots.remove(y * 9 + x);
 			}
 		}
 		updatePage();
