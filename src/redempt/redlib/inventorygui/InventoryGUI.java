@@ -1,28 +1,30 @@
 package redempt.redlib.inventorygui;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.*;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-
 import redempt.redlib.RedLib;
 import redempt.redlib.itemutils.ItemBuilder;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * @author Redempt
@@ -43,7 +45,7 @@ public class InventoryGUI implements Listener {
 	}
 	
 	private final Inventory inventory;
-	private Set<Integer> openSlots = new HashSet<>();
+	private Set<Integer> openSlots = new LinkedHashSet<>();
 	private Runnable onDestroy;
 	private BiConsumer<InventoryClickEvent, List<Integer>> onClickOpenSlot = (e, i) -> {};
 	private Consumer<InventoryDragEvent> onDragOpenSlot = e -> {};
@@ -215,6 +217,22 @@ public class InventoryGUI implements Listener {
 	}
 	
 	/**
+	 * Opens slots so that items can be placed in them
+	 *
+	 * @param x1 The x position to open from, inclusive
+	 * @param y1 The y position to open from, inclusive
+	 * @param x2 The x position to open to, exclusive
+	 * @param y2 The y position to open to, exclusive
+	 */
+	public void openSlots(int x1, int y1, int x2, int y2) {
+		for (int x = x1; x < x2; x++) {
+			for (int y = y1; y < y2; y++) {
+				openSlots.add(y * 9 + x);
+			}
+		}
+	}
+	
+	/**
 	 * Closes a slot so that items can't be placed in it
 	 *
 	 * @param slot The slot to open
@@ -232,6 +250,22 @@ public class InventoryGUI implements Listener {
 	public void closeSlots(int start, int end) {
 		for (int i = start; i < end; i++) {
 			openSlots.remove(i);
+		}
+	}
+	
+	/**
+	 * Closes slots so that items can't be placed in them
+	 *
+	 * @param x1 The x position to close from, inclusive
+	 * @param y1 The y position to close from, inclusive
+	 * @param x2 The x position to close to, exclusive
+	 * @param y2 The y position to close to, exclusive
+	 */
+	public void closeSlots(int x1, int y1, int x2, int y2) {
+		for (int x = x1; x < x2; x++) {
+			for (int y = y1; y < y2; y++) {
+				openSlots.remove(y * 9 + x);
+			}
 		}
 	}
 	
