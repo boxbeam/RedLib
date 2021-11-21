@@ -119,6 +119,23 @@ implements org.bukkit.event.Listener</span></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onLeave(org.bukkit.event.player.PlayerQuitEvent)" class="member-name-link">onLeave</a><wbr>(org.bukkit.event.player.PlayerQuitEvent&nbsp;e)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#prompt(org.bukkit.entity.Player,java.lang.String,boolean,java.util.function.Consumer)" class="member-name-link">prompt</a><wbr>(org.bukkit.entity.Player&nbsp;player,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prompt,
+ boolean&nbsp;showCancelMessage,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;onResponse)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Prompts a player with callbacks for player response and cancelling</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#prompt(org.bukkit.entity.Player,java.lang.String,boolean,java.util.function.Consumer,java.util.function.Consumer)" class="member-name-link">prompt</a><wbr>(org.bukkit.entity.Player&nbsp;player,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prompt,
+ boolean&nbsp;showCancelMessage,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;onResponse,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="ChatPrompt.CancelReason.html" title="enum class in redempt.redlib.misc">ChatPrompt.CancelReason</a>&gt;&nbsp;onCancel)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Prompts a player with callbacks for player response and cancelling</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#prompt(org.bukkit.entity.Player,java.lang.String,java.util.function.Consumer)" class="member-name-link">prompt</a><wbr>(org.bukkit.entity.Player&nbsp;player,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prompt,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;onResponse)</code></div>
@@ -151,19 +168,38 @@ implements org.bukkit.event.Listener</span></div>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="prompt(org.bukkit.entity.Player,java.lang.String,java.util.function.Consumer,java.util.function.Consumer)">
+<section class="detail" id="prompt(org.bukkit.entity.Player,java.lang.String,boolean,java.util.function.Consumer,java.util.function.Consumer)">
 <h3>prompt</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">prompt</span><wbr><span class="parameters">(org.bukkit.entity.Player&nbsp;player,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prompt,
+ boolean&nbsp;showCancelMessage,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;onResponse,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="ChatPrompt.CancelReason.html" title="enum class in redempt.redlib.misc">ChatPrompt.CancelReason</a>&gt;&nbsp;onCancel)</span></div>
 <div class="block">Prompts a player with callbacks for player response and cancelling</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>player</code> - The player to prompt</dd>
-<dd><code>prompt</code> - The prompt to send to the player</dd>
+<dd><code>prompt</code> - The prompt to send to the player, or null for no prompt</dd>
+<dd><code>showCancelMessage</code> - Whether to show the cancel message to the player</dd>
 <dd><code>onResponse</code> - The callback for when the player responds</dd>
 <dd><code>onCancel</code> - The callback for when the prompt is cancelled</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="prompt(org.bukkit.entity.Player,java.lang.String,boolean,java.util.function.Consumer)">
+<h3>prompt</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">prompt</span><wbr><span class="parameters">(org.bukkit.entity.Player&nbsp;player,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prompt,
+ boolean&nbsp;showCancelMessage,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;onResponse)</span></div>
+<div class="block">Prompts a player with callbacks for player response and cancelling</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>player</code> - The player to prompt</dd>
+<dd><code>prompt</code> - The prompt to send to the player, or null for no prompt</dd>
+<dd><code>showCancelMessage</code> - Whether to show the cancel message to the player</dd>
+<dd><code>onResponse</code> - The callback for when the player responds</dd>
 </dl>
 </section>
 </li>
@@ -177,8 +213,25 @@ implements org.bukkit.event.Listener</span></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>player</code> - The player to prompt</dd>
-<dd><code>prompt</code> - The prompt to send to the player</dd>
+<dd><code>prompt</code> - The prompt to send to the player, or null for no prompt</dd>
 <dd><code>onResponse</code> - The callback for when the player responds</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="prompt(org.bukkit.entity.Player,java.lang.String,java.util.function.Consumer,java.util.function.Consumer)">
+<h3>prompt</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">prompt</span><wbr><span class="parameters">(org.bukkit.entity.Player&nbsp;player,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prompt,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;onResponse,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="ChatPrompt.CancelReason.html" title="enum class in redempt.redlib.misc">ChatPrompt.CancelReason</a>&gt;&nbsp;onCancel)</span></div>
+<div class="block">Prompts a player with callbacks for player response and cancelling</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>player</code> - The player to prompt</dd>
+<dd><code>prompt</code> - The prompt to send to the player, or null for no prompt</dd>
+<dd><code>onResponse</code> - The callback for when the player responds</dd>
+<dd><code>onCancel</code> - The callback for when the prompt is cancelled</dd>
 </dl>
 </section>
 </li>

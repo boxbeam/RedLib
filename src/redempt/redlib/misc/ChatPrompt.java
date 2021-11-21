@@ -2,6 +2,7 @@ package redempt.redlib.misc;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
@@ -25,28 +26,53 @@ public class ChatPrompt implements Listener {
 	/**
 	 * Prompts a player with callbacks for player response and cancelling
 	 * @param player The player to prompt
-	 * @param prompt The prompt to send to the player
+	 * @param prompt The prompt to send to the player, or null for no prompt
+	 * @param showCancelMessage Whether to show the cancel message to the player
 	 * @param onResponse The callback for when the player responds
 	 * @param onCancel The callback for when the prompt is cancelled
 	 */
-	public static void prompt(Player player, String prompt, Consumer<String> onResponse, Consumer<CancelReason> onCancel) {
+	public static void prompt(Player player, String prompt, boolean showCancelMessage, Consumer<String> onResponse, Consumer<CancelReason> onCancel) {
 		Prompt removed = prompts.remove(player);
 		if (removed != null) {
 			removed.cancel(CancelReason.PROMPT_OVERRIDDEN);
 		}
 		prompts.put(player, new Prompt(onResponse, onCancel));
-		player.sendMessage(prompt);
-		player.sendMessage(RedLib.msg("cancelPromptMessage").replace("%canceltext%", RedLib.msg("cancelText")));
+		Optional.ofNullable(prompt).ifPresent(player::sendMessage);
+		if (showCancelMessage) {
+			player.sendMessage(RedLib.msg("cancelPromptMessage").replace("%canceltext%", RedLib.msg("cancelText")));
+		}
 	}
 	
 	/**
 	 * Prompts a player with callbacks for player response and cancelling
 	 * @param player The player to prompt
-	 * @param prompt The prompt to send to the player
+	 * @param prompt The prompt to send to the player, or null for no prompt
+	 * @param showCancelMessage Whether to show the cancel message to the player
+	 * @param onResponse The callback for when the player responds
+	 */
+	public static void prompt(Player player, String prompt, boolean showCancelMessage, Consumer<String> onResponse) {
+		prompt(player, prompt, showCancelMessage, onResponse, c -> {});
+	}
+	
+	/**
+	 * Prompts a player with callbacks for player response and cancelling
+	 * @param player The player to prompt
+	 * @param prompt The prompt to send to the player, or null for no prompt
 	 * @param onResponse The callback for when the player responds
 	 */
 	public static void prompt(Player player, String prompt, Consumer<String> onResponse) {
-		prompt(player, prompt, onResponse, c -> {});
+		prompt(player, prompt, true, onResponse, c -> {});
+	}
+	
+	/**
+	 * Prompts a player with callbacks for player response and cancelling
+	 * @param player The player to prompt
+	 * @param prompt The prompt to send to the player, or null for no prompt
+	 * @param onResponse The callback for when the player responds
+	 * @param onCancel The callback for when the prompt is cancelled
+	 */
+	public static void prompt(Player player, String prompt, Consumer<String> onResponse, Consumer<CancelReason> onCancel) {
+		prompt(player, prompt, true, onResponse, onCancel);
 	}
 	
 	private ChatPrompt() {
