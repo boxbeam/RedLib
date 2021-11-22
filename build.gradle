@@ -41,7 +41,7 @@ task updateJars {
 		}
 		copy {
 			from 'build/libs'
-			into '/home/redempt/Desktop/Spigot/1.14/plugins'
+			into '/home/redempt/Desktop/Spigot/1.18/plugins'
 		}
 		copy {
 			from 'build/libs'

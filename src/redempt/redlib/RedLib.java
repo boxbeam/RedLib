@@ -22,6 +22,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Redempt
@@ -46,13 +48,20 @@ public class RedLib extends JavaPlugin {
 	/**
 	 * The middle number of the server version - for example, if the server version is 1.15.2, this will be 15
 	 */
-	public static final int MID_VERSION = Integer.parseInt(getServerVersion().split("\\.")[1]);
+	public static final int MID_VERSION = getMidVersion();
 	
 	/**
 	 * @return An instance of RedLib if it is a plugin dependency, or your plugin if RedLib is shaded
 	 */
 	public static Plugin getInstance() {
 		return redLib != null ? redLib : getCallingPlugin();
+	}
+	
+	private static int getMidVersion() {
+		Pattern pattern = Pattern.compile("1\\.([0-9]+)");
+		Matcher matcher = pattern.matcher(Bukkit.getBukkitVersion());
+		matcher.find();
+		return Integer.parseInt(matcher.group(1));
 	}
 	
 	@Override
