@@ -3143,6 +3143,14 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Registers a custom event to be protected using a specific ProtectionType</div>
 </dd>
+<dt><a href="redempt/redlib/protection/ProtectionPolicy.html#registerProtectionDirectional(java.lang.Class,redempt.redlib.protection.ProtectionPolicy.ProtectionType,java.util.function.Function,java.util.function.Function,java.util.function.Function)" class="member-name-link">registerProtectionDirectional(Class&lt;T&gt;, ProtectionPolicy.ProtectionType, Function&lt;T, Player&gt;, Function&lt;T, Block&gt;, Function&lt;T, List&lt;Block&gt;&gt;)</a> - Static method in class redempt.redlib.protection.<a href="redempt/redlib/protection/ProtectionPolicy.html" title="class in redempt.redlib.protection">ProtectionPolicy</a></dt>
+<dd>
+<div class="block">Registers a custom event to be protected using a specific ProtectionType, where there is a block acting and blocks being acted upon</div>
+</dd>
+<dt><a href="redempt/redlib/protection/ProtectionPolicy.html#registerProtectionMultiBlock(java.lang.Class,redempt.redlib.protection.ProtectionPolicy.ProtectionType,java.util.function.Function,java.util.function.BiConsumer,java.util.function.Function)" class="member-name-link">registerProtectionMultiBlock(Class&lt;T&gt;, ProtectionPolicy.ProtectionType, Function&lt;T, Player&gt;, BiConsumer&lt;T, Block&gt;, Function&lt;T, List&lt;Block&gt;&gt;)</a> - Static method in class redempt.redlib.protection.<a href="redempt/redlib/protection/ProtectionPolicy.html" title="class in redempt.redlib.protection">ProtectionPolicy</a></dt>
+<dd>
+<div class="block">Registers a custom event that modifies multiple blocks to be protected using a specific ProtectionType</div>
+</dd>
 <dt><a href="redempt/redlib/protection/ProtectionPolicy.html#registerProtectionNonCancellable(java.lang.Class,redempt.redlib.protection.ProtectionPolicy.ProtectionType,java.util.function.Function,java.util.function.Consumer,java.util.function.Function...)" class="member-name-link">registerProtectionNonCancellable(Class&lt;T&gt;, ProtectionPolicy.ProtectionType, Function&lt;T, Player&gt;, Consumer&lt;T&gt;, Function&lt;T, Block&gt;...)</a> - Static method in class redempt.redlib.protection.<a href="redempt/redlib/protection/ProtectionPolicy.html" title="class in redempt.redlib.protection">ProtectionPolicy</a></dt>
 <dd>
 <div class="block">Registers a custom event that cannot be cancelled using <code>Cancellable.setCancelled(boolean)</code> using a specific ProtectionType</div>

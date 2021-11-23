@@ -216,6 +216,24 @@ implements org.bukkit.event.Listener</span></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Registers a custom event to be protected using a specific ProtectionType</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;T extends org.bukkit.event.Event &amp; org.bukkit.event.Cancellable&gt;<br>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#registerProtectionDirectional(java.lang.Class,redempt.redlib.protection.ProtectionPolicy.ProtectionType,java.util.function.Function,java.util.function.Function,java.util.function.Function)" class="member-name-link">registerProtectionDirectional</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;clazz,
+ <a href="ProtectionPolicy.ProtectionType.html" title="enum class in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a>&nbsp;type,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;T,<wbr>org.bukkit.entity.Player&gt;&nbsp;getPlayer,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;T,<wbr>org.bukkit.block.Block&gt;&nbsp;getActingBlock,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;T,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;org.bukkit.block.Block&gt;&gt;&nbsp;getSubjectBlocks)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Registers a custom event to be protected using a specific ProtectionType, where there is a block acting and blocks being acted upon</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;T extends org.bukkit.event.Event&gt;<br>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#registerProtectionMultiBlock(java.lang.Class,redempt.redlib.protection.ProtectionPolicy.ProtectionType,java.util.function.Function,java.util.function.BiConsumer,java.util.function.Function)" class="member-name-link">registerProtectionMultiBlock</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;clazz,
+ <a href="ProtectionPolicy.ProtectionType.html" title="enum class in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a>&nbsp;type,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;T,<wbr>org.bukkit.entity.Player&gt;&nbsp;getPlayer,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;T,<wbr>org.bukkit.block.Block&gt;&nbsp;cancel,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;T,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;org.bukkit.block.Block&gt;&gt;&nbsp;getBlocks)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Registers a custom event that modifies multiple blocks to be protected using a specific ProtectionType</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;T extends org.bukkit.event.Event&gt;<br>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#registerProtectionNonCancellable(java.lang.Class,redempt.redlib.protection.ProtectionPolicy.ProtectionType,java.util.function.Function,java.util.function.Consumer,java.util.function.Function...)" class="member-name-link">registerProtectionNonCancellable</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;clazz,
  <a href="ProtectionPolicy.ProtectionType.html" title="enum class in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a>&nbsp;type,
@@ -369,6 +387,50 @@ implements org.bukkit.event.Listener</span></div>
 <dd><code>getPlayer</code> - A function to get the player associated with the event - can return null</dd>
 <dd><code>cancel</code> - A consumer to cancel the event</dd>
 <dd><code>getBlocks</code> - A vararg of functions to get the blocks associated with this event</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="registerProtectionMultiBlock(java.lang.Class,redempt.redlib.protection.ProtectionPolicy.ProtectionType,java.util.function.Function,java.util.function.BiConsumer,java.util.function.Function)">
+<h3>registerProtectionMultiBlock</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;T extends org.bukkit.event.Event&gt;</span>
+<span class="return-type">void</span>&nbsp;<span class="element-name">registerProtectionMultiBlock</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;clazz,
+ <a href="ProtectionPolicy.ProtectionType.html" title="enum class in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a>&nbsp;type,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;T,<wbr>org.bukkit.entity.Player&gt;&nbsp;getPlayer,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;T,<wbr>org.bukkit.block.Block&gt;&nbsp;cancel,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;T,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;org.bukkit.block.Block&gt;&gt;&nbsp;getBlocks)</span></div>
+<div class="block">Registers a custom event that modifies multiple blocks to be protected using a specific ProtectionType</div>
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><code>T</code> - The event type</dd>
+<dt>Parameters:</dt>
+<dd><code>clazz</code> - The event class</dd>
+<dd><code>type</code> - The ProtectionType to protect against this event</dd>
+<dd><code>getPlayer</code> - A function to get the player associated with the event - can return null</dd>
+<dd><code>cancel</code> - A function to cancel the modification of a specific block in the event</dd>
+<dd><code>getBlocks</code> - A vararg of functions to get the blocks associated with the event</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="registerProtectionDirectional(java.lang.Class,redempt.redlib.protection.ProtectionPolicy.ProtectionType,java.util.function.Function,java.util.function.Function,java.util.function.Function)">
+<h3>registerProtectionDirectional</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters-long">&lt;T extends org.bukkit.event.Event &amp; org.bukkit.event.Cancellable&gt;</span>
+<span class="return-type">void</span>&nbsp;<span class="element-name">registerProtectionDirectional</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;clazz,
+ <a href="ProtectionPolicy.ProtectionType.html" title="enum class in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a>&nbsp;type,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;T,<wbr>org.bukkit.entity.Player&gt;&nbsp;getPlayer,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;T,<wbr>org.bukkit.block.Block&gt;&nbsp;getActingBlock,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;T,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;org.bukkit.block.Block&gt;&gt;&nbsp;getSubjectBlocks)</span></div>
+<div class="block">Registers a custom event to be protected using a specific ProtectionType, where there is a block acting and blocks being acted upon</div>
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><code>T</code> - The event type</dd>
+<dt>Parameters:</dt>
+<dd><code>clazz</code> - The event class</dd>
+<dd><code>type</code> - The ProtectionType to protect against this event</dd>
+<dd><code>getPlayer</code> - A function to get the player associated with the event - can be null</dd>
+<dd><code>getActingBlock</code> - A function to get the block acting upon the other blocks, i.e. a piston pushing blocks or a water source spawning new water blocks</dd>
+<dd><code>getSubjectBlocks</code> - A function to get the list of blocks being acted upon, i.e. the blocks being pushed by a piston or the water block being spawned</dd>
 </dl>
 </section>
 </li>

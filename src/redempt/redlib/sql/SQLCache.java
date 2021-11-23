@@ -1,6 +1,10 @@
 package redempt.redlib.sql;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
@@ -14,8 +18,8 @@ public class SQLCache {
 	private String deleteQuery;
 	private String selectQuery;
 	private String updateQuery;
-	private Map<SQLCacheEntry, Object> cache = new HashMap<>();
-	private Set<SQLCacheEntry> modified = new HashSet<>();
+	private Map<SQLCacheEntry, Object> cache = new ConcurrentHashMap<>();
+	private Set<SQLCacheEntry> modified = Collections.synchronizedSet(new HashSet<>());
 	private SQLHelper sql;
 	
 	protected SQLCache(SQLHelper sql, String tableName, String columnName, String... primaryKeyNames) {
@@ -87,7 +91,7 @@ public class SQLCache {
 	 * This operation will always use a query.
 	 * @param primaryKeys The keys to use to delete the row
 	 */
-	public void delete(Object... primaryKeys) {
+	public synchronized void delete(Object... primaryKeys) {
 		remove(primaryKeys);
 		sql.execute(deleteQuery, primaryKeys);
 	}
@@ -96,7 +100,7 @@ public class SQLCache {
 	 * Removes a cached value, but does not affect the table
 	 * @param primaryKeys The keys used to access the value
 	 */
-	public void remove(Object... primaryKeys) {
+	public synchronized void remove(Object... primaryKeys) {
 		checkKeys(primaryKeys);
 		SQLCacheEntry entry = new SQLCacheEntry(primaryKeys);
 		modified.remove(entry);
@@ -108,7 +112,7 @@ public class SQLCache {
 	 * @param value The value to cache
 	 * @param primaryKeys The primary keys used to mutate the row
 	 */
-	public void update(Object value, Object... primaryKeys) {
+	public synchronized void update(Object value, Object... primaryKeys) {
 		checkKeys(primaryKeys);
 		SQLCacheEntry entry = new SQLCacheEntry(primaryKeys);
 		if (!cache.containsKey(entry)) {
@@ -156,7 +160,7 @@ public class SQLCache {
 		return cache.containsKey(new SQLCacheEntry(primaryKeys));
 	}
 	
-	private Object select(Function<Object[], ?> supplier, Object... primaryKeys) {
+	private synchronized Object select(Function<Object[], ?> supplier, Object... primaryKeys) {
 		checkKeys(primaryKeys);
 		SQLCacheEntry entry = new SQLCacheEntry(primaryKeys);
 		Object value;
@@ -180,7 +184,7 @@ public class SQLCache {
 	/**
 	 * Flushes the cache, saving all changes that were made.
 	 */
-	public void flush() {
+	public synchronized void flush() {
 		modified.forEach(s -> {
 			Object val = cache.get(s);
 			Object[] objs = new Object[s.getParams().length + 1];
@@ -197,7 +201,7 @@ public class SQLCache {
 	 * Flushes a single value from the cache, saving changes that were made to it
 	 * @param primaryKeys The primary keys used to access the row
 	 */
-	public void flush(Object... primaryKeys) {
+	public synchronized void flush(Object... primaryKeys) {
 		SQLCacheEntry entry = new SQLCacheEntry(primaryKeys);
 		Object val = cache.get(entry);
 		if (val == null) {

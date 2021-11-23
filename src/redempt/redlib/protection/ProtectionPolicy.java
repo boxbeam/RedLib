@@ -1,6 +1,7 @@
 package redempt.redlib.protection;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -20,6 +21,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
@@ -28,6 +30,7 @@ import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.event.world.PortalCreateEvent.CreateReason;
 import org.bukkit.event.world.StructureGrowEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import org.bukkit.plugin.Plugin;
@@ -63,13 +66,7 @@ public class ProtectionPolicy implements Listener {
 			}
 			return e.getClickedBlock();
 		});
-		ProtectionListener.protect(InventoryOpenEvent.class, ProtectionType.CONTAINER_ACCESS, e -> (Player) e.getPlayer(), e -> {
-			InventoryHolder holder = e.getInventory().getHolder();
-			if (holder instanceof BlockState) {
-				return ((BlockState) holder).getBlock();
-			}
-			return null;
-		});
+		ProtectionListener.protect(InventoryOpenEvent.class, ProtectionType.CONTAINER_ACCESS, e -> (Player) e.getPlayer(), e -> getBlock(e.getInventory()));
 		ProtectionListener.protectMultiBlock(EntityExplodeEvent.class, ProtectionType.ENTITY_EXPLOSION, e -> null, (e, b) -> e.blockList().remove(b), e -> e.blockList());
 		ProtectionListener.protectMultiBlock(BlockExplodeEvent.class, ProtectionType.BLOCK_EXPLOSION, e -> null, (e, b) -> e.blockList().remove(b), e -> e.blockList());
 		ProtectionListener.protect(PlayerBucketFillEvent.class, ProtectionType.USE_BUCKETS, e -> e.getPlayer(), e -> e.getBlockClicked());
@@ -128,6 +125,15 @@ public class ProtectionPolicy implements Listener {
 		ProtectionListener.protectMultiBlock(StructureGrowEvent.class, ProtectionType.STRUCTURE_GROWTH, e -> null, (e, b) -> e.setCancelled(true), e -> e.getBlocks().stream().map(BlockState::getBlock).collect(Collectors.toList()));
 		ProtectionListener.protectDirectional(StructureGrowEvent.class, ProtectionType.STRUCTURE_GROWTH_IN, e -> null, e -> e.getLocation().getBlock(), e -> e.getBlocks().stream().map(BlockState::getBlock).collect(Collectors.toList()));
 		ProtectionListener.protect(EntityBlockFormEvent.class, ProtectionType.ENTITY_FORM_BLOCK, e -> e.getEntity() instanceof Player ? (Player) e.getEntity() : null, e -> e.getBlock());
+		ProtectionListener.protectDirectional(InventoryMoveItemEvent.class, ProtectionType.CONTAINER_ACCESS, e -> null, e -> getBlock(e.getSource()), e -> Collections.singletonList(getBlock(e.getDestination())));
+	}
+	
+	private static Block getBlock(Inventory inv) {
+		InventoryHolder holder = inv.getHolder();
+		if (holder instanceof BlockState) {
+			return ((BlockState) holder).getBlock();
+		}
+		return null;
 	}
 	
 	/**
@@ -153,6 +159,32 @@ public class ProtectionPolicy implements Listener {
 	 */
 	public static <T extends Event> void registerProtectionNonCancellable(Class<T> clazz, ProtectionType type, Function<T, Player> getPlayer, Consumer<T> cancel, Function<T, Block>... getBlocks) {
 		ProtectionListener.protectNonCancellable(clazz, type, getPlayer, cancel, getBlocks);
+	}
+	
+	/**
+	 * Registers a custom event that modifies multiple blocks to be protected using a specific ProtectionType
+	 * @param clazz The event class
+	 * @param type The ProtectionType to protect against this event
+	 * @param getPlayer A function to get the player associated with the event - can return null
+	 * @param cancel A function to cancel the modification of a specific block in the event
+	 * @param getBlocks A vararg of functions to get the blocks associated with the event
+	 * @param <T> The event type
+	 */
+	public static <T extends Event> void registerProtectionMultiBlock(Class<T> clazz, ProtectionType type, Function<T, Player> getPlayer, BiConsumer<T, Block> cancel, Function<T, List<Block>> getBlocks) {
+		ProtectionListener.protectMultiBlock(clazz, type, getPlayer, cancel, getBlocks);
+	}
+	
+	/**
+	 * Registers a custom event to be protected using a specific ProtectionType, where there is a block acting and blocks being acted upon
+	 * @param clazz The event class
+	 * @param type The ProtectionType to protect against this event
+	 * @param getPlayer  A function to get the player associated with the event - can be null
+	 * @param getActingBlock A function to get the block acting upon the other blocks, i.e. a piston pushing blocks or a water source spawning new water blocks
+	 * @param getSubjectBlocks A function to get the list of blocks being acted upon, i.e. the blocks being pushed by a piston or the water block being spawned
+	 * @param <T> The event type
+	 */
+	public static <T extends Event & Cancellable> void registerProtectionDirectional(Class<T> clazz, ProtectionType type, Function<T, Player> getPlayer, Function<T, Block> getActingBlock, Function<T, List<Block>> getSubjectBlocks) {
+		ProtectionListener.protectDirectional(clazz, type, getPlayer, getActingBlock, getSubjectBlocks);
 	}
 	
 	private List<BypassPolicy> bypassPolicies = new ArrayList<>();
