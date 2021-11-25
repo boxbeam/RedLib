@@ -1,7 +1,8 @@
 plugins {
 	id 'java'
 	id 'java-library'
-	id 'com.github.johnrengelman.shadow' version '6.0.0'
+	id 'com.github.johnrengelman.shadow' version '7.0.0'
+	id 'maven-publish'
 }
 targetCompatibility = 1.8
 sourceCompatibility = 1.8
@@ -23,6 +24,15 @@ sourceSets {
 		}
 		resources {
 			srcDir 'res'
+		}
+	}
+}
+publishing {
+	publications {
+		maven(MavenPublication) {
+			groupId = 'com.github.Redempt'
+			artifactId = rootProject.name
+			version = '1.0'
 		}
 	}
 }
