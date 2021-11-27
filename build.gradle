@@ -1,5 +1,4 @@
 plugins {
-	id 'java'
 	id 'java-library'
 	id 'com.github.johnrengelman.shadow' version '7.0.0'
 	id 'maven-publish'
@@ -33,6 +32,7 @@ publishing {
 			groupId = 'com.github.Redempt'
 			artifactId = rootProject.name
 			version = '1.0'
+			artifact ("build/libs/RedLib.jar")
 		}
 	}
 }
