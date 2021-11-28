@@ -1,53 +1,22 @@
 package redempt.redlib.protection;
 
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Silverfish;
-import org.bukkit.entity.Wither;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerBucketEmptyEvent;
-import org.bukkit.event.player.PlayerBucketFillEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.server.PluginDisableEvent;
-import org.bukkit.event.world.PortalCreateEvent;
-import org.bukkit.event.world.PortalCreateEvent.CreateReason;
-import org.bukkit.event.world.StructureGrowEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.Plugin;
 import redempt.redlib.RedLib;
 import redempt.redlib.misc.EventListener;
 import redempt.redlib.region.CuboidRegion;
 import redempt.redlib.region.RegionMap;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.function.*;
 
 /**
  * Represents a set of rules in the form of {@link ProtectionType}s protecting a set of blocks, which can have bypasses
@@ -60,89 +29,7 @@ public class ProtectionPolicy implements Listener {
 	protected static RegionMap<ProtectionPolicy> regionMap = new RegionMap<>();
 	
 	static {
-		registerProtections();
-	}
-	
-	private static void registerProtections() {
-		ProtectionListener.protect(BlockBreakEvent.class, ProtectionType.BREAK_BLOCK, e -> e.getPlayer(), e -> e.getBlock());
-		ProtectionListener.protect(BlockPlaceEvent.class, ProtectionType.PLACE_BLOCK, e -> e.getPlayer(), e -> e.getBlock());
-		ProtectionListener.protect(PlayerInteractEvent.class, ProtectionType.INTERACT, e -> e.getPlayer(), e -> {
-			if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getClickedBlock() == null || (RedLib.MID_VERSION >= 13 && !e.getClickedBlock().getType().isInteractable())) {
-				return null;
-			}
-			if (e.getClickedBlock().getState() instanceof InventoryHolder && !e.getPlayer().isSneaking()) {
-				return null;
-			}
-			return e.getClickedBlock();
-		});
-		ProtectionListener.protect(InventoryOpenEvent.class, ProtectionType.CONTAINER_ACCESS, e -> (Player) e.getPlayer(), e -> getBlock(e.getInventory()));
-		ProtectionListener.protectMultiBlock(EntityExplodeEvent.class, ProtectionType.ENTITY_EXPLOSION, e -> null, (e, b) -> e.blockList().remove(b), e -> e.blockList());
-		ProtectionListener.protectMultiBlock(BlockExplodeEvent.class, ProtectionType.BLOCK_EXPLOSION, e -> null, (e, b) -> e.blockList().remove(b), e -> e.blockList());
-		ProtectionListener.protect(PlayerBucketFillEvent.class, ProtectionType.USE_BUCKETS, e -> e.getPlayer(), e -> e.getBlockClicked());
-		ProtectionListener.protect(PlayerBucketEmptyEvent.class, ProtectionType.USE_BUCKETS, e -> e.getPlayer(), e -> e.getBlockClicked());
-		ProtectionListener.protectMultiBlock(BlockPistonExtendEvent.class, ProtectionType.PISTONS, e -> null, (e, b) -> e.setCancelled(true), e -> {
-			List<Block> blocks = new ArrayList<>(e.getBlocks());
-			blocks.add(e.getBlock());
-			return blocks;
-		});
-		ProtectionListener.protectMultiBlock(BlockPistonRetractEvent.class, ProtectionType.PISTONS, e -> null, (e, b) -> e.setCancelled(true), e -> {
-			List<Block> blocks = new ArrayList<>(e.getBlocks());
-			blocks.add(e.getBlock());
-			return blocks;
-		});
-		ProtectionListener.protectNonCancellable(BlockRedstoneEvent.class, ProtectionType.REDSTONE, e -> null, e -> e.setNewCurrent(e.getOldCurrent()), e -> e.getBlock());
-		ProtectionListener.protect(EntityChangeBlockEvent.class, ProtectionType.FALLING_BLOCK, e -> null, e -> {
-			if (!(e.getEntity() instanceof FallingBlock)) {
-				return null;
-			}
-			return e.getBlock();
-		});
-		ProtectionListener.protect(EntityChangeBlockEvent.class, ProtectionType.SILVERFISH, e -> null, e -> {
-			if (!(e.getEntity() instanceof Silverfish)) {
-				return null;
-			}
-			return e.getBlock();
-		});
-		ProtectionListener.protect(EntityChangeBlockEvent.class, ProtectionType.WITHER, e -> null, e -> {
-			if (!(e.getEntity() instanceof Wither)) {
-				return null;
-			}
-			return e.getBlock();
-		});
-		ProtectionListener.protect(BlockGrowEvent.class, ProtectionType.GROWTH, e -> null, e -> e.getBlock());
-		ProtectionListener.protect(BlockSpreadEvent.class, ProtectionType.GROWTH, e -> null, e -> e.getNewState().getType() == Material.FIRE ? null : e.getBlock());
-		ProtectionListener.protect(BlockFormEvent.class, ProtectionType.GROWTH, e -> null, e -> e.getBlock());
-		ProtectionListener.protect(BlockFadeEvent.class, ProtectionType.FADE, e -> null, e -> e.getBlock());
-		ProtectionListener.protect(BlockFromToEvent.class, ProtectionType.FLOW, e -> null, e -> e.getBlock(), e -> e.getToBlock());
-		ProtectionListener.protect(BlockBurnEvent.class, ProtectionType.FIRE, e -> null, e -> e.getBlock());
-		ProtectionListener.protect(BlockSpreadEvent.class, ProtectionType.FIRE, e -> null, e -> e.getNewState().getType() == Material.FIRE ? e.getBlock() : null);
-		ProtectionListener.protect(CreatureSpawnEvent.class, ProtectionType.MOB_SPAWN, e -> null, e -> {
-			if (e.getSpawnReason() == SpawnReason.CUSTOM) {
-				return null;
-			}
-			return e.getEntity().getLocation().getBlock();
-		});
-		ProtectionListener.protectMultiBlock(PortalCreateEvent.class, ProtectionType.PORTAL_PAIRING, e -> null, (e, b) -> e.setCancelled(true), e -> {
-			if (e.getReason() != CreateReason.NETHER_PAIR) {
-				return null;
-			}
-			return e.getBlocks().stream().map(BlockState::getBlock).collect(Collectors.toList());
-		});
-		ProtectionListener.protectDirectional(BlockFromToEvent.class, ProtectionType.FLOW_IN, e -> null, e -> e.getBlock(), e -> Collections.singletonList(e.getToBlock()));
-		ProtectionListener.protectDirectional(BlockPistonExtendEvent.class, ProtectionType.PISTONS_IN, e -> null, e -> e.getBlock(), e -> e.getBlocks());
-		ProtectionListener.protectDirectional(BlockPistonRetractEvent.class, ProtectionType.PISTONS_IN, e -> null, e -> e.getBlock(), e -> e.getBlocks());
-		ProtectionListener.protectMultiBlock(StructureGrowEvent.class, ProtectionType.STRUCTURE_GROWTH, e -> null, (e, b) -> e.setCancelled(true), e -> e.getBlocks().stream().map(BlockState::getBlock).collect(Collectors.toList()));
-		ProtectionListener.protectDirectional(StructureGrowEvent.class, ProtectionType.STRUCTURE_GROWTH_IN, e -> null, e -> e.getLocation().getBlock(), e -> e.getBlocks().stream().map(BlockState::getBlock).collect(Collectors.toList()));
-		ProtectionListener.protect(EntityBlockFormEvent.class, ProtectionType.ENTITY_FORM_BLOCK, e -> e.getEntity() instanceof Player ? (Player) e.getEntity() : null, e -> e.getBlock());
-		ProtectionListener.protectDirectional(InventoryMoveItemEvent.class, ProtectionType.CONTAINER_ACCESS, e -> null, e -> getBlock(e.getSource()), e -> Collections.singletonList(getBlock(e.getDestination())));
-	}
-	
-	private static Block getBlock(Inventory inv) {
-		InventoryHolder holder = inv.getHolder();
-		if (holder instanceof BlockState) {
-			return ((BlockState) holder).getBlock();
-		}
-		return null;
+		Protections.registerProtections();
 	}
 	
 	/**
@@ -487,7 +374,23 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * Does nothing by default, but other plugins can register their events to be protected against by this type.
 		 */
-		MISCELLANEOUS;
+		MISCELLANEOUS,
+		/**
+		 * Players interacting with entities
+		 */
+		INTERACT_ENTITY,
+		/**
+		 * Players placing entities such as paintings, item frames, and armor stands
+		 */
+		PLACE_ENTITY,
+		/**
+		 * Dispenser events which may modify blocks
+		 */
+		DISPENSER_PLACE,
+		/**
+		 * Dispenser events which may modify blocks inside the protected area from outside it
+		 */
+		DISPENSER_PLACE_IN;
 		
 		/**
 		 * Every protection type
@@ -496,11 +399,11 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * All protection types relating to actions taken directly by players - Breaking, placing, and interacting with blocks
 		 */
-		public static final ProtectionType[] DIRECT_PLAYERS = {BREAK_BLOCK, PLACE_BLOCK, INTERACT, CONTAINER_ACCESS, USE_BUCKETS, ENTITY_FORM_BLOCK};
+		public static final ProtectionType[] DIRECT_PLAYERS = {BREAK_BLOCK, PLACE_BLOCK, INTERACT, CONTAINER_ACCESS, USE_BUCKETS, ENTITY_FORM_BLOCK, PLACE_ENTITY, INTERACT_ENTITY};
 		/**
 		 * All protection types relating to actions usually taken by players which indirectly affect blocks - Pistons, redstone, explosions, and falling blocks
 		 */
-		public static final ProtectionType[] INDIRECT_PLAYERS = {REDSTONE, ENTITY_EXPLOSION, BLOCK_EXPLOSION, FALLING_BLOCK, FIRE, PORTAL_PAIRING, WITHER, FLOW_IN, PISTONS_IN};
+		public static final ProtectionType[] INDIRECT_PLAYERS = {REDSTONE, ENTITY_EXPLOSION, BLOCK_EXPLOSION, FALLING_BLOCK, FIRE, PORTAL_PAIRING, WITHER, FLOW_IN, PISTONS_IN, DISPENSER_PLACE_IN};
 		/**
 		 * All protection types relating to natural processes not caused by players
 		 */
