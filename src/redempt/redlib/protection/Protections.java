@@ -6,6 +6,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.*;
+import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
@@ -101,7 +102,8 @@ class Protections {
         ProtectionListener.protectDirectional(StructureGrowEvent.class, ProtectionType.STRUCTURE_GROWTH_IN, e -> null, e -> e.getLocation().getBlock(), e -> e.getBlocks().stream().map(BlockState::getBlock).collect(Collectors.toList()));
         ProtectionListener.protect(EntityBlockFormEvent.class, ProtectionType.ENTITY_FORM_BLOCK, e -> e.getEntity() instanceof Player ? (Player) e.getEntity() : null, e -> e.getBlock());
         ProtectionListener.protectDirectional(InventoryMoveItemEvent.class, ProtectionType.CONTAINER_ACCESS, e -> null, e -> getBlock(e.getSource()), e -> Collections.singletonList(getBlock(e.getDestination())));
-        ProtectionListener.protect(PlayerInteractEntityEvent.class, ProtectionType.INTERACT_ENTITY, PlayerEvent::getPlayer, e -> e.getRightClicked().getLocation().getBlock());
+        ProtectionListener.protect(PlayerInteractEntityEvent.class, ProtectionType.INTERACT_ENTITY, PlayerEvent::getPlayer, e -> e.getRightClicked() instanceof StorageMinecart ? null : e.getRightClicked().getLocation().getBlock());
+        ProtectionListener.protect(PlayerInteractEntityEvent.class, ProtectionType.CONTAINER_ACCESS, PlayerEvent::getPlayer, e -> e.getRightClicked() instanceof StorageMinecart ? e.getRightClicked().getLocation().getBlock() : null);
         ProtectionListener.protect(PlayerArmorStandManipulateEvent.class, ProtectionType.INTERACT_ENTITY, PlayerEvent::getPlayer, e -> e.getRightClicked().getLocation().getBlock());
         ProtectionListener.protect(HangingPlaceEvent.class, ProtectionType.PLACE_ENTITY, HangingPlaceEvent::getPlayer, HangingPlaceEvent::getBlock);
         ProtectionListener.protect(PlayerInteractEvent.class, ProtectionType.PLACE_ENTITY, e -> e.getPlayer(), e -> {
@@ -117,7 +119,7 @@ class Protections {
         ProtectionListener.protect(HangingBreakByEntityEvent.class, ProtectionType.INTERACT_ENTITY, e -> e.getRemover() instanceof Player ? (Player) e.getRemover() : null, e -> e.getCause() == HangingBreakEvent.RemoveCause.ENTITY ? getBlock(e.getEntity()) : null);
         ProtectionListener.protect(HangingBreakByEntityEvent.class, ProtectionType.ENTITY_EXPLOSION, e -> null, e -> e.getCause() == HangingBreakEvent.RemoveCause.EXPLOSION ? getBlock(e.getEntity()) : null);
         Set<Material> bannedDispenserItems = EnumSet.of(Material.FLINT_AND_STEEL, Material.WATER_BUCKET, Material.LAVA_BUCKET, Material.JACK_O_LANTERN, Material.PUMPKIN, Material.ARMOR_STAND);
-        Arrays.stream(Material.values()).filter(m -> m.toString().endsWith("MINECART") || m.toString().endsWith("BOAT")).forEach(bannedDispenserItems::add);
+        Arrays.stream(Material.values()).filter(m -> m.toString().endsWith("MINECART") || m.toString().endsWith("BOAT") || m.toString().endsWith("_BUCKET")).forEach(bannedDispenserItems::add);
         ProtectionListener.protect(BlockDispenseEvent.class, ProtectionType.DISPENSER_PLACE, e -> null, e -> bannedDispenserItems.contains(e.getItem().getType()) ? e.getBlock() : null);
         ProtectionListener.protectDirectional(BlockDispenseEvent.class, ProtectionType.DISPENSER_PLACE_IN, e -> null, e -> e.getBlock(), e -> {
            if (!bannedDispenserItems.contains(e.getItem().getType())) {
@@ -126,6 +128,7 @@ class Protections {
            Block rel = e.getBlock().getRelative(getFace(e.getBlock()));
            return Collections.singletonList(rel);
         });
+        ProtectionListener.protectMultiBlock(BlockMultiPlaceEvent.class, ProtectionType.PLACE_BLOCK, e -> e.getPlayer(), (e, b) -> e.setCancelled(true), e -> e.getReplacedBlockStates().stream().map(BlockState::getBlock).collect(Collectors.toList()));
     }
 
     private static BlockFace getFace(Block dispenser) {
