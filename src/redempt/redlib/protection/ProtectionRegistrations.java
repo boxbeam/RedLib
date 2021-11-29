@@ -28,7 +28,7 @@ import redempt.redlib.protection.ProtectionPolicy.ProtectionType;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class Protections {
+class ProtectionRegistrations {
 
     public static void registerProtections() {
         ProtectionListener.protect(BlockBreakEvent.class, ProtectionType.BREAK_BLOCK, e -> e.getPlayer(), e -> e.getBlock());

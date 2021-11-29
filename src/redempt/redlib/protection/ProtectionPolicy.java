@@ -29,7 +29,7 @@ public class ProtectionPolicy implements Listener {
 	protected static RegionMap<ProtectionPolicy> regionMap = new RegionMap<>();
 	
 	static {
-		Protections.registerProtections();
+		ProtectionRegistrations.registerProtections();
 	}
 	
 	/**

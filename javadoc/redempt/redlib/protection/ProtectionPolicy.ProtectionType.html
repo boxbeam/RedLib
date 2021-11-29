@@ -124,6 +124,14 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color">
 <div class="block">Players opening containers</div>
 </div>
+<div class="col-first even-row-color"><code><a href="#DISPENSER_PLACE" class="member-name-link">DISPENSER_PLACE</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Dispenser events which may modify blocks</div>
+</div>
+<div class="col-first odd-row-color"><code><a href="#DISPENSER_PLACE_IN" class="member-name-link">DISPENSER_PLACE_IN</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Dispenser events which may modify blocks inside the protected area from outside it</div>
+</div>
 <div class="col-first even-row-color"><code><a href="#ENTITY_EXPLOSION" class="member-name-link">ENTITY_EXPLOSION</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">Entities exploding</div>
@@ -160,25 +168,33 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">
 <div class="block">Players interacting with non-container blocks</div>
 </div>
-<div class="col-first odd-row-color"><code><a href="#MISCELLANEOUS" class="member-name-link">MISCELLANEOUS</a></code></div>
+<div class="col-first odd-row-color"><code><a href="#INTERACT_ENTITY" class="member-name-link">INTERACT_ENTITY</a></code></div>
 <div class="col-last odd-row-color">
+<div class="block">Players interacting with entities</div>
+</div>
+<div class="col-first even-row-color"><code><a href="#MISCELLANEOUS" class="member-name-link">MISCELLANEOUS</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">Does nothing by default, but other plugins can register their events to be protected against by this type.</div>
 </div>
-<div class="col-first even-row-color"><code><a href="#MOB_SPAWN" class="member-name-link">MOB_SPAWN</a></code></div>
-<div class="col-last even-row-color">
+<div class="col-first odd-row-color"><code><a href="#MOB_SPAWN" class="member-name-link">MOB_SPAWN</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">Mobs spawning</div>
 </div>
-<div class="col-first odd-row-color"><code><a href="#PISTONS" class="member-name-link">PISTONS</a></code></div>
-<div class="col-last odd-row-color">
+<div class="col-first even-row-color"><code><a href="#PISTONS" class="member-name-link">PISTONS</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">Pistons pushing and pulling blocks</div>
 </div>
-<div class="col-first even-row-color"><code><a href="#PISTONS_IN" class="member-name-link">PISTONS_IN</a></code></div>
-<div class="col-last even-row-color">
+<div class="col-first odd-row-color"><code><a href="#PISTONS_IN" class="member-name-link">PISTONS_IN</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">Pistons pushing blocks in or pulling blocks out</div>
 </div>
-<div class="col-first odd-row-color"><code><a href="#PLACE_BLOCK" class="member-name-link">PLACE_BLOCK</a></code></div>
-<div class="col-last odd-row-color">
+<div class="col-first even-row-color"><code><a href="#PLACE_BLOCK" class="member-name-link">PLACE_BLOCK</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">Players placing blocks</div>
+</div>
+<div class="col-first odd-row-color"><code><a href="#PLACE_ENTITY" class="member-name-link">PLACE_ENTITY</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Players placing entities such as paintings, item frames, and armor stands</div>
 </div>
 <div class="col-first even-row-color"><code><a href="#PORTAL_PAIRING" class="member-name-link">PORTAL_PAIRING</a></code></div>
 <div class="col-last even-row-color">
@@ -468,6 +484,34 @@ the order they are declared.</div>
 <h3>MISCELLANEOUS</h3>
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="ProtectionPolicy.ProtectionType.html" title="enum class in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a></span>&nbsp;<span class="element-name">MISCELLANEOUS</span></div>
 <div class="block">Does nothing by default, but other plugins can register their events to be protected against by this type.</div>
+</section>
+</li>
+<li>
+<section class="detail" id="INTERACT_ENTITY">
+<h3>INTERACT_ENTITY</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="ProtectionPolicy.ProtectionType.html" title="enum class in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a></span>&nbsp;<span class="element-name">INTERACT_ENTITY</span></div>
+<div class="block">Players interacting with entities</div>
+</section>
+</li>
+<li>
+<section class="detail" id="PLACE_ENTITY">
+<h3>PLACE_ENTITY</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="ProtectionPolicy.ProtectionType.html" title="enum class in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a></span>&nbsp;<span class="element-name">PLACE_ENTITY</span></div>
+<div class="block">Players placing entities such as paintings, item frames, and armor stands</div>
+</section>
+</li>
+<li>
+<section class="detail" id="DISPENSER_PLACE">
+<h3>DISPENSER_PLACE</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="ProtectionPolicy.ProtectionType.html" title="enum class in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a></span>&nbsp;<span class="element-name">DISPENSER_PLACE</span></div>
+<div class="block">Dispenser events which may modify blocks</div>
+</section>
+</li>
+<li>
+<section class="detail" id="DISPENSER_PLACE_IN">
+<h3>DISPENSER_PLACE_IN</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="ProtectionPolicy.ProtectionType.html" title="enum class in redempt.redlib.protection">ProtectionPolicy.ProtectionType</a></span>&nbsp;<span class="element-name">DISPENSER_PLACE_IN</span></div>
+<div class="block">Dispenser events which may modify blocks inside the protected area from outside it</div>
 </section>
 </li>
 </ul>
