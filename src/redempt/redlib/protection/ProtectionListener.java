@@ -37,6 +37,9 @@ class ProtectionListener {
 	}
 	
 	private static boolean testAll(Block outside, List<Block> inside, ProtectionType type, Player player) {
+		if (inside == null) {
+			return true;
+		}
 		Location min = outside.getLocation();
 		Location max = outside.getLocation();
 		for (Block block : inside) {
