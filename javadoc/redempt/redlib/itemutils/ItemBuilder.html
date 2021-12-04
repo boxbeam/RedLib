@@ -203,9 +203,14 @@ Z&gt;&nbsp;<a href="ItemBuilder.html" title="class in redempt.redlib.itemutils">
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Renames this ItemBuilder</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ItemBuilder.html" title="class in redempt.redlib.itemutils">ItemBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#unbreakable()" class="member-name-link">unbreakable</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.bukkit.inventory.ItemStack</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toItemStack()" class="member-name-link">toItemStack</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Converts this ItemBuilder to a normal ItemStack.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ItemBuilder.html" title="class in redempt.redlib.itemutils">ItemBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#unbreakable()" class="member-name-link">unbreakable</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets this ItemBuilder to be unbreakable</div>
 </div>
 </div>
@@ -296,6 +301,17 @@ Z&gt;&nbsp;<a href="ItemBuilder.html" title="class in redempt.redlib.itemutils">
 <dd><code>level</code> - The level of the enchantment</dd>
 <dt>Returns:</dt>
 <dd>The enchanted ItemBuilder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="toItemStack()">
+<h3>toItemStack</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.bukkit.inventory.ItemStack</span>&nbsp;<span class="element-name">toItemStack</span>()</div>
+<div class="block">Converts this ItemBuilder to a normal ItemStack. Useful because there are some inconsistencies within Spigot using this class.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>An ItemStack copy of this ItemBuilder</dd>
 </dl>
 </section>
 </li>

@@ -65,6 +65,14 @@ public class ItemBuilder extends ItemStack {
 	}
 	
 	/**
+	 * Converts this ItemBuilder to a normal ItemStack. Useful because there are some inconsistencies within Spigot using this class.
+	 * @return An ItemStack copy of this ItemBuilder
+	 */
+	public ItemStack toItemStack() {
+		return new ItemStack(this);
+	}
+	
+	/**
 	 * Set the lore of this ItemBuilder
 	 * @param lore The lines of lore
 	 * @return The ItemBuilder with lore added
