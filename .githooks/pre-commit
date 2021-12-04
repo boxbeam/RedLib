@@ -1,0 +1,7 @@
+#!/bin/bash
+gradle javadoc
+rm -rf javadoc
+mv build/docs/javadoc javadoc
+git add javadoc
+sed -E "s/^version: .+/version: $(date -u '+%Y-%m-%d %H:%M')/" -i res/plugin.yml
+git add res/plugin.yml
