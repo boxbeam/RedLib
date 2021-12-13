@@ -1,10 +1,9 @@
 package redempt.redlib.itemutils;
 
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiPredicate;
 
 /**
@@ -24,65 +23,15 @@ public enum ItemTrait {
 	/**
 	 * For comparing the display name of two items
 	 */
-	NAME((a, b) -> {
-		if (a.hasItemMeta() != b.hasItemMeta()) {
-			return false;
-		}
-		if (!a.hasItemMeta()) {
-			return true;
-		}
-		if (a.getItemMeta().hasDisplayName() != b.getItemMeta().hasDisplayName()) {
-			return false;
-		}
-		if (!a.getItemMeta().hasDisplayName()) {
-			return true;
-		}
-		return a.getItemMeta().getDisplayName().equals(b.getItemMeta().getDisplayName());
-	}),
+	NAME((a, b) -> Optional.ofNullable(a.getItemMeta()).map(ItemMeta::getDisplayName).equals(Optional.ofNullable(b.getItemMeta()).map(ItemMeta::getDisplayName))),
 	/**
 	 * For comparing the lore of two items
 	 */
-	LORE((a, b) -> {
-		if (a.hasItemMeta() != b.hasItemMeta()) {
-			return false;
-		}
-		if (!a.hasItemMeta()) {
-			return true;
-		}
-		if (a.getItemMeta().hasLore() != b.getItemMeta().hasLore()) {
-			return false;
-		}
-		if (!a.getItemMeta().hasLore()) {
-			return true;
-		}
-		List<String> lore1 = a.getItemMeta().getLore();
-		List<String> lore2 = b.getItemMeta().getLore();
-		if (lore1.size() != lore2.size()) {
-			return false;
-		}
-		for (int i = 0; i < lore1.size(); i++) {
-			if (!lore1.get(i).equals(lore2.get(i))) {
-				return false;
-			}
-		}
-		return true;
-	}),
+	LORE((a, b) -> Optional.ofNullable(a.getItemMeta()).map(ItemMeta::getLore).equals(Optional.ofNullable(b.getItemMeta()).map(ItemMeta::getLore))),
 	/**
 	 * For comparing the enchantments of two items
 	 */
-	ENCHANTMENTS((a, b) -> {
-		Map<Enchantment, Integer> ench1 = a.getEnchantments();
-		Map<Enchantment, Integer> ench2 = b.getEnchantments();
-		if (ench1.size() != ench2.size() || !ench1.keySet().containsAll(ench2.keySet())) {
-			return false;
-		}
-		for (Enchantment ench : ench1.keySet()) {
-			if (!ench1.get(ench).equals(ench2.get(ench))) {
-				return false;
-			}
-		}
-		return true;
-	}),
+	ENCHANTMENTS((a, b) -> a.getEnchantments().equals(b.getEnchantments())),
 	/**
 	 * For comparing the types of two items
 	 */
