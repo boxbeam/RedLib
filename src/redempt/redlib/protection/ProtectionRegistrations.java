@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.StorageMinecart;
@@ -11,6 +12,7 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
@@ -41,6 +43,14 @@ class ProtectionRegistrations {
                 return null;
             }
             return e.getClickedBlock();
+        });
+        Set<String> farmlandNames = new HashSet<>();
+        Collections.addAll(farmlandNames, "FARMLAND", "SOIL");
+        ProtectionListener.protect(PlayerInteractEvent.class, ProtectionType.TRAMPLE, e -> e.getPlayer(), e -> {
+           if (e.getAction() == Action.PHYSICAL && e.getClickedBlock() != null && farmlandNames.contains(e.getClickedBlock().getType().toString())) {
+               return e.getClickedBlock();
+           }
+           return null;
         });
         ProtectionListener.protect(InventoryOpenEvent.class, ProtectionType.CONTAINER_ACCESS, e -> (Player) e.getPlayer(), e -> getBlock(e.getInventory()));
         ProtectionListener.protectMultiBlock(EntityExplodeEvent.class, ProtectionType.ENTITY_EXPLOSION, e -> null, (e, b) -> e.blockList().remove(b), e -> e.blockList());
@@ -146,6 +156,9 @@ class ProtectionRegistrations {
 
     private static Block getBlock(Inventory inv) {
         InventoryHolder holder = inv.getHolder();
+        if (holder instanceof DoubleChest) {
+            return ((DoubleChest) holder).getLocation().getBlock();
+        }
         if (holder instanceof BlockState) {
             return ((BlockState) holder).getBlock();
         }

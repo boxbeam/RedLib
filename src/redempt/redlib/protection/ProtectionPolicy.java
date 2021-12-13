@@ -390,7 +390,11 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * Dispenser events which may modify blocks inside the protected area from outside it
 		 */
-		DISPENSER_PLACE_IN;
+		DISPENSER_PLACE_IN,
+		/**
+		 * Trampling of farmland by players
+		 */
+		TRAMPLE;
 		
 		/**
 		 * Every protection type
