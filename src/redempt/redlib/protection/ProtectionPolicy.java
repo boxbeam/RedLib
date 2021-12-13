@@ -403,7 +403,7 @@ public class ProtectionPolicy implements Listener {
 		/**
 		 * All protection types relating to actions taken directly by players - Breaking, placing, and interacting with blocks
 		 */
-		public static final ProtectionType[] DIRECT_PLAYERS = {BREAK_BLOCK, PLACE_BLOCK, INTERACT, CONTAINER_ACCESS, USE_BUCKETS, ENTITY_FORM_BLOCK, PLACE_ENTITY, INTERACT_ENTITY};
+		public static final ProtectionType[] DIRECT_PLAYERS = {BREAK_BLOCK, PLACE_BLOCK, INTERACT, CONTAINER_ACCESS, USE_BUCKETS, ENTITY_FORM_BLOCK, PLACE_ENTITY, INTERACT_ENTITY, TRAMPLE};
 		/**
 		 * All protection types relating to actions usually taken by players which indirectly affect blocks - Pistons, redstone, explosions, and falling blocks
 		 */
