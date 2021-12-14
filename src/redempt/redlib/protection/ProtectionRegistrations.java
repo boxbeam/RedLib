@@ -156,8 +156,8 @@ class ProtectionRegistrations {
 
     private static Block getBlock(Inventory inv) {
         InventoryHolder holder = inv.getHolder();
-        if (holder instanceof StorageMinecart) {
-            return ((StorageMinecart) holder).getLocation().getBlock();
+        if (holder instanceof Minecart) {
+            return ((Minecart) holder).getLocation().getBlock();
         }
         if (holder instanceof DoubleChest) {
             return ((DoubleChest) holder).getLocation().getBlock();
