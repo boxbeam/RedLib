@@ -9,12 +9,12 @@ repositories {
 	mavenCentral()
 	maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
 	maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
-	maven { url = "https://jitpack.io" }
+	maven { url = 'https://jitpack.io' }
 	mavenLocal()
 }
 dependencies {
-	compileOnly "org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT"
-	implementation "com.github.Redempt:RedCommands:1.5.2"
+	compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
+	implementation 'com.github.Redempt:RedCommands:1.5.2'
 }
 sourceSets {
 	main {
@@ -23,16 +23,6 @@ sourceSets {
 		}
 		resources {
 			srcDir 'res'
-		}
-	}
-}
-publishing {
-	publications {
-		maven(MavenPublication) {
-			groupId = 'com.github.Redempt'
-			artifactId = rootProject.name
-			version = '1.0'
-			artifact ("build/libs/RedLib.jar")
 		}
 	}
 }
@@ -70,10 +60,33 @@ jar.configure {
 	dependsOn shadowJar
 }
 
+task javadocJar(type: Jar) {
+	from javadoc
+	archiveClassifier.set('javadoc')
+}
+
+task sourcesJar(type: Jar) {
+	from sourceSets.main.allJava
+	archiveClassifier.set('sources')
+}
+
 shadowJar.configure {
 	archiveClassifier.set('')
 }
 
-task deploy(dependsOn: ["jar", "updateJars"]) {
+publishing {
+	publications {
+		maven(MavenPublication) {
+			groupId = 'com.github.Redempt'
+			artifactId = rootProject.name
+			version = '1.0'
+			artifact jar
+			artifact javadocJar
+			artifact sourcesJar
+		}
+	}
+}
+
+task deploy(dependsOn: ['jar', 'updateJars']) {
 	updateJars.mustRunAfter shadowJar
 }
