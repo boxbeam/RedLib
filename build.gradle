@@ -14,7 +14,7 @@ repositories {
 }
 dependencies {
 	compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
-	api 'com.github.Redempt:RedCommands:1.5.3'
+	api 'com.github.Redempt:RedCommands:6010fe0'
 }
 sourceSets {
 	main {
@@ -80,9 +80,9 @@ publishing {
 			groupId = 'com.github.Redempt'
 			artifactId = rootProject.name
 			version = '1.0'
-			artifact jar
 			artifact javadocJar
 			artifact sourcesJar
+			from components.java
 		}
 	}
 }
