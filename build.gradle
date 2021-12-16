@@ -14,7 +14,7 @@ repositories {
 }
 dependencies {
 	compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
-	implementation 'com.github.Redempt:RedCommands:1.5.2'
+	api 'com.github.Redempt:RedCommands:1.5.3'
 }
 sourceSets {
 	main {
