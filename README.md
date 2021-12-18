@@ -3,6 +3,8 @@ RedLib is a Spigot plugin development library, designed to make your life easier
 
 Support Discord: https://discord.gg/agu5xGy2YZ
 
+Docs: https://redempt.dev/javadoc/com/github/Redempt/RedLib/index.html
+
 # Installation for Development
 
 RedLib is a standalone plugin, but can also be used as a shaded dependency if you do not want to distribute RedLib directly. To use it as a plugin dependency, you must add it as a dependency in your plugin.yml:
@@ -19,7 +21,7 @@ Gradle:
 
 ```groovy
 repositories {
-        maven { url 'https://jitpack.io' }
+        maven { url 'https://redempt.dev' }
 }
 
 ```
@@ -38,8 +40,8 @@ Maven:
 
 ```xml
 <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
+        <id>redempt.dev</id>
+        <url>https://redempt.dev</url>
 </repository>
 ```
 
