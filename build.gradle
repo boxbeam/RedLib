@@ -9,12 +9,12 @@ repositories {
 	mavenCentral()
 	maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
 	maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
-	maven { url = 'https://jitpack.io' }
+	maven { url = 'https://redempt.dev' }
 	mavenLocal()
 }
 dependencies {
 	compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
-	api 'com.github.Redempt:RedCommands:6010fe0'
+	api 'com.github.Redempt:RedCommands:1.5.3.1'
 }
 sourceSets {
 	main {
