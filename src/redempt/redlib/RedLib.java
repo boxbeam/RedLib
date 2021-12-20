@@ -7,8 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import redempt.redlib.commandmanager.ArgType;
 import redempt.redlib.commandmanager.CommandParser;
 import redempt.redlib.commandmanager.Messages;
-import redempt.redlib.configmanager.ConfigManager;
-import redempt.redlib.configmanager.annotations.ConfigValue;
+import redempt.redlib.config.ConfigManager;
 import redempt.redlib.dev.ChainCommand;
 import redempt.redlib.dev.StructureTool;
 import redempt.redlib.dev.profiler.ProfilerCommands;
@@ -42,9 +41,6 @@ public class RedLib extends JavaPlugin {
 		return globalMessages.get(msg);
 	}
 	
-	@ConfigValue
-	public static boolean devMode = false;
-	
 	/**
 	 * The middle number of the server version - for example, if the server version is 1.15.2, this will be 15
 	 */
@@ -71,8 +67,8 @@ public class RedLib extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
-		new ConfigManager(this).register(this).saveDefaults().load();
-		if (devMode) {
+		ConfigManager.create(this).target(RedLibConfig.class).load();
+		if (RedLibConfig.devMode) {
 			ChainCommand chain = new ChainCommand();
 			new CommandParser(this.getResource("command.rdcml"))
 					.setArgTypes(ArgType.of("material", Material.class), chain.getArgType())

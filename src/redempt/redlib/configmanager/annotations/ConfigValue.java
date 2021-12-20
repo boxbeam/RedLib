@@ -4,12 +4,13 @@ import redempt.redlib.configmanager.ConversionType;
 
 import java.lang.annotation.*;
 
+/**
+ * Used to indicate that a field should be saved to and loaded from config
+ * @deprecated Old API
+ */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-/**
- * Used to indicate that a field should be saved to and loaded from config
- */
 public @interface ConfigValue {
 	
 	/**

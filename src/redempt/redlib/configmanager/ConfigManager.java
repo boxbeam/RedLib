@@ -13,6 +13,7 @@ import java.util.function.Function;
 
 /**
  * Loads config values into variables annotated with {@link ConfigValue}
+ * @deprecated Old and poorly-designed API, use {@link redempt.redlib.config.ConfigManager}. This API will be removed in a future version.
  */
 public class ConfigManager {
 	

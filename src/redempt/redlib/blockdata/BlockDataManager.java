@@ -20,6 +20,8 @@ import redempt.redlib.json.JSONParser;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.sql.SQLHelper;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -50,6 +52,11 @@ public class BlockDataManager implements Listener {
 	 * @param saveFile The Path to load from immediately, and save to when save is called
 	 */
 	public BlockDataManager(Path saveFile) {
+		try {
+			Files.createDirectories(saveFile.getParent());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
 		sql = new SQLHelper(SQLHelper.openSQLite(saveFile));
 		sql.execute("CREATE TABLE IF NOT EXISTS blocks (world TEXT, cx INT, cz INT, x INT, y INT, z INT, data TEXT, PRIMARY KEY (world, x, y, z));");
