@@ -1,6 +1,7 @@
 package redempt.redlib.sql;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -18,7 +19,7 @@ public class SQLCache {
 	private String deleteQuery;
 	private String selectQuery;
 	private String updateQuery;
-	private Map<SQLCacheEntry, Object> cache = new ConcurrentHashMap<>();
+	private Map<SQLCacheEntry, Object> cache = Collections.synchronizedMap(new HashMap<>());
 	private Set<SQLCacheEntry> modified = Collections.synchronizedSet(new HashSet<>());
 	private SQLHelper sql;
 	

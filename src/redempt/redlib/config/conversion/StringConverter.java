@@ -1,6 +1,7 @@
 package redempt.redlib.config.conversion;
 
 import org.bukkit.configuration.ConfigurationSection;
+import redempt.redlib.config.data.DataHolder;
 
 import java.util.function.Function;
 
@@ -53,7 +54,7 @@ public interface StringConverter<T> extends TypeConverter<T> {
 	 * @return
 	 */
 	@Override
-	public default T loadFrom(ConfigurationSection section, String path, T currentValue) {
+	public default T loadFrom(DataHolder section, String path, T currentValue) {
 		return fromString(section.getString(path));
 	}
 	
@@ -63,7 +64,7 @@ public interface StringConverter<T> extends TypeConverter<T> {
 	 * @param path The path to the data that should be saved in the ConfigurationSection
 	 */
 	@Override
-	public default void saveTo(T t, ConfigurationSection section, String path) {
+	public default void saveTo(T t, DataHolder section, String path) {
 		section.set(path, toString(t));
 	}
 

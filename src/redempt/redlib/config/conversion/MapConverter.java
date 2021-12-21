@@ -3,6 +3,7 @@ package redempt.redlib.config.conversion;
 import org.bukkit.configuration.ConfigurationSection;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.ConfigType;
+import redempt.redlib.config.data.DataHolder;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,18 +30,18 @@ public class MapConverter {
 		TypeConverter<V> valueConverter = (TypeConverter<V>) manager.getConverter(types.get(1));
 		return new TypeConverter<M>() {
 			@Override
-			public M loadFrom(ConfigurationSection section, String path, M currentValue) {
+			public M loadFrom(DataHolder section, String path, M currentValue) {
 				if (currentValue == null) {
 					currentValue = (M) new LinkedHashMap<>();
 				} else {
 					currentValue.clear();
 				}
 				M map = currentValue;
-				ConfigurationSection newSection = section.getConfigurationSection(path);
+				DataHolder newSection = path == null ? section : section.getSubsection(path);
 				if (newSection == null) {
 					return null;
 				}
-				newSection.getKeys(false).forEach(k -> {
+				newSection.getKeys().forEach(k -> {
 					K key = keyConverter.fromString(k);
 					V value = valueConverter.loadFrom(newSection, k, null);
 					map.put(key, value);
@@ -49,8 +50,8 @@ public class MapConverter {
 			}
 			
 			@Override
-			public void saveTo(M m, ConfigurationSection section, String path) {
-				ConfigurationSection newSection = section.createSection(path);
+			public void saveTo(M m, DataHolder section, String path) {
+				DataHolder newSection = path == null ? section : section.createSubsection(path);
 				m.forEach((k, v) -> {
 					String keyPath = keyConverter.toString(k);
 					valueConverter.saveTo(v, newSection, keyPath);

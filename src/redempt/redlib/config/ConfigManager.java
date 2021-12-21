@@ -12,6 +12,8 @@ import redempt.redlib.config.conversion.ObjectConverter;
 import redempt.redlib.config.conversion.StaticRootConverter;
 import redempt.redlib.config.conversion.StringConverter;
 import redempt.redlib.config.conversion.TypeConverter;
+import redempt.redlib.config.data.ConfigurationSectionDataHolder;
+import redempt.redlib.config.data.DataHolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,6 +79,7 @@ public class ConfigManager {
 	}
 	
 	private FileConfiguration config;
+	private DataHolder holder;
 	private File file;
 	private TypeConverter<?> converter;
 	private Object target;
@@ -86,10 +89,15 @@ public class ConfigManager {
 		this.file = file;
 		file.getParentFile().mkdirs();
 		if (file.exists()) {
-			config = YamlConfiguration.loadConfiguration(file);
+			setConfig(YamlConfiguration.loadConfiguration(file));
 		} else {
-			config = new YamlConfiguration();
+			setConfig(new YamlConfiguration());
 		}
+	}
+	
+	private void setConfig(FileConfiguration config) {
+		this.config = config;
+		this.holder = new ConfigurationSectionDataHolder(config);
 	}
 	
 	/**
@@ -150,7 +158,7 @@ public class ConfigManager {
 	}
 	
 	private <T> void load(TypeConverter<T> converter) {
-		converter.loadFrom(config, null, (T) target);
+		converter.loadFrom(holder, null, (T) target);
 	}
 	
 	/**
@@ -158,12 +166,12 @@ public class ConfigManager {
 	 * @return This ConfigManager
 	 */
 	public ConfigManager reload() {
-		config = YamlConfiguration.loadConfiguration(file);
+		setConfig(YamlConfiguration.loadConfiguration(file));
 		return load();
 	}
 	
 	private <T> void save(TypeConverter<T> converter, boolean overwrite) {
-		converter.saveTo((T) target, config, null, overwrite);
+		converter.saveTo((T) target, holder, null, overwrite);
 		try {
 			config.save(file);
 		} catch (IOException e) {

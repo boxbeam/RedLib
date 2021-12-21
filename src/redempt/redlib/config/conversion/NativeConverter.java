@@ -1,6 +1,7 @@
 package redempt.redlib.config.conversion;
 
 import org.bukkit.configuration.ConfigurationSection;
+import redempt.redlib.config.data.DataHolder;
 
 /**
  * A converter which saves and loads directly to config without modifying the data
@@ -16,12 +17,12 @@ public class NativeConverter {
 	public static <T> TypeConverter<T> create() {
 		return new TypeConverter<T>() {
 			@Override
-			public T loadFrom(ConfigurationSection section, String path, T currentValue) {
+			public T loadFrom(DataHolder section, String path, T currentValue) {
 				return (T) section.get(path);
 			}
 			
 			@Override
-			public void saveTo(T t, ConfigurationSection section, String path) {
+			public void saveTo(T t, DataHolder section, String path) {
 				section.set(path, t);
 			}
 		};

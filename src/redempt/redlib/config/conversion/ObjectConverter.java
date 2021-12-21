@@ -5,6 +5,7 @@ import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.ConfigType;
 import redempt.redlib.config.annotations.ConfigPath;
 import redempt.redlib.config.annotations.ConfigPostInit;
+import redempt.redlib.config.data.DataHolder;
 import redempt.redlib.config.instantiation.InstantiationInfo;
 import redempt.redlib.config.instantiation.Instantiator;
 
@@ -71,8 +72,8 @@ public class ObjectConverter {
 		InstantiationInfo info = new InstantiationInfo(postInit, configPath, configPathConverter);
 		return new TypeConverter<T>() {
 			@Override
-			public T loadFrom(ConfigurationSection section, String path, T currentValue) {
-				ConfigurationSection newSection = path == null ? section : section.getConfigurationSection(path);
+			public T loadFrom(DataHolder section, String path, T currentValue) {
+				DataHolder newSection = path == null ? section : section.getSubsection(path);
 				List<Object> objs = new ArrayList<>();
 				for (Field field : fields) {
 					Object value = converters.get(field).loadFrom(newSection, field.getName(), null);
@@ -82,16 +83,16 @@ public class ObjectConverter {
 			}
 			
 			@Override
-			public void saveTo(T t, ConfigurationSection section, String path) {
+			public void saveTo(T t, DataHolder section, String path) {
 				saveTo(t, section, path, true);
 			}
 			
 			@Override
-			public void saveTo(T t, ConfigurationSection section, String path, boolean overwrite) {
+			public void saveTo(T t, DataHolder section, String path, boolean overwrite) {
 				if (path != null && section.isSet(path) && !overwrite) {
 					return;
 				}
-				ConfigurationSection newSection = path == null ? section : section.createSection(path);
+				DataHolder newSection = path == null ? section : section.createSubsection(path);
 				try {
 					for (Field field : fields) {
 						saveWith(converters.get(field), field.get(t), newSection, field.getName(), overwrite);
@@ -103,7 +104,7 @@ public class ObjectConverter {
 		};
 	}
 	
-	private static <T> void saveWith(TypeConverter<T> converter, Object obj, ConfigurationSection section, String path, boolean overwrite) {
+	private static <T> void saveWith(TypeConverter<T> converter, Object obj, DataHolder section, String path, boolean overwrite) {
 		converter.saveTo((T) obj, section, path, overwrite);
 	}
 	

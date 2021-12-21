@@ -1,8 +1,9 @@
 package redempt.redlib.config.conversion;
 
-import org.bukkit.configuration.ConfigurationSection;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.ConfigType;
+import redempt.redlib.config.data.DataHolder;
+import redempt.redlib.config.data.ListDataHolder;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -39,34 +40,37 @@ public class CollectionConverter {
 	 * @return A collection converter
 	 */
 	public static <V, T extends Collection<V>> TypeConverter<T> create(ConfigManager manager, ConfigType<?> collectionType) {
-		TypeConverter<V> converter = (TypeConverter<V>) manager.getConverter(collectionType.getComponentTypes().get(0));
+		ConfigType<?> componentType = collectionType.getComponentTypes().get(0);
+		TypeConverter<V> converter = (TypeConverter<V>) manager.getConverter(componentType);
 		return new TypeConverter<T>() {
 			@Override
-			public T loadFrom(ConfigurationSection section, String path, T currentValue) {
+			public T loadFrom(DataHolder section, String path, T currentValue) {
 				if (currentValue == null) {
 					currentValue = (T) defaults.get(collectionType.getType()).get();
 				} else {
 					currentValue.clear();
 				}
-				ConfigurationSection newSection = section.getConfigurationSection(path);
+				DataHolder newSection = path == null ? section : section.getList(path);
 				if (newSection == null) {
 					return null;
 				}
 				T collection = currentValue;
-				newSection.getKeys(false).forEach(k -> {
-					collection.add(converter.loadFrom(newSection, k, null));
+				newSection.getKeys().forEach(k -> {
+					V obj = converter.loadFrom(newSection, k, null);
+					collection.add(obj);
 				});
 				return collection;
 			}
 			
 			@Override
-			public void saveTo(T t, ConfigurationSection section, String path) {
-				ConfigurationSection newSection = section.createSection(path);
+			public void saveTo(T t, DataHolder section, String path) {
+				DataHolder newSection = new ListDataHolder();
 				int pos = 0;
 				for (V obj : t) {
 					converter.saveTo(obj, newSection, String.valueOf(pos));
 					pos++;
 				}
+				section.set(path, newSection);
 			}
 		};
 	}

@@ -3,6 +3,7 @@ package redempt.redlib.config.conversion;
 import org.bukkit.configuration.ConfigurationSection;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.ConfigType;
+import redempt.redlib.config.data.DataHolder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -38,7 +39,7 @@ public class StaticRootConverter {
 		}
 		return new TypeConverter<T>() {
 			@Override
-			public T loadFrom(ConfigurationSection section, String path, T currentValue) {
+			public T loadFrom(DataHolder section, String path, T currentValue) {
 				try {
 					for (Field field : fields) {
 						Object val = converters.get(field).loadFrom(section, field.getName(), null);
@@ -51,12 +52,12 @@ public class StaticRootConverter {
 			}
 			
 			@Override
-			public void saveTo(T t, ConfigurationSection section, String path) {
+			public void saveTo(T t, DataHolder section, String path) {
 				saveTo(t, section, path, true);
 			}
 			
 			@Override
-			public void saveTo(T t, ConfigurationSection section, String path, boolean overwrite) {
+			public void saveTo(T t, DataHolder section, String path, boolean overwrite) {
 				try {
 					for (Field field : fields) {
 						Object obj = field.get(null);
@@ -69,7 +70,7 @@ public class StaticRootConverter {
 		};
 	}
 	
-	private static <T> void saveWith(TypeConverter<T> converter, Object obj, ConfigurationSection section, String path, boolean overwrite) {
+	private static <T> void saveWith(TypeConverter<T> converter, Object obj, DataHolder section, String path, boolean overwrite) {
 		converter.saveTo((T) obj, section, path, overwrite);
 	}
 	

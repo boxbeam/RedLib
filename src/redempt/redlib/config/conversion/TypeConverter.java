@@ -1,6 +1,6 @@
 package redempt.redlib.config.conversion;
 
-import org.bukkit.configuration.ConfigurationSection;
+import redempt.redlib.config.data.DataHolder;
 
 /**
  * An interface which converts data in config for a given type
@@ -16,7 +16,7 @@ public interface TypeConverter<T> {
 	 * @param currentValue The current value, used for collections and maps
 	 * @return The loaded object
 	 */
-	public T loadFrom(ConfigurationSection section, String path, T currentValue);
+	public T loadFrom(DataHolder section, String path, T currentValue);
 	
 	/**
 	 * Attemps to save the object to config
@@ -24,7 +24,7 @@ public interface TypeConverter<T> {
 	 * @param section The ConfigurationSection to save to
 	 * @param path The path to the data that should be saved in the ConfigurationSection
 	 */
-	public void saveTo(T t, ConfigurationSection section, String path);
+	public void saveTo(T t, DataHolder section, String path);
 	
 	/**
 	 * Attemps to save the object to config
@@ -33,7 +33,7 @@ public interface TypeConverter<T> {
 	 * @param path The path to the data that should be saved in the ConfigurationSection
 	 * @param overwrite Whether to overwrite existing data
 	 */
-	public default void saveTo(T t, ConfigurationSection section, String path, boolean overwrite) {
+	public default void saveTo(T t, DataHolder section, String path, boolean overwrite) {
 		if (!overwrite && section.isSet(path)) {
 			return;
 		}
