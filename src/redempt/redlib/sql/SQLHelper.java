@@ -28,7 +28,7 @@ public class SQLHelper implements Closeable {
 	public static Connection openSQLite(java.nio.file.Path file) {
 		try {
 			Class.forName("org.sqlite.JDBC");
-			return DriverManager.getConnection("jdbc:sqlite:" + file.toAbsolutePath() + "?foreign_keys=on;");
+			return DriverManager.getConnection("jdbc:sqlite:" + file.toAbsolutePath() + "?foreign_keys=on&busy_timeout=1000");
 		} catch (ClassNotFoundException | SQLException e) {
 			sneakyThrow(e);
 			return null;
@@ -427,6 +427,8 @@ public class SQLHelper implements Closeable {
 		try {
 			setCommitInterval(-1);
 			connection.close();
+			connection = null;
+			System.gc();
 		} catch (SQLException e) {
 			sneakyThrow(e);
 		}
