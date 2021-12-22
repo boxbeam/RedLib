@@ -1,5 +1,6 @@
 package redempt.redlib.config.instantiation;
 
+import redempt.redlib.config.ConfigField;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.annotations.ConfigPath;
 
@@ -47,7 +48,6 @@ public class ConstructorInstantiator implements Instantiator {
 	 * @param manager The ConfigManager handling config data
 	 * @param target The target object, always ignored by this type of Instantiator
 	 * @param clazz The class whose fields are being used
-	 * @param fields The fields being worked with
 	 * @param values The values for the fields
 	 * @param path The path in config
 	 * @param info Extra info about the instantiation
@@ -55,7 +55,7 @@ public class ConstructorInstantiator implements Instantiator {
 	 * @return The constructed object
 	 */
 	@Override
-	public <T> T instantiate(ConfigManager manager, Object target, Class<T> clazz, List<Field> fields, List<Object> values, String path, InstantiationInfo info) {
+	public <T> T instantiate(ConfigManager manager, Object target, Class<T> clazz, List<Object> values, String path, FieldSummary info) {
 		Object[] objs = new Object[params.length];
 		int valuePos = 0;
 		for (int i = 0; i < params.length; i++) {

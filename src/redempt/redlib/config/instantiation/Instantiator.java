@@ -1,5 +1,6 @@
 package redempt.redlib.config.instantiation;
 
+import redempt.redlib.config.ConfigField;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.annotations.ConfigMappable;
 
@@ -12,6 +13,10 @@ import java.util.List;
  */
 public interface Instantiator {
 	
+	public static boolean isRecord(Class<?> clazz) {
+		return clazz.getSuperclass() != null && clazz.getSuperclass().getName().equals("java.lang.Record");
+	}
+	
 	/**
 	 * Attemps to get the appropriate Instantiator for the given class type
 	 * @param clazz The class type
@@ -19,7 +24,7 @@ public interface Instantiator {
 	 * @throws IllegalArgumentException If the class cannot be instantiated by known methods
 	 */
 	public static Instantiator getInstantiator(Class<?> clazz) {
-		if (clazz.getSuperclass().getName().equals("java.lang.Record")) {
+		if (isRecord(clazz)) {
 			return ConstructorInstantiator.create(clazz);
 		}
 		if (clazz.isAnnotationPresent(ConfigMappable.class)) {
@@ -33,13 +38,12 @@ public interface Instantiator {
 	 * @param manager The ConfigManager handling config data
 	 * @param target The target object, or null
 	 * @param clazz The class whose fields are being used
-	 * @param fields The fields being worked with
 	 * @param values The values for the fields
 	 * @param path The path in config
 	 * @param info Extra info about the instantiation
 	 * @param <T> The type
 	 * @return An instantiated object, or the input object with its fields modified
 	 */
-	public <T> T instantiate(ConfigManager manager, Object target, Class<T> clazz, List<Field> fields, List<Object> values, String path, InstantiationInfo info);
+	public <T> T instantiate(ConfigManager manager, Object target, Class<T> clazz, List<Object> values, String path, FieldSummary info);
 	
 }

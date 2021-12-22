@@ -6,12 +6,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Indicates that a method should be run when an object is deserialized from config
- * @author Redempt
- */
-@Target(ElementType.METHOD)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface ConfigPostInit {
+public @interface ConfigName {
+	
+	String value();
+	
 }

@@ -1,21 +1,15 @@
 package redempt.redlib.config.conversion;
 
-import org.bukkit.configuration.ConfigurationSection;
+import redempt.redlib.config.ConfigField;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.ConfigType;
-import redempt.redlib.config.annotations.ConfigPath;
-import redempt.redlib.config.annotations.ConfigPostInit;
 import redempt.redlib.config.data.DataHolder;
-import redempt.redlib.config.instantiation.InstantiationInfo;
+import redempt.redlib.config.instantiation.FieldSummary;
 import redempt.redlib.config.instantiation.Instantiator;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A converter which builds objects from configuration sections
@@ -34,52 +28,18 @@ public class ObjectConverter {
 		if (type.getType().isInterface() || Modifier.isAbstract(type.getType().getModifiers())) {
 			throw new IllegalStateException("Cannot automatically convert abstract classe or interface " + type.getType());
 		}
-		List<Field> fields = new ArrayList<>();
-		Map<Field, TypeConverter<?>> converters = new HashMap<>();
 		Instantiator instantiator = Instantiator.getInstantiator(type.getType());
-		Field configPath = null;
-		StringConverter<?> configPathConverter = null;
-		for (Field field : type.getType().getDeclaredFields()) {
-			int mod = field.getModifiers();
-			if (Modifier.isTransient(mod) || Modifier.isStatic(mod)) {
-				continue;
-			}
-			field.setAccessible(true);
-			if (field.isAnnotationPresent(ConfigPath.class)) {
-				configPath = field;
-				configPathConverter = manager.getStringConverter(ConfigType.get(configPath));
-				continue;
-			}
-			fields.add(field);
-			ConfigType<?> fieldType = ConfigType.get(field);
-			converters.put(field, manager.getConverter(fieldType));
-		}
-		Method postInit = null;
-		for (Method method : type.getType().getDeclaredMethods()) {
-			int mod = method.getModifiers();
-			if (Modifier.isStatic(mod)) {
-				continue;
-			}
-			if (method.isAnnotationPresent(ConfigPostInit.class)) {
-				if (method.getParameterCount() != 0) {
-					throw new IllegalStateException("Post-init method must have no parameters: " + method);
-				}
-				method.setAccessible(true);
-				postInit = method;
-				break;
-			}
-		}
-		InstantiationInfo info = new InstantiationInfo(postInit, configPath, configPathConverter);
+		FieldSummary summary = FieldSummary.getFieldSummary(manager, type.getType(), false);
 		return new TypeConverter<T>() {
 			@Override
 			public T loadFrom(DataHolder section, String path, T currentValue) {
 				DataHolder newSection = path == null ? section : section.getSubsection(path);
 				List<Object> objs = new ArrayList<>();
-				for (Field field : fields) {
-					Object value = converters.get(field).loadFrom(newSection, field.getName(), null);
+				for (ConfigField field : summary.getFields()) {
+					Object value = summary.getConverters().get(field).loadFrom(newSection, field.getName(), null);
 					objs.add(value);
 				}
-				return (T) instantiator.instantiate(manager, currentValue, type.getType(), fields, objs, path, info);
+				return (T) instantiator.instantiate(manager, currentValue, type.getType(), objs, path, summary);
 			}
 			
 			@Override
@@ -93,12 +53,8 @@ public class ObjectConverter {
 					return;
 				}
 				DataHolder newSection = path == null ? section : section.createSubsection(path);
-				try {
-					for (Field field : fields) {
-						saveWith(converters.get(field), field.get(t), newSection, field.getName(), overwrite);
-					}
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
+				for (ConfigField field : summary.getFields()) {
+					saveWith(summary.getConverters().get(field), field.get(t), newSection, field.getName(), overwrite);
 				}
 			}
 		};

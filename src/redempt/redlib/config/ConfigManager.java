@@ -14,6 +14,7 @@ import redempt.redlib.config.conversion.StringConverter;
 import redempt.redlib.config.conversion.TypeConverter;
 import redempt.redlib.config.data.ConfigurationSectionDataHolder;
 import redempt.redlib.config.data.DataHolder;
+import redempt.redlib.config.instantiation.Instantiator;
 
 import java.io.File;
 import java.io.IOException;
@@ -254,7 +255,7 @@ public class ConfigManager {
 		if (Map.class.isAssignableFrom(type.getType())) {
 			return MapConverter.create(this, type);
 		}
-		if (type.getType().isAnnotationPresent(ConfigMappable.class) || type.getType().getSuperclass().getName().equals("java.lang.Record")) {
+		if (type.getType().isAnnotationPresent(ConfigMappable.class) || Instantiator.isRecord(type.getType())) {
 			return ObjectConverter.create(this, type);
 		}
 		return NativeConverter.create();

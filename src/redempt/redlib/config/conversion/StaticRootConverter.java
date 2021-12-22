@@ -1,9 +1,11 @@
 package redempt.redlib.config.conversion;
 
 import org.bukkit.configuration.ConfigurationSection;
+import redempt.redlib.config.ConfigField;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.ConfigType;
 import redempt.redlib.config.data.DataHolder;
+import redempt.redlib.config.instantiation.FieldSummary;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -26,27 +28,13 @@ public class StaticRootConverter {
 	 * @return A static root converter
 	 */
 	public static <T> TypeConverter<T> create(ConfigManager manager, Class<?> root) {
-		List<Field> fields = new ArrayList<>();
-		Map<Field, TypeConverter<?>> converters = new HashMap<>();
-		for (Field field : root.getDeclaredFields()) {
-			int mod = field.getModifiers();
-			if (Modifier.isTransient(mod) || !Modifier.isStatic(mod)) {
-				continue;
-			}
-			field.setAccessible(true);
-			fields.add(field);
-			converters.put(field, manager.getConverter(ConfigType.get(field)));
-		}
+		FieldSummary summary = FieldSummary.getFieldSummary(manager, root, true);
 		return new TypeConverter<T>() {
 			@Override
 			public T loadFrom(DataHolder section, String path, T currentValue) {
-				try {
-					for (Field field : fields) {
-						Object val = converters.get(field).loadFrom(section, field.getName(), null);
-						field.set(null, val);
-					}
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
+				for (ConfigField field : summary.getFields()) {
+					Object val = summary.getConverters().get(field).loadFrom(section, field.getName(), null);
+					field.set(val);
 				}
 				return null;
 			}
@@ -58,13 +46,9 @@ public class StaticRootConverter {
 			
 			@Override
 			public void saveTo(T t, DataHolder section, String path, boolean overwrite) {
-				try {
-					for (Field field : fields) {
-						Object obj = field.get(null);
-						saveWith(converters.get(field), obj, section, field.getName(), overwrite);
-					}
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
+				for (ConfigField field : summary.getFields()) {
+					Object obj = field.get();
+					saveWith(summary.getConverters().get(field), obj, section, field.getName(), overwrite);
 				}
 			}
 		};
