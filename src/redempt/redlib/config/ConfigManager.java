@@ -9,6 +9,7 @@ import redempt.redlib.config.conversion.EnumConverter;
 import redempt.redlib.config.conversion.MapConverter;
 import redempt.redlib.config.conversion.NativeConverter;
 import redempt.redlib.config.conversion.ObjectConverter;
+import redempt.redlib.config.conversion.PrimitiveConverter;
 import redempt.redlib.config.conversion.StaticRootConverter;
 import redempt.redlib.config.conversion.StringConverter;
 import redempt.redlib.config.conversion.TypeConverter;
@@ -72,11 +73,11 @@ public class ConfigManager {
 	{
 		convertersByType = new HashMap<>();
 		convertersByType.put(new ConfigType<>(String.class), StringConverter.create(s -> s, s -> s));
-		convertersByType.put(new ConfigType<>(int.class), StringConverter.create(Integer::parseInt, String::valueOf));
-		convertersByType.put(new ConfigType<>(double.class), StringConverter.create(Double::parseDouble, String::valueOf));
-		convertersByType.put(new ConfigType<>(float.class), StringConverter.create(Float::parseFloat, String::valueOf));
-		convertersByType.put(new ConfigType<>(boolean.class), StringConverter.create(Boolean::parseBoolean, String::valueOf));
-		convertersByType.put(new ConfigType<>(long.class), StringConverter.create(Long::parseLong, String::valueOf));
+		convertersByType.put(new ConfigType<>(int.class), PrimitiveConverter.create(Integer::parseInt, String::valueOf));
+		convertersByType.put(new ConfigType<>(double.class), PrimitiveConverter.create(Double::parseDouble, String::valueOf));
+		convertersByType.put(new ConfigType<>(float.class), PrimitiveConverter.create(Float::parseFloat, String::valueOf));
+		convertersByType.put(new ConfigType<>(boolean.class), PrimitiveConverter.create(Boolean::parseBoolean, String::valueOf));
+		convertersByType.put(new ConfigType<>(long.class), PrimitiveConverter.create(Long::parseLong, String::valueOf));
 	}
 	
 	private FileConfiguration config;
