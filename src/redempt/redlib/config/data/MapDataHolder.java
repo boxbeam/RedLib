@@ -53,7 +53,8 @@ public class MapDataHolder implements DataHolder {
 	
 	@Override
 	public String getString(String path) {
-		return (String) map.get(path);
+		Object val = get(path);
+		return val == null ? null : String.valueOf(val);
 	}
 	
 	@Override

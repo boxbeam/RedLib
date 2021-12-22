@@ -70,7 +70,8 @@ public class ListDataHolder implements DataHolder {
 	
 	@Override
 	public String getString(String path) {
-		return (String) get(path);
+		Object val = get(path);
+		return val == null ? null : String.valueOf(val);
 	}
 	
 	@Override
