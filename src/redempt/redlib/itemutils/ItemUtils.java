@@ -2,6 +2,7 @@ package redempt.redlib.itemutils;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
@@ -15,6 +16,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 import redempt.redlib.RedLib;
 import redempt.redlib.json.JSONList;
@@ -23,7 +25,12 @@ import redempt.redlib.json.JSONParser;
 import redempt.redlib.nms.NMSHelper;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiPredicate;
 
 /**
@@ -32,6 +39,29 @@ import java.util.function.BiPredicate;
  *
  */
 public class ItemUtils {
+	
+	/**
+	 * Creates a player skull
+	 * @param owner The owning player
+	 * @return The skull for the player
+	 */
+	public static ItemStack skull(OfflinePlayer owner) {
+		ItemStack base = getBaseSkull();
+		SkullMeta meta = (SkullMeta) base.getItemMeta();
+		if (RedLib.MID_VERSION >= 13) {
+			meta.setOwningPlayer(owner);
+		} else {
+			meta.setOwner(owner.getName());
+		}
+		base.setItemMeta(meta);
+		return base;
+	}
+	
+	private static Material skullType = RedLib.MID_VERSION >= 13 ? Material.valueOf("PLAYER_HEAD") : Material.valueOf("SKULL_ITEM");
+	
+	private static ItemStack getBaseSkull() {
+		return RedLib.MID_VERSION >= 13 ? new ItemStack(skullType) : new ItemStack(skullType, 1, (short) 3);
+	}
 	
 	/**
 	 * Renames an ItemStack, functionally identical to {@link ItemUtils#setName(ItemStack, String)} but kept for legacy reasons
