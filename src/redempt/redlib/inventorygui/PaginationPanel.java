@@ -311,5 +311,18 @@ public class PaginationPanel {
 		page = Math.max(1, page - 1);
 		updatePage();
 	}
-	
+
+	/**
+	 * Sets the filler item
+	 */
+	public void setFillerItem(ItemStack item) {
+		this.fillerItem = item;
+	}
+
+	/**
+	 * Gets the filler item
+	 */
+	public ItemStack getFillerItem() {
+		return fillerItem;
+	}
 }
