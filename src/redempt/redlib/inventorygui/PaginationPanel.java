@@ -24,13 +24,24 @@ public class PaginationPanel {
 	private Map<Object, IntConsumer> items = new HashMap<>();
 	private Set<Integer> slots = new TreeSet<>();
 	private Runnable onUpdate = () -> {};
-	
+	private ItemStack fillerItem;
+
 	/**
 	 * Constructs a PaginationPanel to work on a given InventoryGUI
 	 * @param gui The InventoryGUI to paginate
 	 */
 	public PaginationPanel(InventoryGUI gui) {
+		this(gui, null);
+	}
+
+	/**
+	 * Constructs a PaginationPanel to work on a given InventoryGUI
+	 * @param gui The InventoryGUI to paginate
+	 * @param fillerItem The item to use for the background
+	 */
+	public PaginationPanel(InventoryGUI gui, ItemStack fillerItem) {
 		this.gui = gui;
+		this.fillerItem = fillerItem;
 	}
 	
 	/**
@@ -236,6 +247,7 @@ public class PaginationPanel {
 	 */
 	public void updatePage() {
 		slots.forEach(gui::clearSlot);
+		slots.forEach(i -> gui.getInventory().setItem(i, fillerItem));
 		if (getPageSize() == 0 || buttons.size() == 0) {
 			onUpdate.run();
 			return;
@@ -299,5 +311,18 @@ public class PaginationPanel {
 		page = Math.max(1, page - 1);
 		updatePage();
 	}
-	
+
+	/**
+	 * Sets the filler item
+	 */
+	public void setFillerItem(ItemStack item) {
+		this.fillerItem = item;
+	}
+
+	/**
+	 * Gets the filler item
+	 */
+	public ItemStack getFillerItem() {
+		return fillerItem;
+	}
 }
