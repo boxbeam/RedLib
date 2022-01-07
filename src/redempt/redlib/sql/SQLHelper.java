@@ -190,6 +190,25 @@ public class SQLHelper implements Closeable {
 			sneakyThrow(e);
 		}
 	}
+
+	/**
+	 * Executes a SQL query as a prepared statement, setting its fields to the elements of the vararg passed
+	 * @author U9G
+	 * @param command The SQL command to execute
+	 * @param fields A vararg of the fields to set in the prepared statement
+	 * @return The number of updated rows
+	 */
+	public Integer executeUpdate(String command, Object... fields) {
+		int updatedRows = 0;
+		try {
+			PreparedStatement statement = prepareStatement(command, fields);
+			updatedRows = statement.executeUpdate();
+			statement.close();
+		} catch (SQLException e) {
+			sneakyThrow(e);
+		}
+		return updatedRows;
+	}
 	
 	/**
 	 * Executes a SQL query as a prepared statement, setting its fields to the elements of the vararg passed,
