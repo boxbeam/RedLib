@@ -198,7 +198,7 @@ public class SQLHelper implements Closeable {
 	 * @param fields A vararg of the fields to set in the prepared statement
 	 * @return The number of updated rows
 	 */
-	public Integer executeUpdate(String command, Object... fields) {
+	public int executeUpdate(String command, Object... fields) {
 		int updatedRows = 0;
 		try {
 			PreparedStatement statement = prepareStatement(command, fields);
