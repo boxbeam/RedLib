@@ -275,7 +275,7 @@ public class SQLHelper implements Closeable {
 			if (!results.next()) {
 				return null;
 			}
-			String val = results.getBytes(1);
+			byte[] val = results.getBytes(1);
 			results.close();
 			statement.close();
 			return val;
