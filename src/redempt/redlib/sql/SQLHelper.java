@@ -263,6 +263,30 @@ public class SQLHelper implements Closeable {
 	
 	/**
 	 * Executes a SQL query as a prepared statement, setting its fields to the elements of the vararg passed,
+	 * returning the value in the first column of the first row in the results as a Bytes.
+	 * @param query The SQL query to execute
+	 * @param fields A vararg of the fields to set in the prepared statement
+	 * @return The bytes in the first column of the first row of the returned results, or null if none is present
+	 */
+	public byte[] querySingleResultBytes(String query, Object... fields) {
+		try {
+			PreparedStatement statement = prepareStatement(query, fields);
+			ResultSet results = statement.executeQuery();
+			if (!results.next()) {
+				return null;
+			}
+			String val = results.getBytes(1);
+			results.close();
+			statement.close();
+			return val;
+		} catch (SQLException e) {
+			sneakyThrow(e);
+			return null;
+		}
+	}
+	
+	/**
+	 * Executes a SQL query as a prepared statement, setting its fields to the elements of the vararg passed,
 	 * returning the value in the first column of the first row in the results as a Long.
 	 * @param query The SQL query to execute
 	 * @param fields A vararg of the fields to set in the prepared statement
