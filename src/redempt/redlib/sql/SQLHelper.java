@@ -524,7 +524,21 @@ public class SQLHelper implements Closeable {
 				return null;
 			}
 		}
-		
+
+		/**
+		 * Gets the bytes in the given column in the current row
+		 * @param column The index of the column to get, starting at 1
+		 * @return The bytes in the column
+		 */
+		public byte[] getBytes(int column) {
+			try {
+				return results.getBytes(column);
+			} catch (SQLException e) {
+				sneakyThrow(e);
+				return null;
+			}
+		}
+
 		/**
 		 * Gets a String in the given column in the current row
 		 * @param column The index of the column to get, starting at 1
