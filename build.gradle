@@ -14,7 +14,7 @@ repositories {
 }
 dependencies {
 	compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
-	api 'com.github.Redempt:RedCommands:1.5.4'
+	api 'com.github.Redempt:RedCommands:1.5.5'
 }
 sourceSets {
 	main {
@@ -23,34 +23,6 @@ sourceSets {
 		}
 		resources {
 			srcDir 'res'
-		}
-	}
-}
-task updateJars {
-	doLast {
-		copy {
-			from 'build/libs'
-			into '/home/redempt/Desktop/Spigot/1.8/plugins'
-		}
-		copy {
-			from 'build/libs'
-			into '/home/redempt/Desktop/Spigot/1.12/plugins'
-		}
-		copy {
-			from 'build/libs'
-			into '/home/redempt/Desktop/Spigot/1.13/plugins'
-		}
-		copy {
-			from 'build/libs'
-			into '/home/redempt/Desktop/Spigot/1.16/plugins'
-		}
-		copy {
-			from 'build/libs'
-			into '/home/redempt/Desktop/Spigot/1.17/plugins'
-		}
-		copy {
-			from 'build/libs'
-			into '/home/redempt/Desktop/Spigot/1.18/plugins'
 		}
 	}
 }
@@ -87,6 +59,3 @@ publishing {
 	}
 }
 
-task deploy(dependsOn: ['jar', 'updateJars']) {
-	updateJars.mustRunAfter shadowJar
-}
