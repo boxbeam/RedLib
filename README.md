@@ -15,9 +15,7 @@ depend: [RedLib]
 
 To get the jar, either download it from the releases tab either here on [GitHub](https://github.com/Redempt/RedLib/releases) or on [Spigot](https://www.spigotmc.org/resources/redlib.78713/), or [build it locally](https://github.com/Redempt/RedLib#build-locally).
 
-## With Jitpack:
-
-Gradle:
+## Gradle
 
 ```groovy
 repositories {
@@ -36,7 +34,7 @@ Replace `Tag` with a release tag for RedLib. Example: `6.2.1.7`. You can also us
 
 To shade RedLib, change the dependency from `compileOnly` to `implementation`, and install the [gradle shadow plugin](https://github.com/johnrengelman/shadow).
 
-Maven:
+## Maven:
 
 ```xml
 <repository>
