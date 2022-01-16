@@ -1,18 +1,9 @@
 package redempt.redlib.config.conversion;
 
-import org.bukkit.configuration.ConfigurationSection;
 import redempt.redlib.config.ConfigField;
 import redempt.redlib.config.ConfigManager;
-import redempt.redlib.config.ConfigType;
 import redempt.redlib.config.data.DataHolder;
 import redempt.redlib.config.instantiation.FieldSummary;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A converter which saves to and loads from static fields and can only be used as a config target

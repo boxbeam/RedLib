@@ -4,25 +4,20 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import redempt.redlib.config.annotations.ConfigMappable;
-import redempt.redlib.config.conversion.CollectionConverter;
-import redempt.redlib.config.conversion.EnumConverter;
-import redempt.redlib.config.conversion.MapConverter;
-import redempt.redlib.config.conversion.NativeConverter;
-import redempt.redlib.config.conversion.ObjectConverter;
-import redempt.redlib.config.conversion.PrimitiveConverter;
-import redempt.redlib.config.conversion.StaticRootConverter;
-import redempt.redlib.config.conversion.StringConverter;
-import redempt.redlib.config.conversion.TypeConverter;
+import redempt.redlib.config.annotations.ConfigSubclassable;
+import redempt.redlib.config.conversion.*;
 import redempt.redlib.config.data.ConfigurationSectionDataHolder;
 import redempt.redlib.config.data.DataHolder;
 import redempt.redlib.config.instantiation.Instantiator;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
@@ -33,20 +28,22 @@ public class ConfigManager {
 	
 	/**
 	 * Creates a ConfigManager targetting a specific config file, which will be created if it does not exist
+	 * @param plugin The plugin the ConfigManager belongs to
 	 * @param file The config file to manage
 	 * @return The ConfigManager
 	 */
-	public static ConfigManager create(File file) {
-		return new ConfigManager(file);
+	public static ConfigManager create(Plugin plugin, File file) {
+		return new ConfigManager(plugin, file);
 	}
 	
 	/**
 	 * Creates a ConfigManager targetting a specific config file, which will be created if it does not exist
+	 * @param plugin The plugin the ConfigManager belongs to
 	 * @param path The config file to manage
 	 * @return The ConfigManager
 	 */
-	public static ConfigManager create(Path path) {
-		return create(path.toFile());
+	public static ConfigManager create(Plugin plugin, Path path) {
+		return create(plugin, path.toFile());
 	}
 	
 	/**
@@ -56,7 +53,9 @@ public class ConfigManager {
 	 * @return The ConfigManager
 	 */
 	public static ConfigManager create(Plugin plugin, String configName) {
-		return create(plugin.getDataFolder().toPath().resolve(configName));
+		ConfigManager manager = create(plugin, plugin.getDataFolder().toPath().resolve(configName));
+		manager.loader = plugin.getClass().getClassLoader();
+		return manager;
 	}
 	
 	/**
@@ -69,6 +68,7 @@ public class ConfigManager {
 	}
 	
 	private Map<ConfigType<?>, TypeConverter<?>> convertersByType;
+	private Map<String, Class<?>> classesByName = new ConcurrentHashMap<>();
 	
 	{
 		convertersByType = new HashMap<>();
@@ -86,8 +86,10 @@ public class ConfigManager {
 	private TypeConverter<?> converter;
 	private Object target;
 	private Class<?> targetClass;
+	private ClassLoader loader;
 	
-	private ConfigManager(File file) {
+	private ConfigManager(Plugin plugin, File file) {
+		loader = plugin.getClass().getClassLoader();
 		this.file = file;
 		file.getParentFile().mkdirs();
 		if (file.exists()) {
@@ -115,6 +117,22 @@ public class ConfigManager {
 		target = obj;
 		converter = ObjectConverter.create(this, new ConfigType<>(obj.getClass()));
 		return this;
+	}
+	
+	/**
+	 * Loads a class by name, using a cache
+	 * @param name The name of the class to load
+	 * @return The class
+	 */
+	public Class<?> loadClass(String name) {
+		return classesByName.computeIfAbsent(name, k -> {
+			try {
+				return Class.forName(k, true, loader);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				return null;
+			}
+		});
 	}
 	
 	/**
@@ -246,7 +264,7 @@ public class ConfigManager {
 		return (StringConverter<T>) keyConverter;
 	}
 	
-	private <T> TypeConverter<?> createConverter(ConfigType<?> type) {
+	private TypeConverter<?> createConverter(ConfigType<?> type) {
 		if (Enum.class.isAssignableFrom(type.getType())) {
 			return EnumConverter.create(type.getType());
 		}
@@ -257,6 +275,11 @@ public class ConfigManager {
 			return MapConverter.create(this, type);
 		}
 		if (type.getType().isAnnotationPresent(ConfigMappable.class) || Instantiator.isRecord(type.getType())) {
+			Class<?> clazz = type.getType();
+			boolean isAbstract = clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers());
+			if (isAbstract || clazz.isAnnotationPresent(ConfigSubclassable.class)) {
+				return SubclassConverter.create(this, clazz, isAbstract);
+			}
 			return ObjectConverter.create(this, type);
 		}
 		return NativeConverter.create();

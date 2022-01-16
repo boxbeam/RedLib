@@ -3,6 +3,7 @@ package redempt.redlib.config.instantiation;
 import redempt.redlib.config.ConfigField;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.ConfigType;
+import redempt.redlib.config.annotations.ConfigMappable;
 import redempt.redlib.config.annotations.ConfigName;
 import redempt.redlib.config.annotations.ConfigPath;
 import redempt.redlib.config.annotations.ConfigPostInit;
@@ -40,38 +41,42 @@ public class FieldSummary {
 			List<ConfigField> fields = new ArrayList<>();
 			Map<ConfigField, TypeConverter<?>> converters = new HashMap<>();
 			Method postInit = null;
-			for (Field field : clazz.getDeclaredFields()) {
-				int mod = field.getModifiers();
-				if (Modifier.isTransient(mod) || Modifier.isStatic(mod) != staticContext) {
-					continue;
-				}
-				field.setAccessible(true);
-				if (!staticContext && field.isAnnotationPresent(ConfigPath.class)) {
-					configPath = field;
-					configPathConverter = manager.getStringConverter(ConfigType.get(configPath));
-					continue;
-				}
-				ConfigField cf = new ConfigField(field);
-				fields.add(cf);
-				converters.put(cf, manager.getConverter(ConfigType.get(field)));
-			}
 			
-			if (!staticContext && Instantiator.isRecord(clazz)) {
-				Constructor<?> constructor = clazz.getDeclaredConstructor(Arrays.stream(clazz.getDeclaredFields()).map(Field::getType).toArray(Class<?>[]::new));
-				Parameter[] params = constructor.getParameters();
-				int pos = 0;
-				for (int i = 0; i < params.length; i++) {
-					Parameter param = params[i];
-					if (param.isAnnotationPresent(ConfigPath.class)) {
+			while (clazz != null && (staticContext || clazz.isAnnotationPresent(ConfigMappable.class) || Instantiator.isRecord(clazz))) {
+				for (Field field : clazz.getDeclaredFields()) {
+					int mod = field.getModifiers();
+					if (field.isSynthetic() || Modifier.isTransient(mod) || Modifier.isStatic(mod) != staticContext) {
 						continue;
 					}
-					ConfigName name = param.getAnnotation(ConfigName.class);
-					if (name == null) {
+					field.setAccessible(true);
+					if (!staticContext && field.isAnnotationPresent(ConfigPath.class)) {
+						configPath = field;
+						configPathConverter = manager.getStringConverter(ConfigType.get(configPath));
 						continue;
 					}
-					fields.get(pos).setName(name.value());
-					pos++;
+					ConfigField cf = new ConfigField(field);
+					fields.add(cf);
+					converters.put(cf, manager.getConverter(ConfigType.get(field)));
 				}
+				
+				if (!staticContext && Instantiator.isRecord(clazz)) {
+					Constructor<?> constructor = clazz.getDeclaredConstructor(Arrays.stream(clazz.getDeclaredFields()).map(Field::getType).toArray(Class<?>[]::new));
+					Parameter[] params = constructor.getParameters();
+					int pos = 0;
+					for (int i = 0; i < params.length; i++) {
+						Parameter param = params[i];
+						if (param.isAnnotationPresent(ConfigPath.class)) {
+							continue;
+						}
+						ConfigName name = param.getAnnotation(ConfigName.class);
+						if (name == null) {
+							continue;
+						}
+						fields.get(pos).setName(name.value());
+						pos++;
+					}
+				}
+				clazz = clazz.getSuperclass();
 			}
 			
 			if (!staticContext) {
