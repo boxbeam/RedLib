@@ -78,6 +78,11 @@ public class ConfigManager {
 		convertersByType.put(new ConfigType<>(float.class), PrimitiveConverter.create(Float::parseFloat, String::valueOf));
 		convertersByType.put(new ConfigType<>(boolean.class), PrimitiveConverter.create(Boolean::parseBoolean, String::valueOf));
 		convertersByType.put(new ConfigType<>(long.class), PrimitiveConverter.create(Long::parseLong, String::valueOf));
+		convertersByType.put(new ConfigType<>(Integer.class), PrimitiveConverter.create(Integer::parseInt, String::valueOf));
+		convertersByType.put(new ConfigType<>(Double.class), PrimitiveConverter.create(Double::parseDouble, String::valueOf));
+		convertersByType.put(new ConfigType<>(Float.class), PrimitiveConverter.create(Float::parseFloat, String::valueOf));
+		convertersByType.put(new ConfigType<>(Boolean.class), PrimitiveConverter.create(Boolean::parseBoolean, String::valueOf));
+		convertersByType.put(new ConfigType<>(Long.class), PrimitiveConverter.create(Long::parseLong, String::valueOf));
 	}
 	
 	private FileConfiguration config;
