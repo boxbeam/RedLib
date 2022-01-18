@@ -66,9 +66,11 @@ public class CollectionConverter {
 			public void saveTo(T t, DataHolder section, String path) {
 				DataHolder newSection = new ListDataHolder();
 				int pos = 0;
-				for (V obj : t) {
-					converter.saveTo(obj, newSection, String.valueOf(pos));
-					pos++;
+				if (t != null) {
+					for (V obj : t) {
+						converter.saveTo(obj, newSection, String.valueOf(pos));
+						pos++;
+					}
 				}
 				section.set(path, newSection);
 			}
