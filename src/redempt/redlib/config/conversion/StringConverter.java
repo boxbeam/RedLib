@@ -66,7 +66,7 @@ public interface StringConverter<T> extends TypeConverter<T> {
 	 * @param path The path to the data that should be saved in the ConfigurationSection
 	 */
 	@Override
-	public default void saveTo(T t, DataHolder section, String path, Map<String, List<String>> comments) {
+	public default void saveTo(T t, DataHolder section, String path) {
 		section.set(path, toString(t));
 	}
 

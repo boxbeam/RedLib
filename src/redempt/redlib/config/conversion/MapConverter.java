@@ -49,14 +49,14 @@ public class MapConverter {
 			}
 			
 			@Override
-			public void saveTo(M m, DataHolder section, String path, Map<String, List<String>> comments) {
+			public void saveTo(M m, DataHolder section, String path) {
 				DataHolder newSection = path == null ? section : section.createSubsection(path);
 				if (m == null) {
 					return;
 				}
 				m.forEach((k, v) -> {
 					String keyPath = keyConverter.toString(k);
-					valueConverter.saveTo(v, newSection, keyPath, comments);
+					valueConverter.saveTo(v, newSection, keyPath);
 				});
 			}
 		};

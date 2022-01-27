@@ -45,26 +45,26 @@ public class ObjectConverter {
 			}
 			
 			@Override
-			public void saveTo(T t, DataHolder section, String path, Map<String, List<String>> comments) {
-				saveTo(t, section, path, true, comments);
+			public void saveTo(T t, DataHolder section, String path) {
+				saveTo(t, section, path, true);
 			}
 			
 			@Override
-			public void saveTo(T t, DataHolder section, String path, boolean overwrite, Map<String, List<String>> comments) {
+			public void saveTo(T t, DataHolder section, String path, boolean overwrite) {
 				if (path != null && section.isSet(path) && !overwrite) {
 					return;
 				}
 				DataHolder newSection = path == null ? section : section.createSubsection(path);
 				for (ConfigField field : summary.getFields()) {
-					saveWith(summary.getConverters().get(field), field.get(t), newSection, field.getName(), overwrite, comments);
+					saveWith(summary.getConverters().get(field), field.get(t), newSection, field.getName(), overwrite);
 				}
-				summary.applyComments(newSection, comments);
+				summary.applyComments(newSection);
 			}
 		};
 	}
 	
-	private static <T> void saveWith(TypeConverter<T> converter, Object obj, DataHolder section, String path, boolean overwrite, Map<String, List<String>> comments) {
-		converter.saveTo((T) obj, section, path, overwrite, comments);
+	private static <T> void saveWith(TypeConverter<T> converter, Object obj, DataHolder section, String path, boolean overwrite) {
+		converter.saveTo((T) obj, section, path, overwrite);
 	}
 	
 }

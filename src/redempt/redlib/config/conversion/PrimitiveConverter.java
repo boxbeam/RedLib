@@ -32,7 +32,7 @@ public class PrimitiveConverter {
 			}
 			
 			@Override
-			public void saveTo(T t, DataHolder section, String path, Map<String, List<String>> comments) {
+			public void saveTo(T t, DataHolder section, String path) {
 				section.set(path, t);
 			}
 		};

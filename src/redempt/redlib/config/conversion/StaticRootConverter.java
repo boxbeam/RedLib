@@ -35,23 +35,23 @@ public class StaticRootConverter {
 			}
 			
 			@Override
-			public void saveTo(T t, DataHolder section, String path, Map<String, List<String>> comments) {
-				saveTo(t, section, path, true, comments);
+			public void saveTo(T t, DataHolder section, String path) {
+				saveTo(t, section, path, true);
 			}
 			
 			@Override
-			public void saveTo(T t, DataHolder section, String path, boolean overwrite, Map<String, List<String>> comments) {
+			public void saveTo(T t, DataHolder section, String path, boolean overwrite) {
 				for (ConfigField field : summary.getFields()) {
 					Object obj = field.get();
-					saveWith(summary.getConverters().get(field), obj, section, field.getName(), overwrite, comments);
+					saveWith(summary.getConverters().get(field), obj, section, field.getName(), overwrite);
 				}
-				summary.applyComments(section, comments);
+				summary.applyComments(section);
 			}
 		};
 	}
 	
-	private static <T> void saveWith(TypeConverter<T> converter, Object obj, DataHolder section, String path, boolean overwrite, Map<String, List<String>> comments) {
-		converter.saveTo((T) obj, section, path, overwrite, comments);
+	private static <T> void saveWith(TypeConverter<T> converter, Object obj, DataHolder section, String path, boolean overwrite) {
+		converter.saveTo((T) obj, section, path, overwrite);
 	}
 	
 }

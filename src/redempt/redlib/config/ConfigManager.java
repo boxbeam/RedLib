@@ -75,7 +75,7 @@ public class ConfigManager {
 	}
 	
 	private FileConfiguration config;
-	private DataHolder holder;
+	private ConfigurationSectionDataHolder holder;
 	private File file;
 	private TypeConverter<?> converter;
 	private Object target;
@@ -209,10 +209,10 @@ public class ConfigManager {
 	}
 	
 	private <T> void save(TypeConverter<T> converter, boolean overwrite) {
-		Map<String, List<String>> comments = new HashMap<>();
-		converter.saveTo((T) target, holder, null, overwrite, comments);
+		holder.clearComments();
+		converter.saveTo((T) target, holder, null, overwrite);
 		if (areCommentsSupported()) {
-			comments.forEach(config::setComments);
+			holder.getComments().forEach(config::setComments);
 		}
 		try {
 			config.save(file);

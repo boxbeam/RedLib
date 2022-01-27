@@ -39,13 +39,13 @@ public class SubclassConverter {
 			}
 			
 			@Override
-			public void saveTo(T t, DataHolder section, String path, Map<String, List<String>> comments) {
+			public void saveTo(T t, DataHolder section, String path) {
 				Class<?> type = t.getClass();
 				if (!clazz.isAssignableFrom(type)) {
 					throw new IllegalStateException(type + " is not a subclass of " + clazz);
 				}
 				TypeConverter<T> converter = type.equals(clazz) ? parent : (TypeConverter<T>) manager.getConverter(new ConfigType<>(type));
-				converter.saveTo(t, section, path, comments);
+				converter.saveTo(t, section, path);
 				section.getSubsection(path).set("=type", type.getName());
 			}
 		};

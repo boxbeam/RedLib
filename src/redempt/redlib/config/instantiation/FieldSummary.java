@@ -195,10 +195,10 @@ public class FieldSummary {
 	 * Attempts to apply comments to the given DataHolder
 	 * @param holder The DataHolder to apply comments to
 	 */
-	public void applyComments(DataHolder holder, Map<String, List<String>> allComments) {
+	public void applyComments(DataHolder holder) {
 		fields.forEach(f -> {
 			if (f.getComments() != null) {
-				holder.setComments(f.getName(), f.getComments(), allComments);
+				holder.setComments(f.getName(), f.getComments());
 			}
 		});
 	}

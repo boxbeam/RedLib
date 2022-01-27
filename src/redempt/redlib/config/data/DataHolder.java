@@ -93,6 +93,6 @@ public interface DataHolder {
 	 * @param path The path to apply comments to
 	 * @param comments The comments to apply
 	 */
-	public default void setComments(String path, List<String> comments, Map<String, List<String>> allComments) {}
+	public default void setComments(String path, List<String> comments) {}
 	
 }

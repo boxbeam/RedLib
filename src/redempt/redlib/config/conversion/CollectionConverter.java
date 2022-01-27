@@ -63,12 +63,12 @@ public class CollectionConverter {
 			}
 			
 			@Override
-			public void saveTo(T t, DataHolder section, String path, Map<String, List<String>> comments) {
+			public void saveTo(T t, DataHolder section, String path) {
 				DataHolder newSection = new ListDataHolder();
 				int pos = 0;
 				if (t != null) {
 					for (V obj : t) {
-						converter.saveTo(obj, newSection, String.valueOf(pos), comments);
+						converter.saveTo(obj, newSection, String.valueOf(pos));
 						pos++;
 					}
 				}
