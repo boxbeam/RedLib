@@ -3,6 +3,9 @@ package redempt.redlib.config.conversion;
 import org.bukkit.configuration.ConfigurationSection;
 import redempt.redlib.config.data.DataHolder;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * A converter which saves and loads directly to config without modifying the data
  * @author Redempt
@@ -22,7 +25,7 @@ public class NativeConverter {
 			}
 			
 			@Override
-			public void saveTo(T t, DataHolder section, String path) {
+			public void saveTo(T t, DataHolder section, String path, Map<String, List<String>> comments) {
 				section.set(path, t);
 			}
 		};

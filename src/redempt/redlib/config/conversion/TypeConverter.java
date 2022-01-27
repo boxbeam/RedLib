@@ -2,6 +2,9 @@ package redempt.redlib.config.conversion;
 
 import redempt.redlib.config.data.DataHolder;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * An interface which converts data in config for a given type
  * @param <T> The type
@@ -24,7 +27,7 @@ public interface TypeConverter<T> {
 	 * @param section The ConfigurationSection to save to
 	 * @param path The path to the data that should be saved in the ConfigurationSection
 	 */
-	public void saveTo(T t, DataHolder section, String path);
+	public void saveTo(T t, DataHolder section, String path, Map<String, List<String>> comments);
 	
 	/**
 	 * Attemps to save the object to config
@@ -33,11 +36,11 @@ public interface TypeConverter<T> {
 	 * @param path The path to the data that should be saved in the ConfigurationSection
 	 * @param overwrite Whether to overwrite existing data
 	 */
-	public default void saveTo(T t, DataHolder section, String path, boolean overwrite) {
+	public default void saveTo(T t, DataHolder section, String path, boolean overwrite, Map<String, List<String>> comments) {
 		if (!overwrite && section.isSet(path)) {
 			return;
 		}
-		saveTo(t, section, path);
+		saveTo(t, section, path, comments);
 	}
 
 }

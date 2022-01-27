@@ -3,12 +3,15 @@ package redempt.redlib.config.instantiation;
 import redempt.redlib.config.ConversionManager;
 import redempt.redlib.config.ConfigField;
 import redempt.redlib.config.ConfigType;
+import redempt.redlib.config.annotations.Comment;
+import redempt.redlib.config.annotations.Comments;
 import redempt.redlib.config.annotations.ConfigMappable;
 import redempt.redlib.config.annotations.ConfigName;
 import redempt.redlib.config.annotations.ConfigPath;
 import redempt.redlib.config.annotations.ConfigPostInit;
 import redempt.redlib.config.conversion.StringConverter;
 import redempt.redlib.config.conversion.TypeConverter;
+import redempt.redlib.config.data.DataHolder;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -17,15 +20,45 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Represents a summary of the relevant fields, converters, and other info required to load objects from config
  * @author Redempt
  */
 public class FieldSummary {
+	
+	/**
+	 * Gets the comments applied to a field
+	 * @param field The Field
+	 * @return The comments applied to the field
+	 */
+	public static List<String> getComments(Field field) {
+		Comments comments = field.getAnnotation(Comments.class);
+		if (comments == null) {
+			Comment comment = field.getAnnotation(Comment.class);
+			return comment == null ? null : Collections.singletonList(comment.value());
+		}
+		return Arrays.stream(comments.value()).map(Comment::value).collect(Collectors.toList());
+	}
+	
+	/**
+	 * Gets the comments applied to a parameter
+	 * @param param The Parameter
+	 * @return The comments applied to the parameter
+	 */
+	public static List<String> getComments(Parameter param) {
+		Comments comments = param.getAnnotation(Comments.class);
+		if (comments == null) {
+			Comment comment = param.getAnnotation(Comment.class);
+			return comment == null ? null : Collections.singletonList(comment.value());
+		}
+		return Arrays.stream(comments.value()).map(Comment::value).collect(Collectors.toList());
+	}
 	
 	/**
 	 * Generates a FieldSummary of a class
@@ -68,6 +101,7 @@ public class FieldSummary {
 						if (param.isAnnotationPresent(ConfigPath.class)) {
 							continue;
 						}
+						fields.get(pos).setComments(getComments(param));
 						ConfigName name = param.getAnnotation(ConfigName.class);
 						if (name == null) {
 							continue;
@@ -155,6 +189,18 @@ public class FieldSummary {
 	 */
 	public Method getPostInit() {
 		return postInit;
+	}
+	
+	/**
+	 * Attempts to apply comments to the given DataHolder
+	 * @param holder The DataHolder to apply comments to
+	 */
+	public void applyComments(DataHolder holder, Map<String, List<String>> allComments) {
+		fields.forEach(f -> {
+			if (f.getComments() != null) {
+				holder.setComments(f.getName(), f.getComments(), allComments);
+			}
+		});
 	}
 	
 }

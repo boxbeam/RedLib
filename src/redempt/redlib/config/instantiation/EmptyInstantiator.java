@@ -2,6 +2,7 @@ package redempt.redlib.config.instantiation;
 
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.ConversionManager;
+import redempt.redlib.config.data.DataHolder;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

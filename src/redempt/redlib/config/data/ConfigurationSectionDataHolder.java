@@ -2,6 +2,9 @@ package redempt.redlib.config.data;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ConfigurationSectionDataHolder implements DataHolder {
@@ -61,6 +64,18 @@ public class ConfigurationSectionDataHolder implements DataHolder {
 	@Override
 	public Object unwrap() {
 		return section;
+	}
+	
+	@Override
+	public void setComments(String path, List<String> comments, Map<String, List<String>> allComments) {
+		String key;
+		String currentPath = section.getCurrentPath();
+		if (currentPath == null || currentPath.equals(".")) {
+			key = path;
+		} else {
+			key = currentPath + "." + path;
+		}
+		allComments.put(key, comments);
 	}
 	
 }

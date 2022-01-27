@@ -3,6 +3,7 @@ package redempt.redlib.config.instantiation;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.ConversionManager;
 import redempt.redlib.config.annotations.ConfigMappable;
+import redempt.redlib.config.data.DataHolder;
 
 import java.util.List;
 

@@ -9,7 +9,9 @@ import redempt.redlib.config.instantiation.Instantiator;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A converter which builds objects from configuration sections
@@ -43,25 +45,26 @@ public class ObjectConverter {
 			}
 			
 			@Override
-			public void saveTo(T t, DataHolder section, String path) {
-				saveTo(t, section, path, true);
+			public void saveTo(T t, DataHolder section, String path, Map<String, List<String>> comments) {
+				saveTo(t, section, path, true, comments);
 			}
 			
 			@Override
-			public void saveTo(T t, DataHolder section, String path, boolean overwrite) {
+			public void saveTo(T t, DataHolder section, String path, boolean overwrite, Map<String, List<String>> comments) {
 				if (path != null && section.isSet(path) && !overwrite) {
 					return;
 				}
 				DataHolder newSection = path == null ? section : section.createSubsection(path);
 				for (ConfigField field : summary.getFields()) {
-					saveWith(summary.getConverters().get(field), field.get(t), newSection, field.getName(), overwrite);
+					saveWith(summary.getConverters().get(field), field.get(t), newSection, field.getName(), overwrite, comments);
 				}
+				summary.applyComments(newSection, comments);
 			}
 		};
 	}
 	
-	private static <T> void saveWith(TypeConverter<T> converter, Object obj, DataHolder section, String path, boolean overwrite) {
-		converter.saveTo((T) obj, section, path, overwrite);
+	private static <T> void saveWith(TypeConverter<T> converter, Object obj, DataHolder section, String path, boolean overwrite, Map<String, List<String>> comments) {
+		converter.saveTo((T) obj, section, path, overwrite, comments);
 	}
 	
 }

@@ -1,8 +1,15 @@
 package redempt.redlib.config;
 
+import org.bukkit.configuration.ConfigurationSection;
+import redempt.redlib.config.annotations.Comment;
+import redempt.redlib.config.annotations.Comments;
 import redempt.redlib.config.annotations.ConfigName;
+import redempt.redlib.config.instantiation.FieldSummary;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Wraps a Field and stores the name which should be used to store its value in config
@@ -12,6 +19,7 @@ public class ConfigField {
 	
 	private Field field;
 	private String name;
+	private List<String> comments;
 	
 	/**
 	 * Constructs a ConfigField from a field
@@ -21,6 +29,7 @@ public class ConfigField {
 		this.field = field;
 		ConfigName annotation = field.getAnnotation(ConfigName.class);
 		name = annotation == null ? field.getName() : annotation.value();
+		comments = FieldSummary.getComments(field);
 	}
 	
 	/**
@@ -78,6 +87,21 @@ public class ConfigField {
 	 */
 	public String getName() {
 		return name;
+	}
+	
+	/**
+	 * @return Comments which should be applied to the path in config
+	 */
+	public List<String> getComments() {
+		return comments;
+	}
+	
+	/**
+	 * Sets the comments which should be applied to the path in config
+	 * @param comments The comments which should be applied
+	 */
+	public void setComments(List<String> comments) {
+		this.comments = comments;
 	}
 	
 	/**

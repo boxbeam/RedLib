@@ -1,5 +1,6 @@
 package redempt.redlib.config;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -10,6 +11,10 @@ import redempt.redlib.config.data.DataHolder;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -17,6 +22,18 @@ import java.util.function.Function;
  * @author Redempt
  */
 public class ConfigManager {
+	
+	private static Boolean commentsSupported;
+	
+	/**
+	 * @return Whether comments are supported in this version
+	 */
+	public static boolean areCommentsSupported() {
+		if (commentsSupported == null) {
+			commentsSupported = Arrays.stream(ConfigurationSection.class.getMethods()).anyMatch(m -> m.getName().equals("setComments"));
+		}
+		return commentsSupported;
+	}
 	
 	/**
 	 * Creates a ConfigManager targetting a specific config file, which will be created if it does not exist
@@ -192,7 +209,11 @@ public class ConfigManager {
 	}
 	
 	private <T> void save(TypeConverter<T> converter, boolean overwrite) {
-		converter.saveTo((T) target, holder, null, overwrite);
+		Map<String, List<String>> comments = new HashMap<>();
+		converter.saveTo((T) target, holder, null, overwrite, comments);
+		if (areCommentsSupported()) {
+			comments.forEach(config::setComments);
+		}
 		try {
 			config.save(file);
 		} catch (IOException e) {

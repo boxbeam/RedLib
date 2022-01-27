@@ -3,6 +3,7 @@ package redempt.redlib.config.instantiation;
 import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.ConversionManager;
 import redempt.redlib.config.annotations.ConfigPath;
+import redempt.redlib.config.data.DataHolder;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -74,5 +75,6 @@ public class ConstructorInstantiator implements Instantiator {
 		}
 		return null;
 	}
+	
 	
 }

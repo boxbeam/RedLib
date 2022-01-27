@@ -2,6 +2,8 @@ package redempt.redlib.config.conversion;
 
 import redempt.redlib.config.data.DataHolder;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -30,7 +32,7 @@ public class PrimitiveConverter {
 			}
 			
 			@Override
-			public void saveTo(T t, DataHolder section, String path) {
+			public void saveTo(T t, DataHolder section, String path, Map<String, List<String>> comments) {
 				section.set(path, t);
 			}
 		};

@@ -4,6 +4,9 @@ import redempt.redlib.config.ConversionManager;
 import redempt.redlib.config.ConfigType;
 import redempt.redlib.config.data.DataHolder;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * A converter which can convert subclasses of mappable classes
  * @author Redempt
@@ -36,13 +39,13 @@ public class SubclassConverter {
 			}
 			
 			@Override
-			public void saveTo(T t, DataHolder section, String path) {
+			public void saveTo(T t, DataHolder section, String path, Map<String, List<String>> comments) {
 				Class<?> type = t.getClass();
 				if (!clazz.isAssignableFrom(type)) {
 					throw new IllegalStateException(type + " is not a subclass of " + clazz);
 				}
 				TypeConverter<T> converter = type.equals(clazz) ? parent : (TypeConverter<T>) manager.getConverter(new ConfigType<>(type));
-				converter.saveTo(t, section, path);
+				converter.saveTo(t, section, path, comments);
 				section.getSubsection(path).set("=type", type.getName());
 			}
 		};
