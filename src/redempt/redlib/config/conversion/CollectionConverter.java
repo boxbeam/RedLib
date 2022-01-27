@@ -1,6 +1,6 @@
 package redempt.redlib.config.conversion;
 
-import redempt.redlib.config.ConfigManager;
+import redempt.redlib.config.ConversionManager;
 import redempt.redlib.config.ConfigType;
 import redempt.redlib.config.data.DataHolder;
 import redempt.redlib.config.data.ListDataHolder;
@@ -39,7 +39,7 @@ public class CollectionConverter {
 	 * @param <T> The collection type
 	 * @return A collection converter
 	 */
-	public static <V, T extends Collection<V>> TypeConverter<T> create(ConfigManager manager, ConfigType<?> collectionType) {
+	public static <V, T extends Collection<V>> TypeConverter<T> create(ConversionManager manager, ConfigType<?> collectionType) {
 		ConfigType<?> componentType = collectionType.getComponentTypes().get(0);
 		TypeConverter<V> converter = (TypeConverter<V>) manager.getConverter(componentType);
 		return new TypeConverter<T>() {

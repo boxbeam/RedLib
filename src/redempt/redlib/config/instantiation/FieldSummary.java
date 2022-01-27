@@ -1,7 +1,7 @@
 package redempt.redlib.config.instantiation;
 
+import redempt.redlib.config.ConversionManager;
 import redempt.redlib.config.ConfigField;
-import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.ConfigType;
 import redempt.redlib.config.annotations.ConfigMappable;
 import redempt.redlib.config.annotations.ConfigName;
@@ -29,12 +29,12 @@ public class FieldSummary {
 	
 	/**
 	 * Generates a FieldSummary of a class
-	 * @param manager The ConfigManager with access to converters
+	 * @param manager The ConversionManager with access to converters
 	 * @param clazz The class being summarized
 	 * @param staticContext Whether static fields should be retrieved instead of member fields
 	 * @return A field summary
 	 */
-	public static FieldSummary getFieldSummary(ConfigManager manager, Class<?> clazz, boolean staticContext) {
+	public static FieldSummary getFieldSummary(ConversionManager manager, Class<?> clazz, boolean staticContext) {
 		try {
 			Field configPath = null;
 			StringConverter<?> configPathConverter = null;

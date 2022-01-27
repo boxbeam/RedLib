@@ -1,10 +1,9 @@
 package redempt.redlib.config.instantiation;
 
-import redempt.redlib.config.ConfigField;
 import redempt.redlib.config.ConfigManager;
+import redempt.redlib.config.ConversionManager;
 import redempt.redlib.config.annotations.ConfigMappable;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -35,7 +34,7 @@ public interface Instantiator {
 	
 	/**
 	 * Instantiates and/or loads data into an object
-	 * @param manager The ConfigManager handling config data
+	 * @param manager The ConversionManager handling converters
 	 * @param target The target object, or null
 	 * @param clazz The class whose fields are being used
 	 * @param values The values for the fields
@@ -44,6 +43,6 @@ public interface Instantiator {
 	 * @param <T> The type
 	 * @return An instantiated object, or the input object with its fields modified
 	 */
-	public <T> T instantiate(ConfigManager manager, Object target, Class<T> clazz, List<Object> values, String path, FieldSummary info);
+	public <T> T instantiate(ConversionManager manager, Object target, Class<T> clazz, List<Object> values, String path, FieldSummary info);
 	
 }

@@ -13,24 +13,24 @@ public class JSONList extends ArrayList<Object> implements JSONStorage {
 	private JSONStorage parent;
 	protected String key = null;
 	
-	public int getInt(int key) {
+	public Integer getInt(int key) {
 		Object o = get(key);
 		if (o instanceof Long) {
 			return (int) (long) o;
 		}
-		return (int) o;
+		return (Integer) o;
 	}
 	
-	public boolean getBoolean(int key) {
-		return (boolean) get(key);
+	public Boolean getBoolean(int key) {
+		return (Boolean) get(key);
 	}
 	
-	public long getLong(int key) {
-		return (long) get(key);
+	public Long getLong(int key) {
+		return (Long) get(key);
 	}
 	
-	public double getDouble(int key) {
-		return (double) get(key);
+	public Double getDouble(int key) {
+		return (Double) get(key);
 	}
 	
 	public JSONList getList(int key) {

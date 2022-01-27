@@ -1,7 +1,8 @@
-package redempt.redlib.blockdata;
+package redempt.redlib.blockdata.custom;
 
 import org.bukkit.block.Block;
 import org.bukkit.event.player.PlayerInteractEvent;
+import redempt.redlib.blockdata.DataBlock;
 
 /**
  * Represents an instance of a CustomBlockType. Effectively a wrapper for DataBlock.

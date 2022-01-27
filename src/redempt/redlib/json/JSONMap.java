@@ -11,24 +11,24 @@ public class JSONMap extends HashMap<String, Object> implements JSONStorage {
 	private JSONStorage parent;
 	protected String key;
 	
-	public int getInt(String key) {
+	public Integer getInt(String key) {
 		Object o = get(key);
 		if (o instanceof Long) {
 			return (int) (long) o;
 		}
-		return (int) o;
+		return (Integer) o;
 	}
 	
-	public boolean getBoolean(String key) {
-		return (boolean) get(key);
+	public Boolean getBoolean(String key) {
+		return (Boolean) get(key);
 	}
 	
-	public double getDouble(String key) {
-		return (double) get(key);
+	public Double getDouble(String key) {
+		return (Double) get(key);
 	}
 	
-	public long getLong(String key) {
-		return (long) get(key);
+	public Long getLong(String key) {
+		return (Long) get(key);
 	}
 	
 	public JSONList getList(String key) {
