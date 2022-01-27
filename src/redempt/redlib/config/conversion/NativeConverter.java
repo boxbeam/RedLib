@@ -3,6 +3,9 @@ package redempt.redlib.config.conversion;
 import org.bukkit.configuration.ConfigurationSection;
 import redempt.redlib.config.data.DataHolder;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * A converter which saves and loads directly to config without modifying the data
  * @author Redempt

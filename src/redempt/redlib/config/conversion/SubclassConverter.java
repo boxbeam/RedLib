@@ -1,8 +1,11 @@
 package redempt.redlib.config.conversion;
 
-import redempt.redlib.config.ConfigManager;
+import redempt.redlib.config.ConversionManager;
 import redempt.redlib.config.ConfigType;
 import redempt.redlib.config.data.DataHolder;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * A converter which can convert subclasses of mappable classes
@@ -12,13 +15,13 @@ public class SubclassConverter {
 	
 	/**
 	 * Creates a TypeConverter that can convert subclasses
-	 * @param manager The ConfigManager handling the data
+	 * @param manager The ConversionManager handling converters
 	 * @param clazz The class to handle subclasses of
 	 * @param isAbstract Whether the class is abstract or an interface
 	 * @param <T> The type
 	 * @return The converter
 	 */
-	public static <T> TypeConverter<T> create(ConfigManager manager, Class<T> clazz, boolean isAbstract) {
+	public static <T> TypeConverter<T> create(ConversionManager manager, Class<T> clazz, boolean isAbstract) {
 		TypeConverter<T> parent = !isAbstract ? ObjectConverter.create(manager, new ConfigType<>(clazz)) : null;
 		return new TypeConverter<T>() {
 			@Override

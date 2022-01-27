@@ -1,17 +1,18 @@
 package redempt.redlib.blockdata.events;
 
-import org.bukkit.entity.Player;
+import org.bukkit.block.Block;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.block.BlockEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import redempt.redlib.blockdata.DataBlock;
 
 /**
- * Called when a DataBlock is destroyed by something other than a player
+ * Called when a DataBlock is destroyed
  * @author Redempt
  */
-public class DataBlockDestroyEvent extends BlockEvent implements Cancellable {
+public class DataBlockDestroyEvent extends Event implements Cancellable {
 	
 	private static HandlerList handlers = new HandlerList();
 	
@@ -19,58 +20,70 @@ public class DataBlockDestroyEvent extends BlockEvent implements Cancellable {
 		return handlers;
 	}
 	
-	private DataBlock db;
-	private DestroyCause cause;
-	private Player player;
 	private Event parent;
 	private boolean cancelled = false;
+	private DataBlock db;
+	private DestroyCause cause;
 	
 	/**
-	 * Construct a DataBlockDestroyEvent
+	 * Creates a new BlockDataDestroyEvent
 	 * @param db The DataBlock that was destroyed
-	 * @param player The player that broke the block, or null
-	 * @param cause Why it was destroyed
-	 * @param parent The event that caused this event
+	 * @param parent The Event which caused this one
+	 * @param cause The cause of the DataBlock being destroyed
 	 */
-	public DataBlockDestroyEvent(DataBlock db, Player player, DestroyCause cause, Event parent) {
-		super(db.getBlock());
+	public DataBlockDestroyEvent(DataBlock db, Event parent, DestroyCause cause) {
 		this.db = db;
-		this.player = player;
-		this.cause = cause;
 		this.parent = parent;
+		this.cause = cause;
 	}
 	
 	/**
-	 * @return The event that caused this one
+	 * Sets whether the data should be removed from the block
+	 * @param cancelled True to cancel removal of data from the block, false otherwise
 	 */
-	public Event getParent() {
-		return parent;
+	@Override
+	public void setCancelled(boolean cancelled) {
+		this.cancelled = cancelled;
 	}
 	
 	/**
-	 * @return The Player who broke the DataBlock, or null if it was not a Player.
+	 * Cancels the event which caused this one - meaning the block will not be destroyed
 	 */
-	public Player getPlayer() {
-		return player;
+	public void cancelParent() {
+		setCancelled(true);
+		if (parent instanceof Cancellable) {
+			((Cancellable) parent).setCancelled(true);
+		}
+		if (parent instanceof BlockExplodeEvent) {
+			BlockExplodeEvent e = (BlockExplodeEvent) parent;
+			Block block = db.getBlock();
+			e.blockList().remove(db.getBlock());
+			if (!cancelled) {
+				e.blockList().add(block);
+			}
+		}
+		if (parent instanceof EntityExplodeEvent) {
+			EntityExplodeEvent e = (EntityExplodeEvent) parent;
+			Block block = db.getBlock();
+			e.blockList().remove(db.getBlock());
+			if (!cancelled) {
+				e.blockList().add(block);
+			}
+		}
 	}
 	
 	/**
-	 * @return The DataBlock that was destroyed
-	 */
-	public DataBlock getDataBlock() {
-		return db;
-	}
-	
-	/**
-	 * @return The DestroyCause representing why the DataBlock was destroyed
+	 * @return The reason the DataBlock was destroyed
 	 */
 	public DestroyCause getCause() {
 		return cause;
 	}
 	
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
+	/**
+	 * @return The event which caused this one
+	 */
+	public Event getParent() {
+		return parent;
 	}
 	
 	/**
@@ -81,24 +94,31 @@ public class DataBlockDestroyEvent extends BlockEvent implements Cancellable {
 		return cancelled;
 	}
 	
-	/**
-	 * Sets the cancellation state of this event. A cancelled event will not
-	 * be executed in the server, but will still pass to other plugins.
-	 *
-	 * @param cancel true if you wish to cancel this event
-	 */
 	@Override
-	public void setCancelled(boolean cancel) {
-		this.cancelled = cancel;
+	public HandlerList getHandlers() {
+		return handlers;
 	}
 	
-	public enum DestroyCause {
+	/**
+	 * @return The DataBlock being removed
+	 */
+	public DataBlock getDataBlock() {
+		return db;
+	}
+	
+	/**
+	 * @return The Block being destroyed
+	 */
+	public Block getBlock() {
+		return db.getBlock();
+	}
+	
+	public static enum DestroyCause {
 		
+		PLAYER_BREAK,
+		COMBUST,
 		EXPLOSION,
-		FIRE,
-		LIQUID,
-		PLACE_BUCKET,
-		PLAYER;
+		ENTITY
 		
 	}
 	

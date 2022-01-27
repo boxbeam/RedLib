@@ -1,8 +1,9 @@
 package redempt.redlib.config.instantiation;
 
-import redempt.redlib.config.ConfigField;
 import redempt.redlib.config.ConfigManager;
+import redempt.redlib.config.ConversionManager;
 import redempt.redlib.config.annotations.ConfigPath;
+import redempt.redlib.config.data.DataHolder;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -45,7 +46,7 @@ public class ConstructorInstantiator implements Instantiator {
 	
 	/**
 	 * Instantiates a new object using its constructor
-	 * @param manager The ConfigManager handling config data
+	 * @param manager The ConversionManager handling converters
 	 * @param target The target object, always ignored by this type of Instantiator
 	 * @param clazz The class whose fields are being used
 	 * @param values The values for the fields
@@ -55,7 +56,7 @@ public class ConstructorInstantiator implements Instantiator {
 	 * @return The constructed object
 	 */
 	@Override
-	public <T> T instantiate(ConfigManager manager, Object target, Class<T> clazz, List<Object> values, String path, FieldSummary info) {
+	public <T> T instantiate(ConversionManager manager, Object target, Class<T> clazz, List<Object> values, String path, FieldSummary info) {
 		Object[] objs = new Object[params.length];
 		int valuePos = 0;
 		for (int i = 0; i < params.length; i++) {
@@ -74,5 +75,6 @@ public class ConstructorInstantiator implements Instantiator {
 		}
 		return null;
 	}
+	
 	
 }

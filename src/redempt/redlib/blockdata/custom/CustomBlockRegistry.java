@@ -1,4 +1,4 @@
-package redempt.redlib.blockdata;
+package redempt.redlib.blockdata.custom;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -8,6 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -19,6 +20,8 @@ import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import redempt.redlib.RedLib;
+import redempt.redlib.blockdata.BlockDataManager;
+import redempt.redlib.blockdata.DataBlock;
 import redempt.redlib.blockdata.events.CustomBlockPlaceEvent;
 import redempt.redlib.blockdata.events.DataBlockDestroyEvent;
 import redempt.redlib.blockdata.events.DataBlockDestroyEvent.DestroyCause;
@@ -155,7 +158,7 @@ public class CustomBlockRegistry implements Listener {
 	 * @return The CustomBlock, or null if it was not a custom block
 	 */
 	public <T extends CustomBlock> T getCustomBlock(Block block) {
-		DataBlock db = manager.getExisting(block);
+		DataBlock db = manager.getDataBlock(block, false);
 		if (db == null) {
 			return null;
 		}
@@ -181,9 +184,9 @@ public class CustomBlockRegistry implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public <T extends CustomBlock> void onPlace(BlockPlaceEvent e) {
-		DataBlock db = manager.getExisting(e.getBlock());
+		DataBlock db = manager.getDataBlock(e.getBlock(), false);
 		if (db != null) {
-			db.remove();
+			manager.remove(db);
 		}
 		ItemStack item = e.getItemInHand();
 		if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
@@ -207,8 +210,10 @@ public class CustomBlockRegistry implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public <T extends CustomBlock> void onBreak(DataBlockDestroyEvent e) {
-		if (e.getCause() == DestroyCause.PLAYER) {
-			if (e.getPlayer().getGameMode() == GameMode.CREATIVE) {
+		if (e.getCause() == DestroyCause.PLAYER_BREAK) {
+			BlockBreakEvent blockBreakEvent = (BlockBreakEvent) e.getParent();
+			Player player = ((BlockBreakEvent) e.getParent()).getPlayer();
+			if (player.getGameMode() == GameMode.CREATIVE) {
 				return;
 			}
 			CustomBlock cb = getCustomBlock(e.getBlock());
@@ -231,14 +236,14 @@ public class CustomBlockRegistry implements Listener {
 				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
 					List<Item> drops = new ArrayList<>();
 					items.forEach(item -> drops.add(e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), item)));
-					Event event = (Event) NMSHelper.getClass("org.bukkit.event.block.BlockDropItemEvent").getInstance(e.getBlock(), state, e.getPlayer(), drops).getObject();
+					Event event = (Event) NMSHelper.getClass("org.bukkit.event.block.BlockDropItemEvent").getInstance(e.getBlock(), state, player, drops).getObject();
 					Bukkit.getPluginManager().callEvent(event);
 					if (((Cancellable) event).isCancelled()) {
 						drops.forEach(Item::remove);
 					}
 				});
 			} else {
-				Collection<ItemStack> drops = e.getBlock().getDrops(e.getPlayer().getItemInHand());
+				Collection<ItemStack> drops = e.getBlock().getDrops(player.getItemInHand());
 				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
 					e.getBlock().getWorld().getNearbyEntities(e.getBlock().getLocation().add(0.5, 0.5, 0.5), 1, 1, 1).stream()
 							.filter(en -> en instanceof Item && en.getTicksLived() < 2).map(en -> (Item) en)

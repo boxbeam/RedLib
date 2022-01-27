@@ -1,23 +1,20 @@
 package redempt.redlib.config;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import redempt.redlib.config.annotations.ConfigMappable;
-import redempt.redlib.config.annotations.ConfigSubclassable;
 import redempt.redlib.config.conversion.*;
 import redempt.redlib.config.data.ConfigurationSectionDataHolder;
 import redempt.redlib.config.data.DataHolder;
-import redempt.redlib.config.instantiation.Instantiator;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.nio.file.Path;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
@@ -25,6 +22,18 @@ import java.util.function.Function;
  * @author Redempt
  */
 public class ConfigManager {
+	
+	private static Boolean commentsSupported;
+	
+	/**
+	 * @return Whether comments are supported in this version
+	 */
+	public static boolean areCommentsSupported() {
+		if (commentsSupported == null) {
+			commentsSupported = Arrays.stream(ConfigurationSection.class.getMethods()).anyMatch(m -> m.getName().equals("setComments"));
+		}
+		return commentsSupported;
+	}
 	
 	/**
 	 * Creates a ConfigManager targetting a specific config file, which will be created if it does not exist
@@ -53,9 +62,7 @@ public class ConfigManager {
 	 * @return The ConfigManager
 	 */
 	public static ConfigManager create(Plugin plugin, String configName) {
-		ConfigManager manager = create(plugin, plugin.getDataFolder().toPath().resolve(configName));
-		manager.loader = plugin.getClass().getClassLoader();
-		return manager;
+		return create(plugin, plugin.getDataFolder().toPath().resolve(configName));
 	}
 	
 	/**
@@ -67,34 +74,16 @@ public class ConfigManager {
 		return create(plugin, "config.yml");
 	}
 	
-	private Map<ConfigType<?>, TypeConverter<?>> convertersByType;
-	private Map<String, Class<?>> classesByName = new ConcurrentHashMap<>();
-	
-	{
-		convertersByType = new HashMap<>();
-		convertersByType.put(new ConfigType<>(String.class), StringConverter.create(s -> s, s -> s));
-		convertersByType.put(new ConfigType<>(int.class), PrimitiveConverter.create(Integer::parseInt, String::valueOf));
-		convertersByType.put(new ConfigType<>(double.class), PrimitiveConverter.create(Double::parseDouble, String::valueOf));
-		convertersByType.put(new ConfigType<>(float.class), PrimitiveConverter.create(Float::parseFloat, String::valueOf));
-		convertersByType.put(new ConfigType<>(boolean.class), PrimitiveConverter.create(Boolean::parseBoolean, String::valueOf));
-		convertersByType.put(new ConfigType<>(long.class), PrimitiveConverter.create(Long::parseLong, String::valueOf));
-		convertersByType.put(new ConfigType<>(Integer.class), PrimitiveConverter.create(Integer::parseInt, String::valueOf));
-		convertersByType.put(new ConfigType<>(Double.class), PrimitiveConverter.create(Double::parseDouble, String::valueOf));
-		convertersByType.put(new ConfigType<>(Float.class), PrimitiveConverter.create(Float::parseFloat, String::valueOf));
-		convertersByType.put(new ConfigType<>(Boolean.class), PrimitiveConverter.create(Boolean::parseBoolean, String::valueOf));
-		convertersByType.put(new ConfigType<>(Long.class), PrimitiveConverter.create(Long::parseLong, String::valueOf));
-	}
-	
 	private FileConfiguration config;
-	private DataHolder holder;
+	private ConfigurationSectionDataHolder holder;
 	private File file;
 	private TypeConverter<?> converter;
 	private Object target;
 	private Class<?> targetClass;
-	private ClassLoader loader;
+	private ConversionManager conversionManager;
 	
 	private ConfigManager(Plugin plugin, File file) {
-		loader = plugin.getClass().getClassLoader();
+		conversionManager = new ConversionManager(plugin);
 		this.file = file;
 		file.getParentFile().mkdirs();
 		if (file.exists()) {
@@ -102,6 +91,46 @@ public class ConfigManager {
 		} else {
 			setConfig(new YamlConfiguration());
 		}
+	}
+	
+	/**
+	 * @return The ConversionManager responsible for storing and creating converters for this ConfigManager
+	 */
+	public ConversionManager getConversionManager() {
+		return conversionManager;
+	}
+	
+	/**
+	 * Sets the ConversionManager responsible for storing and creating converters for this ConfigManager
+	 * @param conversionManager The ConversionManager
+	 */
+	public void setConversionManager(ConversionManager conversionManager) {
+		this.conversionManager = conversionManager;
+	}
+	
+	/**
+	 * Registers a string converter to this ConfigManager
+	 * @param clazz The class type the converter is for
+	 * @param loader A function to convert a string to the given type
+	 * @param saver A function to convert the given type to a string
+	 * @param <T> The type
+	 * @return This ConfigManager
+	 */
+	public <T> ConfigManager addConverter(Class<T> clazz, Function<String, T> loader, Function<T, String> saver) {
+		conversionManager.addConverter(clazz, loader, saver);
+		return this;
+	}
+	
+	/**
+	 * Registers a converter to this ConfigManager
+	 * @param type The type the converter is for
+	 * @param converter The converter
+	 * @param <T> The type
+	 * @return This ConfigManager
+	 */
+	public <T> ConfigManager addConverter(ConfigType<T> type, TypeConverter<T> converter) {
+		conversionManager.addConverter(type, converter);
+		return this;
 	}
 	
 	private void setConfig(FileConfiguration config) {
@@ -120,24 +149,8 @@ public class ConfigManager {
 			throw new IllegalStateException("ConfigManager already has a target");
 		}
 		target = obj;
-		converter = ObjectConverter.create(this, new ConfigType<>(obj.getClass()));
+		converter = ObjectConverter.create(conversionManager, new ConfigType<>(obj.getClass()));
 		return this;
-	}
-	
-	/**
-	 * Loads a class by name, using a cache
-	 * @param name The name of the class to load
-	 * @return The class
-	 */
-	public Class<?> loadClass(String name) {
-		return classesByName.computeIfAbsent(name, k -> {
-			try {
-				return Class.forName(k, true, loader);
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				return null;
-			}
-		});
 	}
 	
 	/**
@@ -151,7 +164,7 @@ public class ConfigManager {
 			throw new IllegalStateException("ConfigManager already has a target");
 		}
 		targetClass = clazz;
-		converter = StaticRootConverter.create(this, clazz);
+		converter = StaticRootConverter.create(conversionManager, clazz);
 		return this;
 	}
 	
@@ -196,7 +209,11 @@ public class ConfigManager {
 	}
 	
 	private <T> void save(TypeConverter<T> converter, boolean overwrite) {
+		holder.clearComments();
 		converter.saveTo((T) target, holder, null, overwrite);
+		if (areCommentsSupported()) {
+			holder.getComments().forEach(config::setComments);
+		}
 		try {
 			config.save(file);
 		} catch (IOException e) {
@@ -209,85 +226,6 @@ public class ConfigManager {
 	 */
 	public FileConfiguration getConfig() {
 		return config;
-	}
-	
-	/**
-	 * Gets the TypeConverter for a given type
-	 * @param type The ConfigType
-	 * @param <T> The parameter type
-	 * @return The TypeConverter, making a new one if none exists for the given type
-	 */
-	public <T> TypeConverter<T> getConverter(ConfigType<T> type) {
-		if (type == null) {
-			return null;
-		}
-		TypeConverter<T> converter = (TypeConverter<T>) convertersByType.get(type);
-		if (converter == null) {
-			converter = (TypeConverter<T>) createConverter(type);
-			convertersByType.put(type, converter);
-		}
-		return converter;
-	}
-	
-	/**
-	 * Registers a string converter to this ConfigManager
-	 * @param clazz The class type the converter is for
-	 * @param loader A function to convert a string to the given type
-	 * @param saver A function to convert the given type to a string
-	 * @param <T> The type
-	 * @return This ConfigManager
-	 */
-	public <T> ConfigManager addConverter(Class<T> clazz, Function<String, T> loader, Function<T, String> saver) {
-		convertersByType.put(new ConfigType<>(clazz), StringConverter.create(loader, saver));
-		return this;
-	}
-	
-	/**
-	 * Registers a converter to this ConfigManager
-	 * @param type The type the converter is for
-	 * @param converter The converter
-	 * @param <T> The type
-	 * @return This ConfigManager
-	 */
-	public <T> ConfigManager addConverter(ConfigType<T> type, TypeConverter<T> converter) {
-		convertersByType.put(type, converter);
-		return this;
-	}
-	
-	/**
-	 * Gets a StringConverter for a given type
-	 * @param type The type to get a StringConverter for
-	 * @param <T> The type
-	 * @return The StringConverter associated with the given type
-	 * @throws IllegalStateException If a StringConverter does not exist for the given type
-	 */
-	public <T> StringConverter<T> getStringConverter(ConfigType<T> type) {
-		TypeConverter<T> keyConverter = (TypeConverter<T>) convertersByType.get(type);
-		if (!(keyConverter instanceof StringConverter)) {
-			throw new IllegalStateException("No appropriate string converter for key type " + type);
-		}
-		return (StringConverter<T>) keyConverter;
-	}
-	
-	private TypeConverter<?> createConverter(ConfigType<?> type) {
-		if (Enum.class.isAssignableFrom(type.getType())) {
-			return EnumConverter.create(type.getType());
-		}
-		if (Collection.class.isAssignableFrom(type.getType())) {
-			return CollectionConverter.create(this, type);
-		}
-		if (Map.class.isAssignableFrom(type.getType())) {
-			return MapConverter.create(this, type);
-		}
-		if (type.getType().isAnnotationPresent(ConfigMappable.class) || Instantiator.isRecord(type.getType())) {
-			Class<?> clazz = type.getType();
-			boolean isAbstract = clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers());
-			if (isAbstract || clazz.isAnnotationPresent(ConfigSubclassable.class)) {
-				return SubclassConverter.create(this, clazz, isAbstract);
-			}
-			return ObjectConverter.create(this, type);
-		}
-		return NativeConverter.create();
 	}
 	
 }

@@ -2,6 +2,8 @@ package redempt.redlib.config.conversion;
 
 import redempt.redlib.config.data.DataHolder;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**

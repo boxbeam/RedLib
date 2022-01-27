@@ -1,9 +1,13 @@
 package redempt.redlib.config.conversion;
 
+import redempt.redlib.config.ConversionManager;
 import redempt.redlib.config.ConfigField;
-import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.data.DataHolder;
 import redempt.redlib.config.instantiation.FieldSummary;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A converter which saves to and loads from static fields and can only be used as a config target
@@ -18,7 +22,7 @@ public class StaticRootConverter {
 	 * @param <T> The type
 	 * @return A static root converter
 	 */
-	public static <T> TypeConverter<T> create(ConfigManager manager, Class<?> root) {
+	public static <T> TypeConverter<T> create(ConversionManager manager, Class<?> root) {
 		FieldSummary summary = FieldSummary.getFieldSummary(manager, root, true);
 		return new TypeConverter<T>() {
 			@Override
@@ -41,6 +45,7 @@ public class StaticRootConverter {
 					Object obj = field.get();
 					saveWith(summary.getConverters().get(field), obj, section, field.getName(), overwrite);
 				}
+				summary.applyComments(section);
 			}
 		};
 	}

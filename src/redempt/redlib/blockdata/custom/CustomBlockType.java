@@ -1,4 +1,4 @@
-package redempt.redlib.blockdata;
+package redempt.redlib.blockdata.custom;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import redempt.redlib.blockdata.BlockDataManager;
+import redempt.redlib.blockdata.DataBlock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +99,7 @@ public abstract class CustomBlockType<T extends CustomBlock> implements Listener
 	 * @return The CustomBlock of this type at this Block, or null if it is not present
 	 */
 	public final T get(Block block) {
-		return get(manager.getExisting(block));
+		return get(manager.getDataBlock(block, false));
 	}
 	
 	/**

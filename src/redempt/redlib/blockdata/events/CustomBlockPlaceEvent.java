@@ -6,8 +6,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockEvent;
 import org.bukkit.inventory.ItemStack;
-import redempt.redlib.blockdata.CustomBlock;
-import redempt.redlib.blockdata.CustomBlockType;
+import redempt.redlib.blockdata.custom.CustomBlockType;
 
 /**
  * Called when a CustomBlock is placed by a Player

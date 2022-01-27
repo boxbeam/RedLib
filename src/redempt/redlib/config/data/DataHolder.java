@@ -1,5 +1,7 @@
 package redempt.redlib.config.data;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -85,5 +87,12 @@ public interface DataHolder {
 	 * @return The wrapped storage
 	 */
 	public Object unwrap();
+	
+	/**
+	 * Sets comments on the given path, if it is supported
+	 * @param path The path to apply comments to
+	 * @param comments The comments to apply
+	 */
+	public default void setComments(String path, List<String> comments) {}
 	
 }

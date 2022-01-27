@@ -1,7 +1,8 @@
 package redempt.redlib.config.instantiation;
 
-import redempt.redlib.config.ConfigField;
 import redempt.redlib.config.ConfigManager;
+import redempt.redlib.config.ConversionManager;
+import redempt.redlib.config.data.DataHolder;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -34,7 +35,7 @@ public class EmptyInstantiator implements Instantiator {
 	
 	/**
 	 * Instantiates an object, loads values into its fields, and calls the post-init method
-	 * @param manager The ConfigManager handling the config data
+	 * @param manager The ConversionManager handling converters
 	 * @param target The object to load to, or null if creating a new one
 	 * @param clazz The class whose fields are being worked with
 	 * @param values The values for the fields
@@ -44,7 +45,7 @@ public class EmptyInstantiator implements Instantiator {
 	 * @return The instantiated object, or the input object with its fields modified
 	 */
 	@Override
-	public <T> T instantiate(ConfigManager manager, Object target, Class<T> clazz, List<Object> values, String path, FieldSummary info) {
+	public <T> T instantiate(ConversionManager manager, Object target, Class<T> clazz, List<Object> values, String path, FieldSummary info) {
 		try {
 			T t = target == null ? instantiate(clazz) : (T) target;
 			for (int i = 0; i < info.getFields().size(); i++) {

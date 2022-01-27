@@ -1,8 +1,7 @@
 package redempt.redlib.config.conversion;
 
-import org.bukkit.configuration.ConfigurationSection;
-import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.ConfigType;
+import redempt.redlib.config.ConversionManager;
 import redempt.redlib.config.data.DataHolder;
 
 import java.util.LinkedHashMap;
@@ -17,14 +16,14 @@ public class MapConverter {
 	
 	/**
 	 * Creates a MapConverter
-	 * @param manager The ConfigManager handling the data
+	 * @param manager The ConversionManager handling converters
 	 * @param type The ConfigType of the map with complete generic information
 	 * @param <K> The key type of the map
 	 * @param <V> The value type of the map
 	 * @param <M> The map type
 	 * @return A MapConverter for the given type
 	 */
-	public static <K, V, M extends Map<K, V>> TypeConverter<M> create(ConfigManager manager, ConfigType<?> type) {
+	public static <K, V, M extends Map<K, V>> TypeConverter<M> create(ConversionManager manager, ConfigType<?> type) {
 		List<ConfigType<?>> types = type.getComponentTypes();
 		StringConverter<K> keyConverter = (StringConverter<K>) manager.getStringConverter(types.get(0));
 		TypeConverter<V> valueConverter = (TypeConverter<V>) manager.getConverter(types.get(1));

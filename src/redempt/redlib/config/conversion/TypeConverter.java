@@ -2,6 +2,9 @@ package redempt.redlib.config.conversion;
 
 import redempt.redlib.config.data.DataHolder;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * An interface which converts data in config for a given type
  * @param <T> The type

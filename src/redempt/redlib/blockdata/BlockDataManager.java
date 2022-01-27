@@ -1,527 +1,354 @@
 package redempt.redlib.blockdata;
 
-import org.bukkit.*;
+import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.Waterlogged;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.plugin.Plugin;
 import redempt.redlib.RedLib;
-import redempt.redlib.blockdata.events.DataBlockDestroyEvent;
-import redempt.redlib.blockdata.events.DataBlockDestroyEvent.DestroyCause;
-import redempt.redlib.blockdata.events.DataBlockMoveEvent;
+import redempt.redlib.blockdata.backend.BlockDataBackend;
 import redempt.redlib.json.JSONMap;
 import redempt.redlib.json.JSONParser;
-import redempt.redlib.misc.LocationUtils;
-import redempt.redlib.sql.SQLHelper;
+import redempt.redlib.misc.EventListener;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
- * Manages {@link DataBlock} instances, which allow you to attach persistent metadata to blocks,
- * Keeps track of managed blocks, removing data if a block is destroyed or moving it if a block is pushed
- * by a piston.
+ * Manages persistent data attached to blocks, backed by either SQLite or chunk PersistentDataContainers
  * @author Redempt
  */
-public class BlockDataManager implements Listener {
-
-	private static List<BlockDataManager> managers = new ArrayList<>();
+public class BlockDataManager {
 	
 	/**
-	 * @return The list of all active BlockDataManagers
+	 * Creates a BlockDataManager backed by chunk PersistentDataContainers
+	 * @param plugin The Plugin that owns the data
+	 * @param autoLoad Whether to automatically load data for newly-loaded chunks asynchronously
+	 * @param events Whether to listen for events to automatically move and remove DataBlocks in response to their owning blocks being moved and removed
+	 * @return The created BlockDataManager
 	 */
-	public static List<BlockDataManager> getAllManagers() {
-		return managers;
-	}
-	
-	private Map<World, Map<ChunkPosition, Set<DataBlock>>> blocks = new HashMap<>();
-	protected SQLHelper sql;
-	private boolean autoUnload = true;
-	
-	/**
-	 * Create a BlockDataManager instance with a save file location, to be saved to and loaded from. This constructor
-	 * immediately loads from the given file.
-	 * @param saveFile The Path to load from immediately, and save to when save is called
-	 */
-	public BlockDataManager(Path saveFile) {
-		try {
-			Files.createDirectories(saveFile.getParent());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
-		sql = new SQLHelper(SQLHelper.openSQLite(saveFile));
-		sql.execute("CREATE TABLE IF NOT EXISTS blocks (world TEXT, cx INT, cz INT, x INT, y INT, z INT, data TEXT, PRIMARY KEY (world, x, y, z));");
-		sql.execute("CREATE INDEX IF NOT EXISTS chunkPos ON blocks (cx, cz);");
-		sql.execute("PRAGMA synchronous = OFF;");
-		managers.add(this);
-		setAutoSave(true);
+	public static BlockDataManager createPDC(Plugin plugin, boolean autoLoad, boolean events) {
+		BlockDataBackend backend = BlockDataBackend.pdc(plugin);
+		return new BlockDataManager(plugin, backend, autoLoad, events);
 	}
 	
 	/**
-	 * Sets whether this BlockDataManager will automatically save every 5 minutes. Defaults to true.
-	 * @param autoSave Whether to save automatically every 5 minutes
+	 * Creates a BlockDataManager backed by SQLite
+	 * @param plugin The Plugin that owns the data
+	 * @param path The path to the SQLite database
+	 * @param autoLoad Whether to automatically load data for newly-loaded chunks
+	 * @param events Whether to listen for events to automatically move and remove DataBlocks in response to their owning blocks being moved and removed
+	 * @return The created BlockDataManager
 	 */
-	public void setAutoSave(boolean autoSave) {
-		sql.setCommitInterval(autoSave ? 20 * 60 * 5 : -1);
+	public static BlockDataManager createSQLite(Plugin plugin, Path path, boolean autoLoad, boolean events) {
+		BlockDataBackend backend = BlockDataBackend.sqlite(path);
+		return new BlockDataManager(plugin, backend, autoLoad, events);
 	}
 	
 	/**
-	 * Sets whether this BlockDataManager will automatically unload chunks of DataBlocks when a chunk is unloaded
-	 * @param autoUnload Whether to automatically unload DataBlocks
+	 * Creates a BlockDataManager backed by SQLite if the server is running a version lower than 1.14, and chunk PersistentDataContainers otherwise
+	 * @param plugin The Plugin that owns the data
+	 * @param path The path to the SQLite database
+	 * @param autoLoad Whether to automatically load data for newly-loaded chunks
+	 * @param events Whether to listen for events to automatically move and remove DataBlocks in response to their owning blocks being moved and removed
+	 * @return The created BlockDataManager
 	 */
-	public void setAutoUnload(boolean autoUnload) {
-		this.autoUnload = autoUnload;
+	public static BlockDataManager createAuto(Plugin plugin, Path path, boolean autoLoad, boolean events) {
+		BlockDataBackend backend = RedLib.MID_VERSION >= 14 ? BlockDataBackend.pdc(plugin) : BlockDataBackend.sqlite(path);
+		return new BlockDataManager(plugin, backend, autoLoad, events);
 	}
+	
+	private BlockDataBackend backend;
+	private Plugin plugin;
+	private BlockDataListener listener;
+	private Map<ChunkPosition, Map<BlockPosition, DataBlock>> dataBlocks = new ConcurrentHashMap<>();
+	private Map<ChunkPosition, CompletableFuture<Void>> loading = new ConcurrentHashMap<>();
+	private Set<ChunkPosition> modified = Collections.synchronizedSet(new HashSet<>());
 	
 	/**
-	 * Saves all data to the save file.
+	 * Asynchronously retrieves a DataBlock
+	 * @param block The Block the data is attached to
+	 * @param create Whether to create a new DataBlock if one does not exist for the given Block
+	 * @return A CompletableFuture with the DataBlock
 	 */
-	public void save() {
-		getAllLoaded().forEach(DataBlock::save);
-		sql.commit();
-	}
-	
-	/**
-	 * Saves all data to the save file, and closes the SQL connection. Call this in your onDisable.
-	 */
-	public void saveAndClose() {
-		setAutoSave(false);
-		save();
-		sql.close();
-		managers.remove(this);
-		HandlerList.unregisterAll(this);
-	}
-	
-	protected Set<DataBlock> ensureExists(World world, ChunkPosition pos) {
-		return blocks.computeIfAbsent(world, k -> new HashMap<>()).computeIfAbsent(pos, k -> new HashSet<>());
-	}
-	
-	protected Optional<Set<DataBlock>> tryExists(World world, ChunkPosition pos) {
-		Map<ChunkPosition, Set<DataBlock>> map = blocks.get(world);
-		if (map == null) {
-			return Optional.empty();
-		}
-		Set<DataBlock> set = map.get(pos);
-		return Optional.ofNullable(set);
-	}
-	
-	protected ChunkPosition toChunkPosition(Location loc) {
-		int[] pos = LocationUtils.getChunkCoordinates(loc);
-		return new ChunkPosition(pos[0], pos[1]);
-	}
-	
-	protected ChunkPosition toChunkPosition(Block block) {
-		return toChunkPosition(block.getLocation());
-	}
-	
-	/**
-	 * Gets an existing DataBlock, returning null if that Block has no data attached to it.
-	 * @param block The block to check
-	 * @return A DataBlock, or null
-	 */
-	public DataBlock getExisting(Block block) {
-		ChunkPosition pos = toChunkPosition(block);
-		Set<DataBlock> set = load(block.getWorld(), pos.x, pos.z);
-		for (DataBlock db : set) {
-			if (db.getBlock().equals(block)) {
+	public CompletableFuture<DataBlock> getDataBlockAsync(Block block, boolean create) {
+		ChunkPosition pos = new ChunkPosition(block.getChunk());
+		return load(pos).thenApply(n -> {
+			BlockPosition bPos = new BlockPosition(block);
+			DataBlock db = dataBlocks.get(pos).get(bPos);
+			if (db != null) {
 				return db;
 			}
+			if (!create) {
+				return null;
+			}
+			db = new DataBlock(new JSONMap(), bPos, block.getWorld().getName(), this);
+			dataBlocks.get(pos).put(bPos, db);
+			setModified(pos);
+			return db;
+		});
+	}
+	
+	private BlockDataManager(Plugin plugin, BlockDataBackend backend, boolean autoLoad, boolean events) {
+		this.plugin = plugin;
+		this.backend = backend;
+		new EventListener<>(plugin, ChunkUnloadEvent.class, e -> unload(new ChunkPosition(e.getChunk())));
+		if (autoLoad) {
+			new EventListener<>(plugin, ChunkLoadEvent.class, e -> load(new ChunkPosition(e.getChunk())));
 		}
-		return null;
+		if (events) {
+			new BlockDataListener(this, plugin);
+		}
 	}
 	
 	/**
-	 * Gets a DataBlock from a given Block, creating a new one if that Block had no data attached to it.
-	 * @param block The block to check or create a DataBlock from
-	 * @return An existing or new DataBlock
+	 * Attempts to migrate SQLite from an older version of the database from the previous BlockDataManager library
+	 * @return Whether a migration was completed successfully
+	 */
+	public boolean migrate() {
+		boolean migrated = backend.attemptMigration(this);
+		if (migrated) {
+		
+		}
+		return migrated;
+	}
+	
+	/**
+	 * @return The plugin that owns this BlockDataManager
+	 */
+	public Plugin getPlugin() {
+		return plugin;
+	}
+	
+	/**
+	 * Saves all data loaded in this BlockDataManager
+	 */
+	public void save() {
+		modified.forEach(c -> save(c, true));
+		modified.clear();
+		unwrap(backend.saveAll());
+	}
+	
+	/**
+	 * Saves all data loaded in this BlockDataManager and closes connections where needed
+	 */
+	public void saveAndClose() {
+		save();
+		unwrap(backend.close());
+	}
+	
+	protected void setModified(ChunkPosition pos) {
+		modified.add(pos);
+	}
+	
+	/**
+	 * Gets a DataBlock, creating one if it doesn't exist
+	 * @param block The Block data will be attached to
+	 * @return A DataBlock
 	 */
 	public DataBlock getDataBlock(Block block) {
-		DataBlock db = getExisting(block);
-		if (db != null) {
-			return db;
-		}
-		db = new DataBlock(block, this);
-		ChunkPosition pos = toChunkPosition(block);
-		load(block.getWorld(), pos.x, pos.z).add(db);
-		return db;
+		return getDataBlock(block, true);
 	}
 	
-	protected void register(DataBlock db) {
-		ChunkPosition pos = toChunkPosition(db.getBlock());
-		load(db.getWorld(), pos.x, pos.z).add(db);
+	private CompletableFuture<Void> save(ChunkPosition pos, boolean force) {
+		if (!force && !modified.contains(pos)) {
+			return CompletableFuture.completedFuture(null);
+		}
+		JSONMap map = new JSONMap();
+		Map<BlockPosition, DataBlock> blocks = dataBlocks.get(pos);
+		if (blocks == null || blocks.size() == 0) {
+			dataBlocks.remove(pos);
+			return backend.remove(pos);
+		}
+		blocks.forEach((k, v) -> {
+			map.put(k.toString(), v.data);
+		});
+		return backend.save(pos, map.toString());
+	}
+	
+	private CompletableFuture<Void> unload(ChunkPosition pos) {
+		return save(pos, false).thenRun(() -> dataBlocks.remove(pos));
 	}
 	
 	/**
-	 * Removes a DataBlock from this DataBlockManager
+	 * Removes a DataBlock and its data from this BlockDataManager
 	 * @param db The DataBlock to remove
 	 */
 	public void remove(DataBlock db) {
-		sql.execute("DELETE FROM blocks WHERE x=? AND y=? AND z=? AND world=?;",
-				db.getBlock().getX(), db.getBlock().getY(), db.getBlock().getZ(), db.getWorld().getName());
-		int[] pos = db.getChunkCoordinates();
-		if (isChunkLoaded(db.getWorld(), pos[0], pos[1])) {
-			getLoaded(db.getWorld(), pos[0], pos[1]).remove(db);
-		}
+		ChunkPosition cpos = db.getChunkPosition();
+		setModified(cpos);
+		Optional.ofNullable(dataBlocks.get(cpos)).ifPresent(m -> m.remove(db.getBlockPosition()));
 	}
 	
-	/**
-	 * Gets all the DataBlocks near an approximate location
-	 * @param loc The location to check near
-	 * @param radius The radius to check in
-	 * @return The nearby DataBlocks
-	 */
-	public Set<DataBlock> getNearby(Location loc, int radius) {
-		radius /= 16;
-		radius += 1;
-		Set<DataBlock> set = new HashSet<>();
-		int[] pos = LocationUtils.getChunkCoordinates(loc);
-		for (int x = pos[0] - radius; x <= pos[0] + radius; x++) {
-			for (int z = pos[1] - radius; z <= pos[1] + radius; z++) {
-				set.addAll(load(loc.getWorld(), x, z));
-			}
-		}
-		return set;
-	}
-	
-	/**
-	 * Gets all the loaded DataBlocks in a chunk
-	 * @param chunk The chunk to get the loaded DataBlocks in
-	 * @return A set of DataBlocks in the chunk, or null if the chunk is not loaded
-	 */
-	public Set<DataBlock> getLoaded(Chunk chunk) {
-		return getLoaded(chunk.getWorld(), chunk.getX(), chunk.getZ());
-	}
-	
-	/**
-	 * Gets all the loaded DataBlocks in a chunk
-	 * @param world The world the chunk is in
-	 * @param cx The chunk X
-	 * @param cz The chunk Z
-	 * @return A set of DataBlocks in the chunk, or an empty set if the chunk is not loaded
-	 */
-	public Set<DataBlock> getLoaded(World world, int cx, int cz) {
-		return tryExists(world, new ChunkPosition(cx, cz)).orElse(new HashSet<>());
-	}
-	
-	/**
-	 * Loads all of the DataBlocks in a given chunk, or retrieves the already-loaded set of DataBlocks
-	 * @param world The world the chunk is in
-	 * @param cx The chunk X
-	 * @param cz The chunk Z
-	 * @return The set of DataBlocks in the chunk
-	 */
-	public Set<DataBlock> load(World world, int cx, int cz) {
-		if (isChunkLoaded(world, cx, cz)) {
-			return getLoaded(world, cx, cz);
-		}
-		Set<DataBlock> set = ensureExists(world, new ChunkPosition(cx, cz));
-		sql.queryResults("SELECT x,y,z,data FROM blocks WHERE world=? AND cx=? AND cz=?;", world.getName(), cx, cz).forEach(r -> {
-			int x = r.get(1);
-			int y = r.get(2);
-			int z = r.get(3);
-			JSONMap data = JSONParser.parseMap(r.getString(4));
-			Block block = world.getBlockAt(x, y, z);
-			DataBlock db = new DataBlock(block, this);
-			db.exists = true;
-			db.data = data;
-			set.add(db);
+	public CompletableFuture<DataBlock> moveAsync(DataBlock db, Block location) {
+		remove(db);
+		ChunkPosition cpos = new ChunkPosition(location);
+		modified.add(cpos);
+		return getDataBlockAsync(location, true).thenApply(b -> {
+			b.data = db.data;
+			return b;
 		});
-		return set;
 	}
 	
 	/**
-	 * Loads all of the DataBlocks in a given chunk, or retrieves the already-loaded set of DataBlocks
-	 * @param chunk The chunk to load DataBlocks in
-	 * @return The set of DataBlocks in the chunk
+	 * Moves a DataBlock to a new location
+	 * @param db The DataBlock whose data should be moved
+	 * @param block The Block to move the data to
+	 * @return The new DataBlock
 	 */
-	public Set<DataBlock> load(Chunk chunk) {
-		return load(chunk.getWorld(), chunk.getX(), chunk.getZ());
+	public DataBlock move(DataBlock db, Block block) {
+		return unwrap(moveAsync(db, block));
 	}
 	
 	/**
-	 * Saves and unloads all of the DataBlocks in a chunk
-	 * @param world The world the chunk is in
-	 * @param cx The chunk X
-	 * @param cz The chunk Z
+	 * Loads the data for a chunk asynchronously
+	 * @param world The world the data is in
+	 * @param cx The chunk X of the chunk the data is in
+	 * @param cz The chunk Z of the chunk the data is in
+	 * @return A CompletableFuture for the loading task
+	 */
+	public CompletableFuture<Void> loadAsync(World world, int cx, int cz) {
+		return load(new ChunkPosition(cx, cz, world.getName()));
+	}
+	
+	/**
+	 * Loads the data for a chunk synchronously
+	 * @param world The world the data is in
+	 * @param cx The chunk X of the chunk the data is in
+	 * @param cz The chunk Z of the chunk the data is in
+	 */
+	public void load(World world, int cx, int cz) {
+		unwrap(loadAsync(world, cx, cz));
+	}
+	
+	/**
+	 * Unloads the data for a chunk asynchronously
+	 * @param world The world the data is in
+	 * @param cx The chunk X of the chunk the data is in
+	 * @param cz The chunk Z of the chunk the data is in
+	 * @return A CompletableFuture for the unloading task
+	 */
+	public CompletableFuture<Void> unloadAsync(World world, int cx, int cz) {
+		return unload(new ChunkPosition(cx, cz, world.getName()));
+	}
+	
+	/**
+	 * Unloads the data for a chunk synchronously
+	 * @param world The world the data is in
+	 * @param cx The chunk X of the chunk the data is in
+	 * @param cz The chunk Z of the chunk the data is in
 	 */
 	public void unload(World world, int cx, int cz) {
-		ChunkPosition pos = new ChunkPosition(cx, cz);
-		tryExists(world, pos).ifPresent(s -> {
-			s.forEach(DataBlock::save);
-			blocks.get(world).remove(pos);
+		unwrap(unloadAsync(world, cx, cz));
+	}
+	
+	/**
+	 * Gets the DataBlocks for a given chunk, if it is loaded already
+	 * @param world The world the data is in
+	 * @param cx The chunk X of the chunk the data is in
+	 * @param cz The chunk Z of the chunk the data is in
+	 * @return The DataBlocks if they are loaded, otherwise an empty collection
+	 */
+	public Collection<DataBlock> getLoaded(World world, int cx, int cz) {
+		ChunkPosition pos = new ChunkPosition(cx, cz, world.getName());
+		return Optional.ofNullable(dataBlocks.get(pos)).map(Map::values).orElseGet(ArrayList::new);
+	}
+	
+	/**
+	 * Checks whether the DataBlocks for a given chunk are loaded
+	 * @param world The world the data is in
+	 * @param cx The chunk X of the chunk the data is in
+	 * @param cz The chunk Z of the chunk the data is in
+	 * @return Whether the DataBlocks for the given chunk are loaded
+	 */
+	public boolean isLoaded(World world, int cx, int cz) {
+		ChunkPosition pos = new ChunkPosition(cx, cz, world.getName());
+		return dataBlocks.containsKey(pos);
+	}
+	
+	private CompletableFuture<Void> load(ChunkPosition pos) {
+		if (dataBlocks.containsKey(pos)) {
+			return CompletableFuture.completedFuture(null);
+		}
+		CompletableFuture<Void> load = loading.get(pos);
+		if (load != null) {
+			return load;
+		}
+		dataBlocks.put(pos, new HashMap<>());
+		load = backend.load(pos).thenApply(s -> {
+			if (s == null) {
+				return null;
+			}
+			JSONMap map = JSONParser.parseMap(s);
+			map.keySet().forEach(k -> load(k, map.getMap(k), pos));
+			loading.remove(pos);
+			return null;
+		});
+		loading.put(pos, load);
+		return load;
+	}
+	
+	private void load(String key, JSONMap map, ChunkPosition pos) {
+		String[] split = key.split(" ");
+		int x = Integer.parseInt(split[0]);
+		int y = Integer.parseInt(split[1]);
+		int z = Integer.parseInt(split[2]);
+		BlockPosition bPos = new BlockPosition(x, y, z);
+		DataBlock db = new DataBlock(map, bPos, pos.getWorldName(), this);
+		dataBlocks.get(pos).put(bPos, db);
+	}
+	
+	/**
+	 * Gets a DataBlock for the given Block
+	 * @param block The Block data will be attached to
+	 * @param create Whether to create a new DataBlock if one does not exist already
+	 * @return The DataBlock, or null
+	 */
+	public DataBlock getDataBlock(Block block, boolean create) {
+		return unwrap(getDataBlockAsync(block, create));
+	}
+	
+	/**
+	 * Loads all DataBlocks stored by this BlockDataManager. Not supported for PDC.
+	 * @return A CompletableFuture for the loading task.
+	 */
+	public CompletableFuture<Void> loadAll() {
+		loading.values().forEach(f -> f.cancel(true));
+		dataBlocks.clear();
+		return backend.loadAll().thenApply(chunkMap -> {
+			chunkMap.forEach((cPos, data) -> {
+				JSONMap chunkData = JSONParser.parseMap(data);
+				chunkData.keySet().forEach(bPos -> load(bPos, chunkData.getMap(bPos), cPos));
+			});
+			return null;
 		});
 	}
 	
 	/**
-	 * Saves and unloads all of the DataBlocks in a chunk
-	 * @param chunk The chunk to unload the DataBlocks in
-	 */
-	public void unload(Chunk chunk) {
-		unload(chunk.getWorld(), chunk.getX(), chunk.getZ());
-	}
-	
-	/**
-	 * Saves and unloads all DataBlocks from this BlockDataManager
-	 */
-	public void unloadAll() {
-		save();
-		blocks = new HashMap<>();
-	}
-	
-	/**
-	 * @param chunk The chunk to check
-	 * @return Whether the DataBlocks in the chunk are loaded in this BlockDataManager
-	 */
-	public boolean isChunkLoaded(Chunk chunk) {
-		return isChunkLoaded(chunk.getWorld(), chunk.getX(), chunk.getZ());
-	}
-	
-	/**
-	 *
-	 * @param world The world the chunk is in
-	 * @param cx The X coordinate of the chunk
-	 * @param cz The Z coordinate of the chunk
-	 * @return Whether the DataBlocks in the chunk are loaded in this BlockDataManager
-	 */
-	public boolean isChunkLoaded(World world, int cx, int cz) {
-		return tryExists(world, new ChunkPosition(cx, cz)).isPresent();
-	}
-	
-	/**
-	 * @return The set of all loaded DataBlocks
+	 * @return All DataBlocks currently loaded in this BlockDataManager
 	 */
 	public Set<DataBlock> getAllLoaded() {
-		Set<DataBlock> set = new HashSet<>();
-		blocks.values().forEach(v -> v.values().forEach(set::addAll));
-		return set;
+		return dataBlocks.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toSet());
 	}
 	
-	/**
-	 * Loads and returns a set of all DataBlocks managed by this BlockDataManager. Avoid calling this if possible.
-	 * Will not return DataBlocks in unloaded worlds.
-	 * @return The set of all DataBlocks managed by this BlockDataManager
-	 */
-	public Set<DataBlock> getAll() {
-		Set<DataBlock> set = new HashSet<>();
-		Map<World, Set<ChunkPosition>> positions = new HashMap<>();
-		blocks.forEach((w, m) -> positions.computeIfAbsent(w, k -> new HashSet<>()).addAll(m.keySet()));
-		sql.queryResults("SELECT world,cx,cz,x,y,z,data FROM blocks;").forEach(r -> {
-			World world = Bukkit.getWorld(r.getString(1));
-			if (world == null) {
-				return;
-			}
-			int cx = r.get(2);
-			int cz = r.get(3);
-			ChunkPosition pos = new ChunkPosition(cx, cz);
-			Set<ChunkPosition> pset = positions.get(world);
-			if (pset != null && pset.contains(pos)) {
-				tryExists(world, pos).ifPresent(set::addAll);
-				return;
-			}
-			int x = r.get(4);
-			int y = r.get(5);
-			int z = r.get(6);
-			JSONMap data = JSONParser.parseMap(r.get(7));
-			Block block = world.getBlockAt(x, y, z);
-			DataBlock db = new DataBlock(block, this);
-			db.exists = true;
-			db.data = data;
-			ensureExists(world, pos).add(db);
-			set.add(db);
-		});
-		return set;
-	}
-	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onBreakBlock(BlockBreakEvent e) {
-		DataBlock db = getExisting(e.getBlock());
-		if (db == null) {
-			return;
+	private <T> T unwrap(CompletableFuture<T> future) {
+		try {
+			return future.get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			return null;
 		}
-		DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, e.getPlayer(), DestroyCause.PLAYER, e);
-		Bukkit.getPluginManager().callEvent(event);
-		if (event.isCancelled()) {
-			e.setCancelled(true);
-			return;
-		}
-		remove(db);
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onBucketEmpty(PlayerBucketEmptyEvent e) {
-		if (RedLib.MID_VERSION >= 13 && e.getBlock().getBlockData() instanceof Waterlogged) {
-			return;
-		}
-		DataBlock db = getExisting(e.getBlock());
-		if (db == null) {
-			return;
-		}
-		DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, e.getPlayer(), DestroyCause.PLACE_BUCKET, e);
-		Bukkit.getPluginManager().callEvent(event);
-		if (event.isCancelled()) {
-			e.setCancelled(true);
-			return;
-		}
-		remove(db);
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onFlowBreakBlock(BlockFromToEvent e) {
-		if (e.getBlock().getType() == Material.DRAGON_EGG) {
-			return;
-		}
-		DataBlock db = getExisting(e.getToBlock());
-		if (db == null) {
-			return;
-		}
-		DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, null, DestroyCause.LIQUID, e);
-		Bukkit.getPluginManager().callEvent(event);
-		if (event.isCancelled()) {
-			e.setCancelled(true);
-			return;
-		}
-		remove(db);
-	}
-	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onBurnBlock(BlockBurnEvent e) {
-		DataBlock db = getExisting(e.getBlock());
-		if (db == null) {
-			return;
-		}
-		DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, null, DestroyCause.FIRE, e);
-		Bukkit.getPluginManager().callEvent(event);
-		if (event.isCancelled()) {
-			e.setCancelled(true);
-			return;
-		}
-		remove(db);
-	}
-	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onEntityExplode(EntityExplodeEvent e) {
-		List<Block> toRemove = new ArrayList<>();
-		e.blockList().forEach(block -> {
-			DataBlock db = getExisting(block);
-			if (db == null) {
-				return;
-			}
-			DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, null, DestroyCause.EXPLOSION, e);
-			Bukkit.getPluginManager().callEvent(event);
-			if (event.isCancelled()) {
-				toRemove.add(block);
-				return;
-			}
-			remove(db);
-		});
-		e.blockList().removeAll(toRemove);
-	}
-	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onBlockExplode(BlockExplodeEvent e) {
-		List<Block> toRemove = new ArrayList<>();
-		e.blockList().forEach(block -> {
-			DataBlock db = getExisting(block);
-			if (db == null) {
-				return;
-			}
-			DataBlockDestroyEvent event = new DataBlockDestroyEvent(db, null, DestroyCause.EXPLOSION, e);
-			Bukkit.getPluginManager().callEvent(event);
-			if (event.isCancelled()) {
-				toRemove.add(block);
-				return;
-			}
-			remove(db);
-		});
-		e.blockList().removeAll(toRemove);
-	}
-	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onBlockPush(BlockPistonExtendEvent e) {
-		List<DataBlock> dataBlocks = new ArrayList<>();
-		for (Block block : e.getBlocks()) {
-			DataBlock db = getExisting(block);
-			if (db == null) {
-				continue;
-			}
-			dataBlocks.add(db);
-		}
-		for (DataBlock db : dataBlocks) {
-			Block block = db.getBlock().getRelative(e.getDirection());
-			DataBlockMoveEvent event = new DataBlockMoveEvent(db, block.getLocation());
-			Bukkit.getPluginManager().callEvent(event);
-			if (event.isCancelled()) {
-				continue;
-			}
-			JSONMap map = db.getData();
-			db.remove();
-			getDataBlock(block).setData(map);
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onBlockPull(BlockPistonRetractEvent e) {
-		List<DataBlock> dataBlocks = new ArrayList<>();
-		for (Block block : e.getBlocks()) {
-			DataBlock db = getExisting(block);
-			if (db == null) {
-				continue;
-			}
-			dataBlocks.add(db);
-		}
-		for (DataBlock db : dataBlocks) {
-			Block block = db.getBlock().getRelative(e.getDirection());
-			DataBlockMoveEvent event = new DataBlockMoveEvent(db, block.getLocation());
-			Bukkit.getPluginManager().callEvent(event);
-			if (event.isCancelled()) {
-				continue;
-			}
-			JSONMap map = db.getData();
-			db.remove();
-			getDataBlock(block).setData(map);
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onChunkUnload(ChunkUnloadEvent e) {
-		if (autoUnload) {
-			unload(e.getChunk());
-		}
-	}
-	
-	private static class ChunkPosition {
-		
-		public int x;
-		public int z;
-		
-		public ChunkPosition(int x, int z) {
-			this.x = x;
-			this.z = z;
-		}
-		
-		@Override
-		public int hashCode() {
-			return Objects.hash(x, z);
-		}
-		
-		@Override
-		public boolean equals(Object o) {
-			if (!(o instanceof ChunkPosition)) {
-				return false;
-			}
-			ChunkPosition pos = (ChunkPosition) o;
-			return pos.x == x && pos.z == z;
-		}
-		
 	}
 	
 }

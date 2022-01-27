@@ -1,7 +1,7 @@
 package redempt.redlib.config.conversion;
 
+import redempt.redlib.config.ConversionManager;
 import redempt.redlib.config.ConfigField;
-import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.ConfigType;
 import redempt.redlib.config.data.DataHolder;
 import redempt.redlib.config.instantiation.FieldSummary;
@@ -9,7 +9,9 @@ import redempt.redlib.config.instantiation.Instantiator;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A converter which builds objects from configuration sections
@@ -19,12 +21,12 @@ public class ObjectConverter {
 	
 	/**
 	 * Creates an object converter
-	 * @param manager The ConfigManager managing the data
+	 * @param manager The ConversionManager handling converters
 	 * @param type The config type to convert
 	 * @param <T> The type
 	 * @return An object converter for the given type
 	 */
-	public static <T> TypeConverter<T> create(ConfigManager manager, ConfigType<?> type) {
+	public static <T> TypeConverter<T> create(ConversionManager manager, ConfigType<?> type) {
 		if (type.getType().isInterface() || Modifier.isAbstract(type.getType().getModifiers())) {
 			throw new IllegalStateException("Cannot automatically convert abstract classe or interface " + type.getType());
 		}
@@ -56,6 +58,7 @@ public class ObjectConverter {
 				for (ConfigField field : summary.getFields()) {
 					saveWith(summary.getConverters().get(field), field.get(t), newSection, field.getName(), overwrite);
 				}
+				summary.applyComments(newSection);
 			}
 		};
 	}
