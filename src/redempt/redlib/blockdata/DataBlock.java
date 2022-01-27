@@ -154,8 +154,20 @@ public class DataBlock {
 	 * @param value The data
 	 */
 	public void set(String key, Object value) {
-		data.put(key, value);
 		manager.setModified(new ChunkPosition(block, world));
+		if (value == null) {
+			data.remove(key);
+			return;
+		}
+		data.put(key, value);
+	}
+	
+	/**
+	 * Removes a key from this DataBlock
+	 * @param key The key to remove
+	 */
+	public void remove(String key) {
+		set(key, null);
 	}
 	
 	/**
