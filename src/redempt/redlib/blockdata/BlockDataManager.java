@@ -178,6 +178,9 @@ public class BlockDataManager {
 	}
 	
 	private CompletableFuture<Void> unload(ChunkPosition pos) {
+		if (loading.containsKey(pos)) {
+			return loading.get(pos).thenRun(() -> unload(pos));
+		}
 		return save(pos, false).thenRun(() -> dataBlocks.remove(pos));
 	}
 	
@@ -288,6 +291,7 @@ public class BlockDataManager {
 		dataBlocks.put(pos, new HashMap<>());
 		load = backend.load(pos).thenApply(s -> {
 			if (s == null) {
+				loading.remove(pos);
 				return null;
 			}
 			JSONMap map = JSONParser.parseMap(s);

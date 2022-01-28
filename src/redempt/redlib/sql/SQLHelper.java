@@ -4,6 +4,7 @@ import redempt.redlib.RedLib;
 import redempt.redlib.misc.Task;
 
 import java.io.Closeable;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -26,7 +27,7 @@ public class SQLHelper implements Closeable {
 	 * @param file The path to the SQLite database file
 	 * @return The Connection to this SQLite database
 	 */
-	public static Connection openSQLite(java.nio.file.Path file) {
+	public static Connection openSQLite(Path file) {
 		try {
 			Class.forName("org.sqlite.JDBC");
 
