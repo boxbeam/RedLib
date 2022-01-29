@@ -178,8 +178,11 @@ public class BlockDataManager {
 	}
 	
 	private CompletableFuture<Void> unload(ChunkPosition pos) {
-		if (loading.containsKey(pos)) {
-			return loading.get(pos).thenRun(() -> unload(pos));
+		CompletableFuture<Void> load = loading.remove(pos);
+		if (load != null) {
+			load.cancel(true);
+			dataBlocks.remove(pos);
+			return CompletableFuture.completedFuture(null);
 		}
 		return save(pos, false).thenRun(() -> dataBlocks.remove(pos));
 	}
