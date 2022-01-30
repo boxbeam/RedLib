@@ -165,9 +165,13 @@ public class BlockDataManager {
 		if (!force && !modified.contains(pos)) {
 			return CompletableFuture.completedFuture(null);
 		}
+		modified.remove(pos);
 		JSONMap map = new JSONMap();
 		Map<BlockPosition, DataBlock> blocks = dataBlocks.get(pos);
-		if (blocks == null || blocks.size() == 0) {
+		if (blocks == null) {
+			return CompletableFuture.completedFuture(null);
+		}
+		if (blocks.size() == 0) {
 			dataBlocks.remove(pos);
 			return backend.remove(pos);
 		}
