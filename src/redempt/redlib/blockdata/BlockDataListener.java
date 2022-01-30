@@ -13,6 +13,7 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPistonEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.plugin.Plugin;
 import redempt.redlib.blockdata.events.DataBlockDestroyEvent;
@@ -94,6 +95,12 @@ class BlockDataListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onPistonRetract(BlockPistonRetractEvent e) {
 		handlePiston(e.getBlocks(), e);
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onEntityChangeBlock(EntityChangeBlockEvent e) {
+		DataBlock db = manager.getDataBlock(e.getBlock());
+		fireDestroy(db, e, DestroyCause.ENTITY);
 	}
 	
 	private void handlePiston(List<Block> blocks, BlockPistonEvent e) {
