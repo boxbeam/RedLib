@@ -6,8 +6,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.DelegateDeserialization;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -19,17 +17,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 import redempt.redlib.RedLib;
-import redempt.redlib.json.JSONList;
 import redempt.redlib.json.JSONMap;
 import redempt.redlib.json.JSONParser;
-import redempt.redlib.nms.NMSHelper;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiPredicate;
 
@@ -551,7 +544,7 @@ public class ItemUtils {
 	 * @return A JSON string representing the given item
 	 */
 	public static String toString(ItemStack item) {
-		return item == null ? null : toJSON(item, ItemStack.class).toString();
+		return item == null ? null : ItemSerializer.toJSON(item, ItemStack.class).toString();
 	}
 	
 	/**
@@ -561,77 +554,7 @@ public class ItemUtils {
 	 */
 	public static ItemStack fromString(String json) {
 		JSONMap map = JSONParser.parseMap(json);
-		ItemStack item = (ItemStack) deserialize(map);
-		ItemMeta meta = item.getItemMeta();
-		// Everything except enchantments works. Not sure why, but it has to be done manually.
-		if (map.containsKey("meta")) {
-			JSONMap jsonMeta = map.getMap("meta");
-			JSONMap enchants = jsonMeta.getMap("enchants");
-			if (enchants != null) {
-				enchants.forEach((k, v) -> {
-					meta.addEnchant(Enchantment.getByName(k), (int) v, true);
-				});
-			}
-		}
-		item.setItemMeta(meta);
-		return item;
-	}
-	
-	private static Object deserialize(JSONMap map) {
-		try {
-			Map<String, Object> dmap = new HashMap<>();
-			map.forEach((k, v) -> {
-				if (v instanceof JSONMap) {
-					JSONMap json = (JSONMap) v;
-					if (json.containsKey("==")) {
-						dmap.put(k, deserialize(json));
-					}
-					return;
-				}
-				dmap.put(k, v);
-			});
-			Class<?> clazz = Class.forName(map.getString("==").replace("%version%", NMSHelper.getNMSVersion()));
-			DelegateDeserialization annotation = clazz.getAnnotation(DelegateDeserialization.class);
-			if (annotation != null) {
-				clazz = annotation.value();
-			}
-			Method deserialize = clazz.getDeclaredMethod("deserialize", Map.class);
-			Object o = deserialize.invoke(null, dmap);
-			return o;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	private static JSONMap toJSON(ConfigurationSerializable s, Class<?> clazz) {
-		Map<String, Object> map = s.serialize();
-		JSONMap json = new JSONMap();
-		json.put("==", clazz.getName().replace(NMSHelper.getNMSVersion(), "%version%"));
-		map.forEach((k, v) -> {
-			json.put(k, serialize(v));
-		});
-		return json;
-	}
-	
-	private static Object serialize(Object o) {
-		if (o instanceof ConfigurationSerializable) {
-			Class<?> clazz = o.getClass();
-			return toJSON((ConfigurationSerializable) o, clazz);
-		} else if (o instanceof Map) {
-			Map map = (Map) o;
-			JSONMap json = new JSONMap();
-			map.forEach((k, v) -> {
-				json.put(k.toString(), serialize(v));
-			});
-			return json;
-		} else if (o instanceof List) {
-			List list = (List) o;
-			JSONList json = new JSONList();
-			list.stream().map(ItemUtils::serialize).forEach(json::add);
-			return json;
-		}
-		return o;
+		return (ItemStack) ItemSerializer.recursiveDeserialize(map);
 	}
 	
 }
