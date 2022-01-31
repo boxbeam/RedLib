@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -135,8 +136,9 @@ public class BlockDataManager {
 	 * Saves all data loaded in this BlockDataManager
 	 */
 	public void save() {
+		List<ChunkPosition> modified = new ArrayList<>(this.modified);
 		modified.forEach(c -> save(c, true));
-		modified.clear();
+		this.modified.clear();
 		unwrap(backend.saveAll());
 	}
 	
