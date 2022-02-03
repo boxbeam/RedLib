@@ -4,17 +4,15 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import redempt.redlib.config.conversion.*;
+import redempt.redlib.config.conversion.ObjectConverter;
+import redempt.redlib.config.conversion.StaticRootConverter;
+import redempt.redlib.config.conversion.TypeConverter;
 import redempt.redlib.config.data.ConfigurationSectionDataHolder;
-import redempt.redlib.config.data.DataHolder;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 /**

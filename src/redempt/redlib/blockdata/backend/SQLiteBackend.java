@@ -38,7 +38,7 @@ class SQLiteBackend implements BlockDataBackend {
 		}
 		helper = new SQLHelper(SQLHelper.openSQLite(path));
 		helper.executeUpdate("CREATE TABLE IF NOT EXISTS data (x INT, z INT, world STRING, data TEXT, PRIMARY KEY (x, z, world));");
-		helper.setAutoCommit(false);
+		helper.setCommitInterval(5 * 20 * 60);
 	}
 	
 	@Override
@@ -49,8 +49,8 @@ class SQLiteBackend implements BlockDataBackend {
 			if (!results.next()) {
 				return false;
 			}
-			Files.copy(path, path.getParent().resolve(path.getFileName() + "_old"), StandardCopyOption.REPLACE_EXISTING);
 			results.close();
+			Files.copy(path, path.getParent().resolve(path.getFileName() + "_old"), StandardCopyOption.REPLACE_EXISTING);
 			helper.queryResults("SELECT x, y, z, world, data FROM blocks;").forEach(r -> {
 				int x = r.get(1);
 				int y = r.get(2);

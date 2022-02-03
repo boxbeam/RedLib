@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -135,8 +136,9 @@ public class BlockDataManager {
 	 * Saves all data loaded in this BlockDataManager
 	 */
 	public void save() {
+		List<ChunkPosition> modified = new ArrayList<>(this.modified);
 		modified.forEach(c -> save(c, true));
-		modified.clear();
+		this.modified.clear();
 		unwrap(backend.saveAll());
 	}
 	
@@ -165,9 +167,13 @@ public class BlockDataManager {
 		if (!force && !modified.contains(pos)) {
 			return CompletableFuture.completedFuture(null);
 		}
+		modified.remove(pos);
 		JSONMap map = new JSONMap();
 		Map<BlockPosition, DataBlock> blocks = dataBlocks.get(pos);
-		if (blocks == null || blocks.size() == 0) {
+		if (blocks == null) {
+			return CompletableFuture.completedFuture(null);
+		}
+		if (blocks.size() == 0) {
 			dataBlocks.remove(pos);
 			return backend.remove(pos);
 		}
@@ -178,6 +184,12 @@ public class BlockDataManager {
 	}
 	
 	private CompletableFuture<Void> unload(ChunkPosition pos) {
+		CompletableFuture<Void> load = loading.remove(pos);
+		if (load != null) {
+			load.cancel(true);
+			dataBlocks.remove(pos);
+			return CompletableFuture.completedFuture(null);
+		}
 		return save(pos, false).thenRun(() -> dataBlocks.remove(pos));
 	}
 	
@@ -288,6 +300,7 @@ public class BlockDataManager {
 		dataBlocks.put(pos, new HashMap<>());
 		load = backend.load(pos).thenApply(s -> {
 			if (s == null) {
+				loading.remove(pos);
 				return null;
 			}
 			JSONMap map = JSONParser.parseMap(s);

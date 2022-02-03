@@ -1,5 +1,7 @@
 package redempt.redlib.nms;
 
+import org.bukkit.Bukkit;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -11,6 +13,7 @@ import java.lang.reflect.Parameter;
 public class NMSHelper {
 
 	private static String packageName = null;
+	private static String version = null;
 	
 	/**
 	 * Gets the full name of the NMS package
@@ -32,8 +35,11 @@ public class NMSHelper {
 	 * @return The version section of the NMS package, like v1_15_R1
 	 */
 	public static String getNMSVersion() {
-		String[] split = getNMSPackage().split("\\.");
-		return split[split.length - 1];
+		if (version == null) {
+			String[] split = Bukkit.getServer().getClass().getPackage().getName().split("\\.");
+			version = split[split.length - 1];
+		}
+		return version;
 	}
 	
 	/**

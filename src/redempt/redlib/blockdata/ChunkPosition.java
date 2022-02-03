@@ -83,6 +83,11 @@ public class ChunkPosition {
 	}
 	
 	@Override
+	public String toString() {
+		return world + " " + x + " " + z;
+	}
+	
+	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof ChunkPosition)) {
 			return false;

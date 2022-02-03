@@ -13,6 +13,7 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPistonEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.plugin.Plugin;
 import redempt.redlib.blockdata.events.DataBlockDestroyEvent;
@@ -45,18 +46,18 @@ class BlockDataListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBreak(BlockBreakEvent e) {
 		DataBlock db = manager.getDataBlock(e.getBlock(), false);
 		fireDestroy(db, e, DestroyCause.PLAYER_BREAK);
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onExplode(BlockExplodeEvent e) {
 		handleExplosion(e.blockList(), e);
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onExplode(EntityExplodeEvent e) {
 		handleExplosion(e.blockList(), e);
 	}
@@ -80,20 +81,26 @@ class BlockDataListener implements Listener {
 		toRemove.forEach(manager::remove);
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onCombust(BlockBurnEvent e) {
 		DataBlock db = manager.getDataBlock(e.getBlock());
 		fireDestroy(db, e, DestroyCause.COMBUST);
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPistonExtend(BlockPistonExtendEvent e) {
 		handlePiston(e.getBlocks(), e);
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPistonRetract(BlockPistonRetractEvent e) {
 		handlePiston(e.getBlocks(), e);
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onEntityChangeBlock(EntityChangeBlockEvent e) {
+		DataBlock db = manager.getDataBlock(e.getBlock());
+		fireDestroy(db, e, DestroyCause.ENTITY);
 	}
 	
 	private void handlePiston(List<Block> blocks, BlockPistonEvent e) {
