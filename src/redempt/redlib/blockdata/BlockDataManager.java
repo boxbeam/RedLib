@@ -180,7 +180,8 @@ public class BlockDataManager {
 		blocks.forEach((k, v) -> {
 			map.put(k.toString(), v.data);
 		});
-		return backend.save(pos, map.toString());
+		String data = map.toString();
+		return backend.save(pos, data);
 	}
 	
 	private CompletableFuture<Void> unload(ChunkPosition pos) {
@@ -203,6 +204,12 @@ public class BlockDataManager {
 		Optional.ofNullable(dataBlocks.get(cpos)).ifPresent(m -> m.remove(db.getBlockPosition()));
 	}
 	
+	/**
+	 * Moves a DataBlock to a new location asynchronously
+	 * @param db The DataBlock whose data should be moved
+	 * @param location The Block to move the data to
+	 * @return A CompletableFuture for the moving task
+	 */
 	public CompletableFuture<DataBlock> moveAsync(DataBlock db, Block location) {
 		remove(db);
 		ChunkPosition cpos = new ChunkPosition(location);

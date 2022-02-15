@@ -37,6 +37,7 @@ class SQLiteBackend implements BlockDataBackend {
 			e.printStackTrace();
 		}
 		helper = new SQLHelper(SQLHelper.openSQLite(path));
+		helper.execute("PRAGMA synchronous = OFF;");
 		helper.executeUpdate("CREATE TABLE IF NOT EXISTS data (x INT, z INT, world STRING, data TEXT, PRIMARY KEY (x, z, world));");
 		helper.setCommitInterval(5 * 20 * 60);
 	}

@@ -74,7 +74,6 @@ public class FieldSummary {
 			List<ConfigField> fields = new ArrayList<>();
 			Map<ConfigField, TypeConverter<?>> converters = new HashMap<>();
 			Method postInit = null;
-			
 			while (clazz != null && (staticContext || clazz.isAnnotationPresent(ConfigMappable.class) || Instantiator.isRecord(clazz))) {
 				for (Field field : clazz.getDeclaredFields()) {
 					int mod = field.getModifiers();
@@ -110,11 +109,10 @@ public class FieldSummary {
 						pos++;
 					}
 				}
+				if (!staticContext && postInit == null) {
+					postInit = getPostInitMethod(clazz);
+				}
 				clazz = clazz.getSuperclass();
-			}
-			
-			if (!staticContext) {
-				postInit = getPostInitMethod(clazz);
 			}
 			return new FieldSummary(fields, converters, configPath, configPathConverter, postInit);
 		} catch (NoSuchMethodException e) {

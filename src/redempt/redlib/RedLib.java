@@ -50,7 +50,7 @@ public class RedLib extends JavaPlugin {
 	 * @return An instance of RedLib if it is a plugin dependency, or your plugin if RedLib is shaded
 	 */
 	public static Plugin getInstance() {
-		return redLib != null ? redLib : getCallingPlugin();
+		return redLib != null ? redLib : JavaPlugin.getProvidingPlugin(RedLib.class);
 	}
 	
 	private static int getMidVersion() {
