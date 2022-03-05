@@ -67,7 +67,7 @@ public class RedLib extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
-		ConfigManager.create(this).target(RedLibConfig.class).load();
+		ConfigManager.create(this).target(RedLibConfig.class).saveDefaults().load();
 		if (RedLibConfig.devMode) {
 			ChainCommand chain = new ChainCommand();
 			new CommandParser(this.getResource("command.rdcml"))
