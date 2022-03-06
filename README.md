@@ -34,6 +34,15 @@ Replace `Tag` with a release tag for RedLib. You can see the latest version [her
 
 To shade RedLib, change the dependency from `compileOnly` to `implementation`, and install the [gradle shadow plugin](https://github.com/johnrengelman/shadow).
 
+If you are having a problem while building, such as plugin.yml is duplicate, try setting duplicatesStrategy to DuplicatesStrategy.EXCLUDE.
+```groovy
+tasks {
+        processResources {
+                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        }
+}
+```
+
 ## Maven:
 
 ```xml
