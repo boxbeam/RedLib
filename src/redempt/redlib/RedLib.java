@@ -56,7 +56,8 @@ public class RedLib extends JavaPlugin {
 	private static int getMidVersion() {
 		Pattern pattern = Pattern.compile("1\\.([0-9]+)");
 		Matcher matcher = pattern.matcher(Bukkit.getBukkitVersion());
-		matcher.find();
+		boolean found = matcher.find();
+        if (!found) return 0;
 		return Integer.parseInt(matcher.group(1));
 	}
 	
