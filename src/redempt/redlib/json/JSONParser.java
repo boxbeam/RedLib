@@ -247,8 +247,6 @@ public class JSONParser {
 		BOOLEAN,
 		DOUBLE,
 		INT,
-		NULL;
-		
+		NULL	
 	}
-	
 }
