@@ -301,7 +301,7 @@ public class BlockDataManager {
 			return CompletableFuture.completedFuture(null);
 		}
 		CompletableFuture<Void> load = loading.get(pos);
-		if (load != null) {
+		if (load != null && !load.isDone()) {
 			return load;
 		}
 		dataBlocks.put(pos, new HashMap<>());
@@ -345,6 +345,7 @@ public class BlockDataManager {
 	 */
 	public CompletableFuture<Void> loadAll() {
 		loading.values().forEach(f -> f.cancel(true));
+		loading.clear();
 		dataBlocks.clear();
 		return backend.loadAll().thenApply(chunkMap -> {
 			chunkMap.forEach((cPos, data) -> {
