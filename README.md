@@ -19,7 +19,7 @@ To get the jar, either download it from the releases tab either here on [GitHub]
 
 ```groovy
 repositories {
-        maven { url 'https://redempt.dev' }
+        maven { url = 'https://redempt.dev' }
 }
 
 ```
