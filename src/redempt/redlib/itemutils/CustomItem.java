@@ -1,5 +1,9 @@
 package redempt.redlib.itemutils;
 
+import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import redempt.redlib.RedLib;
@@ -12,10 +16,11 @@ import java.util.Map;
 
 /**
  * Represents a custom item with special behavior
+ *
  * @author Redempt
  */
-public abstract class CustomItem {
-	
+public abstract class CustomItem implements Listener {
+
 	/**
 	 * Gets an instance of every class which extends CustomItem in your plugin, and puts them in a map by name
 	 * Note: Custom item classes MUST have a default constructor which takes no arguments to be loaded by this method
@@ -48,6 +53,7 @@ public abstract class CustomItem {
 	protected CustomItem(String name) {
 		this.name = name;
 		item = getDefaultItem();
+    Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
 	}
 	
 	/**
@@ -61,7 +67,14 @@ public abstract class CustomItem {
 	 * @return The default item for this CustomItem
 	 */
 	public abstract ItemStack getDefaultItem();
-	
+
+  /**
+   * The method that is executed when this item is present in an interact event.
+   *
+   * @param event the interact event
+   */
+  public abstract void onInteract(PlayerInteractEvent event);
+
 	/**
 	 * @return The name of this custom item
 	 */
@@ -78,5 +91,12 @@ public abstract class CustomItem {
 		}
 		return item;
 	}
-	
+
+  @EventHandler
+  public void onInteractEvent(PlayerInteractEvent event) {
+    if (!event.hasItem() || event.getItem() == null || !event.getItem().isSimilar(item)) {
+      return;
+    }
+    onInteract(event);
+  }
 }
