@@ -22,7 +22,7 @@ public class EnumConverter {
 			
 			@Override
 			public String toString(T t) {
-				return t.name();
+				return t == null ? null : t.name();
 			}
 		};
 	}

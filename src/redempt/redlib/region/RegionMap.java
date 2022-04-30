@@ -50,12 +50,7 @@ public class RegionMap<T> {
 		for (int x = start.getX(); x <= end.getX(); x++) {
 			for (int z = start.getZ(); z <= end.getZ(); z++) {
 				Coordinate coord = new Coordinate(start.getWorld(), x, z);
-				Set<T> list = map.get(coord);
-				if (list == null) {
-					list = new HashSet<>();
-				}
-				list.add(object);
-				map.put(coord, list);
+				map.computeIfAbsent(coord, k -> new HashSet<>()).add(object);
 			}
 		}
 	}
@@ -67,12 +62,7 @@ public class RegionMap<T> {
 	 */
 	public void set(Location loc, T object) {
 		Coordinate coord = new Coordinate(loc, scale);
-		Set<T> list = map.get(coord);
-		if (list == null) {
-			list = new HashSet<>();
-		}
-		list.add(object);
-		map.put(coord, list);
+		map.computeIfAbsent(coord, k -> new HashSet<>()).add(object);
 	}
 	
 	/**
@@ -89,12 +79,13 @@ public class RegionMap<T> {
 		for (int x = start.getX(); x <= end.getX(); x++) {
 			for (int z = start.getZ(); z <= end.getZ(); z++) {
 				Coordinate coord = new Coordinate(start.getWorld(), x, z);
-				Set<T> list = map.get(coord);
-				if (list != null) {
-					list.remove(object);
-					if (list.size() == 0) {
-						map.remove(coord);
-					}
+				Set<T> set = map.get(coord);
+				if (set == null) {
+					continue;
+				}
+				set.remove(object);
+				if (set.size() == 0) {
+					map.remove(coord);
 				}
 			}
 		}
@@ -111,11 +102,12 @@ public class RegionMap<T> {
 		}
 		Coordinate coord = new Coordinate(loc, scale);
 		Set<T> list = map.get(coord);
-		if (list != null) {
-			list.remove(object);
-			if (list.size() == 0) {
-				map.remove(coord);
-			}
+		if (list == null) {
+			return;
+		}
+		list.remove(object);
+		if (list.size() == 0) {
+			map.remove(coord);
 		}
 	}
 	

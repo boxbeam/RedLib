@@ -50,7 +50,7 @@ public class RedLib extends JavaPlugin {
 	 * @return An instance of RedLib if it is a plugin dependency, or your plugin if RedLib is shaded
 	 */
 	public static Plugin getInstance() {
-		return redLib != null ? redLib : getCallingPlugin();
+		return redLib != null ? redLib : JavaPlugin.getProvidingPlugin(RedLib.class);
 	}
 	
 	private static int getMidVersion() {
@@ -67,7 +67,7 @@ public class RedLib extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
-		ConfigManager.create(this).target(RedLibConfig.class).load();
+		ConfigManager.create(this).target(RedLibConfig.class).saveDefaults().load();
 		if (RedLibConfig.devMode) {
 			ChainCommand chain = new ChainCommand();
 			new CommandParser(this.getResource("command.rdcml"))

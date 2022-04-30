@@ -55,6 +55,9 @@ public class ObjectConverter {
 					return;
 				}
 				DataHolder newSection = path == null ? section : section.createSubsection(path);
+				if (t == null) {
+					return;
+				}
 				for (ConfigField field : summary.getFields()) {
 					saveWith(summary.getConverters().get(field), field.get(t), newSection, field.getName(), overwrite);
 				}

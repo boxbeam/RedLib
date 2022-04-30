@@ -539,6 +539,15 @@ public class ItemUtils {
 	}
 	
 	/**
+	 * Checks whether an item is empty, meaning it is either null or air
+	 * @param item The item to check
+	 * @return Whether the item is empty
+	 */
+	public static boolean isEmpty(ItemStack item) {
+		return item == null || item.getType() == Material.AIR;
+	}
+	
+	/**
 	 * Converts an ItemStack to a JSON string
 	 * @param item The ItemStack to convert to a string
 	 * @return A JSON string representing the given item

@@ -113,7 +113,7 @@ public class ConversionManager {
 	 * @throws IllegalStateException If a StringConverter does not exist for the given type
 	 */
 	public <T> StringConverter<T> getStringConverter(ConfigType<T> type) {
-		TypeConverter<T> keyConverter = (TypeConverter<T>) convertersByType.get(type);
+		TypeConverter<T> keyConverter = getConverter(type);
 		if (!(keyConverter instanceof StringConverter)) {
 			throw new IllegalStateException("No appropriate string converter for key type " + type);
 		}
