@@ -17,7 +17,8 @@ import org.bukkit.persistence.PersistentDataType;
  *
  */
 public class ItemBuilder extends ItemStack {
-	
+	private Consumer<PlayerInteractEvent> interactEvent;
+
 	/**
 	 * Constructs a new ItemBuilder. An ItemBuilder extends ItemStack, an can be used as such.
 	 * @param material The type of the item
@@ -212,4 +213,30 @@ public class ItemBuilder extends ItemStack {
 		return this;
 	}
 	
+	/**
+	 * Sets the PlayerInteractEvent functions for this ItemBuilder
+	 * @param event
+	 * @return The ItemBuilder with the functions set
+	 */
+	public ItemBuilder setInteractEvent(Consumer<PlayerInteractEvent> event){
+		Bukkit.getPluginManager().registerEvents(this, RedLib.getInstance());
+		this.interactEvent = event;
+		return this;
+	}
+
+	/**
+	 * Removes the PlayerInteractEvent consumer and also unregisters the listener
+	 * @return The ItemBuilder without PlayerInteractEvent functions
+	 */
+	public ItemBuilder removeInteractEvent(){
+		HandlerList.unregisterAll(this);
+		this.interactEvent = null;
+		return this;
+	}
+
+	@EventHandler
+	private void onPlayerInteractEvent(PlayerInteractEvent e){
+		if (e.getItem() != null && e.getItem() == this) interactEvent.accept(e);
+	}
+
 }
