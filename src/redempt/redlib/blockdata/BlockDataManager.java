@@ -109,7 +109,7 @@ public class BlockDataManager {
 			new EventListener<>(plugin, ChunkLoadEvent.class, e -> load(new ChunkPosition(e.getChunk())));
 		}
 		if (events) {
-			new BlockDataListener(this, plugin);
+			listener = new BlockDataListener(this, plugin);
 		}
 	}
 	
@@ -118,11 +118,7 @@ public class BlockDataManager {
 	 * @return Whether a migration was completed successfully
 	 */
 	public boolean migrate() {
-		boolean migrated = backend.attemptMigration(this);
-		if (migrated) {
-		
-		}
-		return migrated;
+		return backend.attemptMigration(this);
 	}
 	
 	/**
@@ -344,12 +340,14 @@ public class BlockDataManager {
 	 * @return A CompletableFuture for the loading task.
 	 */
 	public CompletableFuture<Void> loadAll() {
+		save();
 		loading.values().forEach(f -> f.cancel(true));
 		loading.clear();
 		dataBlocks.clear();
 		return backend.loadAll().thenApply(chunkMap -> {
 			chunkMap.forEach((cPos, data) -> {
 				JSONMap chunkData = JSONParser.parseMap(data);
+				dataBlocks.computeIfAbsent(cPos, k -> new HashMap<>());
 				chunkData.keySet().forEach(bPos -> load(bPos, chunkData.getMap(bPos), cPos));
 			});
 			return null;
