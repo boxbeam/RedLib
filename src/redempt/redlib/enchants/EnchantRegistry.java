@@ -61,15 +61,6 @@ public class EnchantRegistry {
 		return enchants.values();
 	}
 	
-	protected int getLastSpace(String input) {
-		for (int i = input.length() - 1; i >= 0; i--) {
-			if (input.charAt(i) == ' ') {
-				return i;
-			}
-		}
-		return -1;
-	}
-	
 	/**
 	 * Instantiates a new EnchantRegistry
 	 *
@@ -260,7 +251,7 @@ public class EnchantRegistry {
 	 * @return The EnchantInfo containing the enchantment type and level, or null if there was no CustomEnchant on the given line of lore
 	 */
 	public EnchantInfo fromLoreLine(String line) {
-		int lastSpace = getLastSpace(line);
+		int lastSpace = line.lastIndexOf(' ');
 		check:
 		{
 			if (lastSpace == -1) {
