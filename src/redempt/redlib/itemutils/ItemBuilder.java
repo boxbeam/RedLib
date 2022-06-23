@@ -101,6 +101,26 @@ public class ItemBuilder extends ItemStack {
 		ItemUtils.addLore(this, lines);
 		return this;
 	}
+
+	/**
+	 * Remove a String of lore if present from this ItemBuilder
+	 * @param line The line of lore to remove
+	 * @return The ItemBuilder with lore removed if present
+	 */
+	public ItemBuilder removeLore(String line) {
+		ItemUtils.removeLoreLine(this, line);
+		return this;
+	}
+
+	/**
+	 * Remove a line of lore if present from this ItemBuilder
+	 * @param index The index of the line of lore to remove
+	 * @return The ItemBuilder with lore removed if present
+	 */
+	public ItemBuilder removeLore(int index) {
+		ItemUtils.removeLoreLine(this, index);
+		return this;
+	}
 	
 	/**
 	 * Renames this ItemBuilder
