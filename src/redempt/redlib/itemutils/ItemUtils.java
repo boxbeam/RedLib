@@ -181,8 +181,6 @@ public class ItemUtils {
 	public static ItemStack setLore(ItemStack item, String... lore) {
 		return setLore(item, Arrays.asList(lore));
 	}
-
-
 	
 	/**
 	 * Sets an item to be unbreakable
