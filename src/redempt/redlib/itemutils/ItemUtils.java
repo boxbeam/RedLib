@@ -138,6 +138,39 @@ public class ItemUtils {
 		item.setItemMeta(meta);
 		return item;
 	}
+
+	/**
+	 * Remove a specific line of lore from an ItemStack if present in an ItemStack
+	 * @param item The ItemStack to remove lore from
+	 * @param line The line of lore to remove
+	 * @return The modified ItemStack
+	 */
+	public static ItemStack removeLoreLine(ItemStack item, String line){
+		ItemMeta meta = item.getItemMeta();
+		List<String> lore = meta.getLore();
+		lore.remove(line);
+		meta.setLore(lore);
+		item.setItemMeta(meta);
+		return item;
+	}
+
+	/**
+	 * Removes a specific index-line of lore from an ItemStack if present in an ItemStack
+	 * @param item The ItemStack to remove lore from
+	 * @param index The index of the line of lore to remove
+	 * @return The modified ItemStack
+	 */
+	public static ItemStack removeLoreLine(ItemStack item, int index){
+		ItemMeta meta = item.getItemMeta();
+		List<String> lore = meta.getLore();
+		if (index < 0 || index > lore.size()) {
+                    throw new IllegalArgumentException("Value out of bounds (" + n + ")");
+                }
+		lore.remove(index);
+		meta.setLore(lore);
+		item.setItemMeta(meta);
+		return item;
+	}
 	
 	/**
 	 * Set multiple lines of lore for an ItemStack
