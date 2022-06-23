@@ -147,7 +147,7 @@ public class ItemUtils {
 	 */
 	public static ItemStack removeLoreLine(ItemStack item, String line){
 		ItemMeta meta = item.getItemMeta();
-		List<String> lore = new ArrayList<>(meta.getLore());
+		List<String> lore = meta.getLore();
 		lore.remove(line);
 		meta.setLore(lore);
 		item.setItemMeta(meta);
@@ -162,7 +162,7 @@ public class ItemUtils {
 	 */
 	public static ItemStack removeLoreLine(ItemStack item, int index){
 		ItemMeta meta = item.getItemMeta();
-		List<String> lore = new ArrayList<>(meta.getLore());
+		List<String> lore = meta.getLore();
 		if (index < 0 || index > lore.size()) {
                     throw new IllegalArgumentException("Value out of bounds (" + n + ")");
                 }
