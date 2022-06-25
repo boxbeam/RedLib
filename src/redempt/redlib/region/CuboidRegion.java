@@ -10,6 +10,7 @@ import org.bukkit.util.Vector;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.multiblock.Rotator;
 
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -316,6 +317,15 @@ public class CuboidRegion extends Overlappable {
 		CuboidRegion region = clone();
 		region.expand(face.getOppositeFace(), -region.measure(face) + 1);
 		return region;
+	}
+
+	public Block getRandomBlock() {
+		Random random = new Random();
+		int[] limits = getBlockDimensions();
+		int x = start.getBlockX()+random.nextInt(0, limits[0]);
+		int y = start.getBlockY()+random.nextInt(0, limits[1]);;
+		int z = start.getBlockZ()+random.nextInt(0, limits[2]);;
+		return getWorld().getBlockAt(x, y, z);
 	}
 	
 	/**
