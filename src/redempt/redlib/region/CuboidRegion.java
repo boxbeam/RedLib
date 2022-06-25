@@ -319,12 +319,16 @@ public class CuboidRegion extends Overlappable {
 		return region;
 	}
 
+	/**
+	 * Gets a random block from within the cuboid region
+	 * @return Random bukkit block from within the region
+	 */
 	public Block getRandomBlock() {
 		Random random = new Random();
 		int[] limits = getBlockDimensions();
-		int x = start.getBlockX()+random.nextInt(0, limits[0]);
-		int y = start.getBlockY()+random.nextInt(0, limits[1]);;
-		int z = start.getBlockZ()+random.nextInt(0, limits[2]);;
+		int x = start.getBlockX()+random.nextInt(0, limits[0]+1);
+		int y = start.getBlockY()+random.nextInt(0, limits[1]+1);
+		int z = start.getBlockZ()+random.nextInt(0, limits[2]+1);
 		return getWorld().getBlockAt(x, y, z);
 	}
 	

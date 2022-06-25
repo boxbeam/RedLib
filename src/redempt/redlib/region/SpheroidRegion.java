@@ -9,6 +9,7 @@ import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.multiblock.Rotator;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -383,7 +384,34 @@ public class SpheroidRegion extends Region {
 		}
 		return surface.contains(block);
 	}
-	
+
+	/**
+	 * Gets a random block within a spherical region
+	 * @return Bukkit block object of the randomly picked block
+	 */
+	public Block getRandomBlock() {
+		int[] randomBlockLocation = getRandomBlockCoordinates();
+		Location pickedLocation = new Location(getWorld(), randomBlockLocation[0], randomBlockLocation[1], randomBlockLocation[2]);
+		while (!contains(pickedLocation)) {
+			pickedLocation = new Location(getWorld(), randomBlockLocation[0], randomBlockLocation[1], randomBlockLocation[2]);
+		}
+		return pickedLocation.getBlock();
+	}
+
+	/**
+	 * Picks a random block coordinate from a sphere region,
+	 * this treats the sphere as cuboid, be sure to discard points outside the sphere
+	 * @return Array of three integers, one for each coordinate axis
+	 */
+	private int[] getRandomBlockCoordinates(){
+		Random random = new Random();
+		int x = center.getBlockX()+(random.nextInt((int) -getXRadius(), (int) getXRadius()+1));
+		int y = center.getBlockY()+(random.nextInt((int) -getXRadius(), (int) getXRadius()+1));
+		int z = center.getBlockZ()+(random.nextInt((int) -getXRadius(), (int) getXRadius()+1));
+
+		return new int[]{x, y, z};
+	}
+
 	/**
 	 * @return A String representation of this SpheroidRegion which can later be deserialized with {@link SpheroidRegion#fromString(String)}
 	 */
