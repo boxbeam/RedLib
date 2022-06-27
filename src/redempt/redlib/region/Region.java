@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -108,7 +109,26 @@ public abstract class Region implements Cloneable {
 	 * @return The stream of all Blocks contained in this Region
 	 */
 	public abstract Stream<Block> stream();
-	
+
+	/**
+	 * Returns threadLocalRandom
+	 * @return ThreadLocalRandomInstance
+	 */
+	public ThreadLocalRandom getLocalRandom(){
+		return ThreadLocalRandom.current();
+	}
+
+	/**
+	 * Returns random number between min (inclusive) and max (inclusive)
+	 *
+	 * @param origin Min number
+	 * @param bound  Max number
+	 * @return Int
+	 */
+	public int GetRandomNumInclusive(int origin, int bound){
+		return getLocalRandom().nextInt(origin, bound +1);
+	}
+
 	/**
 	 * @return All the Chunks this Region overlaps
 	 */

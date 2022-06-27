@@ -405,9 +405,9 @@ public class SpheroidRegion extends Region {
 	 */
 	private int[] getRandomBlockCoordinates(){
 		Random random = new Random();
-		int x = center.getBlockX()+(random.nextInt((int) -getXRadius(), (int) getXRadius()+1));
-		int y = center.getBlockY()+(random.nextInt((int) -getXRadius(), (int) getXRadius()+1));
-		int z = center.getBlockZ()+(random.nextInt((int) -getXRadius(), (int) getXRadius()+1));
+		int x = center.getBlockX()+(GetRandomNumInclusive((int) -getXRadius(), (int) getXRadius()));
+		int y = center.getBlockY()+(GetRandomNumInclusive((int) -getXRadius(), (int) getXRadius()));
+		int z = center.getBlockZ()+(GetRandomNumInclusive((int) -getXRadius(), (int) getXRadius()));
 
 		return new int[]{x, y, z};
 	}
