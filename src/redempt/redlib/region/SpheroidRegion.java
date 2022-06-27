@@ -400,6 +400,20 @@ public class SpheroidRegion extends Region {
 	}
 
 	/**
+	 * Gets random block within spherical region
+	 * @param random Random instance
+	 * @return Bukkit block object of the randomly picked block
+	 */
+	public Block getRandomBlock(Random random) {
+		int[] randomBlockLocation = getRandomBlockCoordinates(random);
+		Location pickedLocation = new Location(getWorld(), randomBlockLocation[0], randomBlockLocation[1], randomBlockLocation[2]);
+		while (!contains(pickedLocation)) {
+			pickedLocation = new Location(getWorld(), randomBlockLocation[0], randomBlockLocation[1], randomBlockLocation[2]);
+		}
+		return pickedLocation.getBlock();
+	}
+
+	/**
 	 * Picks a random block coordinate from a sphere region,
 	 * this treats the sphere as cuboid, be sure to discard points outside the sphere
 	 * @return Array of three integers, one for each coordinate axis
@@ -409,6 +423,20 @@ public class SpheroidRegion extends Region {
 		int x = center.getBlockX()+(threadLocalRandom.nextInt((int) -getXRadius(), (int) getXRadius()));
 		int y = center.getBlockY()+(threadLocalRandom.nextInt((int) -getXRadius(), (int) getXRadius()));
 		int z = center.getBlockZ()+(threadLocalRandom.nextInt((int) -getXRadius(), (int) getXRadius()));
+		return new int[]{x, y, z};
+	}
+
+
+	/**
+	 * Picks a random block coordinate from a sphere region,
+	 * this treats the sphere as cuboid, be sure to discard points outside the sphere
+	 * @param random Random instance passed from previous function
+	 * @return Array of three integers, one for each coordinate axis
+	 */
+	private int[] getRandomBlockCoordinates(Random random){
+		int x = center.getBlockX()+(random.nextInt((int) -getXRadius(), (int) getXRadius()));
+		int y = center.getBlockY()+(random.nextInt((int) -getXRadius(), (int) getXRadius()));
+		int z = center.getBlockZ()+(random.nextInt((int) -getXRadius(), (int) getXRadius()));
 		return new int[]{x, y, z};
 	}
 
