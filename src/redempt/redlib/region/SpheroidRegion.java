@@ -11,6 +11,7 @@ import redempt.redlib.multiblock.Rotator;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 /**
@@ -404,11 +405,10 @@ public class SpheroidRegion extends Region {
 	 * @return Array of three integers, one for each coordinate axis
 	 */
 	private int[] getRandomBlockCoordinates(){
-		Random random = new Random();
-		int x = center.getBlockX()+(GetRandomNumInclusive((int) -getXRadius(), (int) getXRadius()));
-		int y = center.getBlockY()+(GetRandomNumInclusive((int) -getXRadius(), (int) getXRadius()));
-		int z = center.getBlockZ()+(GetRandomNumInclusive((int) -getXRadius(), (int) getXRadius()));
-
+		ThreadLocalRandom threadLocalRandom = getLocalRandom();
+		int x = center.getBlockX()+(threadLocalRandom.nextInt((int) -getXRadius(), (int) getXRadius()));
+		int y = center.getBlockY()+(threadLocalRandom.nextInt((int) -getXRadius(), (int) getXRadius()));
+		int z = center.getBlockZ()+(threadLocalRandom.nextInt((int) -getXRadius(), (int) getXRadius()));
 		return new int[]{x, y, z};
 	}
 

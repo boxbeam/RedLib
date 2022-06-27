@@ -10,6 +10,8 @@ import org.bukkit.util.Vector;
 import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.multiblock.Rotator;
 
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -324,9 +326,23 @@ public class CuboidRegion extends Overlappable {
 	 */
 	public Block getRandomBlock() {
 		int[] limits = getBlockDimensions();
-		int x = GetRandomNumInclusive(0, limits[0]);
-		int y = GetRandomNumInclusive(0, limits[1]);
-		int z = GetRandomNumInclusive(0, limits[2]);
+		ThreadLocalRandom threadLocalRandom = getLocalRandom();
+		int x = threadLocalRandom.nextInt(0, limits[0]+1);
+		int y = threadLocalRandom.nextInt(0, limits[1]+1);
+		int z = threadLocalRandom.nextInt(0, limits[2]+1);
+		return getWorld().getBlockAt(x, y, z);
+	}
+
+	/**
+	 * Gets a random block from within the cuboid region
+	 * @param random Random instance
+	 * @return Random bukkit block from within the region
+	 */
+	public Block getRandomBlock(Random random){
+		int[] limits = getBlockDimensions();
+		int x = random.nextInt(0, limits[0]+1);
+		int y = random.nextInt(0, limits[1]+1);
+		int z = random.nextInt(0, limits[2]+1);
 		return getWorld().getBlockAt(x, y, z);
 	}
 	

@@ -118,16 +118,6 @@ public abstract class Region implements Cloneable {
 		return ThreadLocalRandom.current();
 	}
 
-	/**
-	 * Returns random number between min (inclusive) and max (inclusive)
-	 *
-	 * @param origin Min number
-	 * @param bound  Max number
-	 * @return Int
-	 */
-	public int GetRandomNumInclusive(int origin, int bound){
-		return getLocalRandom().nextInt(origin, bound +1);
-	}
 
 	/**
 	 * @return All the Chunks this Region overlaps
