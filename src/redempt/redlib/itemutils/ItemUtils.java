@@ -50,10 +50,10 @@ public class ItemUtils {
 		return base;
 	}
 	
-	private static Material skullType = RedLib.MID_VERSION >= 13 ? Material.valueOf("PLAYER_HEAD") : Material.valueOf("SKULL_ITEM");
+	private static String skullType = RedLib.MID_VERSION >= 13 ? "PLAYER_HEAD" : "SKULL_ITEM";
 	
 	private static ItemStack getBaseSkull() {
-		return RedLib.MID_VERSION >= 13 ? new ItemStack(skullType) : new ItemStack(skullType, 1, (short) 3);
+		return RedLib.MID_VERSION >= 13 ? new ItemStack(Material.valueOf(skullType)) : new ItemStack(Material.valueOf(skullType), 1, (short) 3);
 	}
 	
 	/**
