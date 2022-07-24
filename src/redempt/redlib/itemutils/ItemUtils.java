@@ -164,7 +164,7 @@ public class ItemUtils {
 		ItemMeta meta = item.getItemMeta();
 		List<String> lore = meta.getLore();
 		if (index < 0 || index > lore.size()) {
-                    throw new IllegalArgumentException("Value out of bounds (" + n + ")");
+                    throw new IllegalArgumentException("Value out of bounds (" + index + ")");
                 }
 		lore.remove(index);
 		meta.setLore(lore);

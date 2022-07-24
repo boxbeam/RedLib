@@ -30,7 +30,7 @@ public interface Instantiator {
 		if (clazz.isAnnotationPresent(ConfigMappable.class)) {
 			return new EmptyInstantiator();
 		}
-		throw new IllegalArgumentException("Cannot create instantiator for class which is not a record type and not annotated with ConfigMappable");
+		throw new IllegalArgumentException("Cannot create instantiator for class which is not a record type and not annotated with ConfigMappable (" + clazz + ")");
 	}
 	
 	/**
