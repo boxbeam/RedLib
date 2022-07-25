@@ -2,16 +2,14 @@ package redempt.redlib.json;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 /**
  * Represents a list which can be serialized to JSON and deserialized back to this form,
  * assuming all of the values it stores are serializable
  */
-public class JSONList extends ArrayList<Object> implements JSONStorage {
-	
-	private JSONStorage parent;
-	protected String key = null;
+public class JSONList extends ArrayList<Object> {
 	
 	public Integer getInt(int key) {
 		Object o = get(key);
@@ -54,47 +52,9 @@ public class JSONList extends ArrayList<Object> implements JSONStorage {
 	 */
 	@Override
 	public String toString() {
-		if (size() == 0) {
-			return "[]";
-		}
-		StringBuilder builder = new StringBuilder("[");
-		for (Object o : this) {
-			if (o instanceof CharSequence) {
-				builder.append('"').append(o.toString().replace("\\", "\\\\").replace("\"", "\\\"")).append("\", ");
-				continue;
-			}
-			if (o instanceof Long) {
-				builder.append(o.toString()).append("L, ");
-				continue;
-			}
-			builder.append(o).append(", ");
-		}
-		return builder.replace(builder.length() - 2, builder.length(), "]").toString();
-	}
-	
-	@Override
-	public JSONStorage getParent() {
-		return parent;
-	}
-	
-	@Override
-	public void setParent(JSONStorage obj) {
-		this.parent = obj;
-	}
-	
-	@Override
-	public void add(String key, Object value) {
-		add(value);
-	}
-	
-	@Override
-	public String getTempKey() {
-		return key;
-	}
-	
-	@Override
-	public void setTempKey(String value) {
-		this.key = value;
+		StringJoiner joiner = new StringJoiner(", ", "[", "]");
+		forEach(o -> joiner.add(JSONParser.toJSONString(o)));
+		return joiner.toString();
 	}
 	
 }

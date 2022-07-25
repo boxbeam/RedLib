@@ -11,6 +11,10 @@ public class JSONParser {
 		whitespace['\t'] = true;
 	}
 	
+	public static String toJSONString(Object o) {
+		return o instanceof String ? '"' + ((String) o).replace("\"", "\\\"") + '"' : o.toString();
+	}
+	
 	public static JSONMap parseMap(String json) {
 		return new JSONParser(json).map();
 	}
