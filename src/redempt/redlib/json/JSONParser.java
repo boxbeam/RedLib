@@ -77,7 +77,7 @@ public class JSONParser {
 		assertChar('.');
 		long second = integer();
 		double decimal = second * Math.pow(0.1, Math.ceil(Math.log10(second)));
-		return decimal + first;
+		return first < 0 ? first - decimal : decimal + first;
 	}
 	
 	private char escapeSequence() {
