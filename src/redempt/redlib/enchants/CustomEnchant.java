@@ -336,8 +336,15 @@ public abstract class CustomEnchant {
 		return getDisplayName() + " " + toRomanNumerals(level);
 	}
 
+	/**
+	 *
+	 * @param itemStack The targeted item stack of which contains the CustomEnchant to be increased.
+	 * @param customEnchant The CustomEnchant to be increased on the ItemStack.
+	 * @param amount The amount to increase to enchant level by.
+	 * @return The item stack with the increased enchant level.
+	 */
 	public ItemStack increaseLevel(ItemStack itemStack, CustomEnchant customEnchant, int amount) {
 		if (customEnchant.getLevel(itemStack) + amount > customEnchant.getMaxLevel()) return itemStack;
-		return customEnchant.apply(itemStack, customEnchant.getLevel(itemStack) + amount);
+		return customEnchant.apply(itemStack, Math.min(customEnchant.getLevel(itemStack) + amount, customEnchant.getMaxLevel()));
 	}
 }
