@@ -335,5 +335,9 @@ public abstract class CustomEnchant {
 		}
 		return getDisplayName() + " " + toRomanNumerals(level);
 	}
-	
+
+	public ItemStack increaseLevel(ItemStack itemStack, CustomEnchant customEnchant, int amount) {
+		if (customEnchant.getLevel(itemStack) + amount > customEnchant.getMaxLevel()) return itemStack;
+		return customEnchant.apply(itemStack, customEnchant.getLevel(itemStack) + amount);
+	}
 }
