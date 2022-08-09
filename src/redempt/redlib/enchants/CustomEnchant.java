@@ -337,7 +337,7 @@ public abstract class CustomEnchant {
 	}
 
 	/**
-	 *
+	 * Increase the level of this enchantment on an item, ensuring it does not exceed the maximum level
 	 * @param itemStack The targeted item stack of which contains the CustomEnchant to be increased.
 	 * @param customEnchant The CustomEnchant to be increased on the ItemStack.
 	 * @param amount The amount to increase the enchant level by.
