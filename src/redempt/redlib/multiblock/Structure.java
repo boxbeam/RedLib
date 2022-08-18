@@ -130,16 +130,21 @@ public class Structure {
 	 * @throws IllegalArgumentException if the specified block is not within the bounds of this Structure
 	 */
 	public StructureBlock getBlock(Block block) {
+		System.out.println("Hello");
 		if (!block.getWorld().equals(loc.getWorld())) {
 			return null;
 		}
 		Location offset = block.getLocation().subtract(loc);
 		Rotator rotator = this.rotator.getInverse();
+		rotator.setMirrored(false);
 		int[] dim = type.getDimensions();
 		rotator.setLocation(offset.getBlockX(), offset.getBlockZ());
 		int x = rotator.getRotatedBlockX();
 		int y = offset.getBlockY();
 		int z = rotator.getRotatedBlockZ();
+		if (getRotator().isMirrored()) {
+			int ignored = getRotator().getRotation() % 2 != 0 ? (x = -x) : (z = -z);
+		}
 		if (x < 0 || y < 0 || z < 0
 				|| x >= dim[0] || y >= dim[1] || z >= dim[2]) {
 			return null;
