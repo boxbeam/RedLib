@@ -142,7 +142,8 @@ public class Structure {
 		int y = offset.getBlockY();
 		int z = rotator.getRotatedBlockZ();
 		if (getRotator().isMirrored()) {
-			int ignored = getRotator().getRotation() % 2 != 0 ? (x = -x) : (z = -z);
+			if (getRotator().getRotation() % 2 != 0) x *= -1;
+			else z *= -1;
 		}
 		if (x < 0 || y < 0 || z < 0
 				|| x >= dim[0] || y >= dim[1] || z >= dim[2]) {
