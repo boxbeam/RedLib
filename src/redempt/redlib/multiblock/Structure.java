@@ -130,7 +130,6 @@ public class Structure {
 	 * @throws IllegalArgumentException if the specified block is not within the bounds of this Structure
 	 */
 	public StructureBlock getBlock(Block block) {
-		System.out.println("Hello");
 		if (!block.getWorld().equals(loc.getWorld())) {
 			return null;
 		}
