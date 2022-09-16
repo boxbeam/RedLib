@@ -109,7 +109,9 @@ public class EventListener<T extends Event> implements Listener {
 	
 	@EventHandler
 	public void handleEvent(T event) {
-		handler.accept(this, event);
+		if (eventClass.isAssignableFrom(event.getClass())) {
+			handler.accept(this, event);
+		}
 	}
 	
 	/**
