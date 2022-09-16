@@ -109,9 +109,7 @@ public class EventListener<T extends Event> implements Listener {
 	
 	@EventHandler
 	public void handleEvent(T event) {
-		if (event.getClass().equals(eventClass)) {
-			handler.accept(this, event);
-		}
+		handler.accept(this, event);
 	}
 	
 	/**
