@@ -129,11 +129,15 @@ public class Rotator {
 			rot[i] = arr[i];
 		}
 		for (int i = 0; i < 4; i++) {
-			int dir = (i + rotation) % 4;
-			if (mirrored && (i == 0 || i == 2)) {
-				dir = (dir + 2) % 4;
-			}
+			int dir = (i + 4 - rotation) % 4;
 			arr[i] = (T) rot[dir];
+		}
+		if (mirrored) {
+			int first = rotation % 2 == 0 ? 1 : 0;
+			int second = rotation % 2 == 0 ? 3 : 2;
+			T tmp = arr[first];
+			arr[first] = arr[second];
+			arr[second] = tmp;
 		}
 	}
 	

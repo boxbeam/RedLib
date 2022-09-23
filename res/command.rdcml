@@ -11,7 +11,7 @@ structure,struct {
 		hook create
 		user player
 	}
-	build int<0,3>:rotation?(0) boolean:mirrored?(true) {
+	build int<0,3>:rotation?(0) boolean:mirrored?(false) {
 		help Build the created structure at your location
 		hook build
 		user player
