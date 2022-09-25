@@ -21,6 +21,11 @@ structure,struct {
 		hook export
 		user player
 	}
+	import string:filename*? {
+		help Imports the structure data from a file
+		hook import
+		user player
+	}
 	skip material:type? {
 		help Sets a block type to skip when scanning, in case you want to use it for the corners
 		hook skip

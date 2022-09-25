@@ -7,6 +7,7 @@ import org.bukkit.block.BlockState;
 import redempt.redlib.region.CuboidRegion;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -142,8 +143,8 @@ public class Structure {
 		int y = offset.getBlockY();
 		int z = rotator.getRotatedBlockZ();
 		if (getRotator().isMirrored()) {
-			if (getRotator().getRotation() % 2 != 0) x *= -1;
-			else z *= -1;
+			x = Math.abs(x);
+			z = Math.abs(z);
 		}
 		if (x < 0 || y < 0 || z < 0
 				|| x >= dim[0] || y >= dim[1] || z >= dim[2]) {

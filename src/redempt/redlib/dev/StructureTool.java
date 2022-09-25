@@ -127,6 +127,10 @@ public class StructureTool implements Listener {
 		player.sendMessage(ChatColor.GREEN + "Skip type set!");
 	}
 	
+	private static Path getPath(String name) {
+		return Paths.get("plugins/RedLib/").resolve(name + ".dat");
+	}
+	
 	@SuppressWarnings("deprecation")
 	@CommandHook("export")
 	public void export(Player player, String filename) {
@@ -144,12 +148,25 @@ public class StructureTool implements Listener {
 			String mbs = MultiBlockStructure.stringify(locs[0], locs[1], skip);
 			player.sendMessage(ChatColor.GREEN + "The multi-block structure string has been exported to plugins/RedLib/" + filename + ".dat");
 			try {
-				Path path = Paths.get("plugins/RedLib/").resolve(filename + ".dat");
+				Path path = getPath(filename);
 				Files.write(path, mbs.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		});
+	}
+	
+	@CommandHook("import")
+	public void importStructure(Player player, String filename) throws IOException {
+		Path path = getPath(filename);
+		if (!Files.exists(path)) {
+			player.sendMessage(ChatColor.RED + "Could not resolve structure " + path);
+			return;
+		}
+		String contents = new String(Files.readAllBytes(path));
+		MultiBlockStructure struct = MultiBlockStructure.create(contents, filename, true, true);
+		structures.put(player.getUniqueId(), struct);
+		player.sendMessage(ChatColor.GREEN + "Structure imported!");
 	}
 	
 	@CommandHook("build")
