@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that this type can be
+ * Indicates that this type can be subclassed and stored in config, its type will be stored alongside its metadata
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
