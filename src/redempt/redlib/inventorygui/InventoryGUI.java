@@ -84,6 +84,15 @@ public class InventoryGUI implements Listener {
 	}
 	
 	/**
+	 * Gets the inventory size
+	 *
+	 * @return The inventory size
+	 */
+	public int getSize() {
+		return this.getInventory().getSize();
+	}
+
+	/**
 	 * Add a button to the GUI in the given slot
 	 *
 	 * @param button The button to be added
