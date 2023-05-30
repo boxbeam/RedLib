@@ -57,13 +57,16 @@ public class ItemUtils {
 	}
 	
 	/**
-	 * Renames an ItemStack, functionally identical to {@link ItemUtils#setName(ItemStack, String)} but kept for legacy reasons
+	 * Renames an ItemStack, functionally identical to {@link ItemUtils#setName(ItemStack, String)} but kept for legacy reasons. This has no effect on items without meta such as Air
 	 * @param item The ItemStack to be renamed
 	 * @param name The name to give the ItemStack
 	 * @return The renamed ItemStack
 	 */
 	public static ItemStack rename(ItemStack item, String name) {
 		ItemMeta meta = item.getItemMeta();
+		if (meta == null) {
+			return item;
+		}
 		meta.setDisplayName(name);
 		item.setItemMeta(meta);
 		return item;
