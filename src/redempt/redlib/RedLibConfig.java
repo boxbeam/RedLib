@@ -2,6 +2,6 @@ package redempt.redlib;
 
 public class RedLibConfig {
 
-	public static boolean devMode = false;
-	
+    public static boolean devMode = false;
+
 }

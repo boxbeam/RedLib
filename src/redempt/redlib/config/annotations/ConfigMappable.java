@@ -4,6 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Indicates that a class can be automatically serialized to config
+ *
  * @author Redempt
  */
 @Target(ElementType.TYPE)

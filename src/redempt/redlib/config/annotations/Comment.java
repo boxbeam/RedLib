@@ -4,6 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Used to denote comments which should be applied to a config path. Only supported in 1.18.1+
+ *
  * @author Redempt
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -11,7 +12,7 @@ import java.lang.annotation.*;
 @Repeatable(Comments.class)
 @Inherited
 public @interface Comment {
-	
-	String value();
-	
+
+    String value();
+
 }

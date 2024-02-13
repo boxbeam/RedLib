@@ -28,107 +28,107 @@ import java.util.Map;
 
 class BlockDataListener implements Listener {
 
-	private BlockDataManager manager;
-	
-	public BlockDataListener(BlockDataManager manager, Plugin plugin) {
-		this.manager = manager;
-		Bukkit.getPluginManager().registerEvents(this, plugin);
-	}
-	
-	private void fireDestroy(DataBlock db, Event parent, DestroyCause cause) {
-		if (db == null) {
-			return;
-		}
-		DataBlockDestroyEvent ev = new DataBlockDestroyEvent(db, parent, cause);
-		Bukkit.getPluginManager().callEvent(ev);
-		if (!ev.isCancelled()) {
-			manager.remove(db);
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onBreak(BlockBreakEvent e) {
-		DataBlock db = manager.getDataBlock(e.getBlock(), false);
-		fireDestroy(db, e, DestroyCause.PLAYER_BREAK);
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onExplode(BlockExplodeEvent e) {
-		handleExplosion(e.blockList(), e);
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onExplode(EntityExplodeEvent e) {
-		handleExplosion(e.blockList(), e);
-	}
-	
-	private void handleExplosion(List<Block> blocks, Cancellable e) {
-		List<DataBlock> toRemove = new ArrayList<>();
-		blocks.forEach(b -> {
-			DataBlock db = manager.getDataBlock(b);
-			if (db == null) {
-				return;
-			}
-			DataBlockDestroyEvent ev = new DataBlockDestroyEvent(db, (Event) e, DestroyCause.EXPLOSION);
-			Bukkit.getPluginManager().callEvent(ev);
-			if (!ev.isCancelled()) {
-				toRemove.add(db);
-			}
-		});
-		if (e.isCancelled()) {
-			return;
-		}
-		toRemove.forEach(manager::remove);
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onCombust(BlockBurnEvent e) {
-		DataBlock db = manager.getDataBlock(e.getBlock());
-		fireDestroy(db, e, DestroyCause.COMBUST);
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onPistonExtend(BlockPistonExtendEvent e) {
-		handlePiston(e.getBlocks(), e);
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onPistonRetract(BlockPistonRetractEvent e) {
-		handlePiston(e.getBlocks(), e);
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onEntityChangeBlock(EntityChangeBlockEvent e) {
-		DataBlock db = manager.getDataBlock(e.getBlock());
-		fireDestroy(db, e, DestroyCause.ENTITY);
-	}
-	
-	private void handlePiston(List<Block> blocks, BlockPistonEvent e) {
-		List<DataBlock> toMove = new ArrayList<>();
-		blocks.forEach(b -> {
-			DataBlock db = manager.getDataBlock(b);
-			if (db == null) {
-				return;
-			}
-			Block destination = db.getBlock().getRelative(e.getDirection());
-			DataBlockMoveEvent ev = new DataBlockMoveEvent(db, destination, e);
-			Bukkit.getPluginManager().callEvent(ev);
-			if (!ev.isCancelled()) {
-				toMove.add(db);
-			}
-		});
-		if (e.isCancelled()) {
-			return;
-		}
-		Map<Block, JSONMap> moved = new HashMap<>();
-		toMove.forEach(db -> {
-			Block destination = db.getBlock().getRelative(e.getDirection());
-			moved.put(destination, db.data);
-		});
-		toMove.forEach(manager::remove);
-		moved.forEach((block, data) -> {
-			manager.getDataBlock(block).data = data;
-		});
-	}
-	
+    private BlockDataManager manager;
+
+    public BlockDataListener(BlockDataManager manager, Plugin plugin) {
+        this.manager = manager;
+        Bukkit.getPluginManager().registerEvents(this, plugin);
+    }
+
+    private void fireDestroy(DataBlock db, Event parent, DestroyCause cause) {
+        if (db == null) {
+            return;
+        }
+        DataBlockDestroyEvent ev = new DataBlockDestroyEvent(db, parent, cause);
+        Bukkit.getPluginManager().callEvent(ev);
+        if (!ev.isCancelled()) {
+            manager.remove(db);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBreak(BlockBreakEvent e) {
+        DataBlock db = manager.getDataBlock(e.getBlock(), false);
+        fireDestroy(db, e, DestroyCause.PLAYER_BREAK);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onExplode(BlockExplodeEvent e) {
+        handleExplosion(e.blockList(), e);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onExplode(EntityExplodeEvent e) {
+        handleExplosion(e.blockList(), e);
+    }
+
+    private void handleExplosion(List<Block> blocks, Cancellable e) {
+        List<DataBlock> toRemove = new ArrayList<>();
+        blocks.forEach(b -> {
+            DataBlock db = manager.getDataBlock(b);
+            if (db == null) {
+                return;
+            }
+            DataBlockDestroyEvent ev = new DataBlockDestroyEvent(db, (Event) e, DestroyCause.EXPLOSION);
+            Bukkit.getPluginManager().callEvent(ev);
+            if (!ev.isCancelled()) {
+                toRemove.add(db);
+            }
+        });
+        if (e.isCancelled()) {
+            return;
+        }
+        toRemove.forEach(manager::remove);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onCombust(BlockBurnEvent e) {
+        DataBlock db = manager.getDataBlock(e.getBlock());
+        fireDestroy(db, e, DestroyCause.COMBUST);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPistonExtend(BlockPistonExtendEvent e) {
+        handlePiston(e.getBlocks(), e);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPistonRetract(BlockPistonRetractEvent e) {
+        handlePiston(e.getBlocks(), e);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityChangeBlock(EntityChangeBlockEvent e) {
+        DataBlock db = manager.getDataBlock(e.getBlock());
+        fireDestroy(db, e, DestroyCause.ENTITY);
+    }
+
+    private void handlePiston(List<Block> blocks, BlockPistonEvent e) {
+        List<DataBlock> toMove = new ArrayList<>();
+        blocks.forEach(b -> {
+            DataBlock db = manager.getDataBlock(b);
+            if (db == null) {
+                return;
+            }
+            Block destination = db.getBlock().getRelative(e.getDirection());
+            DataBlockMoveEvent ev = new DataBlockMoveEvent(db, destination, e);
+            Bukkit.getPluginManager().callEvent(ev);
+            if (!ev.isCancelled()) {
+                toMove.add(db);
+            }
+        });
+        if (e.isCancelled()) {
+            return;
+        }
+        Map<Block, JSONMap> moved = new HashMap<>();
+        toMove.forEach(db -> {
+            Block destination = db.getBlock().getRelative(e.getDirection());
+            moved.put(destination, db.data);
+        });
+        toMove.forEach(manager::remove);
+        moved.forEach((block, data) -> {
+            manager.getDataBlock(block).data = data;
+        });
+    }
+
 }

@@ -4,6 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * Specifies the name that should be used to access and set a value in config
+ *
  * @author Redempt
  */
 @Target({ElementType.FIELD, ElementType.PARAMETER})
@@ -11,7 +12,7 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 public @interface ConfigName {
-	
-	String value();
-	
+
+    String value();
+
 }

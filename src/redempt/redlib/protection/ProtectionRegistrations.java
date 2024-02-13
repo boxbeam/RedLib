@@ -63,10 +63,10 @@ class ProtectionRegistrations {
         Set<String> farmlandNames = new HashSet<>();
         Collections.addAll(farmlandNames, "FARMLAND", "SOIL");
         ProtectionListener.protect(PlayerInteractEvent.class, ProtectionType.TRAMPLE, e -> e.getPlayer(), e -> {
-           if (e.getAction() == Action.PHYSICAL && e.getClickedBlock() != null && farmlandNames.contains(e.getClickedBlock().getType().toString())) {
-               return e.getClickedBlock();
-           }
-           return null;
+            if (e.getAction() == Action.PHYSICAL && e.getClickedBlock() != null && farmlandNames.contains(e.getClickedBlock().getType().toString())) {
+                return e.getClickedBlock();
+            }
+            return null;
         });
         ProtectionListener.protect(InventoryOpenEvent.class, ProtectionType.CONTAINER_ACCESS, e -> (Player) e.getPlayer(), e -> getBlock(e.getInventory()));
         ProtectionListener.protectMultiBlock(EntityExplodeEvent.class, ProtectionType.ENTITY_EXPLOSION, e -> null, (e, b) -> e.blockList().remove(b), e -> e.blockList());
@@ -148,11 +148,11 @@ class ProtectionRegistrations {
         Arrays.stream(Material.values()).filter(m -> m.toString().endsWith("MINECART") || m.toString().endsWith("BOAT") || m.toString().endsWith("_BUCKET")).forEach(bannedDispenserItems::add);
         ProtectionListener.protect(BlockDispenseEvent.class, ProtectionType.DISPENSER_PLACE, e -> null, e -> bannedDispenserItems.contains(e.getItem().getType()) ? e.getBlock() : null);
         ProtectionListener.protectDirectional(BlockDispenseEvent.class, ProtectionType.DISPENSER_PLACE_IN, e -> null, e -> e.getBlock(), e -> {
-           if (!bannedDispenserItems.contains(e.getItem().getType())) {
-               return null;
-           }
-           Block rel = e.getBlock().getRelative(getFace(e.getBlock()));
-           return Collections.singletonList(rel);
+            if (!bannedDispenserItems.contains(e.getItem().getType())) {
+                return null;
+            }
+            Block rel = e.getBlock().getRelative(getFace(e.getBlock()));
+            return Collections.singletonList(rel);
         });
         ProtectionListener.protectMultiBlock(BlockMultiPlaceEvent.class, ProtectionType.PLACE_BLOCK, e -> e.getPlayer(), (e, b) -> e.setCancelled(true), e -> e.getReplacedBlockStates().stream().map(BlockState::getBlock).collect(Collectors.toList()));
     }
