@@ -1,11 +1,13 @@
 package redempt.redlib.config.instantiation;
 
-import redempt.redlib.config.ConfigManager;
 import redempt.redlib.config.ConversionManager;
+import redempt.redlib.config.annotations.ConfigConstructor;
 import redempt.redlib.config.annotations.ConfigMappable;
-import redempt.redlib.config.data.DataHolder;
 
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A utility to instantiate objects from values loaded from config
@@ -25,11 +27,12 @@ public interface Instantiator {
 	 */
 	public static Instantiator getInstantiator(Class<?> clazz) {
 		if (isRecord(clazz)) {
-			return ConstructorInstantiator.create(clazz);
+			return ConstructorInstantiator.createDefault(clazz);
 		}
 		if (clazz.isAnnotationPresent(ConfigMappable.class)) {
-			return new EmptyInstantiator();
-		}
+			Optional<Constructor<?>> constructor = Arrays.stream(clazz.getConstructors()).filter(c -> c.isAnnotationPresent(ConfigConstructor.class)).findFirst();
+            return constructor.map(value -> ConstructorInstantiator.createDefault(clazz)).orElseGet(EmptyInstantiator::new);
+        }
 		throw new IllegalArgumentException("Cannot create instantiator for class which is not a record type and not annotated with ConfigMappable (" + clazz + ")");
 	}
 	

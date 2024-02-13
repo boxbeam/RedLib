@@ -1,23 +1,22 @@
 package redempt.redlib.config.instantiation;
 
-import redempt.redlib.config.ConfigManager;
+import redempt.redlib.config.ConfigField;
 import redempt.redlib.config.ConversionManager;
 import redempt.redlib.config.annotations.ConfigPath;
-import redempt.redlib.config.data.DataHolder;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.IntStream;
 
 /**
  * An instantiator used for record types which passes in all necessary fields
  * @author Redempt
  */
 public class ConstructorInstantiator implements Instantiator {
-	
+
 	/**
 	 * Attempts to create an Instantiator for a record type, or a class which has a constructor taking all its fields
 	 * in the same order they appear in the class
@@ -25,14 +24,13 @@ public class ConstructorInstantiator implements Instantiator {
 	 * @param <T> The type
 	 * @return An Instantiator
 	 */
-	public static <T> Instantiator create(Class<?> clazz) {
+	public static <T> Instantiator createDefault(Class<?> clazz) {
 		try {
 			Field[] fields = clazz.getDeclaredFields();
 			Constructor<?> constructor = clazz.getDeclaredConstructor(Arrays.stream(fields).map(Field::getType).toArray(Class<?>[]::new));
 			return new ConstructorInstantiator(constructor);
 		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-			return null;
+			throw new IllegalStateException("Class '" + clazz.getName() + "' does not have a constructor that takes all of its fields in order");
 		}
 	}
 	
@@ -40,6 +38,11 @@ public class ConstructorInstantiator implements Instantiator {
 	private Parameter[] params;
 	
 	private ConstructorInstantiator(Constructor<?> constructor) {
+		this.constructor = constructor;
+		params = constructor.getParameters();
+	}
+
+	private ConstructorInstantiator(Constructor<?> constructor, int[] indices) {
 		this.constructor = constructor;
 		params = constructor.getParameters();
 	}

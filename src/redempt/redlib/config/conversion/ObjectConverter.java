@@ -30,13 +30,13 @@ public class ObjectConverter {
 		if (type.getType().isInterface() || Modifier.isAbstract(type.getType().getModifiers())) {
 			throw new IllegalStateException("Cannot automatically convert abstract classe or interface " + type.getType());
 		}
-		Instantiator instantiator = Instantiator.getInstantiator(type.getType());
 		FieldSummary summary = FieldSummary.getFieldSummary(manager, type.getType(), false);
+		Instantiator instantiator = Instantiator.getInstantiator(type.getType());
 		return new TypeConverter<T>() {
 			@Override
 			public T loadFrom(DataHolder section, String path, T currentValue) {
 				DataHolder newSection = path == null ? section : section.getSubsection(path);
-				List<Object> objs = new ArrayList<>();
+				List<Object> objs = new ArrayList<>(summary.getFields().size());
 				for (ConfigField field : summary.getFields()) {
 					Object value = summary.getConverters().get(field).loadFrom(newSection, field.getName(), null);
 					objs.add(value);
