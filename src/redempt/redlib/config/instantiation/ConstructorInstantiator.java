@@ -41,11 +41,6 @@ public class ConstructorInstantiator implements Instantiator {
 		this.constructor = constructor;
 		params = constructor.getParameters();
 	}
-
-	private ConstructorInstantiator(Constructor<?> constructor, int[] indices) {
-		this.constructor = constructor;
-		params = constructor.getParameters();
-	}
 	
 	/**
 	 * Instantiates a new object using its constructor
