@@ -689,12 +689,40 @@ public class MultiRegion extends Overlappable {
     }
 
     /**
+     * Determines whether this MultiRegion is equal to another Object
+     * based on its {@link #getRegions()}
+     *
+     * @param object The Object to compare to
+     * @return Whether the Object is equal to this MultiRegion
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        if (!super.equals(object)) return false;
+
+        MultiRegion that = (MultiRegion) object;
+        return Objects.equals(regions, that.regions);
+    }
+
+    /**
+     * Generates a hash code for this MultiRegion based on its Regions
+     *
+     * @return The hash code of this MultiRegion
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), regions);
+    }
+
+    /**
      * Converts this MultiRegion to a String which can be converted back to a MultiRegion using {@link MultiRegion#fromString(String)}
      * Please use this to persist MultiRegions, as most of the operations for manipulating a MultiRegion are far more
      * expensive than the same operations would be for a Region. If its shape is static, and it needs to be reused, save it.
      *
      * @return The String representation of this MultiRegion
      */
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder(getWorld().getName()).append(" ");
         for (Region region : regions) {
