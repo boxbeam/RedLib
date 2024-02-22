@@ -14,9 +14,9 @@ import java.util.Objects;
  */
 public class ChunkPosition {
 
-    private int x;
-    private int z;
-    private String world;
+    private final int x;
+    private final int z;
+    private final String world;
 
     /**
      * Creates a ChunkPosition from a chunk
@@ -79,6 +79,20 @@ public class ChunkPosition {
      */
     public String getWorldName() {
         return world;
+    }
+
+    /**
+     * Gets the chunk
+     *
+     * @return The chunk at this position
+     * @throws IllegalStateException if the world is not loaded
+     */
+    public Chunk getChunk() {
+        World world = this.getWorld();
+        if (world == null) {
+            throw new IllegalStateException("World " + this.world + " is not loaded");
+        }
+        return world.getChunkAt(x, z);
     }
 
     @Override
