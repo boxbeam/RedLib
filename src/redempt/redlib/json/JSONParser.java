@@ -13,7 +13,7 @@ public class JSONParser {
 
     public static String toJSONString(Object o) {
         if (o instanceof String) {
-            return ((String) o).replace("\\", "\\\\").replace("\"", "\\\"");
+            return '"' + ((String) o).replace("\\", "\\\\").replace("\"", "\\\"") + '"';
         }
         if (o instanceof Long) {
             return o + "L";
@@ -84,7 +84,7 @@ public class JSONParser {
         return (int) number;
     }
 
-    private double decimal(long first) {
+    private Number decimal(long first) {
         assertChar('.');
         int start = pos;
         Number second = integer();
@@ -143,9 +143,9 @@ public class JSONParser {
             case '7':
             case '8':
             case '9':
-                long num = integer();
+                Number num = integer();
                 if (peek() == '.') {
-                    return decimal(num);
+                    return decimal(num.longValue());
                 }
                 return num;
             case '.':
