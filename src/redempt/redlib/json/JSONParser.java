@@ -12,7 +12,13 @@ public class JSONParser {
     }
 
     public static String toJSONString(Object o) {
-        return o instanceof String ? '"' + ((String) o).replace("\\", "\\\\").replace("\"", "\\\"") + '"' : o.toString();
+        if (o instanceof String) {
+            return ((String) o).replace("\\", "\\\\").replace("\"", "\\\"");
+        }
+        if (o instanceof Long) {
+            return o + "L";
+        }
+        return o.toString();
     }
 
     public static JSONMap parseMap(String json) {
@@ -60,7 +66,7 @@ public class JSONParser {
         }
     }
 
-    private long integer() {
+    private Number integer() {
         boolean negative = peek() == '-';
         if (negative) {
             pos++;
@@ -70,14 +76,19 @@ public class JSONParser {
             out *= 10;
             out += advance() - '0';
         }
-        return negative ? -out : out;
+        long number = negative ? -out : out;
+        if (peek() == 'L') {
+            advance();
+            return number;
+        }
+        return (int) number;
     }
 
     private double decimal(long first) {
         assertChar('.');
         int start = pos;
-        long second = integer();
-        double decimal = second * Math.pow(0.1, pos - start);
+        Number second = integer();
+        double decimal = second.doubleValue() * Math.pow(0.1, pos - start);
         return first < 0 ? first - decimal : decimal + first;
     }
 
