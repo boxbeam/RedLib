@@ -618,7 +618,7 @@ public class ItemUtils {
      * @return Whether the item is empty
      */
     public static boolean isEmpty(ItemStack item) {
-        return item == null || item.getType() == Material.AIR;
+        return item == null || item.getType() == Material.AIR || item.getAmount() <= 0;
     }
 
     /**
