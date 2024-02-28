@@ -1,5 +1,6 @@
 package redempt.redlib.blockdata;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
@@ -7,9 +8,9 @@ import java.util.Objects;
 
 class BlockPosition {
 
-    private int x;
-    private int y;
-    private int z;
+    private final int x;
+    private final int y;
+    private final int z;
 
     public BlockPosition(int x, int y, int z) {
         this.x = x;
@@ -35,6 +36,10 @@ class BlockPosition {
 
     public Block getBlock(World world) {
         return world.getBlockAt(x, y, z);
+    }
+
+    public Location getLocation(World world) {
+        return new Location(world, x, y, z);
     }
 
     @Override

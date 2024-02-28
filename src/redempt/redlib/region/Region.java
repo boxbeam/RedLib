@@ -335,4 +335,28 @@ public abstract class Region implements Cloneable {
         }
     }
 
+    /**
+     * Determines whether this Region equals another Object based on {@link #getStart()} and {@link #getEnd()}
+     *
+     * @param object The Object to compare to
+     * @return Whether the Object is equal to this Region
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+
+        Region region = (Region) object;
+        return Objects.equals(getStart(), region.getStart()) && Objects.equals(getEnd(), region.getEnd());
+    }
+
+    /**
+     * Generates a hash code based on {@link #getStart()} and {@link #getEnd()}
+     *
+     * @return The hash code
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(getStart(), getEnd());
+    }
 }

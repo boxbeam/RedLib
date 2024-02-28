@@ -9,6 +9,7 @@ import redempt.redlib.misc.LocationUtils;
 import redempt.redlib.multiblock.Rotator;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -399,6 +400,35 @@ public class SpheroidRegion extends Region {
             getSurface();
         }
         return surface.contains(block);
+    }
+
+    /**
+     * Determines whether this SpheroidRegion equals another object
+     * based on its {@link #getCenter()}, {@link #getXRadius()}, {@link #getYRadius()}, and {@link #getZRadius()}
+     *
+     * @param object The object to compare to
+     * @return Whether the object is a SpheroidRegion and has the same center and radii
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+
+        SpheroidRegion that = (SpheroidRegion) object;
+        return Double.compare(xRad, that.xRad) == 0
+                && Double.compare(yRad, that.yRad) == 0
+                && Double.compare(zRad, that.zRad) == 0
+                && Objects.equals(center, that.center);
+    }
+
+    /**
+     * Generates a hash code for this SpheroidRegion
+     *
+     * @return The hash code
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(xRad, yRad, zRad, center);
     }
 
     /**
