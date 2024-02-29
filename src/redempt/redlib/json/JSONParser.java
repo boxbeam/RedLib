@@ -89,7 +89,13 @@ public class JSONParser {
         int start = pos;
         Number second = integer();
         double decimal = second.doubleValue() * Math.pow(0.1, pos - start);
-        return first < 0 ? first - decimal : decimal + first;
+        double number = first < 0 ? first - decimal : decimal + first;
+        if (peek() == 'E') {
+            advance();
+            int exponent = integer().intValue();
+            number = Math.pow(10, exponent) * number;
+        }
+        return number;
     }
 
     private char escapeSequence() {
