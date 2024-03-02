@@ -181,7 +181,9 @@ public class LocationUtils {
         return new StringBuilder().append(loc.getWorld().getName()).append(separator)
                 .append(loc.getX()).append(separator)
                 .append(loc.getY()).append(separator)
-                .append(loc.getZ()).toString();
+                .append(loc.getZ()).append(separator)
+                .append(loc.getPitch()).append(separator)
+                .append(loc.getYaw()).toString();
     }
 
     /**
@@ -197,7 +199,13 @@ public class LocationUtils {
         double x = Double.parseDouble(split[1]);
         double y = Double.parseDouble(split[2]);
         double z = Double.parseDouble(split[3]);
-        Location location = new Location(world, x, y, z);
+        float pitch = 0;
+        float yaw = 0;
+        if(split.length == 6) {
+            pitch = Float.parseFloat(split[4]);
+            yaw = Float.parseFloat(split[5]);
+        }
+        Location location = new Location(world, x, y, z, yaw, pitch);
         if (world == null) {
             waitForWorld(split[0], location::setWorld);
         }
