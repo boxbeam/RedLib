@@ -1,5 +1,6 @@
 package redempt.redlib.itemutils;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -90,6 +91,17 @@ public class ItemBuilder extends ItemStack {
     }
 
     /**
+     * Set the lore of this ItemBuilder
+     *
+     * @param lore The lines of lore
+     * @return The ItemBuilder with lore added
+     */
+    public ItemBuilder setLore(Component... lore) {
+        ItemUtils.setLore(this, lore);
+        return this;
+    }
+
+    /**
      * Add a line of lore to this ItemBuilder
      *
      * @param line The line of lore
@@ -101,12 +113,34 @@ public class ItemBuilder extends ItemStack {
     }
 
     /**
+     * Add a line of lore to this ItemBuilder
+     *
+     * @param line The line of lore
+     * @return The ItemBuilder with lore added
+     */
+    public ItemBuilder addLore(Component line) {
+        ItemUtils.addLore(this, line);
+        return this;
+    }
+
+    /**
      * Add multiple lines of lore to this ItemBuilder
      *
      * @param lines The lines of lore
      * @return The ItemBuilder with lore added
      */
     public ItemBuilder addLore(Iterable<String> lines) {
+        ItemUtils.addLoreComponents(this, lines);
+        return this;
+    }
+
+    /**
+     * Add multiple lines of lore to this ItemBuilder
+     *
+     * @param lines The lines of lore
+     * @return The ItemBuilder with lore added
+     */
+    public ItemBuilder addLoreComponents(Iterable<Component> lines) {
         ItemUtils.addLore(this, lines);
         return this;
     }
@@ -118,6 +152,17 @@ public class ItemBuilder extends ItemStack {
      * @return The ItemBuilder with lore removed if present
      */
     public ItemBuilder removeLore(String line) {
+        ItemUtils.removeLoreLine(this, line);
+        return this;
+    }
+
+    /**
+     * Remove a String of lore if present from this ItemBuilder
+     *
+     * @param line The line of lore to remove
+     * @return The ItemBuilder with lore removed if present
+     */
+    public ItemBuilder removeLore(Component line) {
         ItemUtils.removeLoreLine(this, line);
         return this;
     }
@@ -141,6 +186,17 @@ public class ItemBuilder extends ItemStack {
      */
     public ItemBuilder setName(String name) {
         ItemUtils.rename(this, name);
+        return this;
+    }
+
+    /**
+     * Renames this ItemBuilder
+     *
+     * @param name The name to set
+     * @return The renamed ItemBuilder
+     */
+    public ItemBuilder setName(Component name) {
+        ItemUtils.setName(this, name);
         return this;
     }
 

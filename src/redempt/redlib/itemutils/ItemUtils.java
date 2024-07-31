@@ -1,5 +1,7 @@
 package redempt.redlib.itemutils;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
@@ -25,6 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * A utility class to easily modify items
@@ -86,6 +90,17 @@ public class ItemUtils {
     }
 
     /**
+     * Renames an ItemStack
+     *
+     * @param item The ItemStack to be renamed
+     * @param name The name to give the ItemStack
+     * @return The renamed ItemStack
+     */
+    public static ItemStack setName(ItemStack item, Component name) {
+        return rename(item, LegacyComponentSerializer.legacySection().serialize(name));
+    }
+
+    /**
      * Set a single line of lore for an ItemStack
      *
      * @param item The ItemStack to be given lore
@@ -102,6 +117,17 @@ public class ItemUtils {
     }
 
     /**
+     * Set a single line of lore for an ItemStack
+     *
+     * @param item The ItemStack to be given lore
+     * @param line The line of lore to be given
+     * @return The modified ItemStack
+     */
+    public static ItemStack setLore(ItemStack item, Component line) {
+        return setLore(item, LegacyComponentSerializer.legacySection().serialize(line));
+    }
+
+    /**
      * Set multiple lines of lore for an ItemStack
      *
      * @param item The ItemStack to be given lore
@@ -113,6 +139,22 @@ public class ItemUtils {
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
+    }
+
+    /**
+     * Set multiple lines of lore for an ItemStack
+     *
+     * @param item The ItemStack to be given lore
+     * @param lore The lines of lore to be given
+     * @return The modified ItemStack
+     */
+    public static ItemStack setLore(ItemStack item, Iterable<Component> lore) {
+        return setLore(
+                item,
+                StreamSupport.stream(lore.spliterator(), false)
+                        .map(line -> LegacyComponentSerializer.legacySection().serialize(line))
+                        .collect(Collectors.toList())
+        );
     }
 
     /**
@@ -133,13 +175,24 @@ public class ItemUtils {
     }
 
     /**
+     * Add a line of lore to an ItemStack
+     *
+     * @param item The ItemStack to be given lore
+     * @param line The line of lore to add
+     * @return The modified ItemStack
+     */
+    public static ItemStack addLore(ItemStack item, Component line) {
+        return addLore(item, LegacyComponentSerializer.legacySection().serialize(line));
+    }
+
+    /**
      * Adds multiple lines of lore to an ItemStack
      *
      * @param item  The ItemStack to be given lore
      * @param lines The lines or lore to add
      * @return The modified ItemStack
      */
-    public static ItemStack addLore(ItemStack item, Iterable<String> lines) {
+    public static ItemStack addLoreComponents(ItemStack item, Iterable<String> lines) {
         ItemMeta meta = item.getItemMeta();
         List<String> lore = meta.getLore();
         lore = lore == null ? new ArrayList<>() : lore;
@@ -147,6 +200,22 @@ public class ItemUtils {
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
+    }
+
+    /**
+     * Adds multiple lines of lore to an ItemStack
+     *
+     * @param item  The ItemStack to be given lore
+     * @param lines The lines or lore to add
+     * @return The modified ItemStack
+     */
+    public static ItemStack addLore(ItemStack item, Iterable<Component> lines) {
+        return addLoreComponents(
+                item,
+                StreamSupport.stream(lines.spliterator(), false)
+                        .map(line -> LegacyComponentSerializer.legacySection().serialize(line))
+                        .collect(Collectors.toList())
+        );
     }
 
     /**
@@ -163,6 +232,17 @@ public class ItemUtils {
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
+    }
+
+    /**
+     * Remove a specific line of lore from an ItemStack if present in an ItemStack
+     *
+     * @param item The ItemStack to remove lore from
+     * @param line The line of lore to remove
+     * @return The modified ItemStack
+     */
+    public static ItemStack removeLoreLine(ItemStack item, Component line) {
+        return removeLoreLine(item, LegacyComponentSerializer.legacySection().serialize(line));
     }
 
     /**
@@ -192,6 +272,17 @@ public class ItemUtils {
      * @return The modified ItemStack
      */
     public static ItemStack setLore(ItemStack item, String... lore) {
+        return setLore(item, Arrays.asList(lore));
+    }
+
+    /**
+     * Set multiple lines of lore for an ItemStack
+     *
+     * @param item The ItemStack to be given lore
+     * @param lore The lines of lore to be given
+     * @return The modified ItemStack
+     */
+    public static ItemStack setLore(ItemStack item, Component... lore) {
         return setLore(item, Arrays.asList(lore));
     }
 
