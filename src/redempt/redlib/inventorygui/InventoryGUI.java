@@ -46,6 +46,7 @@ public class InventoryGUI implements Listener {
 
     private final Inventory inventory;
     private Set<Integer> openSlots = new LinkedHashSet<>();
+    private List<Integer> excludedFillerSlots = new ArrayList<>();
     private Runnable onDestroy;
     private BiConsumer<InventoryClickEvent, List<Integer>> onClickOpenSlot = (e, i) -> {
     };
@@ -137,7 +138,9 @@ public class InventoryGUI implements Listener {
      */
     public void fill(int start, int end, ItemStack item) {
         for (int i = start; i < end; i++) {
-            inventory.setItem(i, item == null ? null : item.clone());
+            if (!excludedFillerSlots.contains(i)) {
+                inventory.setItem(i, item == null ? null : item.clone());
+            }
         }
     }
 
@@ -506,6 +509,10 @@ public class InventoryGUI implements Listener {
                 destroy((Player) e.getPlayer());
             }
         }
+    }
+
+    public void excludeFillerSlot(List<Integer> excludedSlots) {
+        excludedFillerSlots.addAll(excludedSlots);
     }
 
 }
