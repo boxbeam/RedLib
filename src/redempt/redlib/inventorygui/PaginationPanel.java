@@ -23,6 +23,7 @@ public class PaginationPanel {
     private int page = 1;
     private List<IntConsumer> buttons = new ArrayList<>();
     private Map<Object, IntConsumer> items = new HashMap<>();
+    private List<Integer> excludedFillerSlots = new ArrayList<>();
     private Set<Integer> slots = new TreeSet<>();
     private Runnable onUpdate = () -> {
     };
@@ -266,7 +267,11 @@ public class PaginationPanel {
      */
     public void updatePage() {
         slots.forEach(gui::clearSlot);
-        slots.forEach(i -> gui.getInventory().setItem(i, fillerItem));
+        for (int slot : slots) {
+            if (!excludedFillerSlots.contains(slot)) {
+                gui.getInventory().setItem(slot, fillerItem);
+            }
+        }
         if (getPageSize() == 0 || buttons.size() == 0) {
             onUpdate.run();
             return;
@@ -344,5 +349,9 @@ public class PaginationPanel {
      */
     public ItemStack getFillerItem() {
         return fillerItem;
+    }
+
+    public void excludeFillerSlot(List<Integer> slots) {
+        excludedFillerSlots.addAll(slots);
     }
 }
