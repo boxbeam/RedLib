@@ -21,8 +21,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Redempt
@@ -53,11 +51,31 @@ public class RedLib extends JavaPlugin {
         return redLib != null ? redLib : JavaPlugin.getProvidingPlugin(RedLib.class);
     }
 
+    /**
+     * @return The compatability version of Minecraft being used
+     */
     private static int getMidVersion() {
-        Pattern pattern = Pattern.compile("1\\.([0-9]+)");
-        Matcher matcher = pattern.matcher(Bukkit.getBukkitVersion());
-        matcher.find();
-        return Integer.parseInt(matcher.group(1));
+        String version = getServerVersion();
+
+        String[] parts = version.split("\\.");
+
+        if (parts.length < 2) {
+            throw new IllegalStateException("Could not parse Minecraft version: " + version);
+        }
+
+        try {
+            int major = Integer.parseInt(parts[0]);
+
+            // Legacy Minecraft versioning: 1.8, 1.12.2, 1.21.8, etc.
+            if (major == 1) {
+                return Integer.parseInt(parts[1]);
+            }
+
+            // New versioning: 26.1, 26.2, etc.
+            return major;
+        } catch (NumberFormatException e) {
+            throw new IllegalStateException("Could not parse Minecraft version: " + version, e);
+        }
     }
 
     @Override
